@@ -4,6 +4,9 @@ DIR=$(dirname "$0")
 cd "$DIR"
 
 . scripts/functions.sh
+. setup/brew.sh
+. setup/composer.sh
+. setup/npm.sh
 
 info "Prompting for sudo password..."
 if sudo -v; then
@@ -37,14 +40,30 @@ else
 	brew update && brew upgrade
 fi
 
-# Homebrew packages
-. /setup/brew.sh
+info ${taps[@]}
+brew install ${taps[@]}
+
+brew update
+
+info 'Intalling brew fonts'
+info ${fonts[@]}
+brew install ${fonts[@]}
+
+info 'Intalling brew formulas'
+brew install ${formulas[@]}
+
+info 'Intalling brew applications'
+brew install ${casks[@]}
 
 # Composer Global packages
-. /setup/composer.sh
+info "Installing composer global packages."
+info ${composer[@]}
+composer global require ${composer[@]}
 
 # NPM Global packages
-. /setup/npm.sh
+info "Installing npm global packages."
+info ${npm[@]}
+npm install -g ${npm[@]}
 
 # Gem gobal packages
 gem install colorls

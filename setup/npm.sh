@@ -1,6 +1,5 @@
 #! /usr/bin/env sh
 
-info "Installing npm global packages."
 npm=(
   @vue/cli
   caniuse-cmd
@@ -26,6 +25,3 @@ npm=(
   stylelint
   stylelint-config-standard
 )
-
-info ${npm[@]}
-npm install -g ${npm[@]}

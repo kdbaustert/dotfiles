@@ -1,6 +1,5 @@
 #! /usr/bin/env sh
 
-info "Installing composer global packages."
 composer=(
   laravel/installer
   laravel/valet
@@ -12,6 +11,3 @@ composer=(
   phpcompatibility/phpcompatibility-wp
   friendsofphp/php-cs-fixer
 )
-
-info ${composer[@]}
-composer global require ${composer[@]}

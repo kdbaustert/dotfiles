@@ -7,11 +7,6 @@ taps=(
   koekeishiya/formulae
 )
 
-info ${taps[@]}
-brew install ${taps[@]}
-
-brew update
-
 # Homebrew Packages
 formulas=(
   svn
@@ -65,9 +60,6 @@ formulas=(
   nvm
 )
 
-info 'Intalling brew formulas'
-brew install ${formulas[@]}
-
 # Homebrew Fonts
 fonts=(
   font-fira-code
@@ -84,10 +76,6 @@ fonts=(
   font-ubuntu-nerd-font
   font-jetbrains-mono-nerd-font
 )
-
-info 'Intalling brew fonts'
-info ${fonts[@]}
-brew install ${fonts[@]}
 
 # Homebrew casks
 apps=(
@@ -131,6 +119,3 @@ apps=(
   vim
   postman
 )
-
-info 'Intalling brew applications'
-brew install ${casks[@]}
