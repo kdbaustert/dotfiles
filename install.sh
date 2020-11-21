@@ -166,24 +166,22 @@ info 'Intalling brew casks'
 info ${casks[@]}
 brew install ${casks[@]}
 
-# # NPM Global packages
-# . composer.sh
+# Composer Global packages
+. /setup/composer.sh
 
-# # Composer Global packages
-# . composer.sh
+# NPM Global packages
+. /setup/npm.sh
 
-# # Gem gobal packages
-# gem install colorls
-# gem install istats
+# Gem gobal packages
+gem install colorls
+gem install istats
 
-# info "Installing Laravel Valet"
-# valet composer
+info "Installing Laravel Valet"
+valet composer
 
-# mkdir $HOME/Sites
-# mkdir $HOME/Dev
+mkdir $HOME/Sites
+mkdir $HOME/Dev
 
-# cd $HOME/Sites
+cd $HOME/Sites
 
-# valet park
-
-# sudo sed -i -e 's/# sudo: auth account password session/# sudo: auth account password session\'$'\nauth       sufficient     pam_tid.so/' /etc/pam.d/sudo
+valet park
