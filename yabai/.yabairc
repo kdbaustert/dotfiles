@@ -44,18 +44,18 @@ yabai -m config right_padding 12
 yabai -m config window_gap 10
 
 # Space labels
-yabai -m space 1 --label "Dev"
-yabai -m space 2 --label "Browsers"
-yabai -m space 3 --label "Tools"
-yabai -m space 4 --label "Social"
-yabai -m space 5 --label "Music"
-yabai -m space 6 --label "Float"
+yabai -m space 1 --label Dev
+yabai -m space 2 --label Browsers
+yabai -m space 3 --label Tools
+yabai -m space 4 --label Social
+yabai -m space 5 --label Music
+yabai -m space 6 --label Float
 
 # Primary
 yabai -m rule --add app='^Terminus$' space=1
 yabai -m rule --add app='^Hyper$' space=1
 yabai -m rule --add app='iTerm' space=1
-yabai -m rule --add app='Code' space=1
+yabai -m rule --add app='Code' opacity=0.97 space=1
 yabai -m rule --add app='Xcode' space=1
 yabai -m rule --add app='Termius' space=1
 yabai -m rule --add app='SnippetsLab' space=1
@@ -81,12 +81,12 @@ yabai -m rule --add app='Sketch' space=3
 yabai -m rule --add app='Zeplin' space=3
 
 # Social
-yabai -m rule --add app='Slack' space=4
-yabai -m rule --add app='Messages' space=4
+yabai -m rule --add app='Slack' opacity=0.90 space=4
+yabai -m rule --add app='Messages'opacity=0.90 space=4
 yabai -m rule --add app='Spark' space=4
 
 # Music
-yabai -m rule --add app='Spotify' space=5
+yabai -m rule --add app='^Spotify$' opacity=0.85 space=5
 yabai -m rule --add app='Music' space=5
 
 # Float
@@ -95,7 +95,7 @@ yabai -m rule --add app='Parallels Desktop' space=6
 yabai -m rule --add app='Motrix' space=6
 yabai -m rule --add app='CleanMyMac X' space=6
 yabai -m rule --add app='IconJar' space=6
-yabai -m rule --add app='Get Backup Pro' space=6
+yabai -m rule --add app='Carbon Copy Cloner' space=6
 yabai -m rule --add app='^Screens 4$' space=6
 yabai -m rule --add app='^Antivirus for Mac' space=6
 
