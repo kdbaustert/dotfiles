@@ -10,7 +10,7 @@ export ZSH_EXTEND_HISTORY_FILE=$DOTFILES/.zsh_extended_history
 export PATH=$HOME/tools/nvim:$PATH
 export PATH="$HOME/.npm-packages/bin:$PATH"
 export NVM_DIR="$HOME/.nvm"
-export DOTFILES="$HOME/Dropbox (Personal)/dotfiles"
+export DOTFILES=$HOME/Dropbox\ \(Personal\)/dotfiles
 
 # Darwin
 if [[ $OSTYPE == "darwin"* ]]; then
