@@ -1,8 +1,6 @@
-# Kenny's dotfiles v2 
+# Kenny's dotfiles 
 
-A much more advanced dotfile setup & installer
-
-## Under Development (Don't try running this yet)
+## Under Development
 
 My personal dotfiles. These are mine take anything you want, but at your own risk.
 
