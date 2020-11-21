@@ -21,27 +21,13 @@ if [[ $OSTYPE == "darwin"* ]]; then
 	export PATH="/usr/local/sbin:$PATH"
 fi
 
-# Linux
-if [[ $OSTYPE == "linux"* ]]; then
-	export DOTFILES=$HOME/Dropbox/Dotfiles
-	export PATH=$PATH:$(ruby -e 'puts Gem.bindir')
-	export GEM_HOME="$HOME/.gem"
-	export ZPLUG_HOME=/home/linuxbrew/.linuxbrew/opt/zplug
-	export PATH=$HOME/bin:/usr/local/bin:$HOME/.config/composer/vendor/bin:$PATH
-fi
+# FUNCTIONS
+[[ -f $DOTFILES/zsh/functions.zsh ]] && source $DOTFILES/zsh/functions.zsh
 
-if [[ -f "$DOTFILES/zsh/functions.zsh" ]]; then
-	source $DOTFILES/zsh/functions.zsh
-fi
+# ALIASES
+[[ -f $DOTFILES/zsh/aliases.zsh ]] && source $DOTFILES/zsh/aliases.zsh
 
-if [[ -f "$DOTFILES/zsh/aliases.zsh" ]]; then
-	source $DOTFILES/zsh/aliases.zsh
-fi
-
-###################################################################################
-# zinit (plugin manager)
-###################################################################################
-### Added by Zinit's installer
+# ZINIT (PLUGIN MANAGER)
 if [[ ! -f $HOME/.zinit/bin/zinit.zsh ]]; then
 	print -P "%F{33}▓▒░ %F{220}Installing DHARMA Initiative Plugin Manager (zdharma/zinit)…%f"
 	command mkdir -p "$HOME/.zinit" && command chmod g-rwX "$HOME/.zinit"
@@ -52,7 +38,6 @@ fi
 
 source "$HOME/.zinit/bin/zinit.zsh"
 autoload -Uz _zinit
-# (( ${+_comps} )) && _comps[zinit]=_zinit
 
 zinit load zsh-users/zsh-history-substring-search
 zinit load zsh-users/zsh-completions
@@ -132,13 +117,10 @@ bindkey '^[[B' history-substring-search-down
 #THEFUCK
 eval "$(thefuck --alias)"
 
-if [[ -f "$DOTFILES/zsh/completion.zsh" ]]; then
-	source $DOTFILES/zsh/completion.zsh
-fi
+# COMPLETION
+[[ -f $DOTFILES/zsh/completion.zsh ]] && source $DOTFILES/zsh/completion.zsh
 
-if [[ -f "$DOTFILES/zsh/p10k.zsh" ]]; then
-	source $DOTFILES/zsh/p10k.zsh
-fi
+[[ -f $DOTFILES/zsh/p10k.zsh ]] && source $DOTFILES/zsh/p10k.zsh
 
 # FZF SETTINGS
 export FZF_DEFAULT_COMMAND='rg --files --no-ignore --hidden --follow -g "!{.git,node_modules}/*" 2> /dev/null'
