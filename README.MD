@@ -1,16 +1,17 @@
-# Dotfiles for macOS 
+# Kenny's dotfiles v2 
 
-My personal dotfiles. These are mine take anything you want, but at your own risk
+A much more advanced dotfile setup & installer
 
-## Under Development
+## Under Development (Don't try running this yet)
+
+My personal dotfiles. These are mine take anything you want, but at your own risk.
 
 ## Install
 
-#### Clone or download repo install in your home directory 
+#### Clone
 
 ```
-cd ~/
-git clone https://github.com/kdbaustert/dotfiles.git
+git clone git://github.com/kdbaustert/dotfiles.git ~/dotfiles
 ```
 
 ### This setup requires Disabling System Integrity Protection
@@ -18,8 +19,8 @@ git clone https://github.com/kdbaustert/dotfiles.git
 #### How do I disable System Integrity Protection?
 
 1. Turn off your device
-2. Hold down ```command``` ```⌘R``` while booting your device.
-3. In the menu bar, choose ```Utilities```, then ```Terminal```
+2. Hold down `command` `⌘R` while booting your device.
+3. In the menu bar, choose `Utilities`, then `Terminal`
 
 #### macOS 11.0.1
 
