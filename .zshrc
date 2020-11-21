@@ -10,7 +10,7 @@ export ZSH_EXTEND_HISTORY_FILE=$DOTFILES/.zsh_extended_history
 export PATH=$HOME/tools/nvim:$PATH
 export PATH="$HOME/.npm-packages/bin:$PATH"
 export NVM_DIR="$HOME/.nvm"
-export DOTFILES="$HOME/Dropbox (Personal)/Dotfilesv2"
+export DOTFILES="$HOME/Dropbox (Personal)/dotfiles"
 
 # Darwin
 if [[ $OSTYPE == "darwin"* ]]; then
@@ -43,51 +43,51 @@ fi
 ###################################################################################
 ### Added by Zinit's installer
 if [[ ! -f $HOME/.zinit/bin/zinit.zsh ]]; then
-    print -P "%F{33}▓▒░ %F{220}Installing DHARMA Initiative Plugin Manager (zdharma/zinit)…%f"
-    command mkdir -p "$HOME/.zinit" && command chmod g-rwX "$HOME/.zinit"
-    command git clone https://github.com/zdharma/zinit "$HOME/.zinit/bin" && \
-        print -P "%F{33}▓▒░ %F{34}Installation successful.%f" || \
-        print -P "%F{160}▓▒░ The clone has failed.%f"
+	print -P "%F{33}▓▒░ %F{220}Installing DHARMA Initiative Plugin Manager (zdharma/zinit)…%f"
+	command mkdir -p "$HOME/.zinit" && command chmod g-rwX "$HOME/.zinit"
+	command git clone https://github.com/zdharma/zinit "$HOME/.zinit/bin" &&
+		print -P "%F{33}▓▒░ %F{34}Installation successful.%f" ||
+		print -P "%F{160}▓▒░ The clone has failed.%f"
 fi
 
 source "$HOME/.zinit/bin/zinit.zsh"
 autoload -Uz _zinit
 # (( ${+_comps} )) && _comps[zinit]=_zinit
 
-
 zinit load zsh-users/zsh-history-substring-search
 zinit load zsh-users/zsh-completions
-zinit ice depth=1; zinit light romkatv/powerlevel10k
+zinit ice depth=1
+zinit light romkatv/powerlevel10k
 
 zinit snippet PZT::modules/history
 zinit snippet PZT::modules/directory
 zinit snippet PZT::modules/ssh
 
 zinit light-mode for \
-     gretzky/auto-color-ls \
-     zpm-zsh/colors \
-     djui/alias-tips \
-     b4b4r07/enhancd \
-     zsh-users/zsh-autosuggestions \
-     zdharma/fast-syntax-highlighting \
-     Aloxaf/fzf-tab \
+	gretzky/auto-color-ls \
+	zpm-zsh/colors \
+	djui/alias-tips \
+	b4b4r07/enhancd \
+	zsh-users/zsh-autosuggestions \
+	zdharma/fast-syntax-highlighting \
+	Aloxaf/fzf-tab
 
 # FZF-TAB
-# zinit ice wait"1" lucid
-# zinit light Aloxaf/fzf-tab
+zinit ice wait"1" lucid
+zinit light Aloxaf/fzf-tab
 
-# zinit load lincheney/fzf-tab-completion
-# zinit load wookayin/fzf-fasd
+zinit load lincheney/fzf-tab-completion
+zinit load wookayin/fzf-fasd
 
 zinit light-mode for \
-    zdharma/fast-syntax-highlighting \
-    zsh-users/zsh-autosuggestions
+	zdharma/fast-syntax-highlighting \
+	zsh-users/zsh-autosuggestions
 
 # ls colors
-# zinit ice atclone"dircolors -b LS_COLORS > clrs.zsh" \
-#     atpull'%atclone' pick"clrs.zsh" nocompile'!' \
-#     atload'zstyle ":completion:*" list-colors “${(s.:.)LS_COLORS}”'
-# zinit light trapd00r/LS_COLORS
+zinit ice atclone"dircolors -b LS_COLORS > clrs.zsh" \
+	atpull'%atclone' pick"clrs.zsh" nocompile'!' \
+	atload'zstyle ":completion:*" list-colors “${(s.:.)LS_COLORS}”'
+zinit light trapd00r/LS_COLORS
 
 zstyle ':prezto:module:ssh:load' identities 'id_rsa'
 
@@ -115,10 +115,11 @@ setopt HIST_VERIFY
 setopt INC_APPEND_HISTORY
 setopt SHARE_HISTORY
 setopt HIST_SAVE_NO_DUPS
-setopt COMPLETEALIASES        # complete alisases
+setopt COMPLETEALIASES # complete alisases
 setopt AUTOMENU
+
 # SSH
-zstyle :omz:plugins:ssh-agent lifetime 4h
+#zstyle :omz:plugins:ssh-agent lifetime 4h
 
 # syntax color definition
 ZSH_HIGHLIGHT_HIGHLIGHTERS=(main brackets)
@@ -140,17 +141,16 @@ if [[ -f "$DOTFILES/zsh/p10k.zsh" ]]; then
 fi
 
 # FZF SETTINGS
-# export FZF_DEFAULT_COMMAND='rg --files --no-ignore --hidden --follow -g "!{.git,node_modules}/*" 2> /dev/null'
-# export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
-# export FZF_CTRL_T_OPTS='--preview="cat {}" --preview-window=right:60%:wrap'
-# export FZF_ALT_C_OPTS='--preview="ls {}" --preview-window=right:60%:wrap'
-# export FZF_DEFAULT_OPTS=$FZF_DEFAULT_OPTS'
-# --height=50%
-# --color=fg:#e5e9f0,bg:'rgb(0,0,0,0)',hl:#60fdff
-# --color=fg+:#e5e9f0,bg+:'rgb(0,0,0,0)',hl+:#60fdff
-# --color=info:#6871ff,prompt:#6871ff,pointer:#00b0ff
-# --color=marker:#6871ff,spinner:#00b0ff,header:#6871ff'
-
+export FZF_DEFAULT_COMMAND='rg --files --no-ignore --hidden --follow -g "!{.git,node_modules}/*" 2> /dev/null'
+export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
+export FZF_CTRL_T_OPTS='--preview="cat {}" --preview-window=right:60%:wrap'
+export FZF_ALT_C_OPTS='--preview="ls {}" --preview-window=right:60%:wrap'
+export FZF_DEFAULT_OPTS=$FZF_DEFAULT_OPTS'
+--height=50%
+--color=fg:#e5e9f0,bg:'rgb(0,0,0,0)',hl:#60fdff
+--color=fg+:#e5e9f0,bg+:'rgb(0,0,0,0)',hl+:#60fdff
+--color=info:#6871ff,prompt:#6871ff,pointer:#00b0ff
+--color=marker:#6871ff,spinner:#00b0ff,header:#6871ff'
 
 POWERLEVEL9K_BACKGROUND='transparent'
 POWERLEVEL9K_SHORTEN_DIR_LENGTH=1
@@ -182,8 +182,8 @@ POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(
 	# =========================[ Line #1 ]=========================
 	os_icon # os identifier
 	context
-	dir     # current directory
-	vcs     # git status
+	dir # current directory
+	vcs # git status
 	# =========================[ Line #2 ]=========================
 	newline     # \n
 	prompt_char # prompt symbol
