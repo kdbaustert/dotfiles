@@ -45,15 +45,18 @@ brew install ${taps[@]}
 
 brew update
 
+# Homebrew Fonts
 info 'Intalling brew fonts'
 info ${fonts[@]}
 brew install ${fonts[@]}
 
+# Homebrew Formulas
 info 'Intalling brew formulas'
 brew install ${formulas[@]}
 
+# Homebrew Applications
 info 'Intalling brew applications'
-brew install ${casks[@]}
+brew install ${apps[@]}
 
 # Composer Global packages
 info "Installing composer global packages."
