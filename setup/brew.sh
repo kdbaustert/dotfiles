@@ -83,7 +83,7 @@ apps=(
   dropbox
   firefox-developer-edition
   brave-browser-nightly
-  google-chrome-canary
+  google-chrome-dev
   microsoft-edge-dev
   opera-developer
   iterm2-nightly
@@ -92,7 +92,6 @@ apps=(
   slack
   spotify
   karabiner-elements
-  onyx
   screens
   appcleaner
   1password
@@ -116,6 +115,5 @@ apps=(
   datagrip
   github
   parallels
-  vim
   postman
 )
