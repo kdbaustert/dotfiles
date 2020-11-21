@@ -6,6 +6,8 @@ My personal dotfiles. These are mine take anything you want, but at your own ris
 
 ## Install
 
+You should first review the code, and remove things you don’t want or need. Don’t blindly use my settings unless you know what that entails. Use at your own risk!
+
 #### Clone
 
 ```
@@ -36,8 +38,7 @@ Requires Filesystem Protections and Debugging Restrictions to be disabled (print
 csrutil enable --without debug --without fs
 ```
 
-
-![Screenshot 1](/screenshots/ScreenShot1.png?raw=true "Screenshot")
+![Screenshot 1](/screenshots/ScreenShot1.png?raw=true 'Screenshot')
 
 ## Credits
 
