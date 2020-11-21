@@ -1,11 +1,11 @@
 #!/usr/bin
 
-# alias vial="code $HOME/.config/zsh/aliases"
-# alias via="code $HOME/.config/alacritty/alacritty.yml"
-# alias vih="code $HOME/.hammerspoon/init.lua"
-# alias viy="code $HOME/.yabairc"
-# alias viz="code $HOME/.zshrc"
-# alias viv="code $HOME/.config/nvim/init.vim"
+alias caliases="code $DOTFILES/aliases.zsh"
+alias chammerspoon="code $HOME/.hammerspoon/init.lua"
+alias cyabai="code $HOME/.yabairc"
+alias czshrc="code $HOME/.zshrc"
+alias czshrc="code $HOME/.spacebarrc"
+alias cnvims="code $HOME/.config/nvim/init.vim"
 
 # Common aliases
 alias rdir='rm -rf'
