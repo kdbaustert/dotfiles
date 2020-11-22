@@ -4,6 +4,7 @@
 alias copyssh="pbcopy < $HOME/.ssh/id_rsa.pub"
 alias reloadshell="source $HOME/.zshrc"
 alias reloaddns="dscacheutil -flushcache && sudo killall -HUP mDNSResponder"
+alias shrug="echo '¯\_(ツ)_/¯' | pbcopy"
 alias c='clear'
 alias o='open .'
 alias x='exit'
@@ -30,6 +31,7 @@ alias ...='cd ../..'
 alias ....='cd ../../..'
 alias .....='cd ../../../..'
 alias wget='wget -c'
+alias mkcd=mcd
 
 # Disable correction.
 alias ack='nocorrect ack'
