@@ -39,6 +39,9 @@ fi
 
 source "$HOME/.zinit/bin/zinit.zsh"
 
+autoload -Uz _zinit
+(( ${+_comps} )) && _comps[zinit]=_zinit
+
 zinit load zsh-users/zsh-history-substring-search
 zinit load zsh-users/zsh-completions
 zinit ice depth=1
@@ -76,9 +79,9 @@ zinit light trapd00r/LS_COLORS
 
 zstyle ':prezto:module:ssh:load' identities 'id_rsa'
 
-# Enable completions
-autoload -Uz _zinit
-(( ${+_comps} )) && _comps[zinit]=_zinit
+# Load completions
+autoload -U compinit && compinit
+
 
 # options
 setopt AUTO_CD       # Auto changes to a directory without typing cd.
@@ -186,7 +189,5 @@ POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS=(
 )
 
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
-
-source $(brew --prefix nvm)/nvm.sh
 
 # neofetchs
