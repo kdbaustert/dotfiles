@@ -47,20 +47,26 @@ binaries=(
   khanhas/tap/spicetify-cli
   cmacrae/formulae/spacebar
   skhd
-  yarn
-  node
   go
   rbenv
-  composer
-  php-cs-fixer
-  mariadb
-  redis
-  wp-cli
-  firebase-cli
   neovim
+
+  # Development
+  yarn
+  node
+  nvm
+  php@7.2
+  php@7.3
+  php@7.4
   nginx
   php
-  nvm
+  php-cs-fixer
+  mariadb
+  memcached
+  redis
+  composer
+  wp-cli
+  firebase-cli
 )
 
 # Homebrew Fonts
