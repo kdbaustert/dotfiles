@@ -50,9 +50,9 @@ info 'Intalling brew fonts'
 info ${fonts[@]}
 brew install ${fonts[@]}
 
-# Homebrew Formulas
-info 'Intalling brew formulas'
-brew install ${formulas[@]}
+# Homebrew Binaries
+info 'Intalling brew binaries'
+brew install ${binaries[@]}
 
 # Homebrew Applications
 info 'Intalling brew applications'
