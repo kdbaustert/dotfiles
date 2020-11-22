@@ -15,6 +15,12 @@ done 2>/dev/null &
 
 ## General UI/UXs
 
+# Set computer name (as done via System Preferences → Sharing)
+sudo scutil --set ComputerName "Kenny's MacBook Pro"
+sudo scutil --set HostName "Kenny's MacBook Pro"
+sudo scutil --set LocalHostName "Kenny's MacBook Pro"
+sudo defaults write /Library/Preferences/SystemConfiguration/com.apple.smb.server NetBIOSName -string "Kenny's MacBook Pro"
+
 # Disable the sound effects on boot
 sudo nvram SystemAudioVolume=" "
 
@@ -74,12 +80,6 @@ defaults write com.apple.dock show-recents -bool false
 # Remove All Apps From The Dock In OS X
 defaults write com.apple.dock persistent-apps -array
 
-# Disable Dock Recent Apps
-defaults write com.apple.dock show-recents -bool false &&
-
-  # Removed genie animation
-  defaults write com.apple.dock mineffect suck
-
 # Speed up Mission Control animations
 defaults write com.apple.dock expose-animation-duration -float 0.1
 
@@ -118,8 +118,8 @@ defaults write com.apple.screensaver askForPassword -int 1
 defaults write com.apple.screensaver askForPasswordDelay -int 0
 
 # Finder Location to Home Folder
-defaults write com.apple.finder NewWindowTarget -string "PfLo"
-defaults write com.apple.finder NewWindowTargetPath -string "file://${HOME}"
+defaults write com.apple.finder NewWindowTarget -string "PfLo" &&
+  defaults write com.apple.finder NewWindowTargetPath -string "file://${HOME}"
 
 # Finder: disable window animations and Get Info animations
 defaults write com.apple.finder DisableAllAnimations -bool true
