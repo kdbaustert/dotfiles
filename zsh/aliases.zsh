@@ -1,5 +1,20 @@
 #!/usr/bin
 
+# Shourtcuts
+alias copyssh="pbcopy < $HOME/.ssh/id_rsa.pub"
+alias reloadshell="source $HOME/.zshrc"
+alias reloaddns="dscacheutil -flushcache && sudo killall -HUP mDNSResponder"
+alias c='clear'
+alias o='open .'
+alias x='exit'
+
+# Directories
+alias dt="cd $HOME/Desktop"
+alias dev="cd $HOME/Dev"
+alias sites="cd $HOME/Sites"
+alias dl="cd $HOME/Downloads"
+alias dotfiles="cd $HOME/Dropbox (Personal)/dotfiles"
+
 alias caliases="code $DOTFILES/aliases.zsh"
 alias chammerspoon="code $HOME/.hammerspoon/init.lua"
 alias cyabai="code $HOME/.yabairc"
@@ -14,11 +29,7 @@ alias ..='cd ..'
 alias ...='cd ../..'
 alias ....='cd ../../..'
 alias .....='cd ../../../..'
-alias mkcd=mcd
 alias wget='wget -c'
-alias c='clear'
-alias o='open .'
-alias x='exit'
 
 # Disable correction.
 alias ack='nocorrect ack'
@@ -54,10 +65,6 @@ alias ld='colorls --group-directories-first --almost-all --dirs --tree=1'
 alias lf='colorls --group-directories-first --almost-all --files --tree=1'
 alias lt1='colorls --group-directories-first --almost-all --tree=1'
 
-# alias l='ls -1A'         # Lists in one column, hidden files.
-# alias ll='ls -lh'        # Lists human readable sizes.
-# alias la='ll -A'         # Lists human readable sizes, hidden files.
-
 # Mac Helpers
 alias showfiles="defaults write com.apple.finder AppleShowAllFiles -bool true && killall Finder"
 alias hidefiles='defaults write com.apple.finder AppleShowAllFiles -bool false && killall Finder'
@@ -70,8 +77,6 @@ alias shutdown='sudo /sbin/shutdown'
 alias lock='/System/Library/CoreServices/"Menu Extras"/User.menu/Contents/Resources/CGSession -suspend'
 alias poweroff='sudo /sbin/poweroff'
 
-alias flushdns="dscacheutil -flushcache"
-
 # Google Chrome
 alias chrome='/Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome'
 
@@ -82,13 +87,6 @@ alias cnodeold='find . -name "node_modules" -type d -mtime +120 | xargs rm -rf'
 alias cnodeall='find . -name "node_modules" -type d | xargs rm -rf'
 
 alias getsalts="curl https://api.wordpress.org/secret-key/1.1/salt/"
-
-# Aliases for directories {{{
-alias dt="cd $HOME/Desktop"
-alias dev="cd $HOME/Dev"
-alias sites="cd $HOME/Sites"
-alias dl="cd $HOME/Downloads"
-alias dotfiles="cd $HOME/Dropbox (Personal)/dotfiles"
 
 # Brew Services
 alias brewsr mariadb='brew services start mariadb'
@@ -149,11 +147,6 @@ alias lscleanup="/System/Library/Frameworks/CoreServices.framework/Frameworks/La
 
 # Other
 alias fixdb='mkdir /usr/local/etc/my.cnf.d/'
-alias zshconfig='code ~/.zshr'
-alias zshal='code ~/zsh/aliases.zsh'
-alias zshfu='code ~/zsh/functions.zsh'
-alias hyperconfig='code ~/hyper/hyper.js'
-alias vscustom='code ~/.vscode-custom.css'
 alias mysqlroot='mysql -u root -p'
 alias removeLoginMsg='touch .hushlogin'
 
@@ -241,22 +234,23 @@ alias yac='yarn install & composer install'
 alias yui='yarn upgrade-interactive --latest'
 
 # Git
-alias gil='gh issue list'
-alias grc='gh repo create'
-alias gclone='gh repo clone'
-
-alias gac='git add . && git commit -a -m '
-alias gi='git init'
-alias ga='git add .'
-alias gic='git add . && git commit -a -m "Initial commit"'
-alias gc='git commit -m'
-alias gp='git push'
-alias gs='git status'
-alias gpl='git pull'
-alias gs='git status'
-alias grm='git rebase -i origin/master'
-alias grc="git rebase --continue"
-alias gra="git rebase --abort"
+# Git
+alias gst="git status"
+alias gb="git branch"
+alias gc="git checkout"
+alias gl="git log --oneline --decorate --color"
+alias amend="git add . && git commit --amend --no-edit"
+alias commit="git add . && git commit -m"
+alias diff="git diff"
+alias force="git push --force"
+alias nuke="git clean -df && git reset --hard"
+alias pop="git stash pop"
+alias pull="git pull"
+alias push="git push"
+alias resolve="git add . && git commit --no-edit"
+alias stash="git stash -u"
+alias unstage="git restore --staged ."
+alias wip="commit wip"
 
 # Git Large Storage
 alias gitli='git lfs install'
