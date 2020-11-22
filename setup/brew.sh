@@ -7,14 +7,16 @@ taps=(
   koekeishiya/formulae
 )
 
-# Homebrew Packages
-formulas=(
+binaries=(
+  bash      # Latest Bash version
+  coreutils # Those that come with macOS are outdated
   svn
   zsh
   perl
   grep
   openssh
   git
+  mackup
   tmux
   z
   openssl
@@ -26,6 +28,7 @@ formulas=(
   httpie
   jq
   m-cli
+  zlib # Needed for Memcached
   mas
   speedtest-cli
   ssh-copy-id
