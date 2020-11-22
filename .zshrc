@@ -76,7 +76,8 @@ zinit light trapd00r/LS_COLORS
 zstyle ':prezto:module:ssh:load' identities 'id_rsa'
 
 # Enable completions
-autoload -Uz compinit && compinit
+autoload -Uz _zinit
+(( ${+_comps} )) && _comps[zinit]=_zinit
 
 # options
 setopt AUTO_CD       # Auto changes to a directory without typing cd.
@@ -190,4 +191,4 @@ POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS=(
 
 source $(brew --prefix nvm)/nvm.sh
 
-neofetch
+# neofetchs
