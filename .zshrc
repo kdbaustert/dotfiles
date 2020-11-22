@@ -1,5 +1,7 @@
 #! /bin/zsh
 
+export DOTFILES=$HOME/dotfiles
+
 # Locale.
 export LC_ALL=en_US.UTF-8
 export LANG=en_US.UTF-8
@@ -10,7 +12,6 @@ export ZSH_EXTEND_HISTORY_FILE=$DOTFILES/.zsh_extended_history
 export PATH=$HOME/tools/nvim:$PATH
 export PATH="$HOME/.npm-packages/bin:$PATH"
 export NVM_DIR="$HOME/.nvm"
-export DOTFILES=$HOME/Dropbox\ \(Personal\)/dotfiles
 
 # Darwin
 if [[ $OSTYPE == "darwin"* ]]; then
@@ -105,9 +106,6 @@ setopt SHARE_HISTORY
 setopt HIST_SAVE_NO_DUPS
 setopt COMPLETEALIASES # complete alisases
 setopt AUTOMENU
-
-# SSH
-#zstyle :omz:plugins:ssh-agent lifetime 4h
 
 # syntax color definition
 ZSH_HIGHLIGHT_HIGHLIGHTERS=(main brackets)
