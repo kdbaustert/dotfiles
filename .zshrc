@@ -1,8 +1,8 @@
 #! /bin/zsh
 
 # Locale.
-export LANG="en_US.UTF-8"
-export LANGUAGE="en_US.UTF-8"
+export LC_ALL=en_US.UTF-8
+export LANG=en_US.UTF-8
 export CLICOLOR=1
 export LSCOLORS=GxFxCxDxBxegedabagaced
 export TERM=xterm-256color
@@ -37,7 +37,6 @@ if [[ ! -f $HOME/.zinit/bin/zinit.zsh ]]; then
 fi
 
 source "$HOME/.zinit/bin/zinit.zsh"
-autoload -Uz _zinit
 
 zinit load zsh-users/zsh-history-substring-search
 zinit load zsh-users/zsh-completions
@@ -75,6 +74,9 @@ zinit ice atclone"dircolors -b LS_COLORS > clrs.zsh" \
 zinit light trapd00r/LS_COLORS
 
 zstyle ':prezto:module:ssh:load' identities 'id_rsa'
+
+# Enable completions
+autoload -Uz compinit && compinit
 
 # options
 setopt AUTO_CD       # Auto changes to a directory without typing cd.
