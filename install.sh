@@ -68,6 +68,17 @@ info "Installing npm global packages."
 info ${npm[@]}
 npm install -g ${npm[@]}
 
+# Setup Symlinks
+info "Creating file symlinks."
+ln -s $HOME/dotfiles/skhd/.skhdrc $HOME/
+ln -s $HOME/dotfiles/yabai/.yabairc $HOME/
+ln -s $HOME/dotfiles/yabai/.spacebarrc $HOME/
+ln -s $HOME/dotfiles/neofetch $HOME/.config
+ln -s $HOME/dotfiles/.mackup.cfg $HOME/
+
+info "Setting chmod for ~/.ssh"
+chmod 700 "$HOME/.ssh"
+
 # Gem gobal packages
 gem install colorls
 gem install istats
@@ -81,3 +92,7 @@ mkdir $HOME/Dev
 cd $HOME/Sites
 
 valet park
+
+# Setup git
+git config --global user.name "Kenny Baustert"
+git config --global user.email kenny@gothamx.dev
