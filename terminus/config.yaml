@@ -1,0 +1,262 @@
+terminal:
+  font: UbuntuMono Nerd Font
+  shell: default
+  profile: kenny
+  frontend: xterm
+  autoOpen: true
+  fontSize: 21
+  fallbackFont: Hack Nerd Font Mono
+  linePadding: 2.3
+  bell: 'off'
+  bracketedPaste: false
+  background: theme
+  ligatures: true
+  cursor: underline
+  cursorBlink: true
+  customShell: ''
+  rightClick: menu
+  pasteOnMiddleClick: false
+  copyOnSelect: true
+  scrollOnInput: true
+  workingDirectory: /Users/kenny/Sites
+  alwaysUseWorkingDirectory: true
+  altIsMeta: false
+  wordSeparator: ' ()[]{}''"'
+  colorScheme:
+    name: Monokai Soda
+    foreground: '#c4c5b5'
+    background: '#1a1a1a'
+    cursor: '#f6f7ec'
+    colors:
+      - '#1a1a1a'
+      - '#f4005f'
+      - '#98e024'
+      - '#fa8419'
+      - '#9d65ff'
+      - '#f4005f'
+      - '#01affd'
+      - '#c4c5b5'
+      - '#625e4c'
+      - '#f4005f'
+      - '#98e024'
+      - '#f3fb41'
+      - '#9d65ff'
+      - '#f4005f'
+      - '#01affd'
+      - '#f6f6ef'
+  customColorSchemes:
+    - name: Argonaut
+      foreground: '#fffaf4'
+      background: '#0e1019'
+      cursor: '#ffb903'
+      colors:
+        - '#232323'
+        - '#ff284b'
+        - '#0dfa86'
+        - '#8d36fe'
+        - '#1f8eff'
+        - '#efe762'
+        - '#6afdff'
+        - '#ffffff'
+        - '#232323'
+        - '#ff2740'
+        - '#0dfa86'
+        - '#8d36fe'
+        - '#1f8eff'
+        - '#efe762'
+        - '#6afdff'
+        - '#ffffff'
+    - name: Monokai Soda
+      foreground: '#c4c5b5'
+      background: '#1a1a1a'
+      cursor: '#f6f7ec'
+      colors:
+        - '#1a1a1a'
+        - '#f4005f'
+        - '#98e024'
+        - '#fa8419'
+        - '#9d65ff'
+        - '#f4005f'
+        - '#01affd'
+        - '#c4c5b5'
+        - '#625e4c'
+        - '#f4005f'
+        - '#98e024'
+        - '#f3fb41'
+        - '#9d65ff'
+        - '#f4005f'
+        - '#01affd'
+        - '#f6f6ef'
+  environment: {}
+  profiles:
+    - name: Kenny
+      shell: binzsh
+      sessionOptions:
+        command: /bin/zsh
+        args:
+          - '--login'
+        env: {}
+        cwd: ~/Development
+  useConPTY: true
+  recoverTabs: false
+  warnOnMultilinePaste: false
+  showDefaultProfiles: true
+hotkeys:
+  ctrl-c:
+    - Ctrl-C
+  copy:
+    - ⌘-C
+  paste:
+    - ⌘-V
+  clear:
+    - ⌘-K
+  zoom-in:
+    - ⌘-=
+    - ⌘-Shift-=
+  zoom-out:
+    - ⌘--
+    - ⌘-Shift--
+  reset-zoom:
+    - ⌘-0
+  new-tab:
+    - ⌘-T
+    - ⌘-N
+  home:
+    - ⌘-Left
+    - Home
+  end:
+    - ⌘-Right
+    - End
+  previous-word:
+    - ⌥-Left
+  next-word:
+    - ⌥-Right
+  delete-previous-word:
+    - ⌥-Backspace
+  delete-next-word:
+    - ⌥-Delete
+  search:
+    - ⌘-F
+  shell: {}
+  profile: {}
+  serial:
+    - Alt-K
+  settings:
+    - '⌘-,'
+  ssh:
+    - Alt-S
+  new-window:
+    - ⌘-N
+  toggle-window:
+    - Ctrl+Space
+  toggle-fullscreen:
+    - Ctrl+⌘+F
+  close-tab:
+    - ⌘-W
+  reopen-tab:
+    - ⌘-Shift-T
+  toggle-last-tab: []
+  rename-tab:
+    - ⌘-R
+  next-tab:
+    - Ctrl-Tab
+  previous-tab:
+    - Ctrl-Shift-Tab
+  move-tab-left:
+    - ⌘-Shift-Left
+  move-tab-right:
+    - ⌘-Shift-Right
+  tab-1:
+    - ⌘-1
+  tab-2:
+    - ⌘-2
+  tab-3:
+    - ⌘-3
+  tab-4:
+    - ⌘-4
+  tab-5:
+    - ⌘-5
+  tab-6:
+    - ⌘-6
+  tab-7:
+    - ⌘-7
+  tab-8:
+    - ⌘-8
+  tab-9:
+    - ⌘-9
+  tab-10:
+    - ⌘-0
+  split-right:
+    - ⌘-Shift-D
+  split-bottom:
+    - ⌘-D
+  split-left: []
+  split-top: []
+  pane-nav-right:
+    - ⌘-⌥-Right
+  pane-nav-down:
+    - ⌘-⌥-Down
+  pane-nav-up:
+    - ⌘-⌥-Up
+  pane-nav-left:
+    - ⌘-⌥-Left
+  pane-maximize:
+    - ⌘-⌥-Enter
+  close-pane:
+    - ⌘-Shift-W
+serial:
+  connections: []
+  options: {}
+ssh:
+  connections: []
+  recentConnections: []
+  options: {}
+pluginBlacklist:
+  - serial
+  - ssh
+appearance:
+  dock: 'off'
+  dockScreen: current
+  dockFill: 0.6
+  dockHideOnBlur: false
+  dockAlwaysOnTop: true
+  tabsLocation: bottom
+  cycleTabs: true
+  theme: Standard
+  frame: thin
+  css: >-
+    body.vibrant { background: rgb(0,0,0, 0.20) !important; } .platform-darwin
+    .ng-tns-c0-0 { background: transparent !important;}
+    app-root>.content.tabs-on-top .tab-bar tab-header {
+        border-bottom: none !important;
+    } .platform-darwin .tab-bar .background {
+          border-bottom: 0 !important;
+        }
+    .platform-darwin .tab-bar .tab-header {border: 0;} .platform-darwin .tab-bar
+    .tabs tab-header.active { color: white;
+     background: rgba(39,49,60,0.65);
+     border-left: 0 !important;
+            border-right: 0 !important;
+        }
+    .platform-darwin .xterm-viewport::-webkit-scrollbar {background: transparent
+    !important;} .platform-darwin .xterm-viewport::-webkit-scrollbar-thumb
+    {background: transparent !important;}
+
+    app-root>.content:not(.tabs-on-top) .tab-bar>.background {
+        border-top: none !important;
+    }
+
+    app-root>.content:not(.tabs-on-top) .tab-bar tab-header {
+     border-top: none !important;
+    }
+  opacity: 0.92
+  vibrancy: true
+  vibrancyType: blur
+enableAnalytics: true
+enableWelcomeTab: false
+electronFlags:
+  - - force_discrete_gpu
+    - '0'
+enableAutomaticUpdates: true
+titleControl: {}
+qc: {}
