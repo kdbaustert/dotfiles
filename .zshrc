@@ -190,4 +190,8 @@ POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS=(
 
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 
-# neofetchs
+neofetch
+
+source $(brew --prefix nvm)/nvm.sh
+
+
