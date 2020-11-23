@@ -10,34 +10,34 @@ cd "$DIR"
 
 info "Prompting for sudo password..."
 if sudo -v; then
-	# Keep-alive: update existing `sudo` time stamp until `install.sh` has finished
-	while true; do
-		sudo -n true
-		sleep 60
-		kill -0 "$$" || exit
-	done 2>/dev/null &
-	success "Sudo credentials updated."
+        # Keep-alive: update existing `sudo` time stamp until `install.sh` has finished
+        while true; do
+                sudo -n true
+                sleep 60
+                kill -0 "$$" || exit
+        done 2>/dev/null &
+        success "Sudo credentials updated."
 else
-	error "Failed to obtain sudo credentials."
+        error "Failed to obtain sudo credentials."
 fi
 
 info "Installing XCode command line tools..."
 if xcode-select --print-path &>/dev/null; then
-	success "XCode command line tools already installed."
+        success "XCode command line tools already installed."
 elif xcode-select --install &>/dev/null; then
-	success "Finished installing XCode command line tools."
+        success "Finished installing XCode command line tools."
 else
-	error "Failed to install XCode command line tools."
+        error "Failed to install XCode command line tools."
 fi
 
 # Check for Homebrew
 if test ! $(which brew); then
-	info 'Installing homebrew...'
-	ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+        info 'Installing homebrew...'
+        ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
 else
-	info 'Homebrew is already installed!'
-	info 'Updating homebrew && upgrading all formulas'
-	brew update && brew upgrade
+        info 'Homebrew is already installed!'
+        info 'Updating homebrew && upgrading all formulas'
+        brew update && brew upgrade
 fi
 
 info ${taps[@]}
@@ -72,7 +72,7 @@ npm install -g ${npm[@]}
 info "Creating file symlinks."
 ln -s $HOME/dotfiles/skhd/.skhdrc $HOME/
 ln -s $HOME/dotfiles/yabai/.yabairc $HOME/
-ln -s $HOME/dotfiles/yabai/.spacebarrc $HOME/
+ln -s $HOME/dotfiles/spacebar/.spacebarrc $HOME/
 ln -s $HOME/dotfiles/neofetch $HOME/.config
 ln -s $HOME/dotfiles/.mackup.cfg $HOME/
 
