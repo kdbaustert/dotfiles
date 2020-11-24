@@ -30,8 +30,8 @@ zinit light-mode for \
 	gretzky/auto-color-ls \
 	djui/alias-tips \
 
-zinit ice blockf
-zinit light zsh-users/zsh-completions
+zinit ice wait'!0'; zinit load zdharma/fast-syntax-highlighting
+zinit ice wait'!0'; zinit load zsh-users/zsh-completions
 
 zinit ice as"completion"
 
@@ -45,7 +45,6 @@ zinit light Aloxaf/fzf-tab
 zinit load lincheney/fzf-tab-completion
 zinit load wookayin/fzf-fasd
 
-zinit load zdharma/fast-syntax-highlighting
 zinit load zsh-users/zsh-history-substring-search
 
 zinit load chrissicool/zsh-256color
