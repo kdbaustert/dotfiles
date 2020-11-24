@@ -99,6 +99,7 @@ alias brewsr php='brew services start php'
 alias yabres='brew services restart yabai && brew services restart skhd'
 alias yabrestart='brew services start yabai && brew services start skhd'
 alias yabrestop='brew services stop yabai && brew services stop skhd'
+alias yabupdate='brew services stop koekeishiya/formulae/yabai && brew reinstall koekeishiya/formulae/yabai && codesign -fs "${YABAI_CERT:-yabai-cert}" "$(brew --prefix yabai)/bin/yabai" && sudo yabai --uninstall-sa && sudo yabai --install-sa && brew services start koekeishiya/formulae/yabai'
 
 # Valet
 alias vstart='valet start'
