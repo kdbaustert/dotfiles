@@ -1,10 +1,8 @@
 # Kenny's dotfiles 
 
-## Under Development
-
 My personal dotfiles. These are mine take anything you want, but at your own risk.
 
-## Install
+## Installation
 
 You should first review the code, and remove things you don’t want or need. Don’t blindly use my settings unless you know what that entails. Use at your own risk!
 
