@@ -71,6 +71,7 @@ yabai -m rule --add app='Chromium' space=2
 
 # Tools
 yabai -m rule --add app='^Cyberduck$' space=3
+yabai -m rule --add app='^GitKraken$' space=3
 yabai -m rule --add app='GitHub Desktop' space=3
 yabai -m rule --add app='ForkLift' space=3
 yabai -m rule --add app='Insomnia' space=3
