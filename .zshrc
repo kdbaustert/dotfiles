@@ -30,9 +30,6 @@ fi
 # ZINIT Plugin Manager
 [[ -f $DOTFILES/zsh/zinit-plugins.zsh ]] && source $DOTFILES/zsh/zinit-plugins.zsh
 
-# Load completions
-autoload -U compinit && compinit
-
 zstyle ':prezto:module:ssh:load' identities 'id_rsa'
 
 # options
