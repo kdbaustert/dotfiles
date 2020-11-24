@@ -29,7 +29,7 @@ fi
 [[ -f $DOTFILES/zsh/aliases.zsh ]] && source $DOTFILES/zsh/aliases.zsh
 
 # ZINIT Plugin Manager
-[[ -f $DOTFILES/zsh/zinit.zsh ]] && source $DOTFILES/zsh/zinit.zsh
+[[ -f $DOTFILES/zsh/zinit-plugins.zsh ]] && source $DOTFILES/zsh/zinit-plugins.zsh
 
 # Load completions
 autoload -U compinit && compinit
