@@ -76,6 +76,4 @@ zstyle ':completion::*:ssh:*:*' tag-order "users hosts"
 zstyle ':completion::*:kill:*:*' command 'ps xf -U $USER -o pid,%cpu,cmd'
 zstyle ':completion::*:kill:*:processes' list-colors '=(#b) #([0-9]#)*=0=01;32'
 
-# zstyle :compinstall filename '~/.zshrc'
-
 autoload -Uz compinit && compinit
