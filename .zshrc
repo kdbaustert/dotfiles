@@ -9,7 +9,6 @@ export CLICOLOR=1
 export LSCOLORS=GxFxCxDxBxegedabagaced
 export TERM=xterm-256color
 export ZSH_EXTEND_HISTORY_FILE=$DOTFILES/.zsh_extended_history
-export PATH=$HOME/tools/nvim:$PATH
 export PATH="$HOME/.npm-packages/bin:$PATH"
 export NVM_DIR="$HOME/.nvm"
 
@@ -144,7 +143,5 @@ POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS=(
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 
 neofetch
-
-# source $(brew --prefix nvm)/nvm.sh
 
 
