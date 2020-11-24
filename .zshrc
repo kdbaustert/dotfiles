@@ -28,60 +28,13 @@ fi
 # ALIASES
 [[ -f $DOTFILES/zsh/aliases.zsh ]] && source $DOTFILES/zsh/aliases.zsh
 
-# ZINIT (PLUGIN MANAGER)
-if [[ ! -f $HOME/.zinit/bin/zinit.zsh ]]; then
-	print -P "%F{33}▓▒░ %F{220}Installing DHARMA Initiative Plugin Manager (zdharma/zinit)…%f"
-	command mkdir -p "$HOME/.zinit" && command chmod g-rwX "$HOME/.zinit"
-	command git clone https://github.com/zdharma/zinit "$HOME/.zinit/bin" &&
-		print -P "%F{33}▓▒░ %F{34}Installation successful.%f" ||
-		print -P "%F{160}▓▒░ The clone has failed.%f"
-fi
-
-source "$HOME/.zinit/bin/zinit.zsh"
-
-autoload -Uz _zinit
-(( ${+_comps} )) && _comps[zinit]=_zinit
-
-zinit load zsh-users/zsh-history-substring-search
-zinit load zsh-users/zsh-completions
-zinit ice depth=1
-zinit light romkatv/powerlevel10k
-
-zinit snippet PZT::modules/history
-zinit snippet PZT::modules/directory
-zinit snippet PZT::modules/ssh
-
-zinit light-mode for \
-	gretzky/auto-color-ls \
-	zpm-zsh/colors \
-	djui/alias-tips \
-	b4b4r07/enhancd \
-	zsh-users/zsh-autosuggestions \
-	zdharma/fast-syntax-highlighting \
-	Aloxaf/fzf-tab
-
-# FZF-TAB
-zinit ice wait"1" lucid
-zinit light Aloxaf/fzf-tab
-
-zinit load lincheney/fzf-tab-completion
-zinit load wookayin/fzf-fasd
-
-zinit light-mode for \
-	zdharma/fast-syntax-highlighting \
-	zsh-users/zsh-autosuggestions
-
-# ls colors
-zinit ice atclone"dircolors -b LS_COLORS > clrs.zsh" \
-	atpull'%atclone' pick"clrs.zsh" nocompile'!' \
-	atload'zstyle ":completion:*" list-colors “${(s.:.)LS_COLORS}”'
-zinit light trapd00r/LS_COLORS
-
-zstyle ':prezto:module:ssh:load' identities 'id_rsa'
+# ZINIT Plugin Manager
+[[ -f $DOTFILES/zsh/zinit.zsh ]] && source $DOTFILES/zsh/zinit.zsh
 
 # Load completions
 autoload -U compinit && compinit
 
+zstyle ':prezto:module:ssh:load' identities 'id_rsa'
 
 # options
 setopt AUTO_CD       # Auto changes to a directory without typing cd.
@@ -192,6 +145,6 @@ POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS=(
 
 neofetch
 
-source $(brew --prefix nvm)/nvm.sh
+# source $(brew --prefix nvm)/nvm.sh
 
 
