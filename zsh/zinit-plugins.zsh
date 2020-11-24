@@ -29,6 +29,7 @@ zinit snippet OMZ::plugins/fzf/fzf.plugin.zsh
 zinit light-mode for \
 	gretzky/auto-color-ls \
 	djui/alias-tips \
+	b4b4r07/enhancd \
 
 zinit ice wait'!0'; zinit load zdharma/fast-syntax-highlighting
 zinit ice wait'!0'; zinit load zsh-users/zsh-completions
@@ -49,7 +50,7 @@ zinit load zsh-users/zsh-history-substring-search
 
 zinit load chrissicool/zsh-256color
 
-zinit ice lucid
-zinit load romkatv/powerlevel10k
+# zinit ice nocd lucid atload="!source $DOTFILES/zsh/p10k.zsh"
+# zinit load romkatv/powerlevel10k
 
-zstyle ':prezto:module:ssh:load' identities 'id_rsa'
+zinit ice depth=1; zinit light romkatv/powerlevel10k
