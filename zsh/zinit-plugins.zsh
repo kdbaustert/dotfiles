@@ -54,3 +54,5 @@ zinit load chrissicool/zsh-256color
 # zinit load romkatv/powerlevel10k
 
 zinit ice depth=1; zinit light romkatv/powerlevel10k
+
+zinit light buonomo/yarn-completion
