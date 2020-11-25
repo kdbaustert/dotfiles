@@ -59,6 +59,7 @@ yabai -m rule --add app='Code' space=1
 yabai -m rule --add app='Xcode' space=1
 yabai -m rule --add app='Termius' space=1
 yabai -m rule --add app='SnippetsLab' space=1
+yabai -m rule --add app='kitty' space=1
 
 # Browsers
 yabai -m rule --add app='Google Chrome' space=2
