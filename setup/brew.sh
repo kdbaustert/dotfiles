@@ -30,7 +30,6 @@ binaries=(
   m-cli
   zlib # Needed for Memcached
   mas
-  speedtest-cli
   ssh-copy-id
   terminal-notifier
   wifi-password
@@ -43,6 +42,7 @@ binaries=(
   colordiff
   ranger
   htop
+  pwgen
   koekeishiya/formulae/yabai
   khanhas/tap/spicetify-cli
   cmacrae/formulae/spacebar
