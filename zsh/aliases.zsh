@@ -22,6 +22,7 @@ alias cyabai="code $HOME/.yabairc"
 alias czshrc="code $HOME/.zshrc"
 alias czshrc="code $HOME/.spacebarrc"
 alias cnvims="code $HOME/.config/nvim/init.vim"
+alias valetconfig="code /usr/local/etc/nginx/valet/valet.conf"
 
 # Common aliases
 alias rdir='rm -rf'
