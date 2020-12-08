@@ -14,7 +14,7 @@ alias dt="cd $HOME/Desktop"
 alias dev="cd $HOME/Dev"
 alias sites="cd $HOME/Sites"
 alias dl="cd $HOME/Downloads"
-alias dotfiles="cd $HOME/Dropbox (Personal)/dotfiles"
+alias dotfiles="cd $HOME/dotfiles"
 
 alias caliases="code $DOTFILES/aliases.zsh"
 alias chammerspoon="code $HOME/.hammerspoon/init.lua"
@@ -149,11 +149,6 @@ alias chromekill="ps ux | grep '[C]hrome Helper --type=renderer' | grep -v exten
 # Clean up LaunchServices to remove duplicates in the “Open With” menu
 alias lscleanup="/System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister -kill -r -domain local -domain system -domain user && killall Finder"
 
-# Other
-alias fixdb='mkdir /usr/local/etc/my.cnf.d/'
-alias mysqlroot='mysql -u root -p'
-alias removeLoginMsg='touch .hushlogin'
-
 # IP addresses
 alias ip="dig +short myip.opendns.com @resolver1.opendns.com"
 
@@ -163,9 +158,6 @@ alias brewi='brew install'
 alias brewri='brew reinstall'
 alias brewr='brew remove'
 alias brewcl='brew list --cask'
-alias brewci='brew cask install'
-alias brewcri='brew cask reinstall'
-alias brewcr='brew cask remove'
 alias brewd='brew doctor'
 alias brewsr='brew services restart'
 alias brewsl='brew services list'
