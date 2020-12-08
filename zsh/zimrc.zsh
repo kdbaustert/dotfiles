@@ -19,8 +19,8 @@ zmodule utility
 #
 # Exposes git repository status information to prompts.
 zmodule git-info
-# A customizable version of steeef's prompt theme.
-zmodule steeef
+
+zmodule romkatv/powerlevel10k
 
 # Additional completion definitions for Zsh.
 zmodule zsh-users/zsh-completions
@@ -39,3 +39,14 @@ zmodule zsh-users/zsh-history-substring-search
 
 zmodule ssh
 
+zmodule gretzky/auto-color-ls
+zmodule djui/alias-tips
+zmodule b4b4r07/enhancd
+
+zmodule zdharma/fast-syntax-highlighting
+zmodule zsh-users/zsh-completions
+zmodule zsh-users/zsh-autosuggestions
+#zmodule Aloxaf/fzf-tab
+#zmodule wookayin/fzf-fasd
+zmodule zsh-users/zsh-history-substring-search
+zmodule chrissicool/zsh-256color
