@@ -53,7 +53,7 @@ brew install ${binaries[@]}
 
 # Homebrew Applications
 info 'Intalling brew applications'
-brew cask install ${apps[@]}
+brew install ${apps[@]}
 
 # Composer Global packages
 info "Installing composer global packages."
@@ -70,7 +70,7 @@ info "Creating file symlinks."
 ln -s $HOME/dotfiles/skhd/.skhdrc $HOME/
 ln -s $HOME/dotfiles/yabai/.yabairc $HOME/
 ln -s $HOME/dotfiles/spacebar/.spacebarrc $HOME/
-ln -s $HOME/dotfiles/neofetch $HOME/.config
+ln -s $HOME/dotfiles/neofetch/config.conf $HOME/.config/neofetch
 ln -s $HOME/dotfiles/.mackup.cfg $HOME/
 
 info "Setting chmod for ~/.ssh"
