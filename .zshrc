@@ -9,6 +9,8 @@ export DOTFILES=$HOME/dotfiles
 # ALIASES
 [[ -f $DOTFILES/zsh/aliases.zsh ]] && source $DOTFILES/zsh/aliases.zsh
 
+# source $HOME/fzf-tab-completion/zsh/fzf-zsh-completion.sh
+
 setopt AUTO_CD       # Auto changes to a directory without typing cd.
 setopt AUTO_PUSHD    # Push the old directory onto the stack on cd.
 setopt EXTENDED_GLOB # Use extended globbing syntax.
@@ -120,6 +122,8 @@ if [[ ${ZIM_HOME}/init.zsh -ot $DOTFILES/zsh/.zimrc ]]; then
 fi
 source ${ZIM_HOME}/init.zsh
 
+[[ -f $DOTFILES/zsh/p10k.zsh ]] && source $DOTFILES/zsh/p10k.zsh
+
 #
 #zsh-history-substring-search
 #
@@ -158,6 +162,56 @@ export FZF_DEFAULT_OPTS=$FZF_DEFAULT_OPTS'
 --color=fg+:#e5e9f0,bg+:'rgb(0,0,0,0)',hl+:#60fdff
 --color=info:#6871ff,prompt:#6871ff,pointer:#00b0ff
 --color=marker:#6871ff,spinner:#00b0ff,header:#6871ff'
+
+POWERLEVEL9K_BACKGROUND='transparent'
+POWERLEVEL9K_SHORTEN_DIR_LENGTH=1
+POWERLEVEL9K_SHORTEN_STRATEGY="truncate_beginning"
+POWERLEVEL9K_VCS_SHORTEN_LENGTH=4
+POWERLEVEL9K_VCS_SHORTEN_MIN_LENGTH=5
+POWERLEVEL9K_LEFT_PROMPT_LAST_SEGMENT_END_SYMBOL=''
+POWERLEVEL9K_RIGHT_PROMPT_FIRST_SEGMENT_START_SYMBOL=''
+
+# POWERLEVEL9K_OS_ICON_FOREGROUND=255
+POWERLEVEL9K_ICON_BEFORE_CONTENT=false
+# POWERLEVEL9K_DIR_FOREGROUND=#03F7F7
+# POWERLEVEL9K_DIR_DEFAULT_FOREGROUND=#03F7F7
+# POWERLEVEL9K_DIR_HOME_FOREGROUND=#03F7F7
+# POWERLEVEL9K_DIR_HOME_SUBFOLDER_FOREGROUND=#03F7F7
+# POWERLEVEL9K_DIR_ETC_FOREGROUND=#00b0ff
+# POWERLEVEL9K_RAM_FOREGROUND=#5ffa68
+# POWERLEVEL9K_LOAD_NORMAL_FOREGROUND=#00b0ff
+# POWERLEVEL9K_LOAD_WARNING_FOREGROUND=#fffc58
+# POWERLEVEL9K_LOAD_CRITICAL_FOREGROUND=#fa2b73
+# POWERLEVEL9K_LARAVEL_VERSION_FOREGROUND=#fa2b73
+# POWERLEVEL9K_STATUS_OK_FOREGROUND=#5ffa68
+# POWERLEVEL9K_STATUS_ERROR_FOREGROUND=#fa2b73
+# POWERLEVEL9K_COMMAND_EXECUTION_TIME_FOREGROUND=#fffc58
+
+# POWERLEVEL9K_DIR_CLASSES=()
+
+POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(
+	# =========================[ Line #1 ]=========================
+	os_icon # os identifier
+	context
+	dir # current directory
+	vcs # git status
+	# =========================[ Line #2 ]=========================
+	newline     # \n
+	prompt_char # prompt symbol
+)
+
+POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS=(
+	# =========================[ Line #1 ]=========================
+	status                 # exit code of the last command
+	command_execution_time # duration of the last command
+	laravel_version        # laravel php framework version
+	node_version           # node.js version
+	ram                    # free RAM
+	load                   # CPU load
+	php_version            # php version (https://www.php.net/)
+	# =========================[ Line #2 ]=========================
+	newline
+)
 
 
 # NVM
