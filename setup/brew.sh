@@ -1,11 +1,9 @@
 #! /usr/bin/env sh
 
 # Homebrew taps
-taps=(
-  homebrew/cask-fonts
-  homebrew/cask-versions
-  koekeishiya/formulae
-)
+brew tap homebrew/cask-fonts
+brew tap homebrew/cask-versions
+brew tap koekeishiya/formulae
 
 binaries=(
   bash      # Latest Bash version
@@ -101,12 +99,10 @@ apps=(
   slack
   spotify
   karabiner-elements
-  screens
   appcleaner
   1password
   macdown
   the-unarchiver
-  expressvpn
   captin
   app-cleaner
   motrix
