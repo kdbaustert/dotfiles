@@ -10,45 +10,42 @@ cd "$DIR"
 
 info "Prompting for sudo password..."
 if sudo -v; then
-        # Keep-alive: update existing `sudo` time stamp until `install.sh` has finished
-        while true; do
-                sudo -n true
-                sleep 60
-                kill -0 "$$" || exit
-        done 2>/dev/null &
-        success "Sudo credentials updated."
+  # Keep-alive: update existing `sudo` time stamp until `install.sh` has finished
+  while true; do
+    sudo -n true
+    sleep 60
+    kill -0 "$$" || exit
+  done 2>/dev/null &
+  success "Sudo credentials updated."
 else
-        error "Failed to obtain sudo credentials."
+  error "Failed to obtain sudo credentials."
 fi
 
 info "Installing XCode command line tools..."
 if xcode-select --print-path &>/dev/null; then
-        success "XCode command line tools already installed."
+  success "XCode command line tools already installed."
 elif xcode-select --install &>/dev/null; then
-        success "Finished installing XCode command line tools."
+  success "Finished installing XCode command line tools."
 else
-        error "Failed to install XCode command line tools."
+  error "Failed to install XCode command line tools."
 fi
 
 # Check for Homebrew
 if test ! $(which brew); then
-        info 'Installing homebrew...'
-        ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+  info 'Installing homebrew...'
+  ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
 else
-        info 'Homebrew is already installed!'
-        info 'Updating homebrew && upgrading all formulas'
-        brew update && brew upgrade
+  info 'Homebrew is already installed!'
+  info 'Updating homebrew && upgrading all formulas'
+  brew update && brew upgrade
 fi
-
-info ${taps[@]}
-brew install ${taps[@]}
 
 brew update
 
 # Homebrew Fonts
 info 'Intalling brew fonts'
 info ${fonts[@]}
-brew install ${fonts[@]}
+brew cask install ${fonts[@]}
 
 # Homebrew Binaries
 info 'Intalling brew binaries'
@@ -56,7 +53,7 @@ brew install ${binaries[@]}
 
 # Homebrew Applications
 info 'Intalling brew applications'
-brew install ${apps[@]}
+brew cask install ${apps[@]}
 
 # Composer Global packages
 info "Installing composer global packages."
@@ -96,3 +93,5 @@ valet park
 # Setup git
 git config --global user.name "Kenny Baustert"
 git config --global user.email kenny@gothamx.dev
+
+touch ~/.hushlogin
