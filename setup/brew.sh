@@ -121,4 +121,6 @@ apps=(
   github
   parallels
   postman
+  micro-snitch
+  little-snitch
 )
