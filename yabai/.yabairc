@@ -83,12 +83,12 @@ yabai -m rule --add app='Sketch' space=3
 yabai -m rule --add app='Zeplin' space=3
 
 # Social
-yabai -m rule --add app='Slack' opacity=0.90 space=4
-yabai -m rule --add app='Messages' opacity=0.90 space=4
+yabai -m rule --add app='Slack' space=4
+yabai -m rule --add app='Messages' space=4
 yabai -m rule --add app='Spark' space=4
 
 # Music
-yabai -m rule --add app='^Spotify$' opacity=0.90 space=5
+yabai -m rule --add app='^Spotify$' space=5
 yabai -m rule --add app='Music' space=5
 
 # Float
