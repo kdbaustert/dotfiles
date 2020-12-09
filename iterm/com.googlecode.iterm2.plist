@@ -10233,7 +10233,7 @@
 			<key>Non-ASCII Ligatures</key>
 			<true/>
 			<key>Normal Font</key>
-			<string>UbuntuMonoNerdFontComplete-Regular 23</string>
+			<string>UbuntuMonoNerdFontComplete-Regular 22</string>
 			<key>Only The Default BG Color Uses Transparency</key>
 			<true/>
 			<key>Open Toolbelt</key>
@@ -10374,8 +10374,6 @@
 		</dict>
 	</dict>
 	<key>PreserveWindowSizeWhenTabBarVisibilityChanges</key>
-	<false/>
-	<key>PreventEscapeSequenceFromClearingHistory</key>
 	<false/>
 	<key>PromptOnQuit</key>
 	<false/>
