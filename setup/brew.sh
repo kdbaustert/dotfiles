@@ -95,7 +95,6 @@ apps=(
   opera-developer
   iterm2-nightly
   hyper-canary
-  terminus
   slack
   spotify
   karabiner-elements
@@ -123,4 +122,5 @@ apps=(
   postman
   micro-snitch
   little-snitch
+  inkscape
 )
