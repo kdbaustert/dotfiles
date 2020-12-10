@@ -26,7 +26,6 @@ binaries=(
   httpie
   jq
   m-cli
-  zlib # Needed for Memcached
   mas
   ssh-copy-id
   terminal-notifier
@@ -40,7 +39,6 @@ binaries=(
   colordiff
   ranger
   htop
-  pwgen
   koekeishiya/formulae/yabai
   khanhas/tap/spicetify-cli
   cmacrae/formulae/spacebar
@@ -53,14 +51,11 @@ binaries=(
   yarn
   node
   nvm
-  php@7.2
-  php@7.3
   php@7.4
-  nginx
   php
+  nginx
   php-cs-fixer
   mariadb
-  memcached
   redis
   composer
   wp-cli
@@ -100,7 +95,7 @@ apps=(
   karabiner-elements
   appcleaner
   1password
-  macdown
+  typora
   the-unarchiver
   captin
   app-cleaner
