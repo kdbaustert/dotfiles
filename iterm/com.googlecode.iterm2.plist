@@ -9527,6 +9527,8 @@
 	<false/>
 	<key>HideActivityIndicator</key>
 	<true/>
+	<key>HideMenuBarInFullscreen</key>
+	<false/>
 	<key>HideScrollbar</key>
 	<true/>
 	<key>HideTab</key>
@@ -10411,7 +10413,7 @@
 	<key>StretchTabsToFillBar</key>
 	<true/>
 	<key>TabStyleWithAutomaticOption</key>
-	<integer>5</integer>
+	<integer>6</integer>
 	<key>TabsHaveCloseButton</key>
 	<true/>
 	<key>TerminalMargin</key>
