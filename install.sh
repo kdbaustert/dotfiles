@@ -29,12 +29,9 @@ gem install colorls
 
 info "Installing Laravel Valet"
 valet composer
-
 mkdir "$HOME/Sites"
 mkdir "$HOME/Dev"
-
 cd "$HOME/Sites"
-
 valet park
 
 # Global ignore
