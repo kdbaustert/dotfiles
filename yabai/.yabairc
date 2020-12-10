@@ -52,14 +52,12 @@ yabai -m space 5 --label Music
 yabai -m space 6 --label Float
 
 # Primary
-yabai -m rule --add app='^Terminus$' space=1
 yabai -m rule --add app='^Hyper$' space=1
-yabai -m rule --add app='iTerm' space=1
+yabai -m rule --add app='iTerm' opacity=0.93 space=1
 yabai -m rule --add app='Code' space=1
 yabai -m rule --add app='Xcode' space=1
 yabai -m rule --add app='Termius' space=1
 yabai -m rule --add app='SnippetsLab' space=1
-yabai -m rule --add app='kitty' space=1
 
 # Browsers
 yabai -m rule --add app='Google Chrome' space=2
@@ -72,7 +70,6 @@ yabai -m rule --add app='Chromium' space=2
 
 # Tools
 yabai -m rule --add app='^Cyberduck$' space=3
-yabai -m rule --add app='^GitKraken$' space=3
 yabai -m rule --add app='GitHub Desktop' space=3
 yabai -m rule --add app='ForkLift' space=3
 yabai -m rule --add app='Insomnia' space=3
