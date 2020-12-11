@@ -97,7 +97,7 @@ alias brewsr dnsmasq='brew services start dnsmasq'
 alias brewsr php='brew services start php'
 
 # Tiling window manager
-alias yabres='brew services restart yabai && brew services restart skhd'
+alias yabres='brew services restart yabai && brew services restart skhd && brew services restart spacebar'
 alias yabrestart='brew services start yabai && brew services start skhd'
 alias yabrestop='brew services stop yabai && brew services stop skhd'
 alias yabupdate='brew services stop koekeishiya/formulae/yabai && brew reinstall koekeishiya/formulae/yabai && codesign -fs "${YABAI_CERT:-yabai-cert}" "$(brew --prefix yabai)/bin/yabai" && sudo yabai --uninstall-sa && sudo yabai --install-sa && brew services start koekeishiya/formulae/yabai'
