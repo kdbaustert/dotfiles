@@ -14,141 +14,7 @@
                     "basic.to_if_held_down_threshold_milliseconds": 500,
                     "mouse_motion_to_scroll.speed": 100
                 },
-                "rules": [
-                    {
-                        "description": "Change right_command+hjkl to arrow keys",
-                        "manipulators": [
-                            {
-                                "from": {
-                                    "key_code": "h",
-                                    "modifiers": {
-                                        "mandatory": [
-                                            "right_command"
-                                        ],
-                                        "optional": [
-                                            "any"
-                                        ]
-                                    }
-                                },
-                                "to": [
-                                    {
-                                        "key_code": "left_arrow"
-                                    }
-                                ],
-                                "type": "basic"
-                            },
-                            {
-                                "from": {
-                                    "key_code": "j",
-                                    "modifiers": {
-                                        "mandatory": [
-                                            "right_command"
-                                        ],
-                                        "optional": [
-                                            "any"
-                                        ]
-                                    }
-                                },
-                                "to": [
-                                    {
-                                        "key_code": "down_arrow"
-                                    }
-                                ],
-                                "type": "basic"
-                            },
-                            {
-                                "from": {
-                                    "key_code": "k",
-                                    "modifiers": {
-                                        "mandatory": [
-                                            "right_command"
-                                        ],
-                                        "optional": [
-                                            "any"
-                                        ]
-                                    }
-                                },
-                                "to": [
-                                    {
-                                        "key_code": "up_arrow"
-                                    }
-                                ],
-                                "type": "basic"
-                            },
-                            {
-                                "from": {
-                                    "key_code": "l",
-                                    "modifiers": {
-                                        "mandatory": [
-                                            "right_command"
-                                        ],
-                                        "optional": [
-                                            "any"
-                                        ]
-                                    }
-                                },
-                                "to": [
-                                    {
-                                        "key_code": "right_arrow"
-                                    }
-                                ],
-                                "type": "basic"
-                            }
-                        ]
-                    },
-                    {
-                        "manipulators": [
-                            {
-                                "description": "Change caps_lock to command+control+option+shift.",
-                                "from": {
-                                    "key_code": "caps_lock",
-                                    "modifiers": {
-                                        "optional": [
-                                            "any"
-                                        ]
-                                    }
-                                },
-                                "to": [
-                                    {
-                                        "key_code": "left_shift",
-                                        "modifiers": [
-                                            "left_command",
-                                            "left_control",
-                                            "left_option"
-                                        ]
-                                    }
-                                ],
-                                "type": "basic"
-                            }
-                        ]
-                    },
-                    {
-                        "description": "Change spacebar to left_shift. (Post spacebar if pressed alone)",
-                        "manipulators": [
-                            {
-                                "from": {
-                                    "key_code": "spacebar",
-                                    "modifiers": {
-                                        "optional": [
-                                            "any"
-                                        ]
-                                    }
-                                },
-                                "to": [
-                                    {
-                                        "key_code": "left_shift"
-                                    }
-                                ],
-                                "to_if_alone": [
-                                    {
-                                        "key_code": "spacebar"
-                                    }
-                                ],
-                                "type": "basic"
-                            }
-                        ]
-                    }
-                ]
+                "rules": []
             },
             "devices": [
                 {
@@ -162,7 +28,40 @@
                     },
                     "ignore": false,
                     "manipulate_caps_lock_led": true,
-                    "simple_modifications": []
+                    "simple_modifications": [
+                        {
+                            "from": {
+                                "key_code": "down_arrow"
+                            },
+                            "to": {
+                                "key_code": "right_option"
+                            }
+                        },
+                        {
+                            "from": {
+                                "key_code": "right_option"
+                            },
+                            "to": {
+                                "key_code": "down_arrow"
+                            }
+                        },
+                        {
+                            "from": {
+                                "key_code": "up_arrow"
+                            },
+                            "to": {
+                                "key_code": "right_command"
+                            }
+                        },
+                        {
+                            "from": {
+                                "key_code": "right_command"
+                            },
+                            "to": {
+                                "key_code": "up_arrow"
+                            }
+                        }
+                    ]
                 },
                 {
                     "disable_built_in_keyboard_if_exists": false,
