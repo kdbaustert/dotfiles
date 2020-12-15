@@ -117,8 +117,7 @@ alias evalet='code /usr/local/etc/php/7.4/php-fpm.d/valet-fpm.conf'
 alias sshconfig='cd ~/.ssh; code config'
 alias sshkeygen='ssh-keygen -t rsa'
 alias copyssh='ssh-copy-id -i ~/.ssh/id_rsa.pub'
-alias fixssh1='sudo chmod 600 ~/.ssh/id_rsa.pub'
-alias fixssh2='sudo chmod 600 ~/.ssh/id_rsa'
+alias chmodssh='sudo chmod 700 ~/.ssh && chmod 600 ~/.ssh/*'
 
 # Firebase
 alias fblogin='firebase login'
