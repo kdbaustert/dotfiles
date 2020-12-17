@@ -87,6 +87,8 @@ apps=(
   brave-browser-nightly
   google-chrome-dev
   microsoft-edge-dev
+  freesmug-chromium
+  vivaldi
   opera-developer
   iterm2-nightly
   hyper-canary
@@ -99,7 +101,6 @@ apps=(
   the-unarchiver
   captin
   app-cleaner
-  motrix
   brooklyn
   carbon-copy-cloner
   aerial
@@ -111,11 +112,15 @@ apps=(
   visual-studio-code
   insomnia
   forklift
-  datagrip
   github
   parallels
   postman
-  micro-snitch
   little-snitch
-  inkscape
+  onyx
+  anydesk
+  keka
+  boost-note
+  ios-app-signer
+  optimage
+  imageoptim
 )
