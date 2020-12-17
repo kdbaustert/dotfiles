@@ -67,6 +67,7 @@ yabai -m rule --add app='Firefox Developer Edition' space=2
 yabai -m rule --add app='Microsoft Edge Dev' space=2
 yabai -m rule --add app='Safari' space=2
 yabai -m rule --add app='Chromium' space=2
+yabai -m rule --add app='Vivaldi' space=2
 
 # Tools
 yabai -m rule --add app='^Cyberduck$' space=3
