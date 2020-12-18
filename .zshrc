@@ -53,6 +53,8 @@ zinit light-mode for \
 zinit ice from"gh-r" as"program"
 zinit load junegunn/fzf-bin
 
+zinit load changyuheng/zsh-interactive-cd
+
 # ls colors
 zinit ice atclone"dircolors -b LS_COLORS > clrs.zsh" \
     atpull'%atclone' pick"clrs.zsh" nocompile'!' \
