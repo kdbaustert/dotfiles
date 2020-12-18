@@ -27,13 +27,16 @@ autoload -Uz _zinit
 zinit for \
 		light-mode	zsh-users/zsh-history-substring-search \
     light-mode  zsh-users/zsh-autosuggestions \
-    light-mode  zdharma/fast-syntax-highlighting \
 
-zinit snippet PZT::modules/history
-zinit snippet PZT::modules/directory
-zinit snippet PZT::modules/ssh
+zinit snippet PZT::modules/directory/init.zsh
+zinit snippet PZT::modules/history/init.zsh
+zinit snippet PZT::modules/ssh/init.zsh
+zinit snippet PZT::modules/osx/init.zsh
 
 zinit load zpm-zsh/colors
+
+zinit ice wait'0' atinit"zpcompinit" lucid
+zinit light zdharma/fast-syntax-highlighting
 
 zinit load changyuheng/zsh-interactive-cd
 
@@ -55,10 +58,16 @@ zinit ice atclone"dircolors -b LS_COLORS > clrs.zsh" \
 
 zinit light trapd00r/LS_COLORS
 
+zinit load lincheney/fzf-tab-completion
+zinit load wookayin/fzf-fasd
+
 zinit ice depth=1
 zinit light romkatv/powerlevel10k
 
-zstyle ':prezto:module:ssh:load' identities 'id_rsa'
+zinit ice atclone"dircolors -b LS_COLORS > c.zsh" atpull'%atclone' pick"c.zsh" nocompile'!'
+zinit light trapd00r/LS_COLORS
+
+# zstyle ':prezto:module:ssh:load' identities 'id_rsa'
 
 # Activate completion
 if type brew &>/dev/null; then
@@ -95,16 +104,16 @@ setopt HIST_SAVE_NO_DUPS
 setopt COMPLETEALIASES        # complete alisases
 setopt AUTOMENU
 
-zstyle ':completion:*' menu select
-zstyle ':completion:*:warnings' format '%F{red}no matches found%f'
+# zstyle ':completion:*' menu select
+# zstyle ':completion:*:warnings' format '%F{red}no matches found%f'
 
-# complete environment variables
-zstyle ':completion::*:(-command-|export):*' fake-parameters ${${${_comps[(I)-value-*]#*,}%%,*}:#-*-}
+# # complete environment variables
+# zstyle ':completion::*:(-command-|export):*' fake-parameters ${${${_comps[(I)-value-*]#*,}%%,*}:#-*-}
 
-# # correct single char typos
-zstyle ':completion:*' completer _complete _match _approximate
-zstyle ':completion:*:match:*' original only
-zstyle ':completion:*:approximate:*' max-errors 1 numeric
+# # # correct single char typos
+# zstyle ':completion:*' completer _complete _match _approximate
+# zstyle ':completion:*:match:*' original only
+# zstyle ':completion:*:approximate:*' max-errors 1 numeric
 
 # zstyle ':fzf-tab:*' fzf-command fzf
 
@@ -120,16 +129,17 @@ bindkey '^[[B' history-substring-search-down
 eval "$(thefuck --alias)"
 eval "$(fasd --init auto)"
 
+[[ -f $DOTFILES/zsh/completion.zsh ]] && source $DOTFILES/zsh/completion.zsh
+
 [[ -f $DOTFILES/zsh/p10k.zsh ]] && source $DOTFILES/zsh/p10k.zsh
 
-zstyle ':completion:*' matcher-list 'm:{a-z}={A-Z}'
+# zstyle ':completion:*' matcher-list 'm:{a-z}={A-Z}'
 
 # #eval `dircolors`
-zstyle ':completion:*:default' list-colors ${LS_COLORS}
-zstyle ':completion:*:*:kill:*:processes' list-colors '=(#b) #([%0-9]#)*=0=01;31'
+# zstyle ':completion:*:default' list-colors ${LS_COLORS}
+# zstyle ':completion:*:*:kill:*:processes' list-colors '=(#b) #([%0-9]#)*=0=01;31'
 
 autoload colors && colors
-
 
 POWERLEVEL9K_BACKGROUND='transparent'
 POWERLEVEL9K_SHORTEN_DIR_LENGTH=1
@@ -181,16 +191,16 @@ POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS=(
 	newline
 )
 
-export FZF_DEFAULT_COMMAND='rg --files --no-ignore --hidden --follow -g "!{.git,node_modules}/*" 2> /dev/null'
-export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
-export FZF_CTRL_T_OPTS='--preview="cat {}" --preview-window=right:60%:wrap'
-export FZF_ALT_C_OPTS='--preview="ls {}" --preview-window=right:60%:wrap'
-export FZF_DEFAULT_OPTS=$FZF_DEFAULT_OPTS'
---height=50%
---color=fg:#e5e9f0,bg:'rgb(0,0,0,0)',hl:#60fdff
---color=fg+:#e5e9f0,bg+:'rgb(0,0,0,0)',hl+:#60fdff
---color=info:#6871ff,prompt:#6871ff,pointer:#00b0ff
---color=marker:#6871ff,spinner:#00b0ff,header:#6871ff'
+# export FZF_DEFAULT_COMMAND='rg --files --no-ignore --hidden --follow -g "!{.git,node_modules}/*" 2> /dev/null'
+# export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
+# export FZF_CTRL_T_OPTS='--preview="cat {}" --preview-window=right:60%:wrap'
+# export FZF_ALT_C_OPTS='--preview="ls {}" --preview-window=right:60%:wrap'
+# export FZF_DEFAULT_OPTS=$FZF_DEFAULT_OPTS'
+# --height=50%
+# --color=fg:#e5e9f0,bg:'rgb(0,0,0,0)',hl:#60fdff
+# --color=fg+:#e5e9f0,bg+:'rgb(0,0,0,0)',hl+:#60fdff
+# --color=info:#6871ff,prompt:#6871ff,pointer:#00b0ff
+# --color=marker:#6871ff,spinner:#00b0ff,header:#6871ff'
 
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 
