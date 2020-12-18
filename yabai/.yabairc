@@ -92,11 +92,12 @@ yabai -m rule --add app='Music' space=5
 # Float
 yabai -m rule --add app='^BetterTouchTool$' space=6
 yabai -m rule --add app='Parallels Desktop' space=6
-yabai -m rule --add app='Motrix' space=6
+yabai -m rule --add app='Folx' space=6
 yabai -m rule --add app='CleanMyMac X' space=6
 yabai -m rule --add app='IconJar' space=6
 yabai -m rule --add app='Carbon Copy Cloner' space=6
 yabai -m rule --add app='^Screens 4$' space=6
+yabai -m rule --add app='AnyDesk' space=6
 yabai -m rule --add app='^Antivirus for Mac' space=6
 
 #UNMANAGED
