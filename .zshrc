@@ -27,14 +27,10 @@ autoload -Uz _zinit
 zinit load g-plane/zsh-yarn-autocompletions
 
 zinit for \
+		load	zsh-users/zsh-history-substring-search \
     light-mode  zsh-users/zsh-autosuggestions \
     light-mode  zdharma/fast-syntax-highlighting \
                 zdharma/history-search-multi-word \
-
-zinit load zsh-users/zsh-history-substring-search
-
-zinit load zsh-users/zsh-completions
-
 # load completions
 autoload -Uz compinit && compinit -C
 zinit cdreplay -q
@@ -46,8 +42,15 @@ zinit snippet PZT::modules/directory
 zinit snippet PZT::modules/ssh
 
 zinit light-mode for \
-     djui/alias-tips \
-     b4b4r07/enhancd \
+    gretzky/auto-color-ls \
+		zpm-zsh/colors \
+		djui/alias-tips \
+		b4b4r07/enhancd \
+
+zinit ice from"gh-r" as"program"
+zinit load junegunn/fzf-bin
+
+zinit wait lucid atload"zicompinit; zicdreplay" blockf for zsh-users/zsh-completions
 
 zstyle ':prezto:module:ssh:load' identities 'id_rsa'
 
@@ -91,6 +94,14 @@ bindkey '^[[B' history-substring-search-down
 eval "$(thefuck --alias)"
 
 [[ -f $DOTFILES/zsh/p10k.zsh ]] && source $DOTFILES/zsh/p10k.zsh
+
+zstyle ':completion:*' matcher-list 'm:{a-z}={A-Z}'
+
+# 補完候補にも色付き表示
+#eval `dircolors`
+zstyle ':completion:*:default' list-colors ${LS_COLORS}
+# kill の候補にも色付き表示
+zstyle ':completion:*:*:kill:*:processes' list-colors '=(#b) #([%0-9]#)*=0=01;31'
 
 
 POWERLEVEL9K_BACKGROUND='transparent'
