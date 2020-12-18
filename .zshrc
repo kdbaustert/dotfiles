@@ -1,5 +1,6 @@
 export DOTFILES=$HOME/dotfiles
 fpath=(~/.local/share/zsh/comp $fpath)
+setopt promptsubst
 
 # EXPORTS
 [[ -f $DOTFILES/zsh/exports.zsh ]] && source $DOTFILES/zsh/exports.zsh
@@ -24,6 +25,11 @@ source "$HOME/.zinit/bin/zinit.zsh"
 autoload -Uz _zinit
 (( ${+_comps} )) && _comps[zinit]=_zinit
 
+zinit light-mode for \
+    zinit-zsh/z-a-patch-dl \
+    zinit-zsh/z-a-as-monitor \
+    zinit-zsh/z-a-bin-gem-node
+
 zinit for \
 		light-mode	zsh-users/zsh-history-substring-search \
     light-mode  zsh-users/zsh-autosuggestions \
@@ -32,8 +38,6 @@ zinit snippet PZT::modules/directory/init.zsh
 zinit snippet PZT::modules/history/init.zsh
 zinit snippet PZT::modules/ssh/init.zsh
 zinit snippet PZT::modules/osx/init.zsh
-
-zinit load zpm-zsh/colors
 
 zinit ice wait'0' atinit"zpcompinit" lucid
 zinit light zdharma/fast-syntax-highlighting
@@ -55,7 +59,6 @@ zinit load junegunn/fzf-bin
 zinit ice atclone"dircolors -b LS_COLORS > clrs.zsh" \
     atpull'%atclone' pick"clrs.zsh" nocompile'!' \
     atload'zstyle ":completion:*" list-colors “${(s.:.)LS_COLORS}”'
-
 zinit light trapd00r/LS_COLORS
 
 zinit load lincheney/fzf-tab-completion
@@ -63,11 +66,6 @@ zinit load wookayin/fzf-fasd
 
 zinit ice depth=1
 zinit light romkatv/powerlevel10k
-
-zinit ice atclone"dircolors -b LS_COLORS > c.zsh" atpull'%atclone' pick"c.zsh" nocompile'!'
-zinit light trapd00r/LS_COLORS
-
-# zstyle ':prezto:module:ssh:load' identities 'id_rsa'
 
 # Activate completion
 if type brew &>/dev/null; then
@@ -207,8 +205,11 @@ POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS=(
 FZF_DEFAULT_OPTS='--height 50% --ansi'
 FZF_DEFAULT_COMMAND='rg --files --no-ignore --hidden --follow --glob "!.git/*"'
 
-
 neofetch
+
+export NVM_DIR="$HOME/.nvm"
+[ -s "/usr/local/opt/nvm/nvm.sh" ] && . "/usr/local/opt/nvm/nvm.sh"  # This loads nvm
+[ -s "/usr/local/opt/nvm/etc/bash_completion.d/nvm" ] && . "/usr/local/opt/nvm/etc/bash_completion.d/nvm"  # This loads nvm bash_completion
 
 function cd() {
     if [[ "$#" != 0 ]]; then
