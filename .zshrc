@@ -24,22 +24,20 @@ source "$HOME/.zinit/bin/zinit.zsh"
 autoload -Uz _zinit
 (( ${+_comps} )) && _comps[zinit]=_zinit
 
-zinit load g-plane/zsh-yarn-autocompletions
-
 zinit for \
-		load	zsh-users/zsh-history-substring-search \
+		light-mode	zsh-users/zsh-history-substring-search \
     light-mode  zsh-users/zsh-autosuggestions \
     light-mode  zdharma/fast-syntax-highlighting \
-                zdharma/history-search-multi-word \
-# load completions
-autoload -Uz compinit && compinit -C
-zinit cdreplay -q
-
-zinit ice depth=1; zinit light romkatv/powerlevel10k
 
 zinit snippet PZT::modules/history
 zinit snippet PZT::modules/directory
 zinit snippet PZT::modules/ssh
+
+zinit load zpm-zsh/colors
+
+zinit load changyuheng/zsh-interactive-cd
+
+zinit load zsh-users/zsh-completions
 
 zinit light-mode for \
     gretzky/auto-color-ls \
@@ -50,9 +48,25 @@ zinit light-mode for \
 zinit ice from"gh-r" as"program"
 zinit load junegunn/fzf-bin
 
-zinit wait lucid atload"zicompinit; zicdreplay" blockf for zsh-users/zsh-completions
+# ls colors
+zinit ice atclone"dircolors -b LS_COLORS > clrs.zsh" \
+    atpull'%atclone' pick"clrs.zsh" nocompile'!' \
+    atload'zstyle ":completion:*" list-colors “${(s.:.)LS_COLORS}”'
+
+zinit light trapd00r/LS_COLORS
+
+zinit ice depth=1
+zinit light romkatv/powerlevel10k
 
 zstyle ':prezto:module:ssh:load' identities 'id_rsa'
+
+# Activate completion
+if type brew &>/dev/null; then
+	FPATH=$(brew --prefix)/share/zsh-completions:$FPATH
+
+	autoload -Uz compinit
+	compinit
+fi
 
 # options
 setopt AUTO_CD       # Auto changes to a directory without typing cd.
@@ -80,7 +94,19 @@ setopt SHARE_HISTORY
 setopt HIST_SAVE_NO_DUPS
 setopt COMPLETEALIASES        # complete alisases
 setopt AUTOMENU
-# SSH
+
+zstyle ':completion:*' menu select
+zstyle ':completion:*:warnings' format '%F{red}no matches found%f'
+
+# complete environment variables
+zstyle ':completion::*:(-command-|export):*' fake-parameters ${${${_comps[(I)-value-*]#*,}%%,*}:#-*-}
+
+# # correct single char typos
+zstyle ':completion:*' completer _complete _match _approximate
+zstyle ':completion:*:match:*' original only
+zstyle ':completion:*:approximate:*' max-errors 1 numeric
+
+# zstyle ':fzf-tab:*' fzf-command fzf
 
 # zstyle :omz:plugins:ssh-agent lifetime 4h
 
@@ -92,16 +118,17 @@ bindkey '^[[B' history-substring-search-down
 
 #THEFUCK
 eval "$(thefuck --alias)"
+eval "$(fasd --init auto)"
 
 [[ -f $DOTFILES/zsh/p10k.zsh ]] && source $DOTFILES/zsh/p10k.zsh
 
 zstyle ':completion:*' matcher-list 'm:{a-z}={A-Z}'
 
-# 補完候補にも色付き表示
-#eval `dircolors`
+# #eval `dircolors`
 zstyle ':completion:*:default' list-colors ${LS_COLORS}
-# kill の候補にも色付き表示
 zstyle ':completion:*:*:kill:*:processes' list-colors '=(#b) #([%0-9]#)*=0=01;31'
+
+autoload colors && colors
 
 
 POWERLEVEL9K_BACKGROUND='transparent'
@@ -154,27 +181,41 @@ POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS=(
 	newline
 )
 
+export FZF_DEFAULT_COMMAND='rg --files --no-ignore --hidden --follow -g "!{.git,node_modules}/*" 2> /dev/null'
+export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
+export FZF_CTRL_T_OPTS='--preview="cat {}" --preview-window=right:60%:wrap'
+export FZF_ALT_C_OPTS='--preview="ls {}" --preview-window=right:60%:wrap'
+export FZF_DEFAULT_OPTS=$FZF_DEFAULT_OPTS'
+--height=50%
+--color=fg:#e5e9f0,bg:'rgb(0,0,0,0)',hl:#60fdff
+--color=fg+:#e5e9f0,bg+:'rgb(0,0,0,0)',hl+:#60fdff
+--color=info:#6871ff,prompt:#6871ff,pointer:#00b0ff
+--color=marker:#6871ff,spinner:#00b0ff,header:#6871ff'
+
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+
+FZF_DEFAULT_OPTS='--height 50% --ansi'
+FZF_DEFAULT_COMMAND='rg --files --no-ignore --hidden --follow --glob "!.git/*"'
+
 
 neofetch
 
-zstyle ':completion:*' completer _expand _complete _ignored _correct _approximate
-zstyle ':completion:*' expand prefix suffix
-zstyle ':completion:*' file-sort modification
-zstyle ':completion:*' insert-unambiguous false
-zstyle ':completion:*' list-colors ''
-zstyle ':completion:*' list-prompt %SAt %p: Hit TAB for more, or the character to insert%s
-zstyle ':completion:*' matcher-list '' \
-'m:{[:lower:][:upper:]}={[:upper:][:lower:]}' \
-'m:{[:lower:][:upper:]}={[:upper:][:lower:]} r:|[._-]=** r:|=**' \
-'m:{[:lower:][:upper:]}={[:upper:][:lower:]} r:|[._-]=** r:|=** l:|=*'
-zstyle ':completion:*' max-errors 2
-zstyle ':completion:*' menu select=1
-zstyle ':completion:*' original true
-zstyle ':completion:*' select-prompt %SScrlling active: current selection at %p%s
-zstyle ':completion:*' verbose true
-zstyle ':completion:*' completer _complete _ignored
-zstyle :compinstall filename "$HOME/.zshrc"
-
-autoload -Uz compinit
-compinit
+function cd() {
+    if [[ "$#" != 0 ]]; then
+        builtin cd "$@";
+        return
+    fi
+    while true; do
+        local lsd=$(echo ".." && ls -p | grep '/$' | sed 's;/$;;')
+        local dir="$(printf '%s\n' "${lsd[@]}" |
+            fzf --reverse --preview '
+                __cd_nxt="$(echo {})";
+                __cd_path="$(echo $(pwd)/${__cd_nxt} | sed "s;//;/;")";
+                echo $__cd_path;
+                echo;
+                ls -p --color=always "${__cd_path}";
+        ')"
+        [[ ${#dir} != 0 ]] || return 0
+        builtin cd "$dir" &> /dev/null
+    done
+}
