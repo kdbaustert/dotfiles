@@ -100,7 +100,7 @@ alias brewsr php='brew services start php'
 alias yabres='brew services restart yabai && brew services restart skhd && brew services restart spacebar'
 alias yabrestart='brew services start yabai && brew services start skhd'
 alias yabrestop='brew services stop yabai && brew services stop skhd'
-alias yabupgrade='brew services stop koekeishiya/formulae/yabai && brew reinstall koekeishiya/formulae/yabai && sudo yabai --uninstall-sa && sudo yabai --install-sa && brew services start koekeishiya/formulae/yabai'
+alias yabupdate='brew services stop yabai && brew upgrade yabai && sudo yabai --uninstall-sa && sudo yabai --install-sa && brew services start yabai'
 
 # Valet
 alias vstart='valet start'
