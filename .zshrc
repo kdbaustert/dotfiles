@@ -1,4 +1,5 @@
 export DOTFILES=$HOME/dotfiles
+fpath=(~/.local/share/zsh/comp $fpath)
 
 # EXPORTS
 [[ -f $DOTFILES/zsh/exports.zsh ]] && source $DOTFILES/zsh/exports.zsh
@@ -23,9 +24,21 @@ source "$HOME/.zinit/bin/zinit.zsh"
 autoload -Uz _zinit
 (( ${+_comps} )) && _comps[zinit]=_zinit
 
+zinit load g-plane/zsh-yarn-autocompletions
+
+zinit for \
+    light-mode  zsh-users/zsh-autosuggestions \
+    light-mode  zdharma/fast-syntax-highlighting \
+                zdharma/history-search-multi-word \
 
 zinit load zsh-users/zsh-history-substring-search
+
 zinit load zsh-users/zsh-completions
+
+# load completions
+autoload -Uz compinit && compinit -C
+zinit cdreplay -q
+
 zinit ice depth=1; zinit light romkatv/powerlevel10k
 
 zinit snippet PZT::modules/history
@@ -33,30 +46,8 @@ zinit snippet PZT::modules/directory
 zinit snippet PZT::modules/ssh
 
 zinit light-mode for \
-     gretzky/auto-color-ls \
-     zpm-zsh/colors \
      djui/alias-tips \
      b4b4r07/enhancd \
-     zsh-users/zsh-autosuggestions \
-     zdharma/fast-syntax-highlighting \
-     Aloxaf/fzf-tab \
-
-# FZF-TAB
-zinit ice wait"1" lucid
-zinit light Aloxaf/fzf-tab
-
-zinit load lincheney/fzf-tab-completion
-zinit load wookayin/fzf-fasd
-
-zinit light-mode for \
-    zdharma/fast-syntax-highlighting \
-    zsh-users/zsh-autosuggestions
-
-# ls colors
-zinit ice atclone"dircolors -b LS_COLORS > clrs.zsh" \
-    atpull'%atclone' pick"clrs.zsh" nocompile'!' \
-    atload'zstyle ":completion:*" list-colors “${(s.:.)LS_COLORS}”'
-zinit light trapd00r/LS_COLORS
 
 zstyle ':prezto:module:ssh:load' identities 'id_rsa'
 
@@ -87,12 +78,11 @@ setopt HIST_SAVE_NO_DUPS
 setopt COMPLETEALIASES        # complete alisases
 setopt AUTOMENU
 # SSH
-zstyle :omz:plugins:ssh-agent lifetime 4h
+
+# zstyle :omz:plugins:ssh-agent lifetime 4h
 
 # syntax color definition
 ZSH_HIGHLIGHT_HIGHLIGHTERS=(main brackets)
-
-autoload colors && colors
 
 bindkey '^[[A' history-substring-search-up
 bindkey '^[[B' history-substring-search-down
@@ -100,21 +90,7 @@ bindkey '^[[B' history-substring-search-down
 #THEFUCK
 eval "$(thefuck --alias)"
 
-[[ -f $DOTFILES/zsh/completion.zsh ]] && source $DOTFILES/zsh/completion.zsh
-
 [[ -f $DOTFILES/zsh/p10k.zsh ]] && source $DOTFILES/zsh/p10k.zsh
-
-# FZF SETTINGS
-export FZF_DEFAULT_COMMAND='rg --files --no-ignore --hidden --follow -g "!{.git,node_modules}/*" 2> /dev/null'
-export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
-export FZF_CTRL_T_OPTS='--preview="cat {}" --preview-window=right:60%:wrap'
-export FZF_ALT_C_OPTS='--preview="ls {}" --preview-window=right:60%:wrap'
-export FZF_DEFAULT_OPTS=$FZF_DEFAULT_OPTS'
---height=50%
---color=fg:#e5e9f0,bg:'rgb(0,0,0,0)',hl:#60fdff
---color=fg+:#e5e9f0,bg+:'rgb(0,0,0,0)',hl+:#60fdff
---color=info:#6871ff,prompt:#6871ff,pointer:#00b0ff
---color=marker:#6871ff,spinner:#00b0ff,header:#6871ff'
 
 
 POWERLEVEL9K_BACKGROUND='transparent'
@@ -170,9 +146,24 @@ POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS=(
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 
 neofetch
-# echo -en "\n"
 
-# # RVM
-# export PATH="$PATH:$HOME/.rvm/bin"
-test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
+zstyle ':completion:*' completer _expand _complete _ignored _correct _approximate
+zstyle ':completion:*' expand prefix suffix
+zstyle ':completion:*' file-sort modification
+zstyle ':completion:*' insert-unambiguous false
+zstyle ':completion:*' list-colors ''
+zstyle ':completion:*' list-prompt %SAt %p: Hit TAB for more, or the character to insert%s
+zstyle ':completion:*' matcher-list '' \
+'m:{[:lower:][:upper:]}={[:upper:][:lower:]}' \
+'m:{[:lower:][:upper:]}={[:upper:][:lower:]} r:|[._-]=** r:|=**' \
+'m:{[:lower:][:upper:]}={[:upper:][:lower:]} r:|[._-]=** r:|=** l:|=*'
+zstyle ':completion:*' max-errors 2
+zstyle ':completion:*' menu select=1
+zstyle ':completion:*' original true
+zstyle ':completion:*' select-prompt %SScrlling active: current selection at %p%s
+zstyle ':completion:*' verbose true
+zstyle ':completion:*' completer _complete _ignored
+zstyle :compinstall filename "$HOME/.zshrc"
 
+autoload -Uz compinit
+compinit
