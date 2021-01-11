@@ -67,7 +67,7 @@ yabai -m rule --add app='Firefox Developer Edition' space=2
 yabai -m rule --add app='Microsoft Edge Dev' space=2
 yabai -m rule --add app='Safari' space=2
 yabai -m rule --add app='Chromium' space=2
-yabai -m rule --add app='Vivaldi' space=2
+yabai -m rule --add app='SideKick' space=2
 
 # Tools
 yabai -m rule --add app='^Cyberduck$' space=3
@@ -96,8 +96,6 @@ yabai -m rule --add app='Folx' space=6
 yabai -m rule --add app='CleanMyMac X' space=6
 yabai -m rule --add app='IconJar' space=6
 yabai -m rule --add app='Carbon Copy Cloner' space=6
-yabai -m rule --add app='^Screens 4$' space=6
-yabai -m rule --add app='AnyDesk' space=6
 yabai -m rule --add app='^Antivirus for Mac' space=6
 
 #UNMANAGED
