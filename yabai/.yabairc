@@ -38,7 +38,7 @@ yabai -m config mouse_drop_action swap
 # general space settings
 yabai -m config layout bsp
 yabai -m config top_padding 12
-yabai -m config bottom_padding 15
+yabai -m config bottom_padding 50
 yabai -m config left_padding 12
 yabai -m config right_padding 12
 yabai -m config window_gap 10
@@ -58,21 +58,23 @@ yabai -m rule --add app='Code' space=1
 yabai -m rule --add app='Xcode' space=1
 yabai -m rule --add app='Termius' space=1
 yabai -m rule --add app='SnippetsLab' space=1
+yabai -m rule --add app='Termius' space=1
 
 # Browsers
 yabai -m rule --add app='Google Chrome' space=2
 yabai -m rule --add app='Brave' space=2
 yabai -m rule --add app='Opera' space=2
 yabai -m rule --add app='Firefox Developer Edition' space=2
-yabai -m rule --add app='Microsoft Edge Dev' space=2
+yabai -// MARK: - rule --add app='Microsoft Edge Dev' space=2
 yabai -m rule --add app='Safari' space=2
 yabai -m rule --add app='Chromium' space=2
 yabai -m rule --add app='Sidekick' space=2
+yabai -m rule --add app='Blisk' space=2
 
 # Tools
 yabai -m rule --add app='^Cyberduck$' space=3
+yabai -m rule --add app='Transmit' space=3
 yabai -m rule --add app='GitHub Desktop' space=3
-yabai -m rule --add app='ForkLift' space=3
 yabai -m rule --add app='Insomnia' space=3
 yabai -m rule --add app='TablePlus' space=3
 yabai -m rule --add app='Adobe Illustrator' space=3
@@ -96,7 +98,6 @@ yabai -m rule --add app='Folx' space=6
 yabai -m rule --add app='CleanMyMac X' space=6
 yabai -m rule --add app='IconJar' space=6
 yabai -m rule --add app='Carbon Copy Cloner' space=6
-yabai -m rule --add app='^Antivirus for Mac' space=6
 
 #UNMANAGED
 yabai -m rule --add label="System Preferences" app="^System Preferences$" manage=off
@@ -104,6 +105,7 @@ yabai -m rule --add label="App Store" app="^App Store$" manage=off
 yabai -m rule --add label="Finder" app="^Finder$" title="(Co(py|nnect)|Move|Info|Pref)" manage=off
 yabai -m rule --add title='.*Install.*' manage=off
 yabai -m rule --add app='^Dropbox$' manage=off
+yabai -m rule --add app='Step Twо' manage=off
 yabai -m rule --add app='^The Unarchiver$' manage=off
 yabai -m rule --add app='Preview' manage=offs
 yabai -m rule --add app='^Archive Utility' manage=off
