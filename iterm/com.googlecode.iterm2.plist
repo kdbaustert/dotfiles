@@ -10237,7 +10237,7 @@
 			<key>Non-ASCII Ligatures</key>
 			<true/>
 			<key>Normal Font</key>
-			<string>FiraCodeNerdFontCompleteM-Medium 18</string>
+			<string>FiraCodeNerdFontCompleteM-Medium 17</string>
 			<key>Only The Default BG Color Uses Transparency</key>
 			<true/>
 			<key>Open Toolbelt</key>
@@ -10404,6 +10404,33 @@
 	<false/>
 	<key>ShowPaneTitles</key>
 	<true/>
+	<key>Snippets</key>
+	<array>
+		<dict>
+			<key>title</key>
+			<string>Apache Add new site</string>
+			<key>value</key>
+			<string>sudo a2ensite</string>
+		</dict>
+		<dict>
+			<key>title</key>
+			<string>MySQL Login</string>
+			<key>value</key>
+			<string>mysql -u root -p</string>
+		</dict>
+		<dict>
+			<key>title</key>
+			<string>Upgrade Held back packages</string>
+			<key>value</key>
+			<string>sudo apt-get --with-new-pkgs upgrade</string>
+		</dict>
+		<dict>
+			<key>title</key>
+			<string>sudo find /var/www -type d 775</string>
+			<key>value</key>
+			<string>sudo find /var/www/html -type d -exec chmod 775 {} \;</string>
+		</dict>
+	</array>
 	<key>SoundForEsc</key>
 	<false/>
 	<key>StatusBarHeight</key>
@@ -10422,6 +10449,11 @@
 	<integer>26</integer>
 	<key>TmuxUsesDedicatedProfile</key>
 	<false/>
+	<key>ToolbeltTools</key>
+	<array>
+		<string>Profiles</string>
+		<string>Snippets</string>
+	</array>
 	<key>UseBorder</key>
 	<false/>
 	<key>UseColorfgbgFallback</key>
