@@ -8,6 +8,7 @@ alias shrug="echo '¯\_(ツ)_/¯' | pbcopy"
 alias c='clear'
 alias o='open .'
 alias x='exit'
+alias search-history='$(history | cut -c8- | sort -u | pick)'
 
 # Directories
 alias dt="cd $HOME/Desktop"
