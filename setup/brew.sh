@@ -46,6 +46,7 @@ binaries=(
   go
   rbenv
   neovim
+  selecta
 
   # Development
   yarn
