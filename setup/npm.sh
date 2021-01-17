@@ -17,7 +17,9 @@ npm=(
   fkill-cli
   vtop
   vsce
+  @vue/eslint-config-prettier
   @vue/cli-service-global
+  @vue/eslint-config-prettier
   cli-error-notifier
   electron
   http-server
