@@ -47,6 +47,7 @@ binaries=(
   rbenv
   neovim
   selecta
+  gitui
 
   # Development
   yarn
