@@ -120,5 +120,6 @@ apps=(
   ios-app-signer
   optimage
   imageoptim
-  keyboard-lock
+  tor-browser
+  keyboard-cleaner
 )
