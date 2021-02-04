@@ -1,6 +1,7 @@
 export DOTFILES=$HOME/dotfiles
 fpath=(~/.local/share/zsh/comp $fpath)
 setopt promptsubst
+# export NVM_DIR=~/.nvm
 
 # EXPORTS
 [[ -f $DOTFILES/zsh/exports.zsh ]] && source $DOTFILES/zsh/exports.zsh
@@ -104,22 +105,23 @@ setopt HIST_SAVE_NO_DUPS
 setopt COMPLETEALIASES        # complete alisases
 setopt AUTOMENU
 
-# zstyle ':completion:*' menu select
-# zstyle ':completion:*:warnings' format '%F{red}no matches found%f'
+zstyle ':completion:*' menu select
+zstyle ':completion:*:warnings' format '%F{red}no matches found%f'
 
-# # complete environment variables
-# zstyle ':completion::*:(-command-|export):*' fake-parameters ${${${_comps[(I)-value-*]#*,}%%,*}:#-*-}
+# complete environment variables
+zstyle ':completion::*:(-command-|export):*' fake-parameters ${${${_comps[(I)-value-*]#*,}%%,*}:#-*-}
 
-# # # correct single char typos
-# zstyle ':completion:*' completer _complete _match _approximate
-# zstyle ':completion:*:match:*' original only
-# zstyle ':completion:*:approximate:*' max-errors 1 numeric
+# correct single char typos
+zstyle ':completion:*' completer _complete _match _approximate
+zstyle ':completion:*:match:*' original only
+zstyle ':completion:*:approximate:*' max-errors 1 numeric
 
 zstyle ":completion:*:git-checkout:*" sort false
 zstyle ':completion:*:descriptions' format '[%d]'
 zstyle ':completion:*' list-colors ${(s.:.)LS_COLORS}
 zstyle ':fzf-tab:complete:cd:*' fzf-preview 'exa -1 --color=always $realpath'
 zstyle ':fzf-tab:*' fzf-command fzf
+zstyle ':completion:*' fzf-search-display true
 
 # syntax color definition
 ZSH_HIGHLIGHT_HIGHLIGHTERS=(main brackets)
@@ -138,8 +140,8 @@ eval "$(fasd --init auto)"
 # zstyle ':completion:*' matcher-list 'm:{a-z}={A-Z}'
 
 # #eval `dircolors`
-# zstyle ':completion:*:default' list-colors ${LS_COLORS}
-# zstyle ':completion:*:*:kill:*:processes' list-colors '=(#b) #([%0-9]#)*=0=01;31'
+zstyle ':completion:*:default' list-colors ${LS_COLORS}
+#zstyle ':completion:*:*:kill:*:processes' list-colors '=(#b) #([%0-9]#)*=0=01;31'
 
 autoload colors && colors
 
@@ -208,9 +210,4 @@ export FZF_DEFAULT_OPTS=$FZF_DEFAULT_OPTS'
 
 neofetch
 
-# export NVM_DIR="$HOME/.nvm"
-# [ -s "/usr/local/opt/nvm/nvm.sh" ] && . "/usr/local/opt/nvm/nvm.sh"  # This loads nvm
-# [ -s "/usr/local/opt/nvm/etc/bash_completion.d/nvm" ] && . "/usr/local/opt/nvm/etc/bash_completion.d/nvm"  # This loads nvm bash_completion
-
-export NVM_DIR=~/.nvm
 source $(brew --prefix nvm)/nvm.sh
