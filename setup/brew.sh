@@ -70,6 +70,7 @@ fonts=(
   font-fira-code-nerd-font
   font-hack-nerd-font
   font-hasklug-nerd-font
+  font-hasklig
   font-jetbrains-mono
   font-jetbrains-mono-nerd-font
   font-mononoki-nerd-font
@@ -79,6 +80,8 @@ fonts=(
   font-ubuntu-mono-nerd-font
   font-ubuntu-nerd-font
   font-jetbrains-mono-nerd-font
+  font-monoid-nerd-font
+  font-monoid-nerd-font
 )
 
 # Homebrew casks
