@@ -74,7 +74,7 @@ yabai -m rule --add app='Blisk' space=2
 
 # Tools
 yabai -m rule --add app='^Cyberduck$' space=3
-yabai -m rule --add app='^Transmit$' space=3
+yabai -m rule --add app='^Transmit$' space=3 opacity=0.96
 yabai -m rule --add app='GitHub Desktop' space=3
 yabai -m rule --add app='Insomnia' space=3
 yabai -m rule --add app='TablePlus' space=3
@@ -89,7 +89,7 @@ yabai -m rule --add app='Messages' space=4
 yabai -m rule --add app='Spark' space=4
 
 # Music
-yabai -m rule --add app='^Spotify$' space=5
+yabai -m rule --add app='^Spotify$' space=5 opacity=0.93
 yabai -m rule --add app='Music' space=5
 
 # Float
