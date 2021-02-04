@@ -82,6 +82,10 @@ fonts=(
   font-jetbrains-mono-nerd-font
   font-monoid-nerd-font
   font-monoid-nerd-font
+  font-cascadia-code
+  font-cascadia-code-pl
+  font-cascadia-mono
+  font-cascadia-mono-pl
 )
 
 # Homebrew casks
