@@ -1,0 +1,153 @@
+/* monaco-workbench .part.editor > .content .editor-group-container > .title {
+  --title-border-bottom-color: transparent !important
+} */
+/*
+    // ".monaco-workbench .split-view-view .bottom .title": "border-top-color: transparent !important",
+    // ".monaco-pane-view .split-view-view:first-of-type > .pane > .pane-header, .monaco-pane-view .pane > .pane-header, .monaco-workbench .part.titlebar": "border-bottom: none !important",
+    // "suggest-widget size .vs-dark .monaco-editor .suggest-widget.docs-side": "width: 5000px !important",
+    // ".monaco-workbench .activity-bar-placeholder": "background-color: transparent !important",
+    // ".monaco-workbench .monaco-icon-description-container": "display: none !important",
+    // ".monaco-workbench .part.editor>.content .editor-group-container>.title .tabs-container>.tab .tab-label": "line-height: initial !important",
+    // ".monaco-pane-view .pane > .pane-header": "background-color: transparent !important",
+    // ".monaco-workbench .monaco-count-badge": "display: none !important", */
+.monaco-workbench .editor-group-container > .tabs .tab.active {
+  background-color: transparent !important;
+}
+.monaco-editor .suggest-widget {
+  width: 1000px !important;
+}
+.monaco-editor .suggest-widget.docs-side > .details {
+  width: 90% !important;
+}
+.monaco-editor .suggest-widget.docs-side > .tree {
+  width: 80% !important;
+  float: left !important;
+}
+body.inline-title-bar .monaco-workbench .part > .title > .title-actions {
+  display: none !important;
+}
+body {
+  background-color: rgba(0, 0, 0, 0.74) !important;
+}
+.search-view .search-widget .input-box,
+.search-view .search-widget .input-box .monaco-inputbox {
+  background: transparent !important;
+}
+.monaco-workbench
+  .part.editor
+  > .content
+  > .one-editor-silo
+  > .container
+  > .title
+  .tabs-container
+  > .tab {
+  background: transparent !important;
+}
+.editor-container {
+  background: transparent !important;
+}
+.monaco-editor-background {
+  background: transparent !important;
+}
+.monaco-editor .margin {
+  background: transparent !important;
+}
+.monaco-workbench .part > .content {
+  background: transparent !important;
+}
+.monaco-workbench .editor > .content > .one-editor-silo.editor-one {
+  background: transparent !important;
+}
+.monaco-workbench
+  .part.editor
+  > .content
+  > .one-editor-silo
+  > .container
+  > .title {
+  background: transparent !important;
+}
+.monaco-workbench {
+  background: transparent !important;
+}
+.monaco-workbench .part {
+  background: transparent !important;
+}
+.editor-group-container > .tabs {
+  background-color: transparent !important;
+}
+.editor-group-container > .tabs .tab {
+  background: transparent !important;
+}
+.editor-group-container > .tabs .tab.active,
+.editor-group-container > .tabs .monaco-breadcrumbs {
+  background-color: rgba(37, 37, 37, 0.3) !important;
+}
+.monaco-list.settings-toc-tree .monaco-list-row.focused {
+  outline-color: rgb(37, 37, 37, 0.6) !important;
+}
+.monaco-list.settings-toc-tree .monaco-list-row.selected {
+  background-color: rgb(37, 37, 37, 0.6) !important;
+}
+.monaco-list .monaco-list-row.selected {
+  background-color: rgb(37, 37, 37, 0.6) !important;
+}
+.monaco-list.settings-editor-tree .monaco-list-row {
+  background-color: transparent !important;
+  outline-color: transparent !important;
+}
+.monaco-inputbox {
+  background-color: rgba(41, 41, 41, 0.2) !important;
+}
+.monaco-editor .selected-text {
+  background-color: rgba(58, 61, 65, 0.6) !important;
+}
+.monaco-editor .focused .selected-text {
+  background-color: rgba(38, 79, 120, 0.6) !important;
+}
+.extension-editor {
+  background: transparent !important;
+}
+.monaco-workbench
+  .part.editor
+  > .content
+  > .one-editor-silo
+  > .container
+  > .title
+  .tabs-container
+  > .tab.active {
+  background: transparent !important;
+}
+.preferences-editor > .preferences-header {
+  background: transparent !important;
+}
+.preferences-editor
+  > .preferences-editors-container.side-by-side-preferences-editor
+  .preferences-header-container {
+  background: transparent !important;
+}
+.monaco-editor,
+.monaco-editor .inputarea.ime-input {
+  background: transparent !important;
+}
+.monaco-list .monaco-list-rows {
+  background: transparent !important;
+}
+.monaco-workbench .part.sidebar {
+  background-color: rgba(0, 0, 0, 0.1) !important;
+  border-right: none !important;
+}
+.terminal-outer-container {
+  background-color: transparent !important;
+}
+.xterm-viewport {
+  background-color: transparent !important;
+}
+.xterm-rows {
+  background-color: transparent !important;
+}
+body.inline-title-bar
+  .monaco-workbench:not(.fullscreen)
+  .sidebar
+  .composite.title {
+  background-color: transparent !important;
+}
