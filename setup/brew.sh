@@ -89,7 +89,6 @@ apps=(
   brave-browser-nightly
   google-chrome-dev
   microsoft-edge-dev
-  freesmug-chromium
   vivaldi
   opera-developer
   iterm2-nightly
@@ -102,7 +101,6 @@ apps=(
   typora
   the-unarchiver
   captin
-  app-cleaner
   brooklyn
   carbon-copy-cloner
   aerial
@@ -119,10 +117,8 @@ apps=(
   postman
   little-snitch
   onyx
-  anydesk
-  keka
-  boost-note
   ios-app-signer
   optimage
   imageoptim
+  keyboard-lock
 )
