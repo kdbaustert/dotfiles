@@ -9817,7 +9817,7 @@
 			<key>Blur</key>
 			<true/>
 			<key>Blur Radius</key>
-			<real>25.013974911404642</real>
+			<real>21.089462563426228</real>
 			<key>Bold Color</key>
 			<dict>
 				<key>Alpha Component</key>
@@ -10316,7 +10316,7 @@
 			<key>Title Components</key>
 			<integer>128</integer>
 			<key>Transparency</key>
-			<real>0.045036866492831833</real>
+			<real>0.11664479049210696</real>
 			<key>Unicode Version</key>
 			<integer>8</integer>
 			<key>Unlimited Scrollback</key>
