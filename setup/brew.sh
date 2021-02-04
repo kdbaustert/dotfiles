@@ -86,6 +86,10 @@ fonts=(
   font-cascadia-code-pl
   font-cascadia-mono
   font-cascadia-mono-pl
+  font-inconsolata
+  font-inconsolata-nerd-font
+  font-inconsolata-lgc
+  font-inconsolata-lgc-nerd-font
 )
 
 # Homebrew casks
