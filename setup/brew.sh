@@ -14,7 +14,6 @@ binaries=(
   grep
   openssh
   git
-  mackup
   tmux
   z
   openssl
