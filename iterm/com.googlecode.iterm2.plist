@@ -9551,7 +9551,7 @@
 	<array>
 		<dict>
 			<key>ASCII Anti Aliased</key>
-			<true/>
+			<false/>
 			<key>ASCII Ligatures</key>
 			<false/>
 			<key>AWDS Pane Directory</key>
@@ -9897,7 +9897,7 @@
 			<key>Disable Window Resizing</key>
 			<true/>
 			<key>Draw Powerline Glyphs</key>
-			<false/>
+			<true/>
 			<key>Flashing Bell</key>
 			<false/>
 			<key>Foreground Color</key>
@@ -10231,13 +10231,13 @@
 			<key>Name</key>
 			<string>Kenny</string>
 			<key>Non Ascii Font</key>
-			<string>HackNerdFontComplete-Regular 20</string>
+			<string>HackNerdFontComplete-Regular 19</string>
 			<key>Non-ASCII Anti Aliased</key>
-			<true/>
+			<false/>
 			<key>Non-ASCII Ligatures</key>
 			<true/>
 			<key>Normal Font</key>
-			<string>MonoLisa-Medium 18</string>
+			<string>MonoLisa-Medium 19</string>
 			<key>Only The Default BG Color Uses Transparency</key>
 			<true/>
 			<key>Open Toolbelt</key>
@@ -10318,11 +10318,11 @@
 			<key>Transparency</key>
 			<real>0.11664479049210696</real>
 			<key>Unicode Version</key>
-			<integer>8</integer>
+			<integer>9</integer>
 			<key>Unlimited Scrollback</key>
 			<false/>
 			<key>Use Bold Font</key>
-			<false/>
+			<true/>
 			<key>Use Bright Bold</key>
 			<true/>
 			<key>Use Cursor Guide</key>
@@ -10395,7 +10395,7 @@
 	<key>PromptOnQuit</key>
 	<false/>
 	<key>SeparateStatusBarsPerPane</key>
-	<true/>
+	<false/>
 	<key>SeparateWindowTitlePerTab</key>
 	<true/>
 	<key>ShowFullScreenTabBar</key>
@@ -10403,7 +10403,7 @@
 	<key>ShowNewOutputIndicator</key>
 	<false/>
 	<key>ShowPaneTitles</key>
-	<true/>
+	<false/>
 	<key>Snippets</key>
 	<array>
 		<dict>
@@ -10451,7 +10451,6 @@
 	<false/>
 	<key>ToolbeltTools</key>
 	<array>
-		<string>Profiles</string>
 		<string>Snippets</string>
 	</array>
 	<key>UseBorder</key>
