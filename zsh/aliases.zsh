@@ -137,7 +137,7 @@ alias sudo='nocorrect sudo'
 alias permission='chmod +x'
 
 # Get macOS Software Updates, and update installed Ruby gems, Homebrew, npm, and their installed packages
-alias update='brew update; brew upgrade; brew cleanup; brew cask upgrade; npm install npm -g; npm update -g; sudo gem update colorls -n /usr/local/bin; wp cli update; composer global update; zinit update'
+alias update='brew update; brew upgrade; brew cleanup; npm install npm -g; npm update -g; sudo gem update colorls; composer global update; zinit update'
 
 # Recursively remove .DS_Store files
 alias cleanup="find . -type f -name '*.DS_Store' -ls -delete"
@@ -164,12 +164,6 @@ alias brewsl='brew services list'
 
 # FZF
 alias hist="history | fzf"
-
-# Yo Generators
-alias newWebApp='yo webapp'
-
-# DOTNET
-alias dotnetpublish='dotnet publish -c Release'
 
 # Spicetify
 alias sp='spicetify -h'
@@ -230,7 +224,6 @@ alias yac='yarn install & composer install'
 alias yui='yarn upgrade-interactive --latest'
 
 # Git
-# Git
 alias gst="git status"
 alias gb="git branch"
 alias gc="git checkout"
@@ -263,10 +256,6 @@ alias cc='composer clear-cache'
 alias artm='php artisan migrate'
 alias artfs='php artisan migrate:fresh --seed'
 alias artrf='php artisan migrate:refresh'
-
-# Laravel Tests
-alias artftest='php artisan make:test'
-alias artut='php artisan make:test --unit'
 
 # Laravel Makers
 alias artmc='php artisan make:controller'
