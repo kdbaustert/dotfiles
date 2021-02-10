@@ -53,7 +53,7 @@ yabai -m space 6 --label Float
 
 # Primary
 yabai -m rule --add app='^Hyper$' space=1
-yabai -m rule --add app='iTerm' opacity=0.98 space=1
+yabai -m rule --add app='iTerm' space=1
 yabai -m rule --add app='Code' space=1
 yabai -m rule --add app='Xcode' space=1
 yabai -m rule --add app='Termius' space=1
@@ -68,7 +68,7 @@ yabai -m rule --add app='Opera' space=2
 yabai -m rule --add app='Firefox Developer Edition' space=2
 yabai -m rule --add app='Microsoft Edge Dev' space=2
 yabai -m rule --add app='Safari' space=2
-yabai -m rule --add app='Chromium' space=2
+yabai -m rule --add app='Google Chrome Canary' space=2
 yabai -m rule --add app='Sidekick' space=2
 yabai -m rule --add app='Blisk' space=2
 
@@ -76,6 +76,7 @@ yabai -m rule --add app='Blisk' space=2
 yabai -m rule --add app='^Cyberduck$' space=3
 yabai -m rule --add app='^Transmit$' space=3
 yabai -m rule --add app='GitHub Desktop' space=3
+yabai -m rule --add app='Fork' space=3
 yabai -m rule --add app='Insomnia' space=3
 yabai -m rule --add app='TablePlus' space=3
 yabai -m rule --add app='Adobe Illustrator' space=3
