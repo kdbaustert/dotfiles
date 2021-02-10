@@ -1,91 +1,122 @@
+if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
+  source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
+fi
+
 export DOTFILES=$HOME/dotfiles
-fpath=(~/.local/share/zsh/comp $fpath)
-setopt promptsubst
-# export NVM_DIR=~/.nvm
+export LANG=en_US.UTF-8
+export CLICOLOR=1
+export LSCOLORS=GxFxCxDxBxegedabagaced
+export TERM=xterm-256color
+export NVM_DIR="$HOME/.nvm"
+export PATH="$PATH:$HOME/.composer/vendor/bin"
+export PATH="/usr/local/sbin:$PATH"
+export PATH="/usr/local/sbin:$PATH"
+export GEM_HOME="$HOME/.gem"
 
-# EXPORTS
-[[ -f $DOTFILES/zsh/exports.zsh ]] && source $DOTFILES/zsh/exports.zsh
+# Use modern completion system
+# zstyle ':completion:*' menu select
+# zstyle ':completion:*' matcher-list '' \
+#     'm:{a-z\-}={A-Z\_}' \
+#     'r:[^[:alpha:]]|[[:alpha:]]=** r:|=* m:{a-z\-}={A-Z\_}' \
+#     'r:[^[:ascii:]]|[[:ascii:]]=** r:|=* m:{a-z\-}={A-Z\_}'
+# zstyle ':completion:*' list-colors "${(@s.:.)LS_COLORS}"
+# zstyle ':completion:*' format $'\n%F{yellow}Completing %d%f\n'
+# zstyle ':completion:*' group-name ''
+# zstyle ':completion:*:functions' ignored-patterns '_*'
 
-# FUNCTIONS
-[[ -f $DOTFILES/zsh/functions.zsh ]] && source $DOTFILES/zsh/functions.zsh
-
-# ALIASES
-[[ -f $DOTFILES/zsh/aliases.zsh ]] && source $DOTFILES/zsh/aliases.zsh
-
+# define FZF params
+export COLORTERM="truecolor"
+export ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=180'
+export FZF_BASE=/usr/bin/fzf
+export FZF_DEFAULT_OPTS=' --color=light '
+export FZF_DEFAULT_COMMAND='rg --files'
+export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
 
 # ZINIT (PLUGIN MANAGER)
 if [[ ! -f $HOME/.zinit/bin/zinit.zsh ]]; then
-    print -P "%F{33}▓▒░ %F{220}Installing DHARMA Initiative Plugin Manager (zdharma/zinit)…%f"
-    command mkdir -p "$HOME/.zinit" && command chmod g-rwX "$HOME/.zinit"
-    command git clone https://github.com/zdharma/zinit "$HOME/.zinit/bin" && \
-        print -P "%F{33}▓▒░ %F{34}Installation successful.%f" || \
-        print -P "%F{160}▓▒░ The clone has failed.%f"
+  print -P "%F{33}▓▒░ %F{220}Installing DHARMA Initiative Plugin Manager (zdharma/zinit)…%f"
+  command mkdir -p "$HOME/.zinit" && command chmod g-rwX "$HOME/.zinit"
+  command git clone https://github.com/zdharma/zinit "$HOME/.zinit/bin" &&
+    print -P "%F{33}▓▒░ %F{34}Installation successful.%f" ||
+    print -P "%F{160}▓▒░ The clone has failed.%f"
 fi
 
 source "$HOME/.zinit/bin/zinit.zsh"
 autoload -Uz _zinit
 (( ${+_comps} )) && _comps[zinit]=_zinit
 
-zinit light-mode for \
-    zinit-zsh/z-a-patch-dl \
-    zinit-zsh/z-a-as-monitor \
-    zinit-zsh/z-a-bin-gem-node
+zinit ice depth=1
+zinit light romkatv/powerlevel10k
 
-zinit for \
-		light-mode	zsh-users/zsh-history-substring-search \
-        light-mode  zsh-users/zsh-autosuggestions \
+setopt correct
+setopt correct_all
+setopt extendedglob
 
-zinit snippet PZT::modules/directory/init.zsh
-zinit snippet PZT::modules/history/init.zsh
-zinit snippet PZT::modules/ssh/init.zsh
-zinit snippet PZT::modules/osx/init.zsh
-
-zinit ice wait'0' atinit"zpcompinit" lucid
-zinit light zdharma/fast-syntax-highlighting
-
-zinit load zsh-users/zsh-completions
-
-zinit light-mode for \
-        gretzky/auto-color-ls \
-		zpm-zsh/colors \
-		djui/alias-tips \
-		b4b4r07/enhancd \
+zinit light zdharma/history-search-multi-word
 
 zinit ice from"gh-r" as"program"
 zinit load junegunn/fzf-bin
 
-zinit load changyuheng/zsh-interactive-cd
+zinit ice lucid wait pick:"fzf-tab.zsh"
+zinit load "Aloxaf/fzf-tab"
 
-# ls colors
-zinit ice atclone"dircolors -b LS_COLORS > clrs.zsh" \
-    atpull'%atclone' pick"clrs.zsh" nocompile'!' \
-    atload'zstyle ":completion:*" list-colors “${(s.:.)LS_COLORS}”'
+zinit ice atclone"dircolors -b LS_COLORS > c.zsh" atpull'%atclone' pick"c.zsh" nocompile'!'
 zinit light trapd00r/LS_COLORS
 
-zinit load lincheney/fzf-tab-completion
-zinit load wookayin/fzf-fasd
 
-zinit light Aloxaf/fzf-tab
+zinit snippet OMZL::directories.zsh
+zinit snippet OMZP::ssh-agent
+zinit snippet OMZP::history
+zinit snippet OMZP::colorize
+zinit snippet OMZP::colored-man-pages
+zinit snippet OMZP::autojump
+zinit snippet OMZP::fancy-ctrl-z
+zinit snippet OMZP::fasd
+zinit snippet OMZP::safe-paste
+zinit snippet OMZL::clipboard.zsh
+zinit snippet OMZP::gitignore
 
-zinit ice depth=1
-zinit light romkatv/powerlevel10k
+# load ssh
+zstyle :omz:plugins:ssh-agent identities id_rsa
 
-# Activate completion
-if type brew &>/dev/null; then
-	FPATH=$(brew --prefix)/share/zsh-completions:$FPATH
+zinit wait lucid for OMZP::git
+zinit wait lucid for rupa/z
 
-	autoload -Uz compinit
-	compinit
-fi
+zinit light-mode for \
+		zpm-zsh/colors \
+		djui/alias-tips \
+		gretzky/auto-color-ls \
+		b4b4r07/enhancd \
+		MichaelAquilina/zsh-you-should-use
 
-# options
-setopt AUTO_CD       # Auto changes to a directory without typing cd.
-setopt AUTO_PUSHD    # Push the old directory onto the stack on cd.
-setopt EXTENDED_GLOB # Use extended globbing syntax.
-setopt PUSHD_TO_HOME # Push to home directory when no argument is given.
+zinit light chrissicool/zsh-256color
 
-# Correct commands.
-setopt CORRECT
+export NVM_LAZY_LOAD=true
+zinit light lukechilds/zsh-nvm
+
+zinit light hlissner/zsh-autopair
+
+# auto completions
+autoload -Uz compinit
+compinit -c
+zstyle ':completion:*' menu select
+
+# load these plugins last
+zinit wait lucid for \
+ atinit"ZINIT[COMPINIT_OPTS]=-C; zicompinit; zicdreplay" \
+    zdharma/fast-syntax-highlighting \
+ blockf \
+    zsh-users/zsh-completions \
+ atload"!_zsh_autosuggest_start" \
+    zsh-users/zsh-autosuggestions
+
+[[ -f $DOTFILES/zsh/p10k.zsh ]] && source $DOTFILES/zsh/p10k.zsh
+
+# FUNCTIONS
+[[ -f $DOTFILES/zsh/functions.zsh ]] && source $DOTFILES/zsh/functions.zsh
+
+# ALIASES
+[[ -f $DOTFILES/zsh/aliases.zsh ]] && source $DOTFILES/zsh/aliases.zsh
 
 #
 # History
@@ -102,48 +133,20 @@ setopt HIST_VERIFY
 setopt INC_APPEND_HISTORY
 setopt SHARE_HISTORY
 setopt HIST_SAVE_NO_DUPS
-setopt COMPLETEALIASES        # complete alisases
+setopt COMPLETEALIASES
 setopt AUTOMENU
+setopt AUTOCD
 
-zstyle ':completion:*' menu select
-zstyle ':completion:*:warnings' format '%F{red}no matches found%f'
+zstyle ":history-search-multi-word" page-size "30"
 
-# complete environment variables
-zstyle ':completion::*:(-command-|export):*' fake-parameters ${${${_comps[(I)-value-*]#*,}%%,*}:#-*-}
+# autoload -U colors && colors
+# export SPROMPT="Correct $fg[red]%R$reset_color to $fg[green]%r?$reset_color (Yes, No, Abort, Edit) "
 
-# correct single char typos
-zstyle ':completion:*' completer _complete _match _approximate
-zstyle ':completion:*:match:*' original only
-zstyle ':completion:*:approximate:*' max-errors 1 numeric
-
-zstyle ":completion:*:git-checkout:*" sort false
-zstyle ':completion:*:descriptions' format '[%d]'
-zstyle ':completion:*' list-colors ${(s.:.)LS_COLORS}
-zstyle ':fzf-tab:complete:cd:*' fzf-preview 'exa -1 --color=always $realpath'
-zstyle ':fzf-tab:*' fzf-command fzf
-zstyle ':completion:*' fzf-search-display true
-
-# syntax color definition
-ZSH_HIGHLIGHT_HIGHLIGHTERS=(main brackets)
-
-bindkey '^[[A' history-substring-search-up
-bindkey '^[[B' history-substring-search-down
-
-#THEFUCK
-eval "$(thefuck --alias)"
-eval "$(fasd --init auto)"
-
-[[ -f $DOTFILES/zsh/completion.zsh ]] && source $DOTFILES/zsh/completion.zsh
-
-[[ -f $DOTFILES/zsh/p10k.zsh ]] && source $DOTFILES/zsh/p10k.zsh
-
-# zstyle ':completion:*' matcher-list 'm:{a-z}={A-Z}'
-
-# #eval `dircolors`
-zstyle ':completion:*:default' list-colors ${LS_COLORS}
-#zstyle ':completion:*:*:kill:*:processes' list-colors '=(#b) #([%0-9]#)*=0=01;31'
-
-autoload colors && colors
+# zstyle ':completion:*' list-colors ${(s.:.)LS_COLORS}
+# zstyle ':fzf-tab:complete:cd:*' fzf-preview 'exa -1 --color=always $realpath'
+# zstyle ':fzf-tab:*' continuous-trigger '/'
+# zstyle ':completion:*:descriptions' format
+# zstyle ':fzf-tab:*' show-group full
 
 POWERLEVEL9K_BACKGROUND='transparent'
 POWERLEVEL9K_SHORTEN_DIR_LENGTH=1
@@ -191,23 +194,15 @@ POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS=(
 	ram                    # free RAM
 	load                   # CPU load
 	php_version            # php version (https://www.php.net/)
+	nvm
 	# =========================[ Line #2 ]=========================
 	newline
 )
 
+FZF_DEFAULT_OPTS='--height 50% --ansi'
+FZF_DEFAULT_COMMAND='rg --files --no-ignore --hidden --follow --glob "!.git/*"'
+
+#THEFUCK
+eval "$(thefuck --alias)"
+
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
-
-export FZF_DEFAULT_COMMAND='rg --files --no-ignore --hidden --follow -g "!{.git,node_modules}/*" 2> /dev/null'
-export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
-export FZF_CTRL_T_OPTS='--preview="cat {}" --preview-window=right:60%:wrap'
-export FZF_ALT_C_OPTS='--preview="ls {}" --preview-window=right:60%:wrap'
-export FZF_DEFAULT_OPTS=$FZF_DEFAULT_OPTS'
---height=50%
---color=fg:#e5e9f0,bg:'rgb(0,0,0,0)',hl:#60fdff
---color=fg+:#e5e9f0,bg+:'rgb(0,0,0,0)',hl+:#60fdff
---color=info:#6871ff,prompt:#6871ff,pointer:#00b0ff
---color=marker:#6871ff,spinner:#00b0ff,header:#6871ff'
-
-neofetch
-
-source $(brew --prefix nvm)/nvm.sh
