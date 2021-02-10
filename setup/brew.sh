@@ -99,16 +99,13 @@ apps=(
   brave-browser-nightly
   google-chrome-dev
   microsoft-edge-dev
-  vivaldi
   opera-developer
   iterm2-nightly
-  hyper-canary
   slack
   spotify
   karabiner-elements
   appcleaner
   1password
-  typora
   the-unarchiver
   captin
   brooklyn
@@ -119,17 +116,13 @@ apps=(
   bettertouchtool
   zeplin
   sip
-  visual-studio-code
+  visual-studio-code-insiders
   insomnia
-  forklift
   github
-  parallels
   postman
   little-snitch
   onyx
   ios-app-signer
-  optimage
-  imageoptim
   tor-browser
   keyboard-cleaner
 )
