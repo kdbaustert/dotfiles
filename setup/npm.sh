@@ -28,4 +28,7 @@ npm=(
   stylelint-config-standard
   alfred-npms
   electerm
+  firebase-tools
+  ntl
+  prettier-init
 )
