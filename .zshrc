@@ -63,6 +63,8 @@ zinit load "Aloxaf/fzf-tab"
 zinit ice atclone"dircolors -b LS_COLORS > c.zsh" atpull'%atclone' pick"c.zsh" nocompile'!'
 zinit light trapd00r/LS_COLORS
 
+zinit light xav-b/zsh-extend-history
+export ZSH_EXTEND_HISTORY_FILE="$HOME/.zsh_extended_history"
 
 zinit snippet OMZL::directories.zsh
 zinit snippet OMZP::ssh-agent
@@ -87,7 +89,9 @@ zinit light-mode for \
 		djui/alias-tips \
 		gretzky/auto-color-ls \
 		b4b4r07/enhancd \
-		MichaelAquilina/zsh-you-should-use
+		MichaelAquilina/zsh-you-should-use \
+		wfxr/forgit \
+		aperezdc/zsh-fzy
 
 zinit light chrissicool/zsh-256color
 
