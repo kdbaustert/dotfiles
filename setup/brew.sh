@@ -125,4 +125,6 @@ apps=(
   ios-app-signer
   tor-browser
   keyboard-cleaner
+  gitify
+  lulu
 )
