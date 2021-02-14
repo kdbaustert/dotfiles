@@ -80,11 +80,6 @@ fonts=(
   font-ubuntu-nerd-font
   font-jetbrains-mono-nerd-font
   font-monoid-nerd-font
-  font-monoid-nerd-font
-  font-cascadia-code
-  font-cascadia-code-pl
-  font-cascadia-mono
-  font-cascadia-mono-pl
   font-inconsolata
   font-inconsolata-nerd-font
   font-inconsolata-lgc
@@ -97,7 +92,7 @@ apps=(
   dropbox
   firefox-developer-edition
   brave-browser-nightly
-  google-chrome-dev
+  google-chrome-canary
   microsoft-edge-dev
   opera-developer
   iterm2-nightly
@@ -114,7 +109,6 @@ apps=(
   hammerspoon
   osxfuse
   bettertouchtool
-  zeplin
   sip
   visual-studio-code-insiders
   insomnia
@@ -123,8 +117,16 @@ apps=(
   little-snitch
   onyx
   ios-app-signer
-  tor-browser
   keyboard-cleaner
   gitify
   lulu
+  inkdrop
+  motrix
+  forkLift
+  atom-nightly
+  homebrew/cask-drivers/philips-hue-sync
+  malwarebytes
+  imazing
+  bartender
+  archiver
 )
