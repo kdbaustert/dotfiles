@@ -98,7 +98,7 @@ alias brewsr dnsmasq='brew services start dnsmasq'
 alias brewsr php='brew services start php'
 
 # Tiling window manager
-alias yabres='brew services restart yabai && brew services restart skhd && brew services restart spacebar'
+alias yabres='brew services restart yabai && brew services restart skhd'
 alias yabrestart='brew services start yabai && brew services start skhd'
 alias yabrestop='brew services stop yabai && brew services stop skhd'
 alias yabupdate='brew services stop yabai && brew upgrade yabai && sudo yabai --uninstall-sa && sudo yabai --install-sa && brew services start yabai'
@@ -184,19 +184,6 @@ alias wpoptimize='wp db optimize'
 alias wpchildtheme='wp scaffold child-theme'
 alias wpupdateplugins='wp plugin update --all'
 alias wppages="wp post list --post_type='page'"
-
-# ZIM
-alias zimu='zimfw update'
-alias zimi='zimfw install'
-alias zimun='zimfw uninstall'
-alias zimup='zimfw upgrade'
-
-# NVM
-alias nvmv='nvm --version'
-alias nvmlr='nvm ls-remote'
-alias nvmcur='nvm current'
-alias nvmu='nvm use'
-alias nvmyarn='npm install -g yarn'
 
 # Vue cli
 alias vinspect='vue inspect'
