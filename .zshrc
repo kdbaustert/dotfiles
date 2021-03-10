@@ -109,7 +109,9 @@ zinit light-mode for \
   MichaelAquilina/zsh-you-should-use \
   wfxr/forgit \
   aperezdc/zsh-fzy \
-  zsh-users/zsh-autosuggestions
+  zsh-users/zsh-autosuggestions \
+  joel-porquet/zsh-dircolors-solarized \
+  unixorn/warhol.plugin.zsh
 
 zinit ice lucid nocompile wait'0e' nocompletions
 zinit load MenkeTechnologies/zsh-more-completions
@@ -186,6 +188,8 @@ ZSH_HIGHLIGHT_STYLES[path]='fg=cyan'
 
 # To disable highlighting of globbing expressions
 ZSH_HIGHLIGHT_STYLES[globbing]='none'
+
+ZSH_COLORIZE_STYLE="colorful"
 
 # ZOXIDE
 eval "$(zoxide init zsh)"
