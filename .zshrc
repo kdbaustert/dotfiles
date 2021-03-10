@@ -79,9 +79,7 @@ zinit is-snippet for OMZ::lib/theme-and-appearance.zsh
 zinit is-snippet for OMZ::lib/history.zsh
 zinit is-snippet for OMZ::lib/git.zsh
 zinit is-snippet for OMZ::plugins/git/git.plugin.zsh
-zinit is-snippet for OMZ::plugins/git/git.plugin.zsh
 zinit is-snippet for OMZ::plugins/bgnotify/bgnotify.plugin.zsh
-zinit is-snippet for OMZ::plugins/iterm2/iterm2.plugin.zsh
 zinit is-snippet for OMZ::plugins/common-aliases/common-aliases.plugin.zsh
 zinit is-snippet for OMZ::plugins/thefuck/thefuck.plugin.zsh
 zinit is-snippet for OMZ::plugins/history/history.plugin.zsh
@@ -97,9 +95,6 @@ zinit for changyuheng/fz
 zinit for changyuheng/zsh-interactive-cd
 zinit wait lucid for zdharma/fast-syntax-highlighting
 zinit pick"shell/completion.zsh" src"shell/key-bindings.zsh" for junegunn/fzf
-
-zinit for iam4x/zsh-iterm-touchbar
-zinit for bernardop/iterm-tab-color-oh-my-zsh
 
 zinit light-mode for \
   zpm-zsh/colors \
@@ -138,7 +133,7 @@ compinit -c
 # define FZF params
 export ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=180'
 export FZF_BASE=/usr/bin/fzf
-export FZF_DEFAULT_OPTS=' --color=light '
+export FZF_DEFAULT_OPTS=' --color=dark '
 export FZF_DEFAULT_COMMAND='rg --files'
 export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
 
@@ -150,7 +145,7 @@ export FZF_DEFAULT_OPTS='
   --reverse
   --border
   --multi
-  --color fg:#1FF088,bg:#000000,hl:#F7FF00,fg+:#B534FA,bg+:#19161B,hl+:#fabd2f
+  --color fg:#1FF088,bg:'rgb(0,0,0,0)',hl:#F7FF00,fg+:#B534FA,bg+:'rgb(0,0,0,0)',hl+:#fabd2f
   --color info:#83a598,prompt:#bdae93,spinner:#fabd2f,pointer:#83a598,marker:#fe8019,header:#665c54
 '
 export FZF_CTRL_T_OPTS="--preview '(bat --theme ansi-dark --color always {} 2> /dev/null || exa --tree --color=always {}) 2> /dev/null | head -200'"
@@ -253,6 +248,9 @@ POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS=(
 	nvm
 	# =========================[ Line #2 ]=========================
 	newline
+
 )
 
-if [ -e /Users/kenny/.nix-profile/etc/profile.d/nix.sh ]; then . /Users/kenny/.nix-profile/etc/profile.d/nix.sh; fi # added by Nix installer
+# echo "Kennys MacBook Pro" | figlet | lolcat
+
+# echo Kennys MacBook Pro | figlet | lolcat
