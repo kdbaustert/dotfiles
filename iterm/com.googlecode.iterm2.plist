@@ -12075,7 +12075,7 @@
 			<key>Title Components</key>
 			<integer>128</integer>
 			<key>Transparency</key>
-			<real>0.24068439916237114</real>
+			<real>0.33592378683690566</real>
 			<key>Unicode Version</key>
 			<integer>9</integer>
 			<key>Unlimited Scrollback</key>
@@ -12166,28 +12166,104 @@
 	<key>Snippets</key>
 	<array>
 		<dict>
+			<key>guid</key>
+			<string>0c510188e9951232049423a0fd501f077e6b5351094666ab392f43b82cca5ee1</string>
 			<key>title</key>
 			<string>Apache Add new site</string>
 			<key>value</key>
 			<string>sudo a2ensite</string>
+			<key>version</key>
+			<integer>0</integer>
 		</dict>
 		<dict>
+			<key>guid</key>
+			<string>6dcb0eb8e71d69719ff672aeb10eb92436e286270cc717a1bee0d85e2da075a6</string>
 			<key>title</key>
 			<string>MySQL Login</string>
 			<key>value</key>
 			<string>mysql -u root -p</string>
+			<key>version</key>
+			<integer>0</integer>
 		</dict>
 		<dict>
+			<key>guid</key>
+			<string>a9afe385bd120810a46c44681cef99b860f7616a740b199bb0bac96afd05a039</string>
 			<key>title</key>
 			<string>Upgrade Held back packages</string>
 			<key>value</key>
 			<string>sudo apt-get --with-new-pkgs upgrade</string>
+			<key>version</key>
+			<integer>0</integer>
 		</dict>
 		<dict>
+			<key>guid</key>
+			<string>93bf5f670c1a9304e675c5a582f8587e3deb3c92eb237e77d46ea46bd18c9f48</string>
 			<key>title</key>
 			<string>sudo find /var/www -type d 775</string>
 			<key>value</key>
 			<string>sudo find /var/www/html -type d -exec chmod 775 {} \;</string>
+			<key>version</key>
+			<integer>0</integer>
+		</dict>
+		<dict>
+			<key>guid</key>
+			<string>9F0D033E-654D-4BF9-9EF1-199494156808</string>
+			<key>title</key>
+			<string>sudo find -type f 644</string>
+			<key>value</key>
+			<string>sudo find /var/www/html -type f -exec chmod 644 {} \;</string>
+			<key>version</key>
+			<integer>1</integer>
+		</dict>
+		<dict>
+			<key>guid</key>
+			<string>6266A921-6B78-43DF-B564-DB7BB0AECD5D</string>
+			<key>title</key>
+			<string>sudo chown -R www-data:www-data</string>
+			<key>value</key>
+			<string>sudo chown -R www-data:www-data /var/www/html</string>
+			<key>version</key>
+			<integer>1</integer>
+		</dict>
+		<dict>
+			<key>guid</key>
+			<string>36425AD9-A910-42E9-9350-65E22A9CDC3C</string>
+			<key>title</key>
+			<string>Apache Clean</string>
+			<key>value</key>
+			<string>sudo apt-get clean &amp;&amp; sudo apt-get autoremove --purge &amp;&amp; sudo apt-get autoremove</string>
+			<key>version</key>
+			<integer>1</integer>
+		</dict>
+		<dict>
+			<key>guid</key>
+			<string>C0D72154-2A34-4E17-8271-7FF09BEF380A</string>
+			<key>title</key>
+			<string>Obtaining an SSL Certificate nginx</string>
+			<key>value</key>
+			<string>sudo certbot --nginx -d </string>
+			<key>version</key>
+			<integer>1</integer>
+		</dict>
+		<dict>
+			<key>guid</key>
+			<string>56A87529-0128-4B18-B3DE-6A929CBCE8F2</string>
+			<key>title</key>
+			<string>Obtaining an SSL Certificate apache</string>
+			<key>value</key>
+			<string>sudo certbot --apache -d </string>
+			<key>version</key>
+			<integer>1</integer>
+		</dict>
+		<dict>
+			<key>guid</key>
+			<string>C7886C31-294C-471E-9D71-396BB32864E0</string>
+			<key>title</key>
+			<string>Apache reload</string>
+			<key>value</key>
+			<string>sudo systemctl reload apache2</string>
+			<key>version</key>
+			<integer>1</integer>
 		</dict>
 	</array>
 	<key>SoundForEsc</key>
