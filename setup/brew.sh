@@ -15,6 +15,7 @@ binaries=(
   openssh
   git
   tmux
+  gnupg
   z
   openssl
   wget
@@ -30,6 +31,7 @@ binaries=(
   terminal-notifier
   wifi-password
   task
+  fzy
   tree
   mycli
   autojump
@@ -88,26 +90,28 @@ fonts=(
 
 # Homebrew casks
 apps=(
+  adobe-acrobat-reader
   alfred
+  alacritty
   dropbox
   firefox-developer-edition
   brave-browser-nightly
+  google-chrome
   google-chrome-canary
   microsoft-edge-dev
   opera-developer
   iterm2-nightly
   slack
+  duet
   spotify
   karabiner-elements
   appcleaner
   1password
-  the-unarchiver
   captin
   brooklyn
   carbon-copy-cloner
   aerial
   hammerspoon
-  osxfuse
   bettertouchtool
   sip
   visual-studio-code-insiders
@@ -119,7 +123,6 @@ apps=(
   ios-app-signer
   keyboard-cleaner
   gitify
-  lulu
   inkdrop
   motrix
   forkLift
@@ -129,4 +132,6 @@ apps=(
   imazing
   bartender
   archiver
+  vlc
+  datagrip
 )
