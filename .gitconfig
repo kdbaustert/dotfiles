@@ -1,0 +1,13 @@
+[user]
+name = kdbaustert
+email = kenny@gothamx.dev
+	signingkey = 4A77FB33FAFB95DA
+[credential]
+helper = osxkeychain
+[filter "lfs"]
+smudge = git-lfs smudge -- %f
+process = git-lfs filter-process
+required = true
+clean = git-lfs clean -- %f
+[commit]
+	gpgsign = true
