@@ -49,6 +49,7 @@ binaries=(
   neovim
   selecta
   gitui
+  pinentry-mac
 
   # Development
   yarn
