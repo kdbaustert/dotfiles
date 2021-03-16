@@ -50,6 +50,12 @@ binaries=(
   selecta
   gitui
   pinentry-mac
+  cowsay
+  fortune
+  figlet
+  lolcat
+  ccat
+  navi
 
   # Development
   yarn
