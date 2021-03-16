@@ -17,15 +17,7 @@ export PATH="$PATH:$HOME/.composer/vendor/bin"
 export PATH="/usr/local/sbin:$PATH"
 export PATH="/usr/local/sbin:$PATH"
 export GEM_HOME="$HOME/.gem"
-
 export COLORTERM="truecolor"
-
-if [ -f "${HOME}/.gpg-agent-info" ]; then
-  . "${HOME}/.gpg-agent-info"
-  export GPG_AGENT_INFO
-  export SSH_AUTH_SOCK
-  export SSH_AGENT_PID
-fi
 
 # FUNCTIONS
 [[ -f $DOTFILES/zsh/functions.zsh ]] && source $DOTFILES/zsh/functions.zsh
@@ -80,12 +72,10 @@ zinit is-snippet for OMZ::lib/history.zsh
 zinit is-snippet for OMZ::lib/git.zsh
 zinit is-snippet for OMZ::plugins/git/git.plugin.zsh
 zinit is-snippet for OMZ::plugins/bgnotify/bgnotify.plugin.zsh
-zinit is-snippet for OMZ::plugins/common-aliases/common-aliases.plugin.zsh
 zinit is-snippet for OMZ::plugins/thefuck/thefuck.plugin.zsh
 zinit is-snippet for OMZ::plugins/history/history.plugin.zsh
 zinit is-snippet for OMZ::plugins/safe-paste/safe-paste.plugin.zsh
 zinit is-snippet for OMZ::plugins/ssh-agent/ssh-agent.plugin.zsh
-zinit is-snippet for OMZ::plugins/gpg-agent/gpg-agent.plugin.zsh
 zinit is-snippet for OMZ::plugins/colorize/colorize.plugin.zsh
 zinit is-snippet for OMZ::plugins/colored-man-pages/colored-man-pages.plugin.zsh
 
