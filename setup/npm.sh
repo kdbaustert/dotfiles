@@ -31,4 +31,7 @@ npm=(
   firebase-tools
   ntl
   prettier-init
+  readme-md-generator
+  npx
+  auto-changelog
 )
