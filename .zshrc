@@ -55,10 +55,10 @@ zinit light-mode for \
 zinit ice from"gh-r" as"program"
 zinit load junegunn/fzf-bin
 
-zinit ice atclone"dircolors -b LS_COLORS > clrs.zsh" \
-    atpull'%atclone' pick"clrs.zsh" nocompile'!' \
-    atload'zstyle ":completion:*" list-colors “${(s.:.)LS_COLORS}”'
-zinit light trapd00r/LS_COLORS
+# zinit ice atclone"dircolors -b LS_COLORS > clrs.zsh" \
+#     atpull'%atclone' pick"clrs.zsh" nocompile'!' \
+#     atload'zstyle ":completion:*" list-colors “${(s.:.)LS_COLORS}”'
+# zinit light trapd00r/LS_COLORS
 
 zinit ice lucid wait pick:"fzf-tab.zsh"
 zinit load "Aloxaf/fzf-tab"
@@ -92,16 +92,11 @@ zinit light-mode for \
   gretzky/auto-color-ls \
   b4b4r07/enhancd \
   MichaelAquilina/zsh-you-should-use \
-  wfxr/forgit \
   aperezdc/zsh-fzy \
-  zsh-users/zsh-autosuggestions \
-  joel-porquet/zsh-dircolors-solarized \
-  unixorn/warhol.plugin.zsh
+  zsh-users/zsh-autosuggestions
 
 zinit ice lucid nocompile wait'0e' nocompletions
 zinit load MenkeTechnologies/zsh-more-completions
-
-zinit light chrissicool/zsh-256color
 
 zinit ice wait'1' lucid
 zinit light laggardkernel/zsh-thefuck
@@ -117,6 +112,7 @@ zstyle ':completion:*' menu select
 # auto completions
 autoload -Uz compinit
 compinit -c
+
 
 # define FZF params
 export ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=180'
