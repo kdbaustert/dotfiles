@@ -11279,6 +11279,8 @@
 	</dict>
 	<key>Default Bookmark Guid</key>
 	<string>1BA6CD42-E17E-4036-ABBA-25F52535ED6B</string>
+	<key>Default Toolbelt Width</key>
+	<real>250</real>
 	<key>DefaultTabBarHeight</key>
 	<real>25</real>
 	<key>DimInactiveSplitPanes</key>
@@ -11688,7 +11690,7 @@
 			<key>Guid</key>
 			<string>1BA6CD42-E17E-4036-ABBA-25F52535ED6B</string>
 			<key>Horizontal Spacing</key>
-			<real>1.04</real>
+			<real>1</real>
 			<key>Idle Code</key>
 			<integer>0</integer>
 			<key>Initial Use Transparency</key>
@@ -12097,7 +12099,7 @@
 			<key>Use Underline Color</key>
 			<false/>
 			<key>Vertical Spacing</key>
-			<real>1.3300000000000001</real>
+			<real>1.0800000000000001</real>
 			<key>Visual Bell</key>
 			<false/>
 			<key>Window Type</key>
@@ -12266,6 +12268,26 @@
 			<string>Apache reload</string>
 			<key>value</key>
 			<string>sudo systemctl reload apache2</string>
+			<key>version</key>
+			<integer>1</integer>
+		</dict>
+		<dict>
+			<key>guid</key>
+			<string>BEA57D54-DA24-4253-9380-A51E56B36E84</string>
+			<key>title</key>
+			<string>MySQL Create a new user, grant all privileges and reload configuration</string>
+			<key>value</key>
+			<string>CREATE USER 'newuser'@'localhost' IDENTIFIED BY 'password';</string>
+			<key>version</key>
+			<integer>1</integer>
+		</dict>
+		<dict>
+			<key>guid</key>
+			<string>7FA28575-1102-4ACC-8524-4B099C77D5FA</string>
+			<key>title</key>
+			<string>MySQL flush privileges</string>
+			<key>value</key>
+			<string>FLUSH PRIVILEGES;</string>
 			<key>version</key>
 			<integer>1</integer>
 		</dict>
