@@ -18,6 +18,8 @@ export PATH="/usr/local/sbin:$PATH"
 export PATH="/usr/local/sbin:$PATH"
 export GEM_HOME="$HOME/.gem"
 export COLORTERM="truecolor"
+export PATH="/usr/local/opt/openldap/bin:$PATH"
+export PATH="/usr/local/opt/openldap/sbin:$PATH"
 
 # FUNCTIONS
 [[ -f $DOTFILES/zsh/functions.zsh ]] && source $DOTFILES/zsh/functions.zsh
@@ -46,9 +48,7 @@ zinit light romkatv/powerlevel10k
 # Load a few important annexes, without Turbo
 # (this is currently required for annexes)
 zinit light-mode for \
-  zinit-zsh/z-a-rust \
   zinit-zsh/z-a-as-monitor \
-  zinit-zsh/z-a-patch-dl \
   zinit-zsh/z-a-bin-gem-node
 # ### End of Zinit's installer
 
@@ -93,10 +93,15 @@ zinit light-mode for \
   b4b4r07/enhancd \
   MichaelAquilina/zsh-you-should-use \
   aperezdc/zsh-fzy \
-  zsh-users/zsh-autosuggestions
+  zsh-users/zsh-autosuggestions \
+  zdharma/zzcomplete \
+  lukechilds/zsh-better-npm-completion
 
 zinit ice lucid nocompile wait'0e' nocompletions
 zinit load MenkeTechnologies/zsh-more-completions
+
+zinit ice lucid nocompile
+zinit load MenkeTechnologies/zsh-expand
 
 zinit ice wait'1' lucid
 zinit light laggardkernel/zsh-thefuck
@@ -237,4 +242,5 @@ POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS=(
 
 # echo "Kennys MacBook Pro" | figlet | lolcat
 
-# echo Kennys MacBook Pro | figlet | lolcat
+# echo Kennys MacBook Pro | figlet | lolcatif [ -e /Users/kenny/.nix-profile/etc/profile.d/nix.sh ]; then . /Users/kenny/.nix-profile/etc/profile.d/nix.sh; fi # added by Nix installer
+
