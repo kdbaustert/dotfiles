@@ -97,7 +97,6 @@ fonts=(
 
 # Homebrew casks
 apps=(
-  adobe-acrobat-reader
   alfred
   alacritty
   dropbox
@@ -105,8 +104,6 @@ apps=(
   brave-browser-nightly
   google-chrome
   google-chrome-canary
-  microsoft-edge-dev
-  opera-developer
   iterm2-nightly
   slack
   duet
@@ -120,7 +117,6 @@ apps=(
   aerial
   hammerspoon
   bettertouchtool
-  sip
   visual-studio-code-insiders
   insomnia
   github
@@ -141,4 +137,6 @@ apps=(
   archiver
   vlc
   datagrip
+  airbuddy
+  raycast
 )
