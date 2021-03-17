@@ -25,7 +25,7 @@ export COLORTERM="truecolor"
 # ALIASES
 [[ -f $DOTFILES/zsh/aliases.zsh ]] && source $DOTFILES/zsh/aliases.zsh
 
-[ -f /usr/bin/gpg2 ] && alias gpg="/usr/bin/gpg2"
+# [ -f /usr/bin/gpg2 ] && alias gpg="/usr/bin/gpg2"
 
 ### Added by Zinit's installer
 if [[ ! -f $HOME/.zinit/bin/zinit.zsh ]]; then
@@ -55,7 +55,9 @@ zinit light-mode for \
 zinit ice from"gh-r" as"program"
 zinit load junegunn/fzf-bin
 
-zinit ice atclone"dircolors -b LS_COLORS > c.zsh" atpull'%atclone' pick"c.zsh" nocompile'!'
+zinit ice atclone"dircolors -b LS_COLORS > clrs.zsh" \
+    atpull'%atclone' pick"clrs.zsh" nocompile'!' \
+    atload'zstyle ":completion:*" list-colors “${(s.:.)LS_COLORS}”'
 zinit light trapd00r/LS_COLORS
 
 zinit ice lucid wait pick:"fzf-tab.zsh"
@@ -67,7 +69,6 @@ done
 
 # Oh-My-Zsh snippets
 zinit is-snippet for OMZ::lib/directories.zsh
-zinit is-snippet for OMZ::lib/theme-and-appearance.zsh
 zinit is-snippet for OMZ::lib/history.zsh
 zinit is-snippet for OMZ::lib/git.zsh
 zinit is-snippet for OMZ::plugins/git/git.plugin.zsh
@@ -77,7 +78,6 @@ zinit is-snippet for OMZ::plugins/history/history.plugin.zsh
 zinit is-snippet for OMZ::plugins/safe-paste/safe-paste.plugin.zsh
 zinit is-snippet for OMZ::plugins/ssh-agent/ssh-agent.plugin.zsh
 zinit is-snippet for OMZ::plugins/colorize/colorize.plugin.zsh
-zinit is-snippet for OMZ::plugins/colored-man-pages/colored-man-pages.plugin.zsh
 
 # Plugins
 zinit for rupa/z
@@ -117,8 +117,6 @@ zstyle ':completion:*' menu select
 # auto completions
 autoload -Uz compinit
 compinit -c
-
-# [[ -f $DOTFILES/zsh/completion.zsh ]] && source $DOTFILES/zsh/completion.zsh
 
 # define FZF params
 export ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=180'
