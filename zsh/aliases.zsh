@@ -9,6 +9,9 @@ alias c='clear'
 alias o='open .'
 alias x='exit'
 alias search-history='$(history | cut -c8- | sort -u | pick)'
+alias genpass='LC_ALL=C tr -dc "[:alnum:]" < /dev/urandom | head -c 20 | pbcopy'
+alias purgemem='sudo purge'
+alias ClearDNSCache='sudo dscacheutil -flushcache && sudo killall -HUP mDNSResponder'
 
 # Directories
 alias dt="cd $HOME/Desktop"
