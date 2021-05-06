@@ -103,6 +103,7 @@ yabai -m rule --add app='IconJar' space=6
 yabai -m rule --add app='Carbon Copy Cloner' space=6
 
 #UNMANAGED
+yabai -m rule --add label="Archiver" app='Archiver' manage=off
 yabai -m rule --add label="Step Two" app='Step Two' manage=off
 yabai -m rule --add label="System Preferences" app="^System Preferences$" manage=off
 yabai -m rule --add label="App Store" app="^App Store$" manage=off
