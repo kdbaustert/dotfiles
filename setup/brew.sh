@@ -56,6 +56,7 @@ binaries=(
   lolcat
   ccat
   navi
+  ffmpeg
 
   # Development
   yarn
