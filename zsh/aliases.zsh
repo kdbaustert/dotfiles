@@ -93,7 +93,7 @@ alias cnodeold='find . -name "node_modules" -type d -mtime +120 | xargs rm -rf'
 # Removes all node_modules folders:
 alias cnodeall='find . -name "node_modules" -type d | xargs rm -rf'
 
-alias getsalts="curl https://api.wordpress.org/secret-key/1.1/salt/"
+alias wpgetsalts="curl https://api.wordpress.org/secret-key/1.1/salt/"
 
 # Brew Services
 alias brewsr mariadb='brew services start mariadb'
