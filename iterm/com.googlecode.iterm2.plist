@@ -12291,6 +12291,26 @@
 			<key>version</key>
 			<integer>1</integer>
 		</dict>
+		<dict>
+			<key>guid</key>
+			<string>9CAB5638-6AF4-4C87-BC88-DB96129AF713</string>
+			<key>title</key>
+			<string>Apache remove domain config</string>
+			<key>value</key>
+			<string>sudo a2dissite</string>
+			<key>version</key>
+			<integer>1</integer>
+		</dict>
+		<dict>
+			<key>guid</key>
+			<string>839657FF-68E6-4E47-B31D-9E5A0DBDA21D</string>
+			<key>title</key>
+			<string>Copy file and rename</string>
+			<key>value</key>
+			<string>cp</string>
+			<key>version</key>
+			<integer>1</integer>
+		</dict>
 	</array>
 	<key>SoundForEsc</key>
 	<false/>
