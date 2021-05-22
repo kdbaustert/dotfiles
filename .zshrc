@@ -13,13 +13,10 @@ export CLICOLOR=1
 export LSCOLORS=GxFxCxDxBxegedabagaced
 export TERM=xterm-256color
 export NVM_DIR="$HOME/.nvm"
-export PATH="$PATH:$HOME/.composer/vendor/bin"
-export PATH="/usr/local/sbin:$PATH"
+export PATH="$HOME/.composer/vendor/bin:$PATH"
 export PATH="/usr/local/sbin:$PATH"
 export GEM_HOME="$HOME/.gem"
 export COLORTERM="truecolor"
-export PATH="/usr/local/opt/openldap/bin:$PATH"
-export PATH="/usr/local/opt/openldap/sbin:$PATH"
 
 # FUNCTIONS
 [[ -f $DOTFILES/zsh/functions.zsh ]] && source $DOTFILES/zsh/functions.zsh
@@ -70,12 +67,12 @@ done
 # Oh-My-Zsh snippets
 zinit is-snippet for OMZ::lib/directories.zsh
 zinit is-snippet for OMZ::lib/history.zsh
-zinit is-snippet for OMZ::lib/git.zsh
-zinit is-snippet for OMZ::plugins/git/git.plugin.zsh
-zinit is-snippet for OMZ::plugins/bgnotify/bgnotify.plugin.zsh
+# zinit is-snippet for OMZ::lib/git.zsh
+# zinit is-snippet for OMZ::plugins/git/git.plugin.zsh
+# zinit is-snippet for OMZ::plugins/bgnotify/bgnotify.plugin.zsh
 zinit is-snippet for OMZ::plugins/thefuck/thefuck.plugin.zsh
 zinit is-snippet for OMZ::plugins/history/history.plugin.zsh
-zinit is-snippet for OMZ::plugins/safe-paste/safe-paste.plugin.zsh
+# zinit is-snippet for OMZ::plugins/safe-paste/safe-paste.plugin.zsh
 zinit is-snippet for OMZ::plugins/ssh-agent/ssh-agent.plugin.zsh
 zinit is-snippet for OMZ::plugins/colorize/colorize.plugin.zsh
 
@@ -88,14 +85,12 @@ zinit pick"shell/completion.zsh" src"shell/key-bindings.zsh" for junegunn/fzf
 
 zinit light-mode for \
   zpm-zsh/colors \
-  djui/alias-tips \
   gretzky/auto-color-ls \
   b4b4r07/enhancd \
   MichaelAquilina/zsh-you-should-use \
   aperezdc/zsh-fzy \
   zsh-users/zsh-autosuggestions \
   zdharma/zzcomplete \
-  lukechilds/zsh-better-npm-completion
 
 zinit ice lucid nocompile wait'0e' nocompletions
 zinit load MenkeTechnologies/zsh-more-completions
@@ -243,4 +238,3 @@ POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS=(
 # echo "Kennys MacBook Pro" | figlet | lolcat
 
 # echo Kennys MacBook Pro | figlet | lolcatif [ -e /Users/kenny/.nix-profile/etc/profile.d/nix.sh ]; then . /Users/kenny/.nix-profile/etc/profile.d/nix.sh; fi # added by Nix installer
-
