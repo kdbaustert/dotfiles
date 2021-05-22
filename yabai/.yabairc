@@ -57,9 +57,7 @@ yabai -m rule --add app='iTerm' space=1
 yabai -m rule --add app='Code' space=1
 yabai -m rule --add app='Xcode' space=1
 yabai -m rule --add app='Termius' space=1
-yabai -m rule --add app='SnippetsLab' space=1
 yabai -m rule --add app='Termius' space=1
-yabai -m rule --add app='electerm' space=1
 
 # Browsers
 yabai -m rule --add app='Google Chrome' space=2
@@ -70,12 +68,12 @@ yabai -m rule --add app='Microsoft Edge Dev' space=2
 yabai -m rule --add app='Safari' space=2
 yabai -m rule --add app='Google Chrome Canary' space=2
 yabai -m rule --add app='Sidekick' space=2
-yabai -m rule --add app='Blisk' space=2
 
 # Tools
 yabai -m rule --add app='^Cyberduck$' space=3
 yabai -m rule --add app='^Transmit$' space=3
 yabai -m rule --add app='GitHub Desktop' space=3
+yabai -m rule --add app='GitKraken' space=3
 yabai -m rule --add app='Fork' space=3
 yabai -m rule --add app='Insomnia' space=3
 yabai -m rule --add app='TablePlus' space=3
@@ -96,6 +94,7 @@ yabai -m rule --add app='Music' space=5
 
 # Float
 yabai -m rule --add app='^BetterTouchTool$' space=6
+yabai -m rule --add app='IconChamp' space=6
 yabai -m rule --add app='Parallels Desktop' space=6
 yabai -m rule --add app='Folx' space=6
 yabai -m rule --add app='CleanMyMac X' space=6
@@ -111,9 +110,9 @@ yabai -m rule --add label="Finder" app="^Finder$" title="(Co(py|nnect)|Move|Info
 yabai -m rule --add title='.*Install.*' manage=off
 yabai -m rule --add app='^Dropbox$' manage=off
 yabai -m rule --add app='^The Unarchiver$' manage=off
-yabai -m rule --add app='Preview' manage=offs
+yabai -m rule --add app='Preview' manage=off
 yabai -m rule --add app='^Archive Utility' manage=off
-yabai -m rule --add app='1Password 7' manage=off
+yabai -m rule --add app='^1Password 7$' manage=off sticky=on
 yabai -m rule --add app='Speedtest' manage=off
 
 yabai -m rule --add app='Google Chrome'
