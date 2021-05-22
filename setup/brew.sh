@@ -140,4 +140,5 @@ apps=(
   datagrip
   airbuddy
   raycast
+  carbon-copy-cloner
 )
