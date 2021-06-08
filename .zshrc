@@ -161,24 +161,27 @@ zinit light laggardkernel/zsh-thefuck
 export NVM_LAZY_LOAD=true
 zinit light lukechilds/zsh-nvm
 
-#
-# History
-#
-HISTSIZE=1000000
-SAVEHIST=1000000
+#####################
+# HISTORY           #
+#####################
+[ -z "$HISTFILE" ] && HISTFILE="$HOME/.zhistory"
+HISTSIZE=290000
+SAVEHIST=$HISTSIZE
 
-setopt HIST_IGNORE_ALL_DUPS
-setopt APPEND_HISTORY
-setopt EXTENDED_HISTORY
-setopt HIST_EXPIRE_DUPS_FIRST
-setopt HIST_IGNORE_SPACE
-setopt HIST_VERIFY
-setopt INC_APPEND_HISTORY
-setopt SHARE_HISTORY
-setopt HIST_SAVE_NO_DUPS
-setopt COMPLETEALIASES
-setopt AUTOMENU
-setopt AUTOCD
+#####################
+# SETOPT            #
+#####################
+setopt extended_history       # record timestamp of command in HISTFILE
+setopt hist_expire_dups_first # delete duplicates first when HISTFILE size exceeds HISTSIZE
+setopt hist_ignore_all_dups   # ignore duplicated commands history list
+setopt hist_ignore_space      # ignore commands that start with space
+setopt hist_verify            # show command with history expansion to user before running it
+setopt inc_append_history     # add commands to HISTFILE in order of execution
+setopt share_history          # share command history data
+setopt completealiases        # complete alisases
+setopt automenu
+setopt autocd
+setopt sharehistory           # global history
 
 #####################
 # ENV VARIABLE      #
@@ -195,7 +198,7 @@ export PATH="$HOME/.composer/vendor/bin:$PATH"
 export PATH="/usr/local/sbin:$PATH"
 export GEM_HOME="$HOME/.gem"
 export PROMPT_EOL_MARK=''  # hide % at end of output
-export PATH=$HOME/bin:$PATH
+# export PATH=$HOME/bin:$PATH
 
 #####################
 # COLORING          #
