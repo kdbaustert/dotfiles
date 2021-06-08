@@ -39,14 +39,17 @@ zinit ice depth=1; zinit light romkatv/powerlevel10k
 #####################
 # SSH-AGENT
 zinit light bobsoppe/zsh-ssh-agent
+
 # AUTOSUGGESTIONS, TRIGGER PRECMD HOOK UPON LOAD
 ZSH_AUTOSUGGEST_BUFFER_MAX_SIZE=20
 zinit ice wait'0a' lucid atload'_zsh_autosuggest_start'
 zinit light zsh-users/zsh-autosuggestions
+
 # Then load url-quote-magic and bracketed-paste-magic as above
 autoload -U url-quote-magic bracketed-paste-magic
 zle -N self-insert url-quote-magic
 zle -N bracketed-paste bracketed-paste-magic
+
 # Now the fix, setup these two hooks:
 pasteinit() {
   OLD_SELF_INSERT=${${(s.:.)widgets[self-insert]}[2,3]}
@@ -211,6 +214,7 @@ autoload colors && colors
 function fg-fzf() {
   job="$(jobs | fzf -0 -1 | sed -E 's/\[(.+)\].*/\1/')" && echo '' && fg %$job
 }
+
 function fancy-ctrl-z () {
   if [[ $#BUFFER -eq 0 ]]; then
     BUFFER=" fg-fzf"
@@ -220,6 +224,7 @@ function fancy-ctrl-z () {
     zle clear-screen -w
   fi
 }
+
 zle -N fancy-ctrl-z
 bindkey '^Z' fancy-ctrl-z
 
