@@ -24,8 +24,6 @@ export COLORTERM="truecolor"
 # ALIASES
 [[ -f $DOTFILES/zsh/aliases.zsh ]] && source $DOTFILES/zsh/aliases.zsh
 
-# [ -f /usr/bin/gpg2 ] && alias gpg="/usr/bin/gpg2"
-
 ### Added by Zinit's installer
 if [[ ! -f $HOME/.zinit/bin/zinit.zsh ]]; then
   print -P "%F{33}▓▒░ %F{220}Installing %F{33}DHARMA%F{220} Initiative Plugin Manager (%F{33}zdharma/zinit%F{220})…%f"
@@ -39,64 +37,140 @@ source "$HOME/.zinit/bin/zinit.zsh"
 autoload -Uz _zinit
 (( ${+_comps} )) && _comps[zinit]=_zinit
 
-zinit ice depth=1
-zinit light romkatv/powerlevel10k
-
-# Load a few important annexes, without Turbo
-# (this is currently required for annexes)
 zinit light-mode for \
-  zinit-zsh/z-a-as-monitor \
-  zinit-zsh/z-a-bin-gem-node
-# ### End of Zinit's installer
+    zinit-zsh/z-a-rust \
+    zinit-zsh/z-a-as-monitor \
+    zinit-zsh/z-a-patch-dl \
+    zinit-zsh/z-a-bin-gem-node
 
-zinit ice from"gh-r" as"program"
-zinit load junegunn/fzf-bin
+zinit ice depth=1; zinit light romkatv/powerlevel10k
 
-# zinit ice atclone"dircolors -b LS_COLORS > clrs.zsh" \
-#     atpull'%atclone' pick"clrs.zsh" nocompile'!' \
-#     atload'zstyle ":completion:*" list-colors “${(s.:.)LS_COLORS}”'
-# zinit light trapd00r/LS_COLORS
+#####################
+# PLUGINS           #
+#####################
+# SSH-AGENT
+zinit light bobsoppe/zsh-ssh-agent
+# AUTOSUGGESTIONS, TRIGGER PRECMD HOOK UPON LOAD
+ZSH_AUTOSUGGEST_BUFFER_MAX_SIZE=20
+zinit ice wait'0a' lucid atload'_zsh_autosuggest_start'
+zinit light zsh-users/zsh-autosuggestions
+# Then load url-quote-magic and bracketed-paste-magic as above
+autoload -U url-quote-magic bracketed-paste-magic
+zle -N self-insert url-quote-magic
+zle -N bracketed-paste bracketed-paste-magic
+# Now the fix, setup these two hooks:
+pasteinit() {
+  OLD_SELF_INSERT=${${(s.:.)widgets[self-insert]}[2,3]}
+  zle -N self-insert url-quote-magic
+}
+pastefinish() {
+  zle -N self-insert $OLD_SELF_INSERT
+}
+zstyle :bracketed-paste-magic paste-init pasteinit
+zstyle :bracketed-paste-magic paste-finish pastefinish
 
-zinit ice lucid wait pick:"fzf-tab.zsh"
-zinit load "Aloxaf/fzf-tab"
+# and finally, make sure zsh-autosuggestions does not interfere with it:
+ZSH_AUTOSUGGEST_CLEAR_WIDGETS+=(expand-or-complete bracketed-paste accept-line push-line-or-edit)
 
-for plugin in extract command-not-found gpg-agent last-working-dir colored-man-pages zsh-interactive-cd; do
-    zinit snippet OMZ::plugins/$plugin/$plugin.plugin.zsh
-done
+# ENHANCD
+zinit ice wait'0b' lucid
+zinit light b4b4r07/enhancd
+export ENHANCD_FILTER=fzf:fzy:peco
+# HISTORY SUBSTRING SEARCHING
+# zinit ice wait'0b' lucid atload'bindkey "$terminfo[kcuu1]" history-substring-search-up; bindkey "$terminfo[kcud1]" history-substring-search-down'
+zinit light zsh-users/zsh-history-substring-search
+# bindkey '^[[A' history-substring-search-up
+# bindkey '^[[B' history-substring-search-down
+# bindkey -M vicmd 'k' history-substring-search-up
+# bindkey -M vicmd 'j' history-substring-search-down
 
-# Oh-My-Zsh snippets
-zinit is-snippet for OMZ::lib/directories.zsh
-zinit is-snippet for OMZ::lib/history.zsh
-# zinit is-snippet for OMZ::lib/git.zsh
-# zinit is-snippet for OMZ::plugins/git/git.plugin.zsh
-# zinit is-snippet for OMZ::plugins/bgnotify/bgnotify.plugin.zsh
-zinit is-snippet for OMZ::plugins/thefuck/thefuck.plugin.zsh
-zinit is-snippet for OMZ::plugins/history/history.plugin.zsh
-# zinit is-snippet for OMZ::plugins/safe-paste/safe-paste.plugin.zsh
-zinit is-snippet for OMZ::plugins/ssh-agent/ssh-agent.plugin.zsh
-zinit is-snippet for OMZ::plugins/colorize/colorize.plugin.zsh
+# TAB COMPLETIONS
+zinit light-mode for \
+    blockf \
+        zsh-users/zsh-completions \
+    as'program' atclone'rm -f ^(rgg|agv)' \
+        lilydjwg/search-and-view \
+    atclone'dircolors -b LS_COLORS > c.zsh' atpull'%atclone' pick'c.zsh' \
+        trapd00r/LS_COLORS
 
-# Plugins
-zinit for rupa/z
-zinit for changyuheng/fz
-zinit for changyuheng/zsh-interactive-cd
-zinit wait lucid for zdharma/fast-syntax-highlighting
-zinit pick"shell/completion.zsh" src"shell/key-bindings.zsh" for junegunn/fzf
+if whence dircolors >/dev/null; then
+  eval "$(dircolors -b)"
+  zstyle ':completion:*' list-colors ${(s.:.)LS_COLORS}
+  alias ls='ls --color'
+else
+  export CLICOLOR=1
+  zstyle ':completion:*' list-colors ''
+fi
+
+zstyle ':completion:*' completer _expand _complete _ignored _approximate
+zstyle ':completion:*' matcher-list 'm:{a-z}={A-Z}'
+zstyle ':completion:*' menu select=2
+zstyle ':completion:*' select-prompt '%SScrolling active: current selection at %p%s'
+zstyle ':completion:*:descriptions' format '-- %d --'
+zstyle ':completion:*:processes' command 'ps -au$USER'
+zstyle ':completion:complete:*:options' sort false
+zstyle ':fzf-tab:complete:_zlua:*' query-string input
+zstyle ':completion:*:*:*:*:processes' command "ps -u $USER -o pid,user,comm,cmd -w -w"
+zstyle ':fzf-tab:complete:kill:argument-rest' fzf-flags --preview=$extract'ps --pid=$in[(w)1] -o cmd --no-headers -w -w' --preview-window=down:3:wrap
+# zstyle ':fzf-tab:complete:cd:*' fzf-preview 'exa -1 --color=always $realpath'  # disable for tmux-popup
+zstyle ':fzf-tab:*' switch-group ',' '.'
+zstyle ':fzf-tab:*' fzf-command ftb-tmux-popup
+zstyle ':fzf-tab:*' popup-pad 0 0
+zstyle ':completion:*:git-checkout:*' sort false
+
+zinit ice lucid wait'0b' from'gh-r' as'program'
+zinit light junegunn/fzf
+
+# FZF TMUX HELPER SCRIPT
+zinit ice lucid wait'0c' as'command' pick'bin/fzf-tmux'
+zinit light junegunn/fzf
+
+# BIND MULTIPLE WIDGETS USING FZF
+zinit ice lucid wait'0c' multisrc'shell/{completion,key-bindings}.zsh' id-as'junegunn/fzf_completions' pick'/dev/null'
+zinit light junegunn/fzf
+
+# FZF-TAB
+zinit ice wait'1' lucid
+zinit light Aloxaf/fzf-tab
+
+# SYNTAX HIGHLIGHTING
+zinit ice wait'0c' lucid atinit'zpcompinit;zpcdreplay'
+zinit light zdharma/fast-syntax-highlighting
+
+# ZSH DIFF SO FANCY
+zinit ice wait'2' lucid as'program' pick'bin/git-dsf'
+zinit light zdharma/zsh-diff-so-fancy
+
+# neovim
+zinit wait'0' lucid \
+  id-as'nvim' from'gh-r' ver'nightly' as'program' pick'nvim*/bin/nvim' \
+  atclone'echo "" > ._zinit/is_release' \
+  atpull'%atclone' \
+  run-atpull \
+  atload'alias v=nvim' \
+  light-mode for @neovim/neovim
+
+# GH-CLI
+zinit ice lucid wait'0' as'program' id-as'gh' from'gh-r' has'git' \
+  atclone'./gh completion -s zsh > _gh' atpull'%atclone' mv'**/bin/gh -> gh'
+zinit light cli/cli
+
+# prettyping
+zinit ice wait lucid as'program' mv'prettyping* -> prettyping' \
+    atload"alias ping='prettyping --nolegend'"
+zinit light denilsonsa/prettyping
+
+# bottom system monitor
+zinit ice from'gh-r' ver'nightly' as'program' id-as'bottom' \
+  atclone'echo "" > ._zinit/is_release' \
+  atpull'%atclone' \
+  atload'alias top=btm' \
+  atload'alias htop=btm'
+zinit light ClementTsang/bottom
 
 zinit light-mode for \
-  zpm-zsh/colors \
   gretzky/auto-color-ls \
-  b4b4r07/enhancd \
   MichaelAquilina/zsh-you-should-use \
-  aperezdc/zsh-fzy \
-  zsh-users/zsh-autosuggestions \
-  zdharma/zzcomplete \
-
-zinit ice lucid nocompile wait'0e' nocompletions
-zinit load MenkeTechnologies/zsh-more-completions
-
-zinit ice lucid nocompile
-zinit load MenkeTechnologies/zsh-expand
 
 zinit ice wait'1' lucid
 zinit light laggardkernel/zsh-thefuck
@@ -104,39 +178,15 @@ zinit light laggardkernel/zsh-thefuck
 export NVM_LAZY_LOAD=true
 zinit light lukechilds/zsh-nvm
 
-# # Add RVM to PATH for scripting. Make sure this is the last PATH variable change.
-export PATH="$PATH:$HOME/.rvm/bin"
-
-zstyle ':completion:*' menu select
-
-# auto completions
-autoload -Uz compinit
-compinit -c
-
-
-# define FZF params
-export ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=180'
-export FZF_BASE=/usr/bin/fzf
-export FZF_DEFAULT_OPTS=' --color=dark '
-export FZF_DEFAULT_COMMAND='rg --files'
-export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
-
-export FZF_DEFAULT_COMMAND='fd -HI -L --exclude .git --color=always'
-export FZF_DEFAULT_OPTS='
-  --ansi
-  --info inline
-  --height 40%
-  --reverse
-  --border
-  --multi
-  --color fg:#1FF088,bg:'rgb(0,0,0,0)',hl:#F7FF00,fg+:#B534FA,bg+:'rgb(0,0,0,0)',hl+:#fabd2f
-  --color info:#83a598,prompt:#bdae93,spinner:#fabd2f,pointer:#83a598,marker:#fe8019,header:#665c54
-'
-export FZF_CTRL_T_OPTS="--preview '(bat --theme ansi-dark --color always {} 2> /dev/null || exa --tree --color=always {}) 2> /dev/null | head -200'"
-export FZF_CTRL_R_OPTS="--preview 'echo {}' --preview-window down:3:hidden:wrap --bind '?:toggle-preview'"
-export FZF_ALT_C_OPTS="--preview 'exa --tree --color=always {} | head -200'"
-
-HISTORY_SUBSTRING_SEARCH_HIGHLIGHT_FOUND="bg=cyan,fg=white,bold"
+chpwd() {
+  if [[ $(ls | wc -l) -ge 20 ]]; then
+    # print as grid
+    exa -G -a -F --icons --group-directories-first --git --color=always --ignore-glob=".DS_Store|__*"
+  else
+    # print as list and add left padding
+    exa -1 -a -F --icons --group-directories-first --git --color=always --ignore-glob=".DS_Store|__*" | sed 's/^/  /'
+  fi
+}
 
 #
 # History
@@ -237,4 +287,5 @@ POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS=(
 
 # echo "Kennys MacBook Pro" | figlet | lolcat
 
-# echo Kennys MacBook Pro | figlet | lolcatif [ -e /Users/kenny/.nix-profile/etc/profile.d/nix.sh ]; then . /Users/kenny/.nix-profile/etc/profile.d/nix.sh; fi # added by Nix installer
+# echo Kennys MacBook Pro | figlet | lolcatif [ -e /Users/kenny/.nix-profile/etc/profile.d/nix.sh ]; then . /Users/kenny/.nix-profile/etc/profile.d/nix.sh; fi # added by Nix installerexport GPG_TTY=$(tty)
+export PATH=$HOME/bin:$PATH
