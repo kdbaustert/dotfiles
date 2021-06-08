@@ -161,16 +161,6 @@ zinit light laggardkernel/zsh-thefuck
 export NVM_LAZY_LOAD=true
 zinit light lukechilds/zsh-nvm
 
-chpwd() {
-  if [[ $(ls | wc -l) -ge 20 ]]; then
-    # print as grid
-    exa -G -a -F --icons --group-directories-first --git --color=always --ignore-glob=".DS_Store|__*"
-  else
-    # print as list and add left padding
-    exa -1 -a -F --icons --group-directories-first --git --color=always --ignore-glob=".DS_Store|__*" | sed 's/^/  /'
-  fi
-}
-
 #
 # History
 #
@@ -252,15 +242,6 @@ export FZF_DEFAULT_OPTS=$FZF_DEFAULT_OPTS'
 # FZF options for zoxide prompt (zi)
 export _ZO_FZF_OPTS=$FZF_DEFAULT_OPTS'
 --height=7'
-
-# ZOXIDE
-eval "$(zoxide init zsh)"
-
-# THEFUCK
-eval "$(thefuck --alias)"
-
-# FASD
-eval "$(fasd --init auto)"
 
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 
