@@ -102,9 +102,8 @@ apps=(
   alacritty
   dropbox
   firefox-developer-edition
-  brave-browser-nightly
+  brave-browser-beta
   google-chrome
-  google-chrome-canary
   iterm2-nightly
   slack
   duet
@@ -118,20 +117,18 @@ apps=(
   aerial
   hammerspoon
   bettertouchtool
-  visual-studio-code-insiders
+  visual-studio-code
   insomnia
   github
   postman
   little-snitch
   onyx
-  ios-app-signer
   keyboard-cleaner
   gitify
   inkdrop
   motrix
   forkLift
   atom-nightly
-  homebrew/cask-drivers/philips-hue-sync
   malwarebytes
   imazing
   bartender
@@ -140,5 +137,4 @@ apps=(
   datagrip
   airbuddy
   raycast
-  carbon-copy-cloner
 )
