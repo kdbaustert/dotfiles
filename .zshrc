@@ -41,26 +41,26 @@ zinit ice wait'0a' lucid atload'_zsh_autosuggest_start'
 zinit light zsh-users/zsh-autosuggestions
 
 # Then load url-quote-magic and bracketed-paste-magic as above
-autoload -U url-quote-magic bracketed-paste-magic
-zle -N self-insert url-quote-magic
-zle -N bracketed-paste bracketed-paste-magic
+# autoload -U url-quote-magic bracketed-paste-magic
+# zle -N self-insert url-quote-magic
+# zle -N bracketed-paste bracketed-paste-magic
 
 # Now the fix, setup these two hooks:
-pasteinit() {
-  OLD_SELF_INSERT=${${(s.:.)widgets[self-insert]}[2,3]}
-  zle -N self-insert url-quote-magic
-}
+# pasteinit() {
+#   OLD_SELF_INSERT=${${(s.:.)widgets[self-insert]}[2,3]}
+#   zle -N self-insert url-quote-magic
+# }
 
-pastefinish() {
-  zle -N self-insert $OLD_SELF_INSERT
-}
+# pastefinish() {
+#   zle -N self-insert $OLD_SELF_INSERT
+# }
 
 
-zstyle :bracketed-paste-magic paste-init pasteinit
-zstyle :bracketed-paste-magic paste-finish pastefinish
+# zstyle :bracketed-paste-magic paste-init pasteinit
+# zstyle :bracketed-paste-magic paste-finish pastefinish
 
 # and finally, make sure zsh-autosuggestions does not interfere with it:
-ZSH_AUTOSUGGEST_CLEAR_WIDGETS+=(expand-or-complete bracketed-paste accept-line push-line-or-edit)
+ZSH_AUTOSUGGEST_CLEAR_WIDGETS+=(expand-or-complete accept-line push-line-or-edit)
 
 # ENHANCD
 zinit ice wait'0b' lucid
@@ -124,32 +124,15 @@ zinit light zdharma/fast-syntax-highlighting
 zinit ice wait'2' lucid as'program' pick'bin/git-dsf'
 zinit light zdharma/zsh-diff-so-fancy
 
-# neovim
-zinit wait'0' lucid \
-  id-as'nvim' from'gh-r' ver'nightly' as'program' pick'nvim*/bin/nvim' \
-  atclone'echo "" > ._zinit/is_release' \
-  atpull'%atclone' \
-  run-atpull \
-  atload'alias v=nvim' \
-  light-mode for @neovim/neovim
-
 # GH-CLI
 zinit ice lucid wait'0' as'program' id-as'gh' from'gh-r' has'git' \
   atclone'./gh completion -s zsh > _gh' atpull'%atclone' mv'**/bin/gh -> gh'
 zinit light cli/cli
 
 # prettyping
-zinit ice wait lucid as'program' mv'prettyping* -> prettyping' \
-    atload"alias ping='prettyping --nolegend'"
-zinit light denilsonsa/prettyping
-
-# bottom system monitor
-zinit ice from'gh-r' ver'nightly' as'program' id-as'bottom' \
-  atclone'echo "" > ._zinit/is_release' \
-  atpull'%atclone' \
-  atload'alias top=btm' \
-  atload'alias htop=btm'
-zinit light ClementTsang/bottom
+# zinit ice wait lucid as'program' mv'prettyping* -> prettyping' \
+#     atload"alias ping='prettyping --nolegend'"
+# zinit light denilsonsa/prettyping
 
 zinit light-mode for \
   gretzky/auto-color-ls \
@@ -255,6 +238,7 @@ export _ZO_FZF_OPTS=$FZF_DEFAULT_OPTS'
 
 # ALIASES
 [[ -f $DOTFILES/zsh/aliases.zsh ]] && source $DOTFILES/zsh/aliases.zsh
+
 
 [[ -f $DOTFILES/zsh/p10k.zsh ]] && source $DOTFILES/zsh/p10k.zsh
 
