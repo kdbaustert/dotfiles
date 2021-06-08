@@ -7,18 +7,6 @@ fi
 
 # Created by Kenny B <kenny@gothamx.dev>
 
-export EDITOR='nvim'
-export VISUAL=$EDITOR
-export DOTFILES=$HOME/dotfiles
-export SHELL='/bin/zsh'
-export LANG='en_US.UTF-8'
-export LC_ALL='en_US.UTF-8'
-export WORDCHARS='~!#$%^&*(){}[]<>?.+;'  # sane moving between words on the prompt
-export NVM_DIR="$HOME/.nvm"
-export PATH="$HOME/.composer/vendor/bin:$PATH"
-export PATH="/usr/local/sbin:$PATH"
-export GEM_HOME="$HOME/.gem"
-
 # FUNCTIONS
 [[ -f $DOTFILES/zsh/functions.zsh ]] && source $DOTFILES/zsh/functions.zsh
 
@@ -77,13 +65,7 @@ ZSH_AUTOSUGGEST_CLEAR_WIDGETS+=(expand-or-complete bracketed-paste accept-line p
 zinit ice wait'0b' lucid
 zinit light b4b4r07/enhancd
 export ENHANCD_FILTER=fzf:fzy:peco
-# HISTORY SUBSTRING SEARCHING
-# zinit ice wait'0b' lucid atload'bindkey "$terminfo[kcuu1]" history-substring-search-up; bindkey "$terminfo[kcud1]" history-substring-search-down'
 zinit light zsh-users/zsh-history-substring-search
-# bindkey '^[[A' history-substring-search-up
-# bindkey '^[[B' history-substring-search-down
-# bindkey -M vicmd 'k' history-substring-search-up
-# bindkey -M vicmd 'j' history-substring-search-down
 
 # TAB COMPLETIONS
 zinit light-mode for \
@@ -208,18 +190,68 @@ setopt COMPLETEALIASES
 setopt AUTOMENU
 setopt AUTOCD
 
-typeset -A ZSH_HIGHLIGHT_STYLES
+#####################
+# ENV VARIABLE      #
+#####################
+export EDITOR='nvim'
+export VISUAL=$EDITOR
+export DOTFILES=$HOME/dotfiles
+export SHELL='/bin/zsh'
+export LANG='en_US.UTF-8'
+export LC_ALL='en_US.UTF-8'
+export WORDCHARS='~!#$%^&*(){}[]<>?.+;'  # sane moving between words on the prompt
+export NVM_DIR="$HOME/.nvm"
+export PATH="$HOME/.composer/vendor/bin:$PATH"
+export PATH="/usr/local/sbin:$PATH"
+export GEM_HOME="$HOME/.gem"
+export PROMPT_EOL_MARK=''  # hide % at end of output
+export PATH=$HOME/bin:$PATH
 
-# To differentiate aliases from other command types
-ZSH_HIGHLIGHT_STYLES[alias]='fg =magenta,bold'
+#####################
+# COLORING          #
+#####################
+autoload colors && colors
 
-# To have paths colored instead of underlined
-ZSH_HIGHLIGHT_STYLES[path]='fg=cyan'
+#####################
+# FANCY-CTRL-Z      #
+#####################
+function fg-fzf() {
+  job="$(jobs | fzf -0 -1 | sed -E 's/\[(.+)\].*/\1/')" && echo '' && fg %$job
+}
+function fancy-ctrl-z () {
+  if [[ $#BUFFER -eq 0 ]]; then
+    BUFFER=" fg-fzf"
+    zle accept-line -w
+  else
+    zle push-input -w
+    zle clear-screen -w
+  fi
+}
+zle -N fancy-ctrl-z
+bindkey '^Z' fancy-ctrl-z
 
-# To disable highlighting of globbing expressions
-ZSH_HIGHLIGHT_STYLES[globbing]='none'
+#####################
+# FZF SETTINGS      #
+#####################
+export FZF_DEFAULT_COMMAND='rg --files --no-ignore --hidden --follow -g "!{.git,node_modules}/*" 2>/dev/null'
+export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
+export FZF_CTRL_T_OPTS='--preview="bat --color=always --style=header {} 2>/dev/null" --preview-window=right:60%:wrap'
+export FZF_ALT_C_COMMAND='fd -t d -d 1'
+export FZF_ALT_C_OPTS='--preview="exa -1 --icons --git --git-ignore {}" --preview-window=right:60%:wrap'
+bindkey '^F' fzf-file-widget
 
-ZSH_COLORIZE_STYLE="colorful"
+# FZF custom OneDark theme
+export FZF_DEFAULT_OPTS=$FZF_DEFAULT_OPTS'
+--ansi
+--height=50%
+--color=fg:-1,bg:-1,border:#4B5164,hl:#d19a66
+--color=fg+:#f7f7f7,bg+:#2c323d,hl+:#e5c07b
+--color=info:#828997,prompt:#e06c75,pointer:#45cdff
+--color=marker:#98c379,spinner:#e06c75,header:#98c379'
+
+# FZF options for zoxide prompt (zi)
+export _ZO_FZF_OPTS=$FZF_DEFAULT_OPTS'
+--height=7'
 
 # ZOXIDE
 eval "$(zoxide init zsh)"
@@ -285,8 +317,3 @@ POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS=(
 	newline
 
 )
-
-# echo "Kennys MacBook Pro" | figlet | lolcat
-
-# echo Kennys MacBook Pro | figlet | lolcatif [ -e /Users/kenny/.nix-profile/etc/profile.d/nix.sh ]; then . /Users/kenny/.nix-profile/etc/profile.d/nix.sh; fi # added by Nix installerexport GPG_TTY=$(tty)
-export PATH=$HOME/bin:$PATH
