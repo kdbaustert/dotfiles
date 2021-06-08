@@ -7,16 +7,17 @@ fi
 
 # Created by Kenny B <kenny@gothamx.dev>
 
+export EDITOR='nvim'
+export VISUAL=$EDITOR
 export DOTFILES=$HOME/dotfiles
-export LANG=en_US.UTF-8
-export CLICOLOR=1
-export LSCOLORS=GxFxCxDxBxegedabagaced
-export TERM=xterm-256color
+export SHELL='/bin/zsh'
+export LANG='en_US.UTF-8'
+export LC_ALL='en_US.UTF-8'
+export WORDCHARS='~!#$%^&*(){}[]<>?.+;'  # sane moving between words on the prompt
 export NVM_DIR="$HOME/.nvm"
 export PATH="$HOME/.composer/vendor/bin:$PATH"
 export PATH="/usr/local/sbin:$PATH"
 export GEM_HOME="$HOME/.gem"
-export COLORTERM="truecolor"
 
 # FUNCTIONS
 [[ -f $DOTFILES/zsh/functions.zsh ]] && source $DOTFILES/zsh/functions.zsh
