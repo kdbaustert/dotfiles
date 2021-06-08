@@ -7,12 +7,6 @@ fi
 
 # Created by Kenny B <kenny@gothamx.dev>
 
-# FUNCTIONS
-[[ -f $DOTFILES/zsh/functions.zsh ]] && source $DOTFILES/zsh/functions.zsh
-
-# ALIASES
-[[ -f $DOTFILES/zsh/aliases.zsh ]] && source $DOTFILES/zsh/aliases.zsh
-
 ### Added by Zinit's installer
 if [[ ! -f $HOME/.zinit/bin/zinit.zsh ]]; then
   print -P "%F{33}▓▒░ %F{220}Installing %F{33}DHARMA%F{220} Initiative Plugin Manager (%F{33}zdharma/zinit%F{220})…%f"
@@ -37,11 +31,9 @@ zinit ice depth=1; zinit light romkatv/powerlevel10k
 #####################
 # PLUGINS           #
 #####################
+
 # SSH-AGENT
 zinit light bobsoppe/zsh-ssh-agent
-
-# GPG-AGENT
-zinit snippet OMZ::plugins/gpg-agent/gpg-agent.plugin.zsh
 
 # AUTOSUGGESTIONS, TRIGGER PRECMD HOOK UPON LOAD
 ZSH_AUTOSUGGEST_BUFFER_MAX_SIZE=20
@@ -58,9 +50,12 @@ pasteinit() {
   OLD_SELF_INSERT=${${(s.:.)widgets[self-insert]}[2,3]}
   zle -N self-insert url-quote-magic
 }
+
 pastefinish() {
   zle -N self-insert $OLD_SELF_INSERT
 }
+
+
 zstyle :bracketed-paste-magic paste-init pasteinit
 zstyle :bracketed-paste-magic paste-finish pastefinish
 
@@ -80,16 +75,15 @@ zinit light-mode for \
     as'program' atclone'rm -f ^(rgg|agv)' \
         lilydjwg/search-and-view \
     atclone'dircolors -b LS_COLORS > c.zsh' atpull'%atclone' pick'c.zsh' \
-        trapd00r/LS_COLORS
-
-if whence dircolors >/dev/null; then
-  eval "$(dircolors -b)"
-  zstyle ':completion:*' list-colors ${(s.:.)LS_COLORS}
-  alias ls='ls --color'
-else
-  export CLICOLOR=1
-  zstyle ':completion:*' list-colors ''
-fi
+        trapd00r/LS_COLORS \
+    src'etc/git-extras-completion.zsh' \
+        tj/git-extras
+zinit wait'1' lucid for \
+    OMZ::lib/clipboard.zsh \
+    OMZ::lib/git.zsh \
+    OMZ::plugins/systemd/systemd.plugin.zsh \
+    OMZ::plugins/gpg-agent/gpg-agent.plugin.zsh \
+    OMZ::plugins/command-not-found/command-not-found.plugin.zsh \
 
 zstyle ':completion:*' completer _expand _complete _ignored _approximate
 zstyle ':completion:*' matcher-list 'm:{a-z}={A-Z}'
@@ -255,6 +249,12 @@ export _ZO_FZF_OPTS=$FZF_DEFAULT_OPTS'
 --height=7'
 
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+
+# FUNCTIONS
+[[ -f $DOTFILES/zsh/functions.zsh ]] && source $DOTFILES/zsh/functions.zsh
+
+# ALIASES
+[[ -f $DOTFILES/zsh/aliases.zsh ]] && source $DOTFILES/zsh/aliases.zsh
 
 [[ -f $DOTFILES/zsh/p10k.zsh ]] && source $DOTFILES/zsh/p10k.zsh
 
