@@ -40,6 +40,9 @@ zinit ice depth=1; zinit light romkatv/powerlevel10k
 # SSH-AGENT
 zinit light bobsoppe/zsh-ssh-agent
 
+# GPG-AGENT
+zinit snippet OMZ::plugins/gpg-agent/gpg-agent.plugin.zsh
+
 # AUTOSUGGESTIONS, TRIGGER PRECMD HOOK UPON LOAD
 ZSH_AUTOSUGGEST_BUFFER_MAX_SIZE=20
 zinit ice wait'0a' lucid atload'_zsh_autosuggest_start'
@@ -201,7 +204,7 @@ export PATH="$HOME/.composer/vendor/bin:$PATH"
 export PATH="/usr/local/sbin:$PATH"
 export GEM_HOME="$HOME/.gem"
 export PROMPT_EOL_MARK=''  # hide % at end of output
-# export PATH=$HOME/bin:$PATH
+export PATH=$HOME/bin:$PATH
 
 #####################
 # COLORING          #
