@@ -120,7 +120,6 @@ apps=(
   visual-studio-code
   insomnia
   github
-  postman
   little-snitch
   onyx
   keyboard-cleaner
