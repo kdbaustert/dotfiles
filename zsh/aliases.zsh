@@ -29,6 +29,8 @@ alias cnvims="code $HOME/.config/nvim/init.vim"
 alias valetconfig="code /usr/local/etc/nginx/valet/valet.conf"
 
 # Common aliases
+alias x="xplr"
+alias xcd='cd "$(xplr)"'
 alias rdir='rm -rf'
 alias rfile='rm'
 alias ..='cd ..'
@@ -39,19 +41,19 @@ alias wget='wget -c'
 alias mkcd=mcd
 
 # Disable correction.
-alias ack='nocorrect ack'
-alias cd='nocorrect cd'
-alias cp='nocorrect cp'
-alias ebuild='nocorrect ebuild'
-alias gcc='nocorrect gcc'
-alias gist='nocorrect gist'
-alias grep='nocorrect grep'
-alias heroku='nocorrect heroku'
-alias ln='nocorrect ln'
-alias man='nocorrect man'
-alias mkdir='nocorrect mkdir'
-alias mv='nocorrect mv'
-alias rm='nocorrect rm'
+# alias ack='nocorrect ack'
+# alias cd='nocorrect cd'
+# alias cp='nocorrect cp'
+# alias ebuild='nocorrect ebuild'
+# alias gcc='nocorrect gcc'
+# alias gist='nocorrect gist'
+# alias grep='nocorrect grep'
+# alias heroku='nocorrect heroku'
+# alias ln='nocorrect ln'
+# alias man='nocorrect man'
+# alias mkdir='nocorrect mkdir'
+# alias mv='nocorrect mv'
+# alias rm='nocorrect rm'
 
 alias a='fasd -a'        # any
 alias s='fasd -si'       # show / search / select
@@ -62,8 +64,13 @@ alias sf='fasd -sif'     # interactive file selection
 alias z='fasd_cd -d'     # cd, same functionality as j in autojump
 alias zz='fasd_cd -d -i' # cd with interactive selection
 
+alias l='ls -l'
+alias la='ls -a'
+alias lla='ls -la'
+alias lt='ls --tree'
+
 alias ls='colorls --sd -A'
-alias l='colorls --group-directories-first --almost-all'
+# alias l='colorls --group-directories-first --almost-all'
 alias ll='colorls --group-directories-first --almost-all --long'
 alias lc='colorls -lA --sd'
 alias l='colorls --group-directories-first --almost-all --tree=1'
