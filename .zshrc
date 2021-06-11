@@ -223,6 +223,8 @@ export _ZO_FZF_OPTS=$FZF_DEFAULT_OPTS'
 
 [[ -f $DOTFILES/zsh/p10k.zsh ]] && source $DOTFILES/zsh/p10k.zsh
 
+eval "$(zoxide init zsh)"
+
 POWERLEVEL9K_BACKGROUND='transparent'
 POWERLEVEL9K_SHORTEN_DIR_LENGTH=1
 POWERLEVEL9K_SHORTEN_STRATEGY="truncate_beginning"
@@ -274,3 +276,5 @@ POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS=(
 	newline
 
 )
+test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
+
