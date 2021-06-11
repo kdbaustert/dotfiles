@@ -34,14 +34,13 @@ zinit ice depth=1; zinit light romkatv/powerlevel10k
 
 # SSH-AGENT
 zinit light bobsoppe/zsh-ssh-agent
+zinit light rhuang2014/gpg-agent
+
 
 # AUTOSUGGESTIONS, TRIGGER PRECMD HOOK UPON LOAD
 ZSH_AUTOSUGGEST_BUFFER_MAX_SIZE=20
 zinit ice wait'0a' lucid atload'_zsh_autosuggest_start'
 zinit light zsh-users/zsh-autosuggestions
-
-# and finally, make sure zsh-autosuggestions does not interfere with it:
-# ZSH_AUTOSUGGEST_CLEAR_WIDGETS+=(expand-or-complete bracketed-paste accept-line push-line-or-edit)
 
 # ENHANCD
 zinit ice wait'0b' lucid
@@ -63,7 +62,6 @@ zinit wait'1' lucid for \
     OMZ::lib/clipboard.zsh \
     OMZ::lib/git.zsh \
     OMZ::plugins/systemd/systemd.plugin.zsh \
-    OMZ::plugins/gpg-agent/gpg-agent.plugin.zsh \
     OMZ::plugins/command-not-found/command-not-found.plugin.zsh \
 
 zstyle ':completion:*' completer _expand _complete _ignored _approximate
