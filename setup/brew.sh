@@ -50,13 +50,21 @@ binaries=(
   selecta
   gitui
   pinentry-mac
-  cowsay
+  cowsays
   fortune
   figlet
   lolcat
   ccat
   navi
   ffmpeg
+  bat
+  xxh
+  ox
+  mdcat
+  xplr
+  glow
+  lsd
+  fd
 
   # Development
   yarn
