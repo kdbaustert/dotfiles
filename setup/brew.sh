@@ -42,7 +42,6 @@ binaries=(
   htop
   koekeishiya/formulae/yabai
   khanhas/tap/spicetify-cli
-  cmacrae/formulae/spacebar
   skhd
   go
   rbenv
@@ -79,6 +78,7 @@ binaries=(
   composer
   wp-cli
   firebase-cli
+  vivid
 )
 
 # Homebrew Fonts
