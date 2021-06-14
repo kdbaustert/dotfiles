@@ -113,7 +113,6 @@ zinit ice wait lucid as'program' mv'prettyping* -> prettyping' \
     atload"alias ping='prettyping --nolegend'"
 zinit light denilsonsa/prettyping
 
-
 zinit light-mode for \
   gretzky/auto-color-ls \
   MichaelAquilina/zsh-you-should-use \
@@ -162,6 +161,7 @@ export PATH="/usr/local/sbin:$PATH"
 export GEM_HOME="$HOME/.gem"
 export PROMPT_EOL_MARK=''  # hide % at end of output
 export PATH=$HOME/bin:$PATH
+export LS_COLORS="$(vivid generate molokai)"
 
 #####################
 # COLORING          #
