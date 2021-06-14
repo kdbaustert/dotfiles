@@ -4,6 +4,7 @@ npm=(
   @vue/cli
   eslint
   prettier
+  @prettier/plugin-php
   eslint-plugin-prettier
   eslint-config-prettier
   eslint-plugin-vue
@@ -20,7 +21,6 @@ npm=(
   vsce
   @vue/eslint-config-prettier
   @vue/cli-service-global
-  @vue/eslint-config-prettier
   cli-error-notifier
   electron
   npm-check
