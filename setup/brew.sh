@@ -140,8 +140,9 @@ apps=(
   imazing
   bartender
   archiver
-  vlc
   datagrip
   airbuddy
   raycast
+  iina
+  yippy
 )
