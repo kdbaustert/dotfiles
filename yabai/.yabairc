@@ -110,11 +110,8 @@ yabai -m rule --add label="App Store" app="^App Store$" manage=off
 yabai -m rule --add label="Finder" app="^Finder$" title="(Co(py|nnect)|Move|Info|Pref)" manage=off
 yabai -m rule --add title='.*Install.*' manage=off
 yabai -m rule --add app='^Dropbox$' manage=off
-yabai -m rule --add app='^The Unarchiver$' manage=off
-yabai -m rule --add app='Preview' manage=off
 yabai -m rule --add app='^Archive Utility' manage=off
 yabai -m rule --add app='^1Password 7$' manage=off sticky=on
-yabai -m rule --add app='Speedtest' manage=off
 
 yabai -m rule --add app='Google Chrome'
 yabai -m rule --add title='.*Install.*' manage=off
