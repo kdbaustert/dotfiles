@@ -64,6 +64,9 @@ binaries=(
   glow
   lsd
   fd
+  sqlite
+  zlib
+  pyenv
 
   # Development
   yarn
