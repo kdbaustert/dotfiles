@@ -148,4 +148,5 @@ apps=(
   raycast
   iina
   yippy
+  yt-music
 )
