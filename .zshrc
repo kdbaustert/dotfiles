@@ -225,9 +225,6 @@ export _ZO_FZF_OPTS=$FZF_DEFAULT_OPTS'
 
 eval "$(zoxide init zsh)"
 
-eval "$(pyenv init -)"
-eval "$(pyenv virtualenv-init -)"
-
 POWERLEVEL9K_BACKGROUND='transparent'
 POWERLEVEL9K_SHORTEN_DIR_LENGTH=1
 POWERLEVEL9K_SHORTEN_STRATEGY="truncate_beginning"
@@ -279,8 +276,3 @@ POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS=(
 	newline
 
 )
-test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
-
-if command -v pyenv 1>/dev/null 2>&1; then
-  eval "$(pyenv init -)"
-fi
