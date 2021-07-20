@@ -1,11 +1,11 @@
 # Created by Kenny B <kenny@gothamx.dev>
 
 # Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
-# Initialization code that may require console input (password prompts, [y/n]
-# confirmations, etc.) must go above this block; everything else may go below.
-if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
-  source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
-fi
+# # Initialization code that may require console input (password prompts, [y/n]
+# # confirmations, etc.) must go above this block; everything else may go below.
+# if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
+#   source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
+# fi
 
 ### Added by Zinit's installer
 if [[ ! -f $HOME/.zinit/bin/zinit.zsh ]]; then
@@ -35,6 +35,10 @@ zinit ice depth=1; zinit light romkatv/powerlevel10k
 # SSH-AGENT
 zinit light bobsoppe/zsh-ssh-agent
 zinit light rhuang2014/gpg-agent
+zinit light chrissicool/zsh-256color
+
+zinit ice wait"2" lucid
+zinit light changyuheng/zsh-interactive-cd
 
 
 # AUTOSUGGESTIONS, TRIGGER PRECMD HOOK UPON LOAD
@@ -45,7 +49,6 @@ zinit light zsh-users/zsh-autosuggestions
 # ENHANCD
 zinit ice wait'0b' lucid
 zinit light b4b4r07/enhancd
-export ENHANCD_FILTER=fzf:fzy:peco
 zinit light zsh-users/zsh-history-substring-search
 
 # TAB COMPLETIONS
@@ -63,30 +66,23 @@ zinit wait'1' lucid for \
     OMZ::lib/git.zsh \
     OMZ::plugins/command-not-found/command-not-found.plugin.zsh \
 
-zstyle ':completion:*' completer _expand _complete _ignored _approximate
-zstyle ':completion:*' matcher-list 'm:{a-z}={A-Z}'
-zstyle ':completion:*' menu select=2
-zstyle ':completion:*' select-prompt '%SScrolling active: current selection at %p%s'
-zstyle ':completion:*:descriptions' format '-- %d --'
-zstyle ':completion:*:processes' command 'ps -au$USER'
-zstyle ':completion:complete:*:options' sort false
-zstyle ':fzf-tab:complete:_zlua:*' query-string input
-zstyle ':completion:*:*:*:*:processes' command "ps -u $USER -o pid,user,comm,cmd -w -w"
-zstyle ':fzf-tab:complete:kill:argument-rest' fzf-flags --preview=$extract'ps --pid=$in[(w)1] -o cmd --no-headers -w -w' --preview-window=down:3:wrap
-zstyle ':fzf-tab:complete:cd:*' fzf-preview 'exa -1 --color=always $realpath'  # disable for tmux-popup
-zstyle ':fzf-tab:*' switch-group ',' '.'
-zstyle ':fzf-tab:*' fzf-command ftb-tmux-popup
-zstyle ':fzf-tab:*' popup-pad 0 0
-zstyle ':completion:*:git-checkout:*' sort false
+# zstyle ':completion:*' completer _expand _complete _ignored _approximate
+# zstyle ':completion:*' matcher-list 'm:{a-z}={A-Z}'
+# zstyle ':completion:*' menu select=2
+# zstyle ':completion:*' select-prompt '%SScrolling active: current selection at %p%s'
+# zstyle ':completion:*:descriptions' format '-- %d --'
+# zstyle ':completion:*:processes' command 'ps -au$USER'
+# zstyle ':completion:complete:*:options' sort false
+# zstyle ':fzf-tab:complete:_zlua:*' query-string input
+# zstyle ':completion:*:*:*:*:processes' command "ps -u $USER -o pid,user,comm,cmd -w -w"
+# zstyle ':fzf-tab:complete:kill:argument-rest' fzf-flags --preview=$extract'ps --pid=$in[(w)1] -o cmd --no-headers -w -w' --preview-window=down:3:wrap
+# zstyle ':fzf-tab:complete:cd:*' fzf-preview 'exa -1 --color=always $realpath'  # disable for tmux-popup
+# zstyle ':fzf-tab:*' switch-group ',' '.'
+# zstyle ':fzf-tab:*' fzf-command ftb-tmux-popup
+# zstyle ':fzf-tab:*' popup-pad 0 0
+# zstyle ':completion:*:git-checkout:*' sort false
 
 zinit ice lucid wait'0b' from'gh-r' as'program'
-zinit light junegunn/fzf
-
-# FZF TMUX HELPER SCRIPT
-zinit light junegunn/fzf
-
-# BIND MULTIPLE WIDGETS USING FZF
-zinit ice lucid wait'0c' multisrc'shell/{completion,key-bindings}.zsh' id-as'junegunn/fzf_completions' pick'/dev/null'
 zinit light junegunn/fzf
 
 # FZF-TAB
@@ -149,17 +145,23 @@ setopt sharehistory           # global history
 export EDITOR='nvim'
 export VISUAL=$EDITOR
 export DOTFILES=$HOME/dotfiles
-export SHELL='/bin/zsh'
 export LANG='en_US.UTF-8'
-export LC_ALL='en_US.UTF-8'
 export WORDCHARS='~!#$%^&*(){}[]<>?.+;'  # sane moving between words on the prompt
-export NVM_DIR="$HOME/.nvm"
-export PATH="$HOME/.composer/vendor/bin:$PATH"
 export PATH="/usr/local/sbin:$PATH"
-export GEM_HOME="$HOME/.gem"
 export PROMPT_EOL_MARK=''  # hide % at end of output
-export PATH=$HOME/bin:$PATH
 # export LS_COLORS="$(vivid generate molokai)"
+
+if [ -d "$HOME/.nvm" ] ; then
+  export NVM_DIR="$HOME/.nvm"
+fi
+
+if [ -d "$HOME/.composer/vendor/bin" ] ; then
+  export PATH="$HOME/.composer/vendor/bin:$PATH"
+fi
+
+if [ -d "$HOME/.gem" ] ; then
+  export GEM_HOME="$HOME/.gem"
+fi
 
 #####################
 # COLORING          #
@@ -174,57 +176,10 @@ export FZF_DEFAULT_OPTS=$FZF_DEFAULT_OPTS'
 --color=info:#828997,prompt:#e06c75,pointer:#45cdff
 --color=marker:#98c379,spinner:#e06c75,header:#98c379'
 
-alias glNoGraph='git log --color=always --format="%C(auto)%h%d %s %C(black)%C(bold)%cr% C(auto)%an" "$@"'
-local _gitLogLineToHash="echo {} | grep -o '[a-f0-9]\{7\}' | head -1"
-local _viewGitLogLine="$_gitLogLineToHash | xargs -I % sh -c 'git show --color=always % | diff-so-fancy'"
-
-if [[ $TMUX_ENABLE ]] then
-    export FZF_TMUX=1
-fi
-#Directly executing the command (CTRL-X CTRL-R)
-zle     -N     fzf-history-widget-accept
-bindkey '^X^R' fzf-history-widget-accept
-
 export FZF_ALT_C_OPTS="--preview 'tree -C {} | head -200'"
 
 export FZF_DEFAULT_COMMAND='rg --files --no-ignore --hidden --follow -g "!{.git,node_modules}/*" 2> /dev/null'
 export FZF_CTRL_T_OPTS="--preview '(highlight -O ansi -l {} 2> /dev/null || cat {} || tree -C {}) 2> /dev/null | head -200'"
-
-##-----Completion
-_fzf_complete_hg()
-{
-  ARGS="$@"
-  if [[ $ARGS == 'hg merge'* ]] || [[ $ARGS == 'hg up'* ]]; then
-    _fzf_complete "--no-sort" "$@" < <(
-      { hg branches & hg tags }
-    )
-  else
-    eval "zle ${fzf_default_completion:-expand-or-complete}"
-  fi
-}
-
-_fzf_complete_hg_post()
-{
-  cut -f1 -d' '
-}
-#Git
-_fzf_complete_git()
-{
-    ARGS="$@"
-    local branches
-    branches=$(git branch -vv --all)
-    if [[ $ARGS == 'git co'* ]]; then
-        _fzf_complete "--reverse --multi" "$@" < <(
-            echo $branches
-        )
-    else
-        eval "zle ${fzf_default_completion:-expand-or-complete}"
-    fi
-}
-_fzf_complete_git_post()
-{
-    awk '{print $1}'
-}
 
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 
