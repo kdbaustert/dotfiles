@@ -73,7 +73,7 @@ zstyle ':completion:complete:*:options' sort false
 zstyle ':fzf-tab:complete:_zlua:*' query-string input
 zstyle ':completion:*:*:*:*:processes' command "ps -u $USER -o pid,user,comm,cmd -w -w"
 zstyle ':fzf-tab:complete:kill:argument-rest' fzf-flags --preview=$extract'ps --pid=$in[(w)1] -o cmd --no-headers -w -w' --preview-window=down:3:wrap
-# zstyle ':fzf-tab:complete:cd:*' fzf-preview 'exa -1 --color=always $realpath'  # disable for tmux-popup
+zstyle ':fzf-tab:complete:cd:*' fzf-preview 'exa -1 --color=always $realpath'  # disable for tmux-popup
 zstyle ':fzf-tab:*' switch-group ',' '.'
 zstyle ':fzf-tab:*' fzf-command ftb-tmux-popup
 zstyle ':fzf-tab:*' popup-pad 0 0
@@ -83,7 +83,6 @@ zinit ice lucid wait'0b' from'gh-r' as'program'
 zinit light junegunn/fzf
 
 # FZF TMUX HELPER SCRIPT
-zinit ice lucid wait'0c' as'command' pick'bin/fzf-tmux'
 zinit light junegunn/fzf
 
 # BIND MULTIPLE WIDGETS USING FZF
@@ -160,46 +159,13 @@ export PATH="/usr/local/sbin:$PATH"
 export GEM_HOME="$HOME/.gem"
 export PROMPT_EOL_MARK=''  # hide % at end of output
 export PATH=$HOME/bin:$PATH
-export LS_COLORS="$(vivid generate molokai)"
-export LDFLAGS="-L/usr/local/opt/zlib/lib -L/usr/local/opt/sqlite/lib"
-export CPPFLAGS="-I/usr/local/opt/zlib/include -I/usr/local/opt/sqlite/include"
+# export LS_COLORS="$(vivid generate molokai)"
 
 #####################
 # COLORING          #
 #####################
 autoload colors && colors
 
-#####################
-# FANCY-CTRL-Z      #
-#####################
-function fg-fzf() {
-  job="$(jobs | fzf -0 -1 | sed -E 's/\[(.+)\].*/\1/')" && echo '' && fg %$job
-}
-
-function fancy-ctrl-z () {
-  if [[ $#BUFFER -eq 0 ]]; then
-    BUFFER=" fg-fzf"
-    zle accept-line -w
-  else
-    zle push-input -w
-    zle clear-screen -w
-  fi
-}
-
-zle -N fancy-ctrl-z
-bindkey '^Z' fancy-ctrl-z
-
-#####################
-# FZF SETTINGS      #
-#####################
-export FZF_DEFAULT_COMMAND='rg --files --no-ignore --hidden --follow -g "!{.git,node_modules}/*" 2>/dev/null'
-export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
-export FZF_CTRL_T_OPTS='--preview="bat --color=always --style=header {} 2>/dev/null" --preview-window=right:60%:wrap'
-export FZF_ALT_C_COMMAND='fd -t d -d 1'
-export FZF_ALT_C_OPTS='--preview="exa -1 --icons --git --git-ignore {}" --preview-window=right:60%:wrap'
-bindkey '^F' fzf-file-widget
-
-# FZF custom theme
 export FZF_DEFAULT_OPTS=$FZF_DEFAULT_OPTS'
 --ansi
 --height=50%
@@ -208,9 +174,57 @@ export FZF_DEFAULT_OPTS=$FZF_DEFAULT_OPTS'
 --color=info:#828997,prompt:#e06c75,pointer:#45cdff
 --color=marker:#98c379,spinner:#e06c75,header:#98c379'
 
-# FZF options for zoxide prompt (zi)
-export _ZO_FZF_OPTS=$FZF_DEFAULT_OPTS'
---height=7'
+alias glNoGraph='git log --color=always --format="%C(auto)%h%d %s %C(black)%C(bold)%cr% C(auto)%an" "$@"'
+local _gitLogLineToHash="echo {} | grep -o '[a-f0-9]\{7\}' | head -1"
+local _viewGitLogLine="$_gitLogLineToHash | xargs -I % sh -c 'git show --color=always % | diff-so-fancy'"
+
+if [[ $TMUX_ENABLE ]] then
+    export FZF_TMUX=1
+fi
+#Directly executing the command (CTRL-X CTRL-R)
+zle     -N     fzf-history-widget-accept
+bindkey '^X^R' fzf-history-widget-accept
+
+export FZF_ALT_C_OPTS="--preview 'tree -C {} | head -200'"
+
+export FZF_DEFAULT_COMMAND='rg --files --no-ignore --hidden --follow -g "!{.git,node_modules}/*" 2> /dev/null'
+export FZF_CTRL_T_OPTS="--preview '(highlight -O ansi -l {} 2> /dev/null || cat {} || tree -C {}) 2> /dev/null | head -200'"
+
+##-----Completion
+_fzf_complete_hg()
+{
+  ARGS="$@"
+  if [[ $ARGS == 'hg merge'* ]] || [[ $ARGS == 'hg up'* ]]; then
+    _fzf_complete "--no-sort" "$@" < <(
+      { hg branches & hg tags }
+    )
+  else
+    eval "zle ${fzf_default_completion:-expand-or-complete}"
+  fi
+}
+
+_fzf_complete_hg_post()
+{
+  cut -f1 -d' '
+}
+#Git
+_fzf_complete_git()
+{
+    ARGS="$@"
+    local branches
+    branches=$(git branch -vv --all)
+    if [[ $ARGS == 'git co'* ]]; then
+        _fzf_complete "--reverse --multi" "$@" < <(
+            echo $branches
+        )
+    else
+        eval "zle ${fzf_default_completion:-expand-or-complete}"
+    fi
+}
+_fzf_complete_git_post()
+{
+    awk '{print $1}'
+}
 
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 
