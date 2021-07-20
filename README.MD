@@ -36,8 +36,6 @@ Requires Filesystem Protections and Debugging Restrictions to be disabled (print
 csrutil enable --without debug --without fs
 ```
 
-![Screenshot 1](/screenshots/ScreenShot1.png?raw=true 'Screenshot')
-
 ## Credits
 
 Thanks to the [dotfiles community](https://dotfiles.github.io).
