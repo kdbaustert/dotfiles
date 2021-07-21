@@ -49,6 +49,7 @@ zinit light zsh-users/zsh-autosuggestions
 # ENHANCD
 zinit ice wait'0b' lucid
 zinit light b4b4r07/enhancd
+# export ENHANCD_FILTER=fzf:fzy:peco
 zinit light zsh-users/zsh-history-substring-search
 
 # TAB COMPLETIONS
@@ -85,13 +86,22 @@ zinit wait'1' lucid for \
 zinit ice lucid wait'0b' from'gh-r' as'program'
 zinit light junegunn/fzf
 
+# BIND MULTIPLE WIDGETS USING FZF
+zinit ice lucid wait'0c' multisrc'shell/{completion,key-bindings}.zsh' id-as'junegunn/fzf_completions' pick'/dev/null'
+zinit light junegunn/fzf
+
 # FZF-TAB
 zinit ice wait'1' lucid
 zinit light Aloxaf/fzf-tab
 
+zinit load wfxr/forgit
+
 # SYNTAX HIGHLIGHTING
 zinit ice wait'0c' lucid atinit'zpcompinit;zpcdreplay'
 zinit light zdharma/fast-syntax-highlighting
+
+zinit ice wait lucid
+zinit load redxtech/zsh-fzf-utils
 
 # ZSH DIFF SO FANCY
 zinit ice wait'2' lucid as'program' pick'bin/git-dsf'
@@ -168,6 +178,37 @@ fi
 #####################
 autoload colors && colors
 
+#####################
+# FANCY-CTRL-Z      #
+#####################
+function fg-fzf() {
+  job="$(jobs | fzf -0 -1 | sed -E 's/\[(.+)\].*/\1/')" && echo '' && fg %$job
+}
+
+function fancy-ctrl-z () {
+  if [[ $#BUFFER -eq 0 ]]; then
+    BUFFER=" fg-fzf"
+    zle accept-line -w
+  else
+    zle push-input -w
+    zle clear-screen -w
+  fi
+}
+
+zle -N fancy-ctrl-z
+bindkey '^Z' fancy-ctrl-z
+
+#####################
+# FZF SETTINGS      #
+#####################
+export FZF_DEFAULT_COMMAND='rg --files --no-ignore --hidden --follow -g "!{.git,node_modules}/*" 2>/dev/null'
+export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
+export FZF_CTRL_T_OPTS='--preview="bat --color=always --style=header {} 2>/dev/null" --preview-window=right:60%:wrap'
+export FZF_ALT_C_COMMAND='fd -t d -d 1'
+export FZF_ALT_C_OPTS='--preview="exa -1 --icons --git --git-ignore {}" --preview-window=right:60%:wrap'
+bindkey '^F' fzf-file-widget
+
+# FZF custom OneDark theme
 export FZF_DEFAULT_OPTS=$FZF_DEFAULT_OPTS'
 --ansi
 --height=50%
@@ -175,6 +216,11 @@ export FZF_DEFAULT_OPTS=$FZF_DEFAULT_OPTS'
 --color=fg+:#f7f7f7,bg+:#2c323d,hl+:#e5c07b
 --color=info:#828997,prompt:#e06c75,pointer:#45cdff
 --color=marker:#98c379,spinner:#e06c75,header:#98c379'
+
+# FZF options for zoxide prompt (zi)
+export _ZO_FZF_OPTS=$FZF_DEFAULT_OPTS'
+--height=7'
+
 
 export FZF_ALT_C_OPTS="--preview 'tree -C {} | head -200'"
 
@@ -190,6 +236,8 @@ export FZF_CTRL_T_OPTS="--preview '(highlight -O ansi -l {} 2> /dev/null || cat 
 [[ -f $DOTFILES/zsh/aliases.zsh ]] && source $DOTFILES/zsh/aliases.zsh
 
 eval "$(zoxide init zsh)"
+
+source <(curl -sSL git.io/forgit)
 
 [[ -f $DOTFILES/zsh/p10k.zsh ]] && source $DOTFILES/zsh/p10k.zsh
 
