@@ -9,10 +9,13 @@ fi
 
 export COLORTERM="truecolor"
 
+export GPG_TTY=$TTY
+
 export SPROMPT="zsh: correct %F{red}'%R'%f to %F{blue}'%r'%f [%B%Uy%u%bes, %B%Un%u%bo, %B%Ue%u%bdit, %B%Ua%u%bbort]?"
 
 export EDITOR='nvim'
 export VISUAL=$EDITOR
+export TERMINAL='iTerm'
 export DOTFILES=$HOME/dotfiles
 export LANG='en_US.UTF-8'
 export WORDCHARS='~!#$%^&*(){}[]<>?.+;' # sane moving between words on the prompt
@@ -34,6 +37,15 @@ fi
 
 [[ -f "$DOTFILES/zsh/zinit.zsh" ]] && source "$DOTFILES/zsh/zinit.zsh"
 
+zinit ice atclone"dircolors -b LS_COLORS > clrs.zsh" \
+    atpull'%atclone' pick"clrs.zsh" nocompile'!' \
+    atload'zstyle ":completion:*" list-colors “${(s.:.)LS_COLORS}”'
+zinit light trapd00r/LS_COLORS
+zinit light "pinelibg/dircolors-solarized-zsh"
+
+# Use a better command for searching with fzf
+export FZF_DEFAULT_COMMAND='rg --files --no-ignore-vcs --hidden --ignore-file ~/.config/ripgrep/ignore'
+
 #####################
 # HISTORY           #
 #####################
@@ -44,18 +56,24 @@ SAVEHIST=$HISTSIZE
 #####################
 # SETOPT            #
 #####################
-setopt extended_history       # record timestamp of command in HISTFILE
-setopt hist_expire_dups_first # delete duplicates first when HISTFILE size exceeds HISTSIZE
-setopt hist_ignore_all_dups   # ignore duplicated commands history list
-setopt hist_ignore_space      # ignore commands that start with space
-setopt hist_verify            # show command with history expansion to user before running it
-setopt inc_append_history     # add commands to HISTFILE in order of execution
-setopt share_history          # share command history data
-setopt completealiases        # complete alisases
-setopt automenu
-setopt autocd
-setopt sharehistory           # global history
-setopt NO_HUP
+setopt EXTENDED_HISTORY       # record timestamp of command in HISTFILE
+setopt HIST_EXPIRE_DUPS_FIRST # delete duplicates first when HISTFILE size exceeds HISTSIZE
+setopt HIST_IGNORE_ALL_DUPS   # ignore duplicated commands history list
+setopt HIST_IGNORE_SPACE      # ignore commands that start with space
+setopt HIST_VERIFY            # show command with history expansion to user before running it
+setopt INC_APPEND_HISTORY     # add commands to HISTFILE in order of execution
+setopt SHARE_HISTORY          # share command history data
+setopt COMPLETEALIASES        # complete alisases
+setopt AUTOMENU
+setopt AUTOCD
+setopt SHAREHISTORY           # global history
+setopt GLOB_DOTS     # no special treatment for file names with a leading dot
+setopt NO_AUTO_MENU  # require an extra TAB press to open the completion menu
+setopt NOTIFY               # Report the status of background jobs immediately, rather than waiting until just before printing a prompt.
+setopt NO_BG_NICE           # Prevent runing all background jobs at a lower priority.
+setopt NO_CHECK_JOBS        # Prevent reporting the status of background and suspended jobs before exiting a shell with job control. NO_CHECK_JOBS is best used only in combination with NO_HUP, else such jobs will be killed automatically.
+setopt NO_HUP               # Prevent sending the HUP signal to running jobs when the shell exits.
+setopt NO_BEEP              # Don't beep on erros (overrides /etc/zshrc in Catalina)
 
 #####################
 # COLORING          #
@@ -64,18 +82,14 @@ autoload colors && colors
 
 #####################
 
-# FZF custom OneDark theme
-export FZF_DEFAULT_OPTS=$FZF_DEFAULT_OPTS'
---ansi
---height=50%
---color=fg:-1,bg:-1,border:#4B5164,hl:#d19a66
---color=fg+:#f7f7f7,bg+:#2c323d,hl+:#e5c07b
---color=info:#828997,prompt:#e06c75,pointer:#45cdff
---color=marker:#98c379,spinner:#e06c75,header:#98c379'
-
-# FZF options for zoxide prompt (zi)
-export _ZO_FZF_OPTS=$FZF_DEFAULT_OPTS'
---height=7'
+alias preview="fzf --preview 'bat --color \"always\" {}'"
+export FZF_DEFAULT_OPTS="
+--bind='ctrl-o:execute(nvim {})+abort'
+--inline-info
+--color=spinner:#c594c5,hl:#82aaff
+--color=fg:#a6accd,header:#7982B4,info:#ffcb6b,pointer:#c792ea
+--color=marker:#ffcb6b,fg+:#a6accd,prompt:#c792ea,hl+:#c792ea
+"
 
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 
