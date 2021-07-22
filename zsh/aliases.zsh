@@ -91,9 +91,6 @@ alias shutdown='sudo /sbin/shutdown'
 alias lock='/System/Library/CoreServices/"Menu Extras"/User.menu/Contents/Resources/CGSession -suspend'
 alias poweroff='sudo /sbin/poweroff'
 
-# Google Chrome
-alias chrome='/Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome'
-
 # Removes all node_modules folders older than 4 months:
 alias cnodeold='find . -name "node_modules" -type d -mtime +120 | xargs rm -rf'
 
@@ -122,20 +119,11 @@ alias vl='valet link'
 alias vul='valet unlink'
 alias vhttps='valet secure'
 
-alias evalet='code /usr/local/etc/php/7.4/php-fpm.d/valet-fpm.conf'
-
 # SSH
 alias sshconfig='cd ~/.ssh; code config'
 alias sshkeygen='ssh-keygen -t rsa'
 alias copyssh='ssh-copy-id -i ~/.ssh/id_rsa.pub'
 alias chmodssh='sudo chmod 700 ~/.ssh && chmod 600 ~/.ssh/*'
-
-# Firebase
-alias fblogin='firebase login'
-alias fbprojects='firebase projects:list'
-alias fblogout='firebase logout'
-alias fbini='firebase init'
-alias fbdeploy='firebase deploy'
 
 # Enable aliases to be sudo’ed
 alias root='sudo -i'
@@ -221,22 +209,23 @@ alias yac='yarn install & composer install'
 alias yui='yarn upgrade-interactive --latest'
 
 # Git
-alias gst="git status"
-alias gb="git branch"
-alias gc="git checkout"
-alias gl="git log --oneline --decorate --color"
-alias amend="git add . && git commit --amend --no-edit"
-alias commit="git add . && git commit -m"
-alias diff="git diff"
-alias force="git push --force"
-alias nuke="git clean -df && git reset --hard"
-alias pop="git stash pop"
-alias pull="git pull"
-alias push="git push"
-alias resolve="git add . && git commit --no-edit"
-alias stash="git stash -u"
-alias unstage="git restore --staged ."
-alias wip="commit wip"
+alias g='git'
+alias ga='git add'
+alias gaa='git add --all'
+alias gb='git branch'
+alias gc='git commit -v'
+alias gc!='git commit -v --amend'
+alias gca='git commit -v -a'
+alias gca!='git commit -v -a --amend'
+alias gco='git checkout'
+alias gd='git diff'
+alias gl='git pull'
+alias glg='git log --stat'
+alias glog='git log --oneline --decorate --graph'
+alias gm='git merge'
+alias gp='git push'
+alias gst='git status'
+alias lg='lazygit'
 
 # Git Large Storage
 alias gitli='git lfs install'
