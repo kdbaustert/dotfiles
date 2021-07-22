@@ -13,9 +13,9 @@ autoload -Uz _zinit
 
 zinit ice depth=1; zinit light romkatv/powerlevel10k
 
- zinit ice atclone"dircolors -b LS_COLORS > clrs.zsh" \
-    atpull'%atclone' pick"clrs.zsh" nocompile'!' atload'zstyle ":completion:*" list-colors “${(s.:.)LS_COLORS}”'
-  zinit light https://github.com/trapd00r/LS_COLORS
+#  zinit ice atclone"dircolors -b LS_COLORS > clrs.zsh" \
+#     atpull'%atclone' pick"clrs.zsh" nocompile'!' atload'zstyle ":completion:*" list-colors “${(s.:.)LS_COLORS}”'
+#   zinit light https://github.com/trapd00r/LS_COLORS
 
 
   zinit ice wait blockf lucid atpull'zinit creinstall -q .'
@@ -34,6 +34,12 @@ zinit light "b4b4r07/enhancd"
 zinit ice from"gh-r" as"program"
 zinit load junegunn/fzf-bin
 
+zinit ice atclone"dircolors -b LS_COLORS > c.zsh" atpull'%atclone' pick"c.zsh" nocompile'!'
+zinit light trapd00r/LS_COLORS
+
+zinit ice as"program" make'!' atclone'./direnv hook zsh > zhook.zsh' atpull'%atclone' src"zhook.zsh"
+zinit light direnv/direnv
+
 # SSH-AGENT
 zinit light bobsoppe/zsh-ssh-agent
 zinit light rhuang2014/gpg-agent
@@ -46,16 +52,19 @@ zinit wait'1' lucid for \
     OMZ::lib/git.zsh \
     OMZ::plugins/command-not-found/command-not-found.plugin.zsh \
 
-# fzf-marks, at slot 0, for quick Ctrl-G accessibility
-# https://github.com/urbainvaes/fzf-marks
-zinit ice trackbinds bindmap'^g -> ^f' lucid
-zinit light urbainvaes/fzf-marks
+    # fzf - fuzzy finder
+zinit ice from"gh-r" as"program"
+zinit load junegunn/fzf-bin
+
+# z - jump around
+zinit wait lucid for \
+	"agkozak/zsh-z"
 
 # ─── fuzzy movement and directory choosing ────────────────────────────────────
 # autojump command
 # https://github.com/rupa/z
-zinit ice wait'0c' lucid
-zinit light rupa/z
+# zinit ice wait'0c' lucid
+# zinit light rupa/z
 
 # Pick from most frecent folders with `Ctrl+g`
 # https://github.com/andrewferrier/fzf-z
