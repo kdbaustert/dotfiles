@@ -37,6 +37,8 @@ fi
 
 [[ -f "$DOTFILES/zsh/zinit.zsh" ]] && source "$DOTFILES/zsh/zinit.zsh"
 
+[[ -f "$DOTFILES/zsh/completion.zsh" ]] && source "$DOTFILES/zsh/completion.zsh"
+
 zinit ice atclone"dircolors -b LS_COLORS > clrs.zsh" \
     atpull'%atclone' pick"clrs.zsh" nocompile'!' \
     atload'zstyle ":completion:*" list-colors “${(s.:.)LS_COLORS}”'
@@ -74,13 +76,15 @@ setopt NO_BG_NICE           # Prevent runing all background jobs at a lower prio
 setopt NO_CHECK_JOBS        # Prevent reporting the status of background and suspended jobs before exiting a shell with job control. NO_CHECK_JOBS is best used only in combination with NO_HUP, else such jobs will be killed automatically.
 setopt NO_HUP               # Prevent sending the HUP signal to running jobs when the shell exits.
 setopt NO_BEEP              # Don't beep on erros (overrides /etc/zshrc in Catalina)
+setopt ALWAYS_TO_END # If a completion is performed with the cursor within a word, and a full completion is inserted, the cursor is moved to the end of the word
+setopt PATH_DIRS     # Perform a path search even on command names with slashes in them.
+unsetopt CASE_GLOB   # Make globbing (filename generation) not sensitive to case.
+unsetopt LIST_BEEP   # Don't beep on an ambiguous completion.
 
-#####################
-# COLORING          #
-#####################
 autoload colors && colors
 
-#####################
+autoload -Uz compinit compdef && compinit -C -d "${ZDOTDIR}/${zcompdump_file:-.zcompdump}"
+
 
 alias preview="fzf --preview 'bat --color \"always\" {}'"
 export FZF_DEFAULT_OPTS="
@@ -99,9 +103,9 @@ export FZF_DEFAULT_OPTS="
 # ALIASES
 [[ -f $DOTFILES/zsh/aliases.zsh ]] && source $DOTFILES/zsh/aliases.zsh
 
-eval "$(zoxide init zsh)"
+# eval "$(direnv hook zsh)"
+eval "$(zoxide init zsh --hook pwd)"
 
-source <(curl -sSL git.io/forgit)
 
 # Base16 Shell
 # BASE16_SHELL="$HOME/.config/base16-shell/"
