@@ -28,17 +28,16 @@ zinit ice depth=1; zinit light romkatv/powerlevel10k
   zinit ice wait lucid atload'_zsh_autosuggest_start'
   zinit light https://github.com/zsh-users/zsh-autosuggestions
 
+  zinit ice atclone"dircolors -b LS_COLORS > clrs.zsh" \
+	atpull'%atclone' pick"clrs.zsh" nocompile'!' \
+	atload'zstyle ":completion:*" list-colors “${(s.:.)LS_COLORS}”'
+zinit light trapd00r/LS_COLORS
+
 zinit ice wait"!0" blockf lucid pick"init.sh"
 zinit light "b4b4r07/enhancd"
 
 zinit ice from"gh-r" as"program"
 zinit load junegunn/fzf-bin
-
-zinit ice atclone"dircolors -b LS_COLORS > c.zsh" atpull'%atclone' pick"c.zsh" nocompile'!'
-zinit light trapd00r/LS_COLORS
-
-zinit ice as"program" make'!' atclone'./direnv hook zsh > zhook.zsh' atpull'%atclone' src"zhook.zsh"
-zinit light direnv/direnv
 
 # SSH-AGENT
 zinit light bobsoppe/zsh-ssh-agent
@@ -59,6 +58,16 @@ zinit load junegunn/fzf-bin
 # z - jump around
 zinit wait lucid for \
 	"agkozak/zsh-z"
+
+  # diff-so-fancy
+# https://github.com/so-fancy/diff-so-fancy
+zinit ice wait"1b" lucid as"program" pick"bin/git-dsf"
+zinit light zdharma/zsh-diff-so-fancy
+
+# fuzzy git
+# https://github.com/wfxr/forgit
+zinit ice has'fzf'
+zinit light wfxr/forgit
 
 # ─── fuzzy movement and directory choosing ────────────────────────────────────
 # autojump command
