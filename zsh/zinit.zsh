@@ -13,24 +13,25 @@ autoload -Uz _zinit
 
 zinit ice depth=1; zinit light romkatv/powerlevel10k
 
-#  zinit ice atclone"dircolors -b LS_COLORS > clrs.zsh" \
-#     atpull'%atclone' pick"clrs.zsh" nocompile'!' atload'zstyle ":completion:*" list-colors “${(s.:.)LS_COLORS}”'
-#   zinit light https://github.com/trapd00r/LS_COLORS
+zinit ice silent wait"0"
+zinit snippet OMZ::plugins/history/history.plugin.zsh
 
+zinit ice silent wait"0"
+zinit snippet OMZ::plugins/per-directory-history/per-directory-history.zsh
 
-  zinit ice wait blockf lucid atpull'zinit creinstall -q .'
-  zinit light https://github.com/zsh-users/zsh-completions
+zinit ice wait blockf lucid atpull'zinit creinstall -q .'
+zinit light https://github.com/zsh-users/zsh-completions
 
-  zinit ice wait lucid atinit'ZINIT[COMPINIT_OPTS]=-C; zpcompinit; zpcdreplay' \
-    atload'unset "FAST_HIGHLIGHT[chroma-whatis]" "FAST_HIGHLIGHT[chroma-man]"'
-  zinit light https://github.com/zdharma/fast-syntax-highlighting
+zinit ice wait lucid atinit'ZINIT[COMPINIT_OPTS]=-C; zpcompinit; zpcdreplay' \
+  atload'unset "FAST_HIGHLIGHT[chroma-whatis]" "FAST_HIGHLIGHT[chroma-man]"'
+zinit light https://github.com/zdharma/fast-syntax-highlighting
 
-  zinit ice wait lucid atload'_zsh_autosuggest_start'
-  zinit light https://github.com/zsh-users/zsh-autosuggestions
+zinit ice wait lucid atload'_zsh_autosuggest_start'
+zinit light https://github.com/zsh-users/zsh-autosuggestions
 
-  zinit ice atclone"dircolors -b LS_COLORS > clrs.zsh" \
-	atpull'%atclone' pick"clrs.zsh" nocompile'!' \
-	atload'zstyle ":completion:*" list-colors “${(s.:.)LS_COLORS}”'
+zinit ice atclone"dircolors -b LS_COLORS > clrs.zsh" \
+atpull'%atclone' pick"clrs.zsh" nocompile'!' \
+atload'zstyle ":completion:*" list-colors “${(s.:.)LS_COLORS}”'
 zinit light trapd00r/LS_COLORS
 
 zinit ice wait"!0" blockf lucid pick"init.sh"
