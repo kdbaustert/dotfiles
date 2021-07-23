@@ -7,9 +7,9 @@
 	<key>BadgeMaxHeightFraction</key>
 	<real>0.20000000298023224</real>
 	<key>BadgeRightMargin</key>
-	<integer>20</integer>
+	<integer>10</integer>
 	<key>BadgeTopMargin</key>
-	<integer>20</integer>
+	<integer>10</integer>
 	<key>BracketedPasteMode</key>
 	<true/>
 	<key>CheckTestRelease</key>
@@ -2785,7 +2785,7 @@
 	<key>FlashTabBarInFullscreen</key>
 	<false/>
 	<key>HTMLTabTitles</key>
-	<false/>
+	<true/>
 	<key>HapticFeedbackForEsc</key>
 	<false/>
 	<key>HideActivityIndicator</key>
@@ -3284,13 +3284,13 @@
 				<key>Alpha Component</key>
 				<real>1</real>
 				<key>Blue Component</key>
-				<real>0.070108413696289062</real>
+				<real>0.20392156862745098</real>
 				<key>Color Space</key>
 				<string>sRGB</string>
 				<key>Green Component</key>
-				<real>0.037968158664625662</real>
+				<real>0.15686274509803921</real>
 				<key>Red Component</key>
-				<real>0.037968158664625662</real>
+				<real>0.13333333333333333</real>
 			</dict>
 			<key>Background Color (Dark)</key>
 			<dict>
@@ -3360,7 +3360,7 @@
 			<key>Blur</key>
 			<true/>
 			<key>Blur Radius</key>
-			<real>17.422934767916999</real>
+			<real>29.344935734090537</real>
 			<key>Bold Color</key>
 			<dict>
 				<key>Blue Component</key>
@@ -3397,7 +3397,7 @@
 				<real>0.99999600648880005</real>
 			</dict>
 			<key>Brighten Bold Text</key>
-			<true/>
+			<false/>
 			<key>Brighten Bold Text (Dark)</key>
 			<true/>
 			<key>Brighten Bold Text (Light)</key>
@@ -3540,7 +3540,7 @@
 			<key>Disable Window Resizing</key>
 			<true/>
 			<key>Draw Powerline Glyphs</key>
-			<false/>
+			<true/>
 			<key>Flashing Bell</key>
 			<false/>
 			<key>Foreground Color</key>
@@ -3926,7 +3926,7 @@
 			<key>Non-ASCII Ligatures</key>
 			<true/>
 			<key>Normal Font</key>
-			<string>MonoLisa-Medium 16</string>
+			<string>JetBrainsMono-Regular 16</string>
 			<key>Only The Default BG Color Uses Transparency</key>
 			<true/>
 			<key>Open Toolbelt</key>
@@ -4086,13 +4086,13 @@
 			<key>Title Components</key>
 			<integer>128</integer>
 			<key>Transparency</key>
-			<real>0.18818085392882736</real>
+			<real>0.15875483113544306</real>
 			<key>Unicode Version</key>
-			<integer>8</integer>
+			<integer>9</integer>
 			<key>Unlimited Scrollback</key>
 			<false/>
 			<key>Use Bold Font</key>
-			<false/>
+			<true/>
 			<key>Use Bright Bold</key>
 			<true/>
 			<key>Use Bright Bold (Dark)</key>
@@ -4128,7 +4128,7 @@
 			<key>Use Underline Color (Light)</key>
 			<false/>
 			<key>Vertical Spacing</key>
-			<real>1.0600000000000001</real>
+			<real>1.1499999999999999</real>
 			<key>Visual Bell</key>
 			<false/>
 			<key>Window Type</key>
@@ -4378,7 +4378,7 @@
 	<key>TerminalMargin</key>
 	<integer>15</integer>
 	<key>TerminalVMargin</key>
-	<integer>26</integer>
+	<integer>17</integer>
 	<key>TmuxUsesDedicatedProfile</key>
 	<false/>
 	<key>ToolbeltTools</key>
