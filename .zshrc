@@ -20,6 +20,7 @@ export DOTFILES="$HOME/dotfiles"
 export LANG='en_US.UTF-8'
 export WORDCHARS='~!#$%^&*(){}[]<>?.+;' # sane moving between words on the prompt
 export PATH="/usr/local/sbin:$PATH"
+export PATH="/usr/local/bin:$PATH"
 export PROMPT_EOL_MARK='' # hide % at end of output
 export LS_COLORS="$(vivid generate molokai)"
 
@@ -51,9 +52,10 @@ export FZF_DEFAULT_COMMAND='rg --files --no-ignore-vcs --hidden --ignore-file ~/
 #####################
 # HISTORY           #
 #####################
-[ -z "$HISTFILE" ] && HISTFILE="$HOME/.zhistory"
-HISTSIZE=290000
-SAVEHIST=$HISTSIZE
+HISTFILE="$HOME/.zsh_history"
+HISTSIZE=10000000
+SAVEHIST=10000000
+
 
 #####################
 # SETOPT            #
