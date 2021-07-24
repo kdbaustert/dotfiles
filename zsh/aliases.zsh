@@ -1,21 +1,23 @@
 #!/usr/bin
 
 # Shourtcuts
-alias copyssh="pbcopy < $HOME/.ssh/id_rsa.pub"
-alias reloadshell="source $HOME/.zshrc"
-alias reloaddns="dscacheutil -flushcache && sudo killall -HUP mDNSResponder"
-alias shrug="echo '¯\_(ツ)_/¯' | pbcopy"
 alias c='clear'
 alias o='open .'
 alias x='exit'
+alias x+="chmod +x"
+alias copyssh="pbcopy < $HOME/.ssh/id_rsa.pub"
+alias reload="source ~/.zshrc"
+alias reloaddns="dscacheutil -flushcache && sudo killall -HUP mDNSResponder"
+alias shrug="echo '¯\_(ツ)_/¯' | pbcopy"
 alias search-history='$(history | cut -c8- | sort -u | pick)'
 alias genpass='LC_ALL=C tr -dc "[:alnum:]" < /dev/urandom | head -c 20 | pbcopy'
 alias purgemem='sudo purge'
 alias ClearDNSCache='sudo dscacheutil -flushcache && sudo killall -HUP mDNSResponder'
 
 # Directories
-alias dt="cd $HOME/Desktop"
-alias dev="cd $HOME/Dev"
+alias desk="cd ~/desktop"
+alias docs="cd ~/documents"
+alias dev="cd $HOME/Development"
 alias sites="cd $HOME/Sites"
 alias dl="cd $HOME/Downloads"
 alias dotfiles="cd $HOME/dotfiles"
@@ -138,7 +140,7 @@ alias permission='chmod +x'
 alias update='brew update; brew upgrade; brew cleanup; npm install npm -g; npm update -g; sudo gem update colorls; composer global update; zinit update'
 
 # Recursively remove .DS_Store files
-alias cleanup="find . -type f -name '*.DS_Store' -ls -delete"
+alias cleanup="find . -name '*.DS_Store' -type f -ls -delete"
 
 # Kill all the tabs in Chrome to free up memory
 # [C] explained: http://www.commandlinefu.com/commands/view/402/exclude-grep-from-your-grepped-output-of-ps-alias-included-in-description
@@ -149,6 +151,14 @@ alias lscleanup="/System/Library/Frameworks/CoreServices.framework/Frameworks/La
 
 # IP addresses
 alias ip="dig +short myip.opendns.com @resolver1.opendns.com"
+
+# 🔇
+alias stfu="osascript -e 'set volume output muted true'"
+
+# use gitignore.io cmd line tool
+gi() {
+  curl -L -s https://www.gitignore.io/api/$@
+}
 
 # Brew
 alias brewl='brew list'
@@ -202,11 +212,21 @@ alias npmu='npm run uninstall'
 alias npmc='npm install & composer install'
 
 # Yarn
-alias ys='yarn start'
-alias ya='yarn add'
-alias yag='yarn global add'
-alias yac='yarn install & composer install'
-alias yui='yarn upgrade-interactive --latest'
+# yarn
+alias y="yarn"
+alias yi="yarn init"
+alias ya="yarn add"
+alias yad="yarn add --dev"
+alias yga="yarn global add"
+alias yr="yarn run"
+alias ys="yarn start"
+alias yis="yarn install && yarn start"
+alias yrm="yarn remove"
+alias yup="yarn upgrade"
+alias ycl="yarn clean"
+alias ych="yarn check"
+alias yt="yarn test"
+alias ycc="yarn cache clean"
 
 # Git
 alias g='git'
