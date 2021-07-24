@@ -13,12 +13,6 @@ autoload -Uz _zinit
 
 zinit ice depth=1; zinit light romkatv/powerlevel10k
 
-zinit ice silent wait"0"
-zinit snippet OMZ::plugins/history/history.plugin.zsh
-
-zinit ice silent wait"0"
-zinit snippet OMZ::plugins/per-directory-history/per-directory-history.zsh
-
 zinit ice wait blockf lucid atpull'zinit creinstall -q .'
 zinit light https://github.com/zsh-users/zsh-completions
 
@@ -43,7 +37,6 @@ zinit load junegunn/fzf-bin
 # SSH-AGENT
 zinit light bobsoppe/zsh-ssh-agent
 zinit light rhuang2014/gpg-agent
-zinit light chrissicool/zsh-256color
 
 zinit light "marzocchi/zsh-notify"
 
@@ -51,6 +44,10 @@ zinit wait'1' lucid for \
     OMZ::lib/clipboard.zsh \
     OMZ::lib/git.zsh \
     OMZ::plugins/command-not-found/command-not-found.plugin.zsh \
+    OMZ::plugins/history/history.plugin.zsh
+
+zinit ice silent wait"0"
+zinit snippet OMZ::plugins/per-directory-history/per-directory-history.zsh
 
     # fzf - fuzzy finder
 zinit ice from"gh-r" as"program"
@@ -73,8 +70,8 @@ zinit light wfxr/forgit
 # ─── fuzzy movement and directory choosing ────────────────────────────────────
 # autojump command
 # https://github.com/rupa/z
-# zinit ice wait'0c' lucid
-# zinit light rupa/z
+zinit ice wait'0c' lucid
+zinit light rupa/z
 
 # Pick from most frecent folders with `Ctrl+g`
 # https://github.com/andrewferrier/fzf-z
@@ -83,16 +80,16 @@ zinit light wfxr/forgit
 
 # lets z+[Tab] and zz+[Tab]
 # https://github.com/changyuheng/fz
-# zinit ice wait'0b' lucid
-# zinit light changyuheng/fz
+zinit ice wait'0b' lucid
+zinit light changyuheng/fz
 
 # # sharkdp/fd
-# zinit ice as"program" from"gh-r" mv"fd* -> fd" pick"fd/fd"
-# zinit light sharkdp/fd
+zinit ice as"program" from"gh-r" mv"fd* -> fd" pick"fd/fd"
+zinit light sharkdp/fd
 
 # # sharkdp/bat
-# zinit ice as"program" from"gh-r" mv"bat* -> bat" pick"bat/bat"
-# zinit light sharkdp/bat
+zinit ice as"program" from"gh-r" mv"bat* -> bat" pick"bat/bat"
+zinit light sharkdp/bat
 
 # FZF-TAB
 zinit ice wait'1' lucid
