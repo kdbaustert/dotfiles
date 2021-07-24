@@ -226,6 +226,7 @@ alias gm='git merge'
 alias gp='git push'
 alias gst='git status'
 alias lg='lazygit'
+alias gcl='git clone'
 
 # Git Large Storage
 alias gitli='git lfs install'
