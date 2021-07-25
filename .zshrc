@@ -1,9 +1,9 @@
 # Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
 # Initialization code that may require console input (password prompts, [y/n]
 # confirmations, etc.) must go above this block; everything else may go below.
-if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
-  source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
-fi
+# if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
+#   source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
+# fi
 
 # Created by Kenny B <kenny@gothamx.dev>
 
@@ -41,8 +41,8 @@ fi
 [[ -f "$DOTFILES/zsh/completion.zsh" ]] && source "$DOTFILES/zsh/completion.zsh"
 
 zinit ice atclone"dircolors -b LS_COLORS > clrs.zsh" \
-    atpull'%atclone' pick"clrs.zsh" nocompile'!' \
-    atload'zstyle ":completion:*" list-colors “${(s.:.)LS_COLORS}”'
+  atpull'%atclone' pick"clrs.zsh" nocompile'!' \
+  atload'zstyle ":completion:*" list-colors “${(s.:.)LS_COLORS}”'
 zinit light trapd00r/LS_COLORS
 zinit light "pinelibg/dircolors-solarized-zsh"
 
@@ -55,7 +55,6 @@ export FZF_DEFAULT_COMMAND='rg --files --no-ignore-vcs --hidden --ignore-file ~/
 HISTFILE="$HOME/.zsh_history"
 HISTSIZE=10000000
 SAVEHIST=10000000
-
 
 #####################
 # SETOPT            #
@@ -70,14 +69,14 @@ setopt SHARE_HISTORY          # share command history data
 setopt COMPLETEALIASES        # complete alisases
 setopt AUTOMENU
 setopt AUTOCD
-setopt SHAREHISTORY           # global history
+setopt SHAREHISTORY  # global history
 setopt GLOB_DOTS     # no special treatment for file names with a leading dot
 setopt NO_AUTO_MENU  # require an extra TAB press to open the completion menu
-setopt NOTIFY               # Report the status of background jobs immediately, rather than waiting until just before printing a prompt.
-setopt NO_BG_NICE           # Prevent runing all background jobs at a lower priority.
-setopt NO_CHECK_JOBS        # Prevent reporting the status of background and suspended jobs before exiting a shell with job control. NO_CHECK_JOBS is best used only in combination with NO_HUP, else such jobs will be killed automatically.
-setopt NO_HUP               # Prevent sending the HUP signal to running jobs when the shell exits.
-setopt NO_BEEP              # Don't beep on erros (overrides /etc/zshrc in Catalina)
+setopt NOTIFY        # Report the status of background jobs immediately, rather than waiting until just before printing a prompt.
+setopt NO_BG_NICE    # Prevent runing all background jobs at a lower priority.
+setopt NO_CHECK_JOBS # Prevent reporting the status of background and suspended jobs before exiting a shell with job control. NO_CHECK_JOBS is best used only in combination with NO_HUP, else such jobs will be killed automatically.
+setopt NO_HUP        # Prevent sending the HUP signal to running jobs when the shell exits.
+setopt NO_BEEP       # Don't beep on erros (overrides /etc/zshrc in Catalina)
 setopt ALWAYS_TO_END # If a completion is performed with the cursor within a word, and a full completion is inserted, the cursor is moved to the end of the word
 setopt PATH_DIRS     # Perform a path search even on command names with slashes in them.
 unsetopt CASE_GLOB   # Make globbing (filename generation) not sensitive to case.
@@ -86,7 +85,6 @@ unsetopt LIST_BEEP   # Don't beep on an ambiguous completion.
 autoload colors && colors
 
 autoload -Uz compinit compdef && compinit -C -d "${ZDOTDIR}/${zcompdump_file:-.zcompdump}"
-
 
 alias preview="fzf --preview 'bat --color \"always\" {}'"
 export FZF_DEFAULT_OPTS="
@@ -108,16 +106,9 @@ export FZF_DEFAULT_OPTS="
 # eval "$(direnv hook zsh)"
 eval "$(zoxide init zsh --hook pwd)"
 
-
-# Base16 Shell
-# BASE16_SHELL="$HOME/.config/base16-shell/"
-# [ -n "$PS1" ] && \
-#     [ -s "$BASE16_SHELL/profile_helper.sh" ] && \
-#         eval "$("$BASE16_SHELL/profile_helper.sh")"
-
 [[ -f $DOTFILES/zsh/p10k.zsh ]] && source $DOTFILES/zsh/p10k.zsh
 
-s=' ' # fix too wide icons
+s='' # fix too wide icons
 POWERLEVEL9K_MODE=nerdfont-complete
 POWERLEVEL9K_SHORTEN_STRATEGY=truncate_beginning
 POWERLEVEL9K_PROMPT_ADD_NEWLINE=true
@@ -177,12 +168,12 @@ POWERLEVEL9K_MULTILINE_LAST_PROMPT_PREFIX='%F{blue}╰%f '
 ZLE_RPROMPT_INDENT=0
 
 POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(
-	os_icon
+  os_icon
   root_indicator
   ssh
-	dir
+  dir
   dir_writable
-	vcs
+  vcs
 )
 
 POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS=(
