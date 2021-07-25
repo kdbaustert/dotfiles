@@ -155,11 +155,6 @@ alias ip="dig +short myip.opendns.com @resolver1.opendns.com"
 # 🔇
 alias stfu="osascript -e 'set volume output muted true'"
 
-# use gitignore.io cmd line tool
-gi() {
-  curl -L -s https://www.gitignore.io/api/$@
-}
-
 # Brew
 alias brewl='brew list'
 alias brewi='brew install'
