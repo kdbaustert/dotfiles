@@ -106,7 +106,7 @@ export FZF_DEFAULT_OPTS="
 # eval "$(direnv hook zsh)"
 eval "$(zoxide init zsh --hook pwd)"
 
-[[ -f $DOTFILES/zsh/p10k.zsh ]] && source $DOTFILES/zsh/p10k.zsh
+[[ -f $DOTFILES/zsh/.p10k.zsh ]] && source $DOTFILES/zsh/.p10k.zsh
 
 s='' # fix too wide icons
 POWERLEVEL9K_MODE=nerdfont-complete
