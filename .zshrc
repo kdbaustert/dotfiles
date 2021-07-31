@@ -8,11 +8,7 @@
 # Created by Kenny B <kenny@gothamx.dev>
 
 export COLORTERM="truecolor"
-
 export GPG_TTY=$TTY
-
-# export SPROMPT="zsh: correct %F{red}'%R'%f to %F{blue}'%r'%f [%B%Uy%u%bes, %B%Un%u%bo, %B%Ue%u%bdit, %B%Ua%u%bbort]?"
-
 export EDITOR='nvim'
 export VISUAL=$EDITOR
 export TERMINAL='iTerm'
@@ -23,6 +19,7 @@ export PATH="/usr/local/sbin:$PATH"
 export PATH="/usr/local/bin:$PATH"
 export PROMPT_EOL_MARK='' # hide % at end of output
 export LS_COLORS="$(vivid generate molokai)"
+export ZSH_EXTEND_HISTORY_FILE="$HOME/zsh-extend.history"
 
 if [ -d "$HOME/.nvm" ]; then
   export NVM_DIR="$HOME/.nvm"
@@ -106,7 +103,7 @@ export FZF_DEFAULT_OPTS="
 # eval "$(direnv hook zsh)"
 eval "$(zoxide init zsh --hook pwd)"
 
-[[ -f $DOTFILES/zsh/.p10k.zsh ]] && source $DOTFILES/zsh/.p10k.zsh
+[[ -f $DOTFILES/zsh/p10k.zsh ]] && source $DOTFILES/zsh/p10k.zsh
 
 s='' # fix too wide icons
 POWERLEVEL9K_MODE=nerdfont-complete
