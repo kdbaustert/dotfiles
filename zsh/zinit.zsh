@@ -48,8 +48,8 @@ zinit wait'1' lucid for \
 
 zinit light xav-b/zsh-extend-history
 
-zinit ice silent wait"0"
-zinit snippet OMZ::plugins/per-directory-history/per-directory-history.zsh
+# zinit ice silent wait"0"
+# zinit snippet OMZ::plugins/per-directory-history/per-directory-history.zsh
 
     # fzf - fuzzy finder
 zinit ice from"gh-r" as"program"
@@ -66,24 +66,24 @@ zinit light zdharma/zsh-diff-so-fancy
 
 # fuzzy git
 # https://github.com/wfxr/forgit
-# zinit ice has'fzf'
-# zinit light wfxr/forgit
+zinit ice has'fzf'
+zinit light wfxr/forgit
 
 # ─── fuzzy movement and directory choosing ────────────────────────────────────
 # autojump command
 # https://github.com/rupa/z
-# zinit ice wait'0c' lucid
-# zinit light rupa/z
+zinit ice wait'0c' lucid
+zinit light rupa/z
 
 # Pick from most frecent folders with `Ctrl+g`
 # https://github.com/andrewferrier/fzf-z
-# : zinit ice wait'0b' lucid
-# : zinit load andrewferrier/fzf-z
+: zinit ice wait'0b' lucid
+: zinit load andrewferrier/fzf-z
 
 # lets z+[Tab] and zz+[Tab]
 # https://github.com/changyuheng/fz
-# zinit ice wait'0b' lucid
-# zinit light changyuheng/fz
+zinit ice wait'0b' lucid
+zinit light changyuheng/fz
 
 # sharkdp/fd
 zinit ice as"program" from"gh-r" mv"fd* -> fd" pick"fd/fd"
