@@ -102,9 +102,9 @@ alias cnodeall='find . -name "node_modules" -type d | xargs rm -rf'
 alias wpgetsalts="curl https://api.wordpress.org/secret-key/1.1/salt/"
 
 # Brew Services
-alias brewsr mariadb='brew services start mariadb'
-alias brewsr dnsmasq='brew services start dnsmasq'
-alias brewsr php='brew services start php'
+# alias brewsr mariadb='brew services start mariadb'
+# alias brewsr dnsmasq='brew services start dnsmasq'
+# alias brewsr php='brew services start php'
 
 # Tiling window manager
 alias yabres='brew services restart yabai && brew services restart skhd'
