@@ -13,6 +13,10 @@ autoload -Uz _zinit
 
 zinit ice depth=1; zinit light romkatv/powerlevel10k
 
+# SSH-AGENT
+zinit light bobsoppe/zsh-ssh-agent
+zinit light rhuang2014/gpg-agent
+
 zinit ice wait blockf lucid atpull'zinit creinstall -q .'
 zinit light https://github.com/zsh-users/zsh-completions
 
@@ -34,12 +38,6 @@ zinit light "b4b4r07/enhancd"
 zinit ice from"gh-r" as"program"
 zinit load junegunn/fzf-bin
 
-# SSH-AGENT
-zinit light bobsoppe/zsh-ssh-agent
-zinit light rhuang2014/gpg-agent
-
-zinit light "marzocchi/zsh-notify"
-
 zinit wait'1' lucid for \
     OMZ::lib/clipboard.zsh \
     OMZ::lib/git.zsh \
@@ -48,10 +46,12 @@ zinit wait'1' lucid for \
 
 zinit light xav-b/zsh-extend-history
 
-# zinit ice silent wait"0"
-# zinit snippet OMZ::plugins/per-directory-history/per-directory-history.zsh
+# prettyping
+zinit ice wait lucid as'program' mv'prettyping* -> prettyping' \
+    atload"alias ping='prettyping --nolegend'"
+zinit light denilsonsa/prettyping
 
-    # fzf - fuzzy finder
+# fzf - fuzzy finder
 zinit ice from"gh-r" as"program"
 zinit load junegunn/fzf-bin
 
