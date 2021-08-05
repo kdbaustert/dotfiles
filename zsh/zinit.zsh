@@ -15,10 +15,10 @@ zinit ice depth=1; zinit light romkatv/powerlevel10k
 
 # SSH-AGENT
 zinit light bobsoppe/zsh-ssh-agent
-zinit light rhuang2014/gpg-agent
+#zinit light rhuang2014/gpg-agent
 
-zinit ice wait blockf lucid atpull'zinit creinstall -q .'
-zinit light https://github.com/zsh-users/zsh-completions
+#zinit ice wait blockf lucid atpull'zinit creinstall -q .'
+#zinit light https://github.com/zsh-users/zsh-completions
 
 zinit ice wait lucid atinit'ZINIT[COMPINIT_OPTS]=-C; zpcompinit; zpcdreplay' \
   atload'unset "FAST_HIGHLIGHT[chroma-whatis]" "FAST_HIGHLIGHT[chroma-man]"'
@@ -66,8 +66,8 @@ zinit light zdharma/zsh-diff-so-fancy
 
 # fuzzy git
 # https://github.com/wfxr/forgit
-zinit ice has'fzf'
-zinit light wfxr/forgit
+# zinit ice has'fzf'
+# zinit light wfxr/forgit
 
 # ─── fuzzy movement and directory choosing ────────────────────────────────────
 # autojump command
@@ -90,8 +90,8 @@ zinit ice as"program" from"gh-r" mv"fd* -> fd" pick"fd/fd"
 zinit light sharkdp/fd
 
 # sharkdp/bat
-zinit ice as"program" from"gh-r" mv"bat* -> bat" pick"bat/bat"
-zinit light sharkdp/bat
+# zinit ice as"program" from"gh-r" mv"bat* -> bat" pick"bat/bat"
+# zinit light sharkdp/bat
 
 # FZF-TAB
 zinit ice wait'1' lucid
