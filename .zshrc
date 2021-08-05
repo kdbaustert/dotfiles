@@ -7,32 +7,6 @@
 
 # Created by Kenny B <kenny@gothamx.dev>
 
-export COLORTERM="truecolor"
-export GPG_TTY=$TTY
-export EDITOR='nvim'
-export VISUAL=$EDITOR
-export TERMINAL='iTerm'
-export DOTFILES="$HOME/dotfiles"
-export LANG='en_US.UTF-8'
-export WORDCHARS='~!#$%^&*(){}[]<>?.+;' # sane moving between words on the prompt
-export PATH="/usr/local/sbin:$PATH"
-export PATH="/usr/local/bin:$PATH"
-export PROMPT_EOL_MARK='' # hide % at end of output
-export LS_COLORS="$(vivid generate molokai)"
-export ZSH_EXTEND_HISTORY_FILE="$HOME/zsh-extend.history"
-
-if [ -d "$HOME/.nvm" ]; then
-  export NVM_DIR="$HOME/.nvm"
-fi
-
-if [ -d "$HOME/.composer/vendor/bin" ]; then
-  export PATH="$HOME/.composer/vendor/bin:$PATH"
-fi
-
-if [ -d "$HOME/.gem" ]; then
-  export GEM_HOME="$HOME/.gem"
-fi
-
 [[ -f "$DOTFILES/zsh/zinit.zsh" ]] && source "$DOTFILES/zsh/zinit.zsh"
 
 [[ -f "$DOTFILES/zsh/completion.zsh" ]] && source "$DOTFILES/zsh/completion.zsh"
@@ -103,16 +77,17 @@ export FZF_DEFAULT_OPTS="
 # eval "$(direnv hook zsh)"
 eval "$(zoxide init zsh --hook pwd)"
 
-[[ -f $DOTFILES/zsh/p10k.zsh ]] && source $DOTFILES/zsh/p10k.zsh
+[[ -f $DOTFILES/zsh/.p10k.zsh ]] && source $DOTFILES/zsh/.p10k.zsh
 
-s='' # fix too wide icons
-POWERLEVEL9K_MODE=nerdfont-complete
+s=' ' # fix too wide icons
+POWERLEVEL9K_MODE="nerdfont-complete"
+POWERLEVEL9K_APPLE_ICON=
 POWERLEVEL9K_SHORTEN_STRATEGY=truncate_beginning
 POWERLEVEL9K_PROMPT_ADD_NEWLINE=true
 POWERLEVEL9K_PROMPT_ON_NEWLINE=true
 POWERLEVEL9K_RPROMPT_ON_NEWLINE=false
 POWERLEVEL9K_SHORTEN_DIR_LENGTH=2
-POWERLEVEL9K_ICON_BEFORE_CONTENT=false
+POWERLEVEL9K_ICON_BEFORE_CONTENT=true
 POWERLEVEL9K_OS_ICON_CONTENT_EXPANSION='${P9K_CONTENT} $(whoami | grep -v "^root\$")'
 POWERLEVEL9K_OS_ICON_BACKGROUND=#8d36fe
 POWERLEVEL9K_OS_ICON_FOREGROUND=#fff
@@ -123,13 +98,13 @@ POWERLEVEL9K_SSH_FOREGROUND=blue
 POWERLEVEL9K_FOLDER_ICON=
 POWERLEVEL9K_DIR_BACKGROUND=cyan
 POWERLEVEL9K_DIR_FOREGROUND=black
-POWERLEVEL9K_DIR_WRITABLE_BACKGROUND=black
+POWERLEVEL9K_DIR_WRITABLE_BACKGROUND=white
 POWERLEVEL9K_DIR_WRITABLE_FOREGROUND=red
-POWERLEVEL9K_VCS_CLEAN_FOREGROUND=black
+POWERLEVEL9K_VCS_CLEAN_FOREGROUND=white
 POWERLEVEL9K_VCS_CLEAN_BACKGROUND=green
-POWERLEVEL9K_VCS_UNTRACKED_FOREGROUND=black
+POWERLEVEL9K_VCS_UNTRACKED_FOREGROUND=white
 POWERLEVEL9K_VCS_UNTRACKED_BACKGROUND=yellow
-POWERLEVEL9K_VCS_MODIFIED_FOREGROUND=white
+POWERLEVEL9K_VCS_MODIFIED_FOREGROUND=blue
 POWERLEVEL9K_VCS_MODIFIED_BACKGROUND=black
 POWERLEVEL9K_VCS_UNTRACKED_ICON=●
 POWERLEVEL9K_VCS_UNSTAGED_ICON=±
