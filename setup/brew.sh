@@ -145,8 +145,8 @@ apps=(
   archiver
   datagrip
   airbuddy
-  raycast
   iina
   yippy
   yt-music
+  pushplaylabs-sidekick
 )
