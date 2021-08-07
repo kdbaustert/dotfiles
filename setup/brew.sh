@@ -146,4 +146,11 @@ apps=(
   yt-music
   pushplaylabs-sidekick
   zeplin
+  dissenter-browser
+  gitkraken
+  messenger
+  kitty
+  raindropio
+  optimage
+  parallels
 )
