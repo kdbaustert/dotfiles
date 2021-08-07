@@ -66,7 +66,7 @@ binaries=(
   fd
   sqlite
   zlib
-  pyenv
+  zoxide
 
   # Development
   yarn
@@ -99,7 +99,6 @@ fonts=(
   font-space-mono-nerd-font
   font-ubuntu-mono-nerd-font
   font-ubuntu-nerd-font
-  font-jetbrains-mono-nerd-font
   font-monoid-nerd-font
   font-inconsolata
   font-inconsolata-nerd-font
@@ -120,7 +119,6 @@ apps=(
   duet
   spotify
   karabiner-elements
-  appcleaner
   1password
   captin
   brooklyn
@@ -133,10 +131,8 @@ apps=(
   github
   little-snitch
   onyx
-  keyboard-cleaner
   gitify
   inkdrop
-  motrix
   forkLift
   atom-nightly
   malwarebytes
@@ -149,4 +145,5 @@ apps=(
   yippy
   yt-music
   pushplaylabs-sidekick
+  zeplin
 )
