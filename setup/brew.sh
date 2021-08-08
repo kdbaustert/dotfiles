@@ -82,6 +82,7 @@ binaries=(
   wp-cli
   firebase-cli
   vivid
+  xplr
 )
 
 # Homebrew Fonts
