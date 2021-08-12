@@ -16,8 +16,14 @@ zinit ice depth=1; zinit light romkatv/powerlevel10k
 # SSH-AGENT
 zinit light bobsoppe/zsh-ssh-agent
 
-#zinit ice wait blockf lucid atpull'zinit creinstall -q .'
+# zinit ice lucid nocompile wait'0e' nocompletions
+# zinit load MenkeTechnologies/zsh-more-completions
+
+zinit ice wait blockf lucid atpull'zinit creinstall -q .'
 zinit light https://github.com/zsh-users/zsh-completions
+
+# zinit ice lucid nocompile
+# zinit load MenkeTechnologies/zsh-expand
 
 zinit ice wait lucid atinit'ZINIT[COMPINIT_OPTS]=-C; zpcompinit; zpcdreplay' \
   atload'unset "FAST_HIGHLIGHT[chroma-whatis]" "FAST_HIGHLIGHT[chroma-man]"'
@@ -41,24 +47,7 @@ zinit wait'1' lucid for \
     OMZ::lib/clipboard.zsh \
     OMZ::lib/git.zsh \
     OMZ::plugins/command-not-found/command-not-found.plugin.zsh \
-    OMZ::plugins/history/history.plugin.zsh \
-    OMZ::plugins/gitignore/gitignore.plugin.zsh \
-    zpm-zsh/ssh \
-    chrissicool/zsh-256color
-
-zinit ice lucid nocompile wait'0e' nocompletions
-zinit load MenkeTechnologies/zsh-more-completions
-
-zinit ice from"gh-r" as"program"
-zinit load junegunn/fzf-bin
-
-zinit wait'1' lucid for \
-    OMZ::lib/clipboard.zsh \
-    OMZ::lib/git.zsh \
-    OMZ::plugins/command-not-found/command-not-found.plugin.zsh \
     OMZ::plugins/history/history.plugin.zsh
-
-zinit light xav-b/zsh-extend-history
 
 zinit light xav-b/zsh-extend-history
 
@@ -107,10 +96,6 @@ zinit light changyuheng/fz
 # sharkdp/fd
 zinit ice as"program" from"gh-r" mv"fd* -> fd" pick"fd/fd"
 zinit light sharkdp/fd
-
-# sharkdp/bat
-# zinit ice as"program" from"gh-r" mv"bat* -> bat" pick"bat/bat"
-# zinit light sharkdp/bat
 
 # FZF-TAB
 zinit ice wait'1' lucid
