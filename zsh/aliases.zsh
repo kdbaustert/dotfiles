@@ -42,6 +42,8 @@ alias .....='cd ../../../..'
 alias wget='wget -c'
 alias mkcd=mcd
 
+# alias v="nvim"
+
 alias a='fasd -a'        # any
 alias s='fasd -si'       # show / search / select
 alias d='fasd -d'        # directory
@@ -51,11 +53,10 @@ alias sf='fasd -sif'     # interactive file selection
 alias z='fasd_cd -d'     # cd, same functionality as j in autojump
 alias zz='fasd_cd -d -i' # cd with interactive selection
 
-# alias l='ls -l'
+alias ls='lsd'
 alias la='ls -a'
 alias lla='ls -la'
 alias lt='ls --tree'
-alias ls='colorls --sd -A'
 alias ll='colorls --group-directories-first --almost-all --long'
 alias lc='colorls -lA --sd'
 alias l='colorls --group-directories-first --almost-all --tree=1'
@@ -82,13 +83,6 @@ alias cnodeold='find . -name "node_modules" -type d -mtime +120 | xargs rm -rf'
 # Removes all node_modules folders:
 alias cnodeall='find . -name "node_modules" -type d | xargs rm -rf'
 
-alias wpgetsalts="curl https://api.wordpress.org/secret-key/1.1/salt/"
-
-# Brew Services
-# alias brewsr mariadb='brew services start mariadb'
-# alias brewsr dnsmasq='brew services start dnsmasq'
-# alias brewsr php='brew services start php'
-
 # Tiling window manager
 alias yabres='brew services restart yabai && brew services restart skhd'
 alias yabrestart='brew services start yabai && brew services start skhd'
@@ -96,19 +90,17 @@ alias yabrestop='brew services stop yabai && brew services stop skhd'
 alias yabupdate='brew services stop yabai && brew upgrade yabai && sudo yabai --uninstall-sa && sudo yabai --install-sa && brew services start yabai'
 
 # Valet
-alias vstart='valet start'
-alias vstop='valet stop'
-alias vr='valet start'
+alias vs='valet start'
+alias vst='valet stop'
 alias vls='valet links'
 alias vl='valet link'
 alias vul='valet unlink'
-alias vhttps='valet secure'
+alias vssl='valet secure'
 
 # SSH
 alias sshconfig='cd ~/.ssh; code config'
 alias sshkeygen='ssh-keygen -t rsa'
 alias copyssh='ssh-copy-id -i ~/.ssh/id_rsa.pub'
-alias chmodssh='sudo chmod 700 ~/.ssh && chmod 600 ~/.ssh/*'
 
 alias permission='chmod +x'
 
@@ -144,25 +136,21 @@ alias brewsl='brew services list'
 # FZF
 alias hist="history | fzf"
 
-# Spicetify
-alias sp='spicetify -h'
-alias spu='spicetify update'
-alias spd='spicetify enable-devtool'
-alias spr='spicetify restart'
-alias spb='spicetify backup apply'
-
-# WordPress
+#
+alias wp_get_salts="curl https://api.wordpress.org/secret-key/1.1/salt/"
+alias wp_export_staging='wp @staging db export - > "staging_db_$(date +%F_$R).sql"'
+alias wp_export_production='wp @production db export - > "production_db_$(date +%F_$R).sql"'
 alias newwp=install_wp
-alias wpcore='wp core download'
-alias newwpconfig='wp config create'
+alias wp_core='wp core download'
+alias new_wpconfig='wp config create'
 alias newwpplugin='wp scaffold plugin'
-alias wpignore='wp_gitignore'
-alias wpdbcheck='wp db check'
-alias wprepairdb='wp db repair'
-alias wpoptimize='wp db optimize'
-alias wpchildtheme='wp scaffold child-theme'
-alias wpupdateplugins='wp plugin update --all'
-alias wppages="wp post list --post_type='page'"
+alias wp_ignore='wp_gitignore'
+alias wp_dbcheck='wp db check'
+alias wp_repairdb='wp db repair'
+alias wp_optimize='wp db optimize'
+alias wp_child_theme='wp scaffold child-theme'
+alias wp_update_plugins='wp plugin update --all'
+alias wp_pages="wp post list --post_type='page'"
 
 # Vue cli
 alias vinspect='vue inspect'
@@ -175,7 +163,6 @@ alias npmgroot='npm root -g'
 alias npmgl='npm list -g --depth 0'
 alias npmg='npm install -g'
 alias npmi='npm install'
-alias npmoutdated='npm outdated'
 alias npms='npm install --save'
 alias npmsd='npm install --save-dev'
 alias npmrw='npm run watch'
@@ -223,25 +210,12 @@ alias gitli='git lfs install'
 alias gitlt='git lfs track $1'
 
 # Composer
+alias c='composer'
+alias cda='composer dump-autoload'
 alias ci='composer install'
+alias cr='composer require'
+alias crm='composer remove'
 alias cu='composer update'
-alias cgu='composer global update'
-alias cda='composer dump-autoload -o'
-alias cc='composer clear-cache'
-
-# Laravel Database
-alias artm='php artisan migrate'
-alias artfs='php artisan migrate:fresh --seed'
-alias artrf='php artisan migrate:refresh'
-
-# Laravel Makers
-alias artmc='php artisan make:controller'
-alias artmevent='php artisan make:event'
-alias artmmodel='php artisan make:model'
-alias artmmigration='php artisan make:migration'
-alias artmseed='php artisan make:seed'
-alias artmprovider='php artisan make:provider'
-alias artrlist='php artisan route:list'
 
 # PHP code sniffer
 alias codewp='phpcs --config-set default_standard WordPress'
