@@ -36,12 +36,6 @@ fi
 
 [[ -f "$DOTFILES/zsh/completion.zsh" ]] && source "$DOTFILES/zsh/completion.zsh"
 
-zinit ice atclone"dircolors -b LS_COLORS > clrs.zsh" \
-  atpull'%atclone' pick"clrs.zsh" nocompile'!' \
-  atload'zstyle ":completion:*" list-colors “${(s.:.)LS_COLORS}”'
-zinit light trapd00r/LS_COLORS
-zinit light "pinelibg/dircolors-solarized-zsh"
-
 # Use a better command for searching with fzf
 export FZF_DEFAULT_COMMAND='rg --files --no-ignore-vcs --hidden --ignore-file ~/.config/ripgrep/ignore'
 
@@ -78,7 +72,7 @@ setopt PATH_DIRS     # Perform a path search even on command names with slashes 
 unsetopt CASE_GLOB   # Make globbing (filename generation) not sensitive to case.
 unsetopt LIST_BEEP   # Don't beep on an ambiguous completion.
 
-autoload colors && colors
+# autoload colors && colors
 
 autoload -Uz compinit compdef && compinit -C -d "${ZDOTDIR}/${zcompdump_file:-.zcompdump}"
 
@@ -99,7 +93,6 @@ export FZF_DEFAULT_OPTS="
 # ALIASES
 [[ -f $DOTFILES/zsh/aliases.zsh ]] && source $DOTFILES/zsh/aliases.zsh
 
-# eval "$(direnv hook zsh)"
 eval "$(zoxide init zsh --hook pwd)"
 
 [[ -f $DOTFILES/zsh/.p10k.zsh ]] && source $DOTFILES/zsh/.p10k.zsh
