@@ -46,8 +46,11 @@ zinit load junegunn/fzf-bin
 zinit wait'1' lucid for \
     OMZ::lib/clipboard.zsh \
     OMZ::lib/git.zsh \
+    OMZ::plugins/gitignore/gitignore.plugin.zsh \
     OMZ::plugins/command-not-found/command-not-found.plugin.zsh \
-    OMZ::plugins/history/history.plugin.zsh
+    OMZ::plugins/history/history.plugin.zsh \
+    zpm-zsh/ssh \
+    chrissicool/zsh-256color
 
 zinit light xav-b/zsh-extend-history
 
