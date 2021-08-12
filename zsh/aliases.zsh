@@ -42,7 +42,7 @@ alias .....='cd ../../../..'
 alias wget='wget -c'
 alias mkcd=mcd
 
-# alias v="nvim"
+alias v="nvim"
 
 alias a='fasd -a'        # any
 alias s='fasd -si'       # show / search / select
