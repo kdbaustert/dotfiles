@@ -72,7 +72,7 @@ setopt PATH_DIRS     # Perform a path search even on command names with slashes 
 unsetopt CASE_GLOB   # Make globbing (filename generation) not sensitive to case.
 unsetopt LIST_BEEP   # Don't beep on an ambiguous completion.
 
-# autoload colors && colors
+autoload colors && colors
 
 autoload -Uz compinit compdef && compinit -C -d "${ZDOTDIR}/${zcompdump_file:-.zcompdump}"
 
@@ -94,6 +94,8 @@ export FZF_DEFAULT_OPTS="
 [[ -f $DOTFILES/zsh/aliases.zsh ]] && source $DOTFILES/zsh/aliases.zsh
 
 eval "$(zoxide init zsh --hook pwd)"
+
+eval "$(mcfly init zsh)"
 
 [[ -f $DOTFILES/zsh/.p10k.zsh ]] && source $DOTFILES/zsh/.p10k.zsh
 
@@ -122,8 +124,8 @@ POWERLEVEL9K_VCS_CLEAN_FOREGROUND=white
 POWERLEVEL9K_VCS_CLEAN_BACKGROUND=green
 POWERLEVEL9K_VCS_UNTRACKED_FOREGROUND=white
 POWERLEVEL9K_VCS_UNTRACKED_BACKGROUND=yellow
-POWERLEVEL9K_VCS_MODIFIED_FOREGROUND=blue
 POWERLEVEL9K_VCS_MODIFIED_BACKGROUND=black
+POWERLEVEL9K_VCS_MODIFIED_FOREGROUND=blue
 POWERLEVEL9K_VCS_UNTRACKED_ICON=●
 POWERLEVEL9K_VCS_UNSTAGED_ICON=±
 POWERLEVEL9K_VCS_INCOMING_CHANGES_ICON=↓
@@ -155,6 +157,8 @@ POWERLEVEL9K_VI_MODE_OVERWRITE_BACKGROUND=red
 POWERLEVEL9K_VI_INSERT_MODE_STRING=
 POWERLEVEL9K_MULTILINE_FIRST_PROMPT_PREFIX='%F{blue}╭─'
 POWERLEVEL9K_MULTILINE_LAST_PROMPT_PREFIX='%F{blue}╰%f '
+POWERLEVEL9K_MULTILINE_FIRST_PROMPT_SUFFIX='%F{blue}─╮'
+POWERLEVEL9K_MULTILINE_LAST_PROMPT_SUFFIX='%F{blue}─╯'
 ZLE_RPROMPT_INDENT=0
 
 POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(
@@ -171,5 +175,3 @@ POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS=(
   command_execution_time
   ram
 )
-
-test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
