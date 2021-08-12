@@ -15,10 +15,9 @@ zinit ice depth=1; zinit light romkatv/powerlevel10k
 
 # SSH-AGENT
 zinit light bobsoppe/zsh-ssh-agent
-#zinit light rhuang2014/gpg-agent
 
 #zinit ice wait blockf lucid atpull'zinit creinstall -q .'
-#zinit light https://github.com/zsh-users/zsh-completions
+zinit light https://github.com/zsh-users/zsh-completions
 
 zinit ice wait lucid atinit'ZINIT[COMPINIT_OPTS]=-C; zpcompinit; zpcdreplay' \
   atload'unset "FAST_HIGHLIGHT[chroma-whatis]" "FAST_HIGHLIGHT[chroma-man]"'
@@ -42,9 +41,29 @@ zinit wait'1' lucid for \
     OMZ::lib/clipboard.zsh \
     OMZ::lib/git.zsh \
     OMZ::plugins/command-not-found/command-not-found.plugin.zsh \
+    OMZ::plugins/history/history.plugin.zsh \
+    OMZ::plugins/gitignore/gitignore.plugin.zsh \
+    zpm-zsh/ssh \
+    chrissicool/zsh-256color
+
+zinit ice lucid nocompile wait'0e' nocompletions
+zinit load MenkeTechnologies/zsh-more-completions
+
+zinit ice from"gh-r" as"program"
+zinit load junegunn/fzf-bin
+
+zinit wait'1' lucid for \
+    OMZ::lib/clipboard.zsh \
+    OMZ::lib/git.zsh \
+    OMZ::plugins/command-not-found/command-not-found.plugin.zsh \
     OMZ::plugins/history/history.plugin.zsh
 
 zinit light xav-b/zsh-extend-history
+
+zinit light xav-b/zsh-extend-history
+
+zinit wait"2" lucid as"program" from"gh-r" for \
+      mv"lsd-*/lsd -> lsd" atload"alias ls='lsd'" Peltoche/lsd
 
 # prettyping
 zinit ice wait lucid as'program' mv'prettyping* -> prettyping' \
@@ -66,8 +85,8 @@ zinit light zdharma/zsh-diff-so-fancy
 
 # fuzzy git
 # https://github.com/wfxr/forgit
-# zinit ice has'fzf'
-# zinit light wfxr/forgit
+zinit ice has'fzf'
+zinit light wfxr/forgit
 
 # ─── fuzzy movement and directory choosing ────────────────────────────────────
 # autojump command
