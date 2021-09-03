@@ -154,4 +154,5 @@ apps=(
   raindropio
   optimage
   parallels
+  homebrew/cask-drivers/evolv-escribe-suite
 )
