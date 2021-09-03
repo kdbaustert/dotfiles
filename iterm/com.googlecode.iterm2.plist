@@ -3293,7 +3293,7 @@
 	<key>DisableFullscreenTransparency</key>
 	<false/>
 	<key>DisableWindowSizeSnap</key>
-	<false/>
+	<true/>
 	<key>DisallowCopyEmptyString</key>
 	<true/>
 	<key>EnableDivisionView</key>
@@ -4626,7 +4626,7 @@
 			<key>Title Components</key>
 			<integer>128</integer>
 			<key>Transparency</key>
-			<real>0.18227765049215849</real>
+			<real>0.31067214902228085</real>
 			<key>Unicode Version</key>
 			<integer>9</integer>
 			<key>Unlimited Scrollback</key>
