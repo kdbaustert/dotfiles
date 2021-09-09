@@ -34,4 +34,5 @@ npm=(
   readme-md-generator
   npx
   auto-changelog
+  typescript
 )
