@@ -45,14 +45,14 @@ brew install ${taps[@]}
 
 brew update
 
+# Homebrew Binaries
+info 'Intalling brew binaries'
+brew install ${binaries[@]}
+
 # Homebrew Fonts
 info 'Intalling brew fonts'
 info ${fonts[@]}
 brew install ${fonts[@]}
-
-# Homebrew Binaries
-info 'Intalling brew binaries'
-brew install ${binaries[@]}
 
 # Homebrew Applications
 info 'Intalling brew applications'
@@ -75,7 +75,6 @@ ln -s "$HOME/dotfiles/skhd/.skhdrc" $HOME/
 ln -s "$HOME/dotfiles/yabai/.yabairc" $HOME/
 ln -s "$HOME/dotfiles/spacebar/.spacebarrc" $HOME/
 ln -s "$HOME/dotfiles/neofetch/config.conf" "$HOME/.config/neofetch"
-ln -s "$HOME/dotfiles/.mackup.cfg" $HOME/
 
 info "Setting chmod for ~/.ssh"
 chmod 700 "$HOME/.ssh"
