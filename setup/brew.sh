@@ -4,6 +4,7 @@
 brew tap homebrew/cask-fonts
 brew tap homebrew/cask-versions
 brew tap koekeishiya/formulae
+brew tap shopify/shopify
 
 binaries=(
   bash      # Latest Bash version
@@ -72,7 +73,9 @@ binaries=(
   yarn
   node
   nvm
+  php
   php@7.4
+  php@7.3
   php
   nginx
   php-cs-fixer
@@ -83,6 +86,8 @@ binaries=(
   firebase-cli
   vivid
   xplr
+  shopify-cli
+  themekit
 )
 
 # Homebrew Fonts
