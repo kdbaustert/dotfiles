@@ -35,4 +35,5 @@ npm=(
   npx
   auto-changelog
   typescript
+  generator-alfred
 )
