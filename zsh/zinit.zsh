@@ -104,6 +104,9 @@ zinit light sharkdp/fd
 zinit ice wait'1' lucid
 zinit light Aloxaf/fzf-tab
 
+# zinit ice lucit wait"0" as"program" from"gh-r" pick"bit"
+# zinit light "chriswalz/bit"
+
 zinit light-mode for \
   gretzky/auto-color-ls \
   MichaelAquilina/zsh-you-should-use \
