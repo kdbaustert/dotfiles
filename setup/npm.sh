@@ -36,4 +36,5 @@ npm=(
   auto-changelog
   typescript
   generator-alfred
+  alfred-fkill
 )
