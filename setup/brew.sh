@@ -5,6 +5,7 @@ brew tap homebrew/cask-fonts
 brew tap homebrew/cask-versions
 brew tap koekeishiya/formulae
 brew tap shopify/shopify
+brew tap cantino/mcfly
 
 binaries=(
   bash      # Latest Bash version
@@ -68,6 +69,7 @@ binaries=(
   sqlite
   zlib
   zoxide
+  mcfly
 
   # Development
   yarn
@@ -118,8 +120,12 @@ apps=(
   alacritty
   dropbox
   firefox-developer-edition
+  firefox-beta
   brave-browser-beta
   google-chrome
+  google-chrome-dev
+  google-chrome-canary
+  blisk
   iterm2-nightly
   slack
   duet
@@ -159,5 +165,6 @@ apps=(
   raindropio
   optimage
   parallels
-  homebrew/cask-drivers/evolv-escribe-suite
+  hackintool
+  opencore-configurator
 )
