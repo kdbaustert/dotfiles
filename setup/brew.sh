@@ -90,6 +90,7 @@ binaries=(
   xplr
   shopify-cli
   themekit
+  google-cloud-sdk
 )
 
 # Homebrew Fonts
