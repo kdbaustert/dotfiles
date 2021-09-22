@@ -9,6 +9,8 @@ module.exports = {
     'eslint:recommended',
     'prettier/vue',
     'plugin:prettier/recommended',
+    'plugin:react/recommended',
+    'airbnb',
   ],
   rules: {
     'vue/component-name-in-template-casing': ['error', 'PascalCase'],
