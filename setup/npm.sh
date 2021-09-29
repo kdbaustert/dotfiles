@@ -37,4 +37,6 @@ npm=(
   typescript
   generator-alfred
   alfred-fkill
+  browser-sync
+  gulp-cli
 )
