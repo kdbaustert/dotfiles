@@ -101,6 +101,7 @@ alias vssl='valet secure'
 alias sshconfig='cd ~/.ssh; code config'
 alias sshkeygen='ssh-keygen -t rsa'
 alias copyssh='ssh-copy-id -i ~/.ssh/id_rsa.pub'
+alias chmodssh='sudo chmod 700 ~/.ssh && chmod 600 ~/.ssh/*'
 
 alias permission='chmod +x'
 
