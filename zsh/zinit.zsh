@@ -16,6 +16,9 @@ zinit ice depth=1; zinit light romkatv/powerlevel10k
 # SSH-AGENT
 zinit light bobsoppe/zsh-ssh-agent
 
+zinit ice wait'1' lucid
+zinit light laggardkernel/zsh-gpg-agent
+
 # zinit ice lucid nocompile wait'0e' nocompletions
 # zinit load MenkeTechnologies/zsh-more-completions
 
