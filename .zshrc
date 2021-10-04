@@ -6,11 +6,9 @@
 # fi
 
 # Created by Kenny B <kenny@gothamx.dev>
-
+export GPG_TTY=$(tty)
 export COLORTERM="truecolor"
-
 export SPROMPT="zsh: correct %F{red}'%R'%f to %F{blue}'%r'%f [%B%Uy%u%bes, %B%Un%u%bo, %B%Ue%u%bdit, %B%Ua%u%bbort]?"
-
 export EDITOR='nvim'
 export VISUAL=$EDITOR
 export DOTFILES=$HOME/dotfiles
