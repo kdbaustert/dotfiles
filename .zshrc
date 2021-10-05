@@ -97,9 +97,6 @@ eval "$(mcfly init zsh)"
 
 [[ -f $DOTFILES/zsh/.p10k.zsh ]] && source $DOTFILES/zsh/.p10k.zsh
 
-source "/usr/local/Caskroom/google-cloud-sdk/latest/google-cloud-sdk/path.zsh.inc"
-source "/usr/local/Caskroom/google-cloud-sdk/latest/google-cloud-sdk/completion.zsh.inc"
-
 s=' ' # fix too wide icons
 POWERLEVEL9K_MODE="nerdfont-complete"
 POWERLEVEL9K_APPLE_ICON=
