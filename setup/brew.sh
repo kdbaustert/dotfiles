@@ -70,6 +70,8 @@ binaries=(
   zlib
   zoxide
   mcfly
+  mkcert
+  certbot
 
   # Development
   yarn
@@ -90,7 +92,6 @@ binaries=(
   xplr
   shopify-cli
   themekit
-  google-cloud-sdk
 )
 
 # Homebrew Fonts
@@ -118,13 +119,11 @@ fonts=(
 # Homebrew casks
 apps=(
   alfred
-  alacritty
   dropbox
   firefox-developer-edition
   firefox-beta
   brave-browser-beta
   google-chrome
-  google-chrome-dev
   google-chrome-canary
   blisk
   iterm2-nightly
@@ -144,7 +143,6 @@ apps=(
   github
   little-snitch
   onyx
-  gitify
   inkdrop
   forkLift
   atom-nightly
@@ -156,7 +154,6 @@ apps=(
   airbuddy
   iina
   yippy
-  yt-music
   pushplaylabs-sidekick
   zeplin
   dissenter-browser
