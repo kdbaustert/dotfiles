@@ -6,6 +6,7 @@ brew tap homebrew/cask-versions
 brew tap koekeishiya/formulae
 brew tap shopify/shopify
 brew tap cantino/mcfly
+brew tap nicoverbruggen/homebrew-cask
 
 binaries=(
   bash      # Latest Bash version
@@ -72,6 +73,8 @@ binaries=(
   mcfly
   mkcert
   certbot
+  ruby-install
+  chruby
 
   # Development
   yarn
@@ -122,7 +125,6 @@ apps=(
   dropbox
   firefox-developer-edition
   firefox-beta
-  brave-browser-beta
   google-chrome
   google-chrome-canary
   blisk
@@ -157,7 +159,6 @@ apps=(
   pushplaylabs-sidekick
   zeplin
   dissenter-browser
-  gitkraken
   messenger
   kitty
   raindropio
@@ -165,4 +166,6 @@ apps=(
   parallels
   hackintool
   opencore-configurator
+  phpmon
+  yt-music
 )
