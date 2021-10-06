@@ -49,7 +49,6 @@ zinit load junegunn/fzf-bin
 zinit wait'1' lucid for \
     OMZ::lib/clipboard.zsh \
     OMZ::lib/git.zsh \
-    OMZ::plugins/gitignore/gitignore.plugin.zsh \
     OMZ::plugins/command-not-found/command-not-found.plugin.zsh \
     OMZ::plugins/history/history.plugin.zsh \
     zpm-zsh/ssh \
@@ -106,9 +105,6 @@ zinit light sharkdp/fd
 # FZF-TAB
 zinit ice wait'1' lucid
 zinit light Aloxaf/fzf-tab
-
-# zinit ice lucit wait"0" as"program" from"gh-r" pick"bit"
-# zinit light "chriswalz/bit"
 
 zinit light-mode for \
   gretzky/auto-color-ls \
