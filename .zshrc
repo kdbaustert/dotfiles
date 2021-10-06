@@ -6,17 +6,18 @@
 # fi
 
 # Created by Kenny B <kenny@gothamx.dev>
-export GPG_TTY=$(tty)
 export COLORTERM="truecolor"
 export SPROMPT="zsh: correct %F{red}'%R'%f to %F{blue}'%r'%f [%B%Uy%u%bes, %B%Un%u%bo, %B%Ue%u%bdit, %B%Ua%u%bbort]?"
 export EDITOR='nvim'
 export VISUAL=$EDITOR
 export DOTFILES=$HOME/dotfiles
+export PATH="/usr/local/sbin:$PATH"
+export PATH="/usr/local/opt/ruby/bin:$PATH"
 export LANG='en_US.UTF-8'
 export WORDCHARS='~!#$%^&*(){}[]<>?.+;' # sane moving between words on the prompt
-export PATH="/usr/local/sbin:$PATH"
-export PROMPT_EOL_MARK='' # hide % at end of output
+export PROMPT_EOL_MARK=''               # hide % at end of output
 export LS_COLORS="$(vivid generate molokai)"
+export GPG_TTY=$(tty)
 
 if [ -d "$HOME/.nvm" ]; then
   export NVM_DIR="$HOME/.nvm"
@@ -24,10 +25,6 @@ fi
 
 if [ -d "$HOME/.composer/vendor/bin" ]; then
   export PATH="$HOME/.composer/vendor/bin:$PATH"
-fi
-
-if [ -d "$HOME/.gem" ]; then
-  export GEM_HOME="$HOME/.gem"
 fi
 
 [[ -f "$DOTFILES/zsh/zinit.zsh" ]] && source "$DOTFILES/zsh/zinit.zsh"
@@ -92,7 +89,6 @@ export FZF_DEFAULT_OPTS="
 [[ -f $DOTFILES/zsh/aliases.zsh ]] && source $DOTFILES/zsh/aliases.zsh
 
 eval "$(zoxide init zsh --hook pwd)"
-
 eval "$(mcfly init zsh)"
 
 [[ -f $DOTFILES/zsh/.p10k.zsh ]] && source $DOTFILES/zsh/.p10k.zsh
@@ -173,5 +169,3 @@ POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS=(
   command_execution_time
   ram
 )
-# autoload -U +X bashcompinit && bashcompinit
-# complete -o nospace -C /usr/local/bin/bit bit
