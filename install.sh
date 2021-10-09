@@ -97,3 +97,6 @@ git config --global user.name "Kenny Baustert"
 git config --global user.email "kenny@gothamx.dev"
 
 touch "$HOME/.hushlogin"
+
+# vim-plug
+curl -fLo ~/.config/nvim/autoload/plug.vim --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
