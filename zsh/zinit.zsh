@@ -22,8 +22,8 @@ zinit light laggardkernel/zsh-gpg-agent
 # zinit ice lucid nocompile wait'0e' nocompletions
 # zinit load MenkeTechnologies/zsh-more-completions
 
-# zinit ice wait blockf lucid atpull'zinit creinstall -q .'
-# zinit light https://github.com/zsh-users/zsh-completions
+zinit ice wait blockf lucid atpull'zinit creinstall -q .'
+zinit light https://github.com/zsh-users/zsh-completions
 
 # zinit ice lucid nocompile
 # zinit load MenkeTechnologies/zsh-expand
