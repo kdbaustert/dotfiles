@@ -1,0 +1,24 @@
+{
+  "printWidth": 100,
+  "trailingComma": "es5",
+  "tabWidth": 2,
+  "arrowParens": "avoid",
+  "semi": false,
+  "overrides": [
+    {
+      "files": "*.test.js",
+      "options": {
+        "semi": true
+      }
+    },
+    {
+      "files": [
+        "*.md",
+        "*.scss"
+      ],
+      "options": {
+        "tabWidth": 4
+      }
+    }
+  ]
+}
