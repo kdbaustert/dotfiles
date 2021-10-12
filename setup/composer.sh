@@ -6,8 +6,8 @@ composer=(
   phpunit/phpunit
   squizlabs/php_codesniffer
   escapestudios/symfony2-coding-standard
-  dealerdirect/phpcodesniffer-composer-installer
   wp-coding-standards/wpcs
   phpcompatibility/phpcompatibility-wp
   friendsofphp/php-cs-fixer
+  dealerdirect/phpcodesniffer-composer-installer
 )
