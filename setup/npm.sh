@@ -8,35 +8,25 @@ npm=(
   eslint-plugin-prettier
   eslint-config-prettier
   eslint-plugin-vue
-  eslint-config-standard
-  eslint-plugin-import
-  eslint-plugin-promise
-  eslint-plugin-node
   babel-eslint
   generator-code
   yo
   fast-cli
   fkill-cli
-  vtop
   vsce
-  @vue/eslint-config-prettier
-  @vue/cli-service-global
   cli-error-notifier
-  electron
   npm-check
   stylelint
-  stylelint-config-standard
   alfred-npms
-  electerm
   firebase-tools
   ntl
   prettier-init
-  readme-md-generator
-  npx
-  auto-changelog
   typescript
   generator-alfred
   alfred-fkill
   browser-sync
   gulp-cli
+  svgo
+  npm-check-updates
+  blade-formatter
 )
