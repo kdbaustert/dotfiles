@@ -47,12 +47,10 @@ binaries=(
   khanhas/tap/spicetify-cli
   skhd
   go
-  rbenv
   neovim
   selecta
   gitui
   pinentry-mac
-  cowsays
   fortune
   figlet
   lolcat
@@ -60,7 +58,6 @@ binaries=(
   navi
   ffmpeg
   bat
-  xxh
   ox
   mdcat
   xplr
@@ -71,19 +68,14 @@ binaries=(
   zlib
   zoxide
   mcfly
-  mkcert
-  certbot
-  ruby-install
-  chruby
+  asdf
+  git-delta
 
   # Development
-  yarn
-  node
   nvm
   php
   php@7.4
   php@7.3
-  php
   nginx
   php-cs-fixer
   mariadb
@@ -92,7 +84,6 @@ binaries=(
   wp-cli
   firebase-cli
   vivid
-  xplr
   shopify-cli
   themekit
 )
