@@ -8,20 +8,29 @@ export SPROMPT="zsh: correct %F{red}'%R'%f to %F{blue}'%r'%f [%B%Uy%u%bes, %B%Un
 export EDITOR='nvim'
 export VISUAL=$EDITOR
 export DOTFILES=$HOME/dotfiles
+export RUBY_CONFIGURE_OPTS="--with-openssl-dir=$(brew --prefix openssl@1.1)"
+export PATH="/usr/local/sbin:$PATH"
 export PATH="/opt/homebrew/bin:$PATH"
 export PATH="/usr/local/sbin:$PATH"
-# export PATH="/usr/local/opt/ruby/bin:$PATH"
+export PATH="/usr/local/opt/ruby/bin:$PATH"
 export LANG='en_US.UTF-8'
 export WORDCHARS='~!#$%^&*(){}[]<>?.+;' # sane moving between words on the prompt
 export PROMPT_EOL_MARK=''               # hide % at end of output
 export LS_COLORS="$(vivid generate molokai)"
-export PATH="$PATH:$HOME/.composer/vendor/bin"
 export GPG_TTY=$(tty)
-
 
 if [ -d "$HOME/.nvm" ]; then
   export NVM_DIR="$HOME/.nvm"
+  export NVM_COLORS='cmgRY'
 
+fi
+
+if [ -d "$HOME/.composer/vendor/bin" ]; then
+  export PATH="$HOME/.composer/vendor/bin:$PATH"
+fi
+
+if [ -d "$HOME/.gem" ]; then
+  export GEM_HOME="$HOME/.gem"
 fi
 
 [[ -f "$DOTFILES/zsh/zinit.zsh" ]] && source "$DOTFILES/zsh/zinit.zsh"
@@ -30,10 +39,6 @@ fi
 
 # Use a better command for searching with fzf
 export FZF_DEFAULT_COMMAND='rg --files --no-ignore-vcs --hidden --ignore-file ~/.config/ripgrep/ignore'
-
-if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
-  source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
-fi
 
 #####################
 # HISTORY           #
@@ -90,6 +95,7 @@ export FZF_DEFAULT_OPTS="
 [[ -f $DOTFILES/zsh/aliases.zsh ]] && source $DOTFILES/zsh/aliases.zsh
 
 eval "$(zoxide init zsh --hook pwd)"
+
 eval "$(mcfly init zsh)"
 
 [[ -f $DOTFILES/zsh/.p10k.zsh ]] && source $DOTFILES/zsh/.p10k.zsh
@@ -182,3 +188,5 @@ POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS=(
 )
 
 . /usr/local/opt/asdf/libexec/asdf.sh
+export PATH="/usr/local/opt/ruby/bin:$PATH"
+if [ -e /Users/kenny/.nix-profile/etc/profile.d/nix.sh ]; then . /Users/kenny/.nix-profile/etc/profile.d/nix.sh; fi # added by Nix installer
