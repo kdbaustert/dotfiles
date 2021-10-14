@@ -50,8 +50,10 @@ Plug 'psliwka/vim-smoothie'
 Plug 'antoinemadec/FixCursorHold.nvim'
 Plug 'wellle/context.vim'
 
-" Entertainment
-Plug 'dansomething/vim-hackernews'
+Plug 'nvim-telescope/telescope.nvim'
+Plug 'nvim-lua/plenary.nvim'
+Plug 'MunifTanjim/nui.nvim'
+Plug 'fhill2/xplr.nvim', { 'do': ':lua require\"xplr\".install({hide=true})' }
 
 call plug#end()
 
@@ -88,14 +90,13 @@ endfunction
 augroup MyColors
     autocmd!
     autocmd ColorScheme dracula call DraculaPMenu()
-    "autocmd ColorScheme * call TransparentBackground() " uncomment if you are using a translucent terminal and you want nvim to use that
+    autocmd ColorScheme * call TransparentBackground()
 augroup END
 
 " Main Coloring Configurations
 syntax on
 color dracula
 
-" Enable True Color Support (ensure you're using a 256-color enabled $TERM, e.g. xterm-256color)
 set termguicolors
 
 """ Plugin Configurations
