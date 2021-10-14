@@ -1,29 +1,15 @@
 #!/usr/bin/env zsh
-# disrupted zshrc
+# # disrupted zshrc
 
-# Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
-# Initialization code that may require console input (password prompts, [y/n]
-# confirmations, etc.) must go above this block; everything else may go below.
-if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
-  source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
-fi
+# # Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
+# # Initialization code that may require console input (password prompts, [y/n]
+# # confirmations, etc.) must go above this block; everything else may go below.
+# if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
+#   source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
+# fi
 
 # Created by Kenny B <kenny@gothamx.dev>
-export COLORTERM="truecolor"
-export SPROMPT="zsh: correct %F{red}'%R'%f to %F{blue}'%r'%f [%B%Uy%u%bes, %B%Un%u%bo, %B%Ue%u%bdit, %B%Ua%u%bbort]?"
-export EDITOR='nvim'
-export VISUAL=$EDITOR
 export DOTFILES=$HOME/dotfiles
-# export RUBY_CONFIGURE_OPTS="--with-openssl-dir=$(brew --prefix openssl@1.1)"
-# export PATH="/usr/local/sbin:$PATH"
-# export PATH="/opt/homebrew/bin:$PATH"
-# export PATH="/usr/local/sbin:$PATH"
-# export PATH="/usr/local/opt/ruby/bin:$PATH"
-# export PATH="/usr/local/opt/ruby/bin:$PATH"
-# export LANG='en_US.UTF-8'
-# export WORDCHARS='~!#$%^&*(){}[]<>?.+;' # sane moving between words on the prompt
-# export GPG_TTY=$(tty)
-# export PROMPT_EOL_MARK='' # hide % at end of output
 
 if [ -d "$HOME/.nvm" ]; then
   export NVM_DIR="$HOME/.nvm"
@@ -120,6 +106,7 @@ export PATH="/opt/homebrew/bin:$PATH"
 export PATH="$PATH:~/.local/bin" # for pipx
 export PATH="$PATH:$GOPATH/bin"
 export PROMPT_EOL_MARK='' # hide % at end of output
+
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 
 # FUNCTIONS
@@ -161,8 +148,9 @@ export _ZO_FZF_OPTS=$FZF_DEFAULT_OPTS'
 # --color=marker:#ffcb6b,fg+:#a6accd,prompt:#c792ea,hl+:#c792ea
 # "
 
-
 [[ -f $DOTFILES/zsh/.p10k.zsh ]] && source $DOTFILES/zsh/.p10k.zsh
+
+[[ -f $DOTFILES/zsh/aliases.zsh ]] && source $DOTFILES/zsh/aliases.zsh
 
 s=' ' # fix too wide icons
 POWERLEVEL9K_MODE="nerdfont-complete"
@@ -171,6 +159,7 @@ POWERLEVEL9K_SHORTEN_STRATEGY=truncate_beginning
 POWERLEVEL9K_PROMPT_ADD_NEWLINE=true
 POWERLEVEL9K_PROMPT_ON_NEWLINE=true
 POWERLEVEL9K_RPROMPT_ON_NEWLINE=false
+
 POWERLEVEL9K_SHORTEN_DIR_LENGTH=2
 POWERLEVEL9K_ICON_BEFORE_CONTENT=true
 POWERLEVEL9K_OS_ICON_CONTENT_EXPANSION='${P9K_CONTENT} $(whoami | grep -v "^root\$")'
