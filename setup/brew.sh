@@ -84,8 +84,6 @@ binaries=(
   wp-cli
   firebase-cli
   vivid
-  shopify-cli
-  themekit
 )
 
 # Homebrew Fonts
