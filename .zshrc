@@ -27,7 +27,6 @@ export LESS_TERMCAP_me=$'\E[0m'    # end mode
 export LESS_TERMCAP_ue=$'\E[0m'    # end underline
 export LESS_TERMCAP_se=$'\E[0m'    # end standout-mode
 export MANPAGER="nvim -c 'set ft=man' -"
-export SHELL='/opt/homebrew/bin/zsh'
 export LANG='en_US.UTF-8'
 export LC_ALL='en_US.UTF-8'
 export WORDCHARS='~!#$%^&*(){}[]<>?.+;' # sane moving between words on the prompt
