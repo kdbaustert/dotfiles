@@ -3334,7 +3334,7 @@
 	<array>
 		<dict>
 			<key>ASCII Anti Aliased</key>
-			<false/>
+			<true/>
 			<key>ASCII Ligatures</key>
 			<false/>
 			<key>AWDS Pane Directory</key>
@@ -3866,7 +3866,7 @@
 			<key>Blend</key>
 			<real>0.11355904841768578</real>
 			<key>Blink Allowed</key>
-			<false/>
+			<true/>
 			<key>Blinking Cursor</key>
 			<true/>
 			<key>Blur</key>
@@ -4604,7 +4604,7 @@
 			<key>Transparency</key>
 			<real>0.2999313284206036</real>
 			<key>Unicode Version</key>
-			<integer>9</integer>
+			<integer>8</integer>
 			<key>Unlimited Scrollback</key>
 			<false/>
 			<key>Use Bold Font</key>
@@ -4626,7 +4626,7 @@
 			<key>Use Custom Window Title</key>
 			<false/>
 			<key>Use Italic Font</key>
-			<true/>
+			<false/>
 			<key>Use Non-ASCII Font</key>
 			<true/>
 			<key>Use Separate Colors for Light and Dark Mode</key>
