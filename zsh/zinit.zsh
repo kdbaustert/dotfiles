@@ -58,25 +58,25 @@ else
   zstyle ':completion:*' list-colors ''
 fi
 
-zstyle ':completion:*' completer _expand _complete _ignored _approximate
-zstyle ':completion:*' matcher-list 'm:{a-z}={A-Z}'
-zstyle ':completion:*' menu select=2
-zstyle ':completion:*' select-prompt '%SScrolling active: current selection at %p%s'
-zstyle ':completion:*:descriptions' format '-- %d --'
-zstyle ':completion:*:processes' command 'ps -au$USER'
-zstyle ':completion:complete:*:options' sort false
-zstyle ':fzf-tab:*' query-string prefix first
-# zstyle ':fzf-tab:complete:_zlua:*' query-string input
-zstyle ':fzf-tab:*' continuous-trigger '/'
-zstyle ':completion:*:*:*:*:processes' command "ps -u $USER -o pid,user,comm,cmd -w -w"
-zstyle ':fzf-tab:complete:kill:argument-rest' fzf-flags --preview=$extract'ps --pid=$in[(w)1] -o cmd --no-headers -w -w' --preview-window=down:3:wrap
-# zstyle ':fzf-tab:complete:cd:*' fzf-preview 'exa -1 --color=always $realpath'  # disable for tmux-popup
-zstyle ':fzf-tab:*' switch-group ',' '.'
-zstyle ':fzf-tab:*' fzf-command ftb-tmux-popup
-zstyle ':fzf-tab:*' popup-pad 0 0
-zstyle ':completion:*:git-checkout:*' sort false
-zstyle ':completion:*:exa' file-sort modification
-zstyle ':completion:*:exa' sort false
+# zstyle ':completion:*' completer _expand _complete _ignored _approximate
+# zstyle ':completion:*' matcher-list 'm:{a-z}={A-Z}'
+# zstyle ':completion:*' menu select=2
+# zstyle ':completion:*' select-prompt '%SScrolling active: current selection at %p%s'
+# zstyle ':completion:*:descriptions' format '-- %d --'
+# zstyle ':completion:*:processes' command 'ps -au$USER'
+# zstyle ':completion:complete:*:options' sort false
+# zstyle ':fzf-tab:*' query-string prefix first
+# # zstyle ':fzf-tab:complete:_zlua:*' query-string input
+# zstyle ':fzf-tab:*' continuous-trigger '/'
+# zstyle ':completion:*:*:*:*:processes' command "ps -u $USER -o pid,user,comm,cmd -w -w"
+# zstyle ':fzf-tab:complete:kill:argument-rest' fzf-flags --preview=$extract'ps --pid=$in[(w)1] -o cmd --no-headers -w -w' --preview-window=down:3:wrap
+# # zstyle ':fzf-tab:complete:cd:*' fzf-preview 'exa -1 --color=always $realpath'  # disable for tmux-popup
+# zstyle ':fzf-tab:*' switch-group ',' '.'
+# zstyle ':fzf-tab:*' fzf-command ftb-tmux-popup
+# zstyle ':fzf-tab:*' popup-pad 0 0
+# zstyle ':completion:*:git-checkout:*' sort false
+# zstyle ':completion:*:exa' file-sort modification
+# zstyle ':completion:*:exa' sort false
 
 # TMUX plugin manager
 zinit ice lucid wait'!0a' as'null' id-as'tpm' \
