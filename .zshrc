@@ -9,7 +9,34 @@
 # fi
 
 # Created by Kenny B <kenny@gothamx.dev>
+
+####################
+# ENV VARIABLE      #
+#####################
 export DOTFILES=$HOME/dotfiles
+export LSCOLORS="Gxfxcxdxbxegedabagacad"
+export EDITOR='nvim'
+export VISUAL=$EDITOR
+export PAGER='less'
+export LESS='-F -g -i -M -R -S -w -X -z-4 -~'
+export LESS_TERMCAP_mb=$'\E[6m'    # begin blinking
+export LESS_TERMCAP_md=$'\E[34m'   # begin bold
+export LESS_TERMCAP_us=$'\E[4;32m' # begin underline
+export LESS_TERMCAP_so=$'\E[0m'    # begin standout-mode (info box), remove background
+export LESS_TERMCAP_me=$'\E[0m'    # end mode
+export LESS_TERMCAP_ue=$'\E[0m'    # end underline
+export LESS_TERMCAP_se=$'\E[0m'    # end standout-mode
+export MANPAGER="nvim -c 'set ft=man' -"
+export SHELL='/opt/homebrew/bin/zsh'
+export LANG='en_US.UTF-8'
+export LC_ALL='en_US.UTF-8'
+export WORDCHARS='~!#$%^&*(){}[]<>?.+;' # sane moving between words on the prompt
+export GPG_TTY=$(tty)
+export PATH="/opt/homebrew/bin:$PATH"
+export PATH="$PATH:~/.local/bin" # for pipx
+export PATH="$PATH:$GOPATH/bin"
+export PROMPT_EOL_MARK='' # hide % at end of output
+export PATH="/usr/local/sbin:$PATH"
 
 if [ -d "$HOME/.nvm" ]; then
   export NVM_DIR="$HOME/.nvm"
@@ -21,7 +48,7 @@ fi
 
 [[ -f "$DOTFILES/zsh/zinit.zsh" ]] && source "$DOTFILES/zsh/zinit.zsh"
 
-# [[ -f "$DOTFILES/zsh/completion.zsh" ]] && source "$DOTFILES/zsh/completion.zsh"
+[[ -f "$DOTFILES/zsh/completion.zsh" ]] && source "$DOTFILES/zsh/completion.zsh"
 
 #####################
 # HISTORY           #
@@ -81,31 +108,6 @@ zle -N down-line-or-local-history
 # Global history
 bindkey "^[[1;5A" up-line-or-history   # [CTRL] + Cursor up
 bindkey "^[[1;5B" down-line-or-history # [CTRL] + Cursor down
-
-#####################
-# ENV VARIABLE      #
-#####################
-export EDITOR='nvim'
-export VISUAL=$EDITOR
-export PAGER='less'
-export LESS='-F -g -i -M -R -S -w -X -z-4 -~'
-export LESS_TERMCAP_mb=$'\E[6m'    # begin blinking
-export LESS_TERMCAP_md=$'\E[34m'   # begin bold
-export LESS_TERMCAP_us=$'\E[4;32m' # begin underline
-export LESS_TERMCAP_so=$'\E[0m'    # begin standout-mode (info box), remove background
-export LESS_TERMCAP_me=$'\E[0m'    # end mode
-export LESS_TERMCAP_ue=$'\E[0m'    # end underline
-export LESS_TERMCAP_se=$'\E[0m'    # end standout-mode
-export MANPAGER="nvim -c 'set ft=man' -"
-export SHELL='/opt/homebrew/bin/zsh'
-export LANG='en_US.UTF-8'
-export LC_ALL='en_US.UTF-8'
-export WORDCHARS='~!#$%^&*(){}[]<>?.+;' # sane moving between words on the prompt
-export GPG_TTY=$(tty)
-export PATH="/opt/homebrew/bin:$PATH"
-export PATH="$PATH:~/.local/bin" # for pipx
-export PATH="$PATH:$GOPATH/bin"
-export PROMPT_EOL_MARK='' # hide % at end of output
 
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 
