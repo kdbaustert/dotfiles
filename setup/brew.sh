@@ -70,6 +70,8 @@ binaries=(
   mcfly
   asdf
   git-delta
+  stormssh
+  assh
 
   # Development
   nvm
