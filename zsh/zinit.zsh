@@ -106,8 +106,7 @@ zinit wait'1' lucid for \
     OMZP::command-not-found \
     OMZP::history \
     OMZP::gpg-agent \
-    chrissicool/zsh-256color \
-    gretzky/auto-color-ls
+    chrissicool/zsh-256color
 
 zinit light xav-b/zsh-extend-history
 
