@@ -66,7 +66,7 @@ alias zz='fasd_cd -d -i' # cd with interactive selection
 # alias lt1='colorls --group-directories-first --almost-all --tree=1'
 
 alias ls='exa --icons'
-alias l='exa -a -lgmH'
+alias l='exa -a -lgmH --icons -G'
 # alias lg='l --git'
 alias la='l -@'
 alias ll='l -h'
