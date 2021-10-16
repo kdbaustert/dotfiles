@@ -123,7 +123,7 @@ eval "$(mcfly init zsh)"
 #####################
 # FZF SETTINGS      #
 #####################
-# export FZF_DEFAULT_COMMAND='fd --files --no-ignore --hidden --follow -g "!{.git,node_modules}/*" 2>/dev/null'
+export FZF_DEFAULT_COMMAND='fd --files --no-ignore --hidden --follow -g "!{.git,node_modules}/*" 2>/dev/null'
 export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
 export FZF_CTRL_T_OPTS='--preview="bat --color=always --style=header {} 2>/dev/null" --preview-window=right:60%:wrap'
 export FZF_ALT_C_COMMAND='fd -t d -d 1'
