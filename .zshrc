@@ -85,7 +85,6 @@ export FZF_COMPLETION_TRIGGER=','
 # ------------------------------------
 
 export FZF_DEFAULT_COMMAND='fd --exclude .git --max-depth 5 --hidden'
-# export FZF_DEFAULT_OPTS='--height 40% --reverse --border'
 export FZF_COMPLETION_TRIGGER=','
 
 function fzf-file() {
