@@ -14,7 +14,7 @@ discharging_symbol = "💀"
 
 [shell]
 fish_indicator = ""
-zsh_indicator = "🦾"
+#zsh_indicator = "🦾"
 bash_indicator = "🐚"
 powershell_indicator = "_"
 disabled = false
@@ -24,7 +24,7 @@ threshold = 10
 style = "bold red"
 
 [[battery.display]] # "bold yellow" style when capacity is between 10% and 30%
-threshold = 30
+threshold = 40
 style = "bold yellow"
 
 [hostname]
@@ -33,10 +33,6 @@ format = "@[$hostname]($style)"
 ssh_only = true
 style = "bold green"
 
-[golang]
-symbol = "🐹 "
-format = "via [$symbol $version](bold cyan) "
-
 [username]
 format = "[$user]($style) in "
 disabled = false
@@ -44,32 +40,13 @@ show_always = true
 style_user = "blue bold"
 style_root = "red bold"
 
-# Replace the "❯" symbol in the prompt with "λ"
-[character]
-format = "[$symbol]($style) "
-success_symbol = "[λ](green)"
-error_symbol = "[λ](bold red)"
-vicmd_symbol = "[](bold white)"
-
 # Disable the package module, hiding it from the prompt completely
 [package]
 disabled = false
 
-[aws]
-format = "on [$symbol $region $profile]($style) "
-style = "bold blue"
-symbol="⛅"
-
-[aws.region_aliases]
-ap-southeast-2 = "au"
-us-east-1 = "va"
-
-[docker_context]
-disabled = false
-
 [directory]
-home_symbol = "🏠"
-read_only = "🔒"
+home_symbol = "🏠 "
+read_only = "🔒 "
 style = "bold yellow"
 truncation_length = 2
 truncate_to_repo = false
@@ -100,14 +77,9 @@ tag_symbol = "🔖 "
 format = '[\($state( $progress_current of $progress_total)\)]($style) '
 cherry_pick = "[🍒 PICKING](bold red)"
 
-[kubernetes]
-symbol = "⛵ "
-style = "dim green"
-disabled = false
-
 ## Memory
 [memory_usage]
-disabled = false
+disabled = true
 format = "[${symbol}RAM: ${ram}]($style) "
 threshold = -1
 style = "bold dimmed green"
@@ -117,10 +89,6 @@ style = "bold dimmed green"
 symbol = "🏃️"
 threshold = 4
 format = "[$symbol $number]($style) "
-
-[python]
-pyenv_version_name = true
-detect_extensions = []
 
 [terraform]
 disabled = true
@@ -133,13 +101,6 @@ style = "bold yellow"
 use_12hr = false
 #time_format = "%Y/%m/%d %T"
 time_range="-" # always: time_range="00:00:00-23:59:59"
-
-[env_var]
-symbol="⛅"
-variable = "AWS_PROFILE_NAME"
-default = "profile name"
-format = "in [$symbol $env_value]($style) "
-style = "blue"
 
 [custom.giturl]
 disabled = false
@@ -174,48 +135,9 @@ when = 'git rev-parse --is-inside-work-tree 2> /dev/null'
 shell = ["bash", "--noprofile", "--norc"]
 format = "$output "
 
+[character]
+success_symbol = "[❯](bold purple)"
+error_symbol = "[❯](bold red)"
+
 # format = """\
 #   $username  $hostname  $directory  $git_branch  $git_commit  $git_state  $git_status  $package  $nodejs  $cmd_duration  $line_break  $character"""
-
-# [username]
-# style_root = "red"
-# style_user = "242"
-
-# [hostname]
-# style = "242"
-
-# [directory]
-# style = "blue"
-
-# [git_branch]
-# symbol = ""
-# style = "242"
-
-# [git_commit]
-# style = "green"
-
-# [git_state]
-# style = "yellow"
-
-# [git_status]
-# style = "purple"
-# modified = "*"
-# deleted = "×"
-# stashed = "≡"
-# format = '([$all_status$ahead_behind]($style) )'
-
-# [package]
-# symbol = ""
-# style = "cyan"
-# display_private = true
-
-# [nodejs]
-# symbol = "⬢ "
-# style = "green"
-
-# [cmd_duration]
-# style = "yellow"
-
-# [character]
-# success_symbol = "[❯](bold green)"
-# error_symbol = "[❯](bold red)"
