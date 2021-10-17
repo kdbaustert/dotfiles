@@ -11,17 +11,15 @@ source "${HOME}/.zinit/bin/zinit.zsh"
 autoload -Uz _zinit
 (( ${+_comps} )) && _comps[zinit]=_zinit
 
-zinit light spaceship-prompt/spaceship-prompt
+# zinit light spaceship-prompt/spaceship-prompt
 
 # Load starship theme
-# zinit ice as"command" from"gh-r" \ # `starship` binary as command, from github release
-#           atclone"./starship init zsh > init.zsh; ./starship completions zsh > _starship" \ # starship setup at clone(create init.zsh, completion)
-#           atpull"%atclone" src"init.zsh" # pull behavior same as clone, source init.zsh
-# zinit light starship/starship
+zinit ice from"gh-r" as"program" atload'!eval $(starship init zsh)'
+zinit light starship/starship
 
 # SSH-AGENT
 zinit light bobsoppe/zsh-ssh-agent
-
+zinit light bobsoppe/zsh-ssh-agent
 
 # ENHANCD
 zinit ice wait'0b' lucid
@@ -62,18 +60,15 @@ zinit light Aloxaf/fzf-tab
 zinit wait lucid light-mode for \
   atinit"ZINIT[COMPINIT_OPTS]=-C; zicompinit; zicdreplay" zdharma/fast-syntax-highlighting \
   blockf zsh-users/zsh-completions \
-  atload"!_zsh_autosuggest_start; export ZSH_AUTOSUGGEST_USE_ASYNC=1" zsh-users/zsh-autosuggestions \
-  atload"ZVM_NO_INSERT_MODE_BINDINGS=true" depth=1 kitagawa-hr/zsh-vi-mode
+  atload"!_zsh_autosuggest_start; export ZSH_AUTOSUGGEST_USE_ASYNC=1" zsh-users/zsh-autosuggestions
 
 zinit lucid from'gh-r' as'program' for \
   mv'zoxide* -> zoxide' atload'eval "$(zoxide init zsh)"' ajeetdsouza/zoxide \
-  mv'mcfly* -> mcfly' atload'eval "$(mcfly init zsh)"; export MCFLY_KEY_SCHEME=vim; export MCFLY_FUZZY=true' cantino/mcfly \
-  mv'skim* -> sk' lotabout/skim
+  mv'mcfly* -> mcfly' atload'eval "$(mcfly init zsh)"; export MCFLY_KEY_SCHEME=vim; export MCFLY_FUZZY=true' cantino/mcfly
 
 zinit wait'1' lucid for \
     OMZP::command-not-found \
     OMZP::history \
-    OMZP::gpg-agent \
     chrissicool/zsh-256color
 
 zinit light xav-b/zsh-extend-history
