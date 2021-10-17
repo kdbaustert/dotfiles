@@ -1,14 +1,13 @@
 #!/usr/bin/env zsh
-# # disrupted zshrc
-
-# # Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
-# # Initialization code that may require console input (password prompts, [y/n]
-# # confirmations, etc.) must go above this block; everything else may go below.
-# if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
-#   source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
-# fi
 
 # Created by Kenny B <kenny@gothamx.dev>
+
+# Disaable compfix warning
+ZSH_DISABLE_COMPFIX=true
+
+# Remove percent sign at the beginning
+# https://superuser.com/questions/645599/why-is-a-percent-sign-appearing-before-each-prompt-on-zsh-in-windows
+unsetopt PROMPT_SP
 
 ####################
 # ENV VARIABLE      #
@@ -93,35 +92,48 @@ autoload colors && colors
 
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 
-# FUNCTIONS
-[[ -f $DOTFILES/zsh/functions.zsh ]] && source $DOTFILES/zsh/functions.zsh
-
-# ALIASES
-[[ -f $DOTFILES/zsh/aliases.zsh ]] && source $DOTFILES/zsh/aliases.zsh
-
-eval "$(zoxide init zsh)"
-
-eval "$(mcfly init zsh)"
-
-#####################
-# FZF SETTINGS      #
-#####################
-export FZF_DEFAULT_COMMAND='fd --files --no-ignore --hidden --follow -g "!{.git,node_modules}/*" 2>/dev/null'
-export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
-export FZF_CTRL_T_OPTS='--preview="bat --color=always --style=header {} 2>/dev/null" --preview-window=right:60%:wrap'
-export FZF_ALT_C_COMMAND='fd -t d -d 1'
-export FZF_ALT_C_OPTS='--preview="exa -1 --icons --git --git-ignore {}" --preview-window=right:60%:wrap'
+export FZF_DEFAULT_COMMAND='fd --exclude .git --max-depth 5 --hidden'
 
 # FZF custom Aura theme
 export FZF_DEFAULT_OPTS=$FZF_DEFAULT_OPTS'
---ansi
+--reverse
 --color=fg:-1,bg:-1,border:#4B5164,hl:#d19a66
 --color=fg+:#a6accd,bg+:#2c323d,hl+:#e5c07b
 --color=info:#ffcb6b,prompt:#82e2ff,pointer:#c792ea
 --color=marker:#ffcb6b,spinner:#e06c75,header:#a277ff'
 # FZF options for zoxide prompt (zi)
 export _ZO_FZF_OPTS=$FZF_DEFAULT_OPTS'
---height=10'
+--height=40%'
+
+export FZF_COMPLETION_TRIGGER=','
+
+# ------------------------------------
+# Fuzzy Finder
+# ------------------------------------
+
+export FZF_DEFAULT_COMMAND='fd --exclude .git --max-depth 5 --hidden'
+# export FZF_DEFAULT_OPTS='--height 40% --reverse --border'
+export FZF_COMPLETION_TRIGGER=','
+
+function fzf-file() {
+  local find_cmd='fd --exclude .git --max-depth 3 --hidden'
+  local add_slash="awk '{print \$0 \"/\"}'"
+  local preview_dir='exa --tree -L 2 {}'
+  local preview_file='bat --style=header,grid --color=always --line-range :100 {}'
+  local preview_cmd="if [[ {} == */ ]] ; then ${preview_dir}; else ${preview_file}; fi"
+  local fzf_cmd="fzf -0 -1 --preview '${preview_cmd}'"
+  local cmd="{${find_cmd} --type d | ${add_slash}; ${find_cmd} --type f} | ${fzf_cmd}"
+  local ret=$(eval "${cmd}")
+  case $ret in
+    "")  zle reset-prompt && return;;
+    */)  cd $ret ;;
+    *)   ${EDITOR} $ret ;;
+  esac
+  zle accept-line
+}
+
+zle -N fzf-file
+bindkey '^O' fzf-file
 
 # disable sort when completing `git checkout`
 zstyle ':completion:*:git-checkout:*' sort false
@@ -134,97 +146,53 @@ zstyle ':fzf-tab:complete:cd:*' fzf-preview 'exa -1 --color=always $realpath'
 # switch group using `,` and `.`
 zstyle ':fzf-tab:*' switch-group ',' '.'
 
-[[ -f $DOTFILES/zsh/.p10k.zsh ]] && source $DOTFILES/zsh/.p10k.zsh
+# only for git
+zstyle ':completion:*:*:git:*' fzf-search-display true
+# or for everything
+zstyle ':completion:*' fzf-search-display true
 
+# basic file preview for ls (you can replace with something more sophisticated than head)
+zstyle ':completion::*:ls::*' fzf-completion-opts --preview='eval head {1}'
+
+# preview when completing env vars (note: only works for exported variables)
+# eval twice, first to unescape the string, second to expand the $variable
+zstyle ':completion::*:(-command-|-parameter-|-brace-parameter-|export|unset|expand):*' fzf-completion-opts --preview='eval eval echo {1}'
+
+# preview a `git status` when completing git add
+zstyle ':completion::*:git::git,add,*' fzf-completion-opts --preview='git -c color.status=always status --short'
+
+# if other subcommand to git is given, show a git diff or git log
+zstyle ':completion::*:git::*,[a-z]*' fzf-completion-opts --preview='
+eval set -- {+1}
+for arg in "$@"; do
+    { git diff --color=always -- "$arg" | git log --color=always "$arg" } 2>/dev/null
+done'
+
+zstyle ':completion:*' completer _expand _complete _ignored _approximate
+zstyle ':completion:*' matcher-list 'm:{a-z}={A-Z}'
+zstyle ':completion:*' menu select=2
+zstyle ':completion:*' select-prompt '%SScrolling active: current selection at %p%s'
+zstyle ':completion:*:descriptions' format '-- %d --'
+zstyle ':completion:*:processes' command 'ps -au$USER'
+zstyle ':completion:complete:*:options' sort false
+zstyle ':fzf-tab:*' query-string prefix first
+# zstyle ':fzf-tab:complete:_zlua:*' query-string input
+zstyle ':fzf-tab:*' continuous-trigger '/'
+zstyle ':completion:*:*:*:*:processes' command "ps -u $USER -o pid,user,comm,cmd -w -w"
+zstyle ':fzf-tab:complete:kill:argument-rest' fzf-flags --preview=$extract'ps --pid=$in[(w)1] -o cmd --no-headers -w -w' --preview-window=down:3:wrap
+# zstyle ':fzf-tab:complete:cd:*' fzf-preview 'exa -1 --color=always $realpath'  # disable for tmux-popup
+zstyle ':fzf-tab:*' switch-group ',' '.'
+zstyle ':fzf-tab:*' fzf-command ftb-tmux-popup
+zstyle ':fzf-tab:*' popup-pad 0 0
+zstyle ':completion:*:git-checkout:*' sort false
+zstyle ':completion:*:exa' file-sort modification
+zstyle ':completion:*:exa' sort false
+
+# FUNCTIONS
+[[ -f $DOTFILES/zsh/functions.zsh ]] && source $DOTFILES/zsh/functions.zsh
+
+# ALIASES
 [[ -f $DOTFILES/zsh/aliases.zsh ]] && source $DOTFILES/zsh/aliases.zsh
-
-s=' ' # fix too wide icons
-POWERLEVEL9K_MODE="nerdfont-complete"
-POWERLEVEL9K_APPLE_ICON=
-POWERLEVEL9K_SHORTEN_STRATEGY=truncate_beginning
-POWERLEVEL9K_PROMPT_ADD_NEWLINE=true
-POWERLEVEL9K_PROMPT_ON_NEWLINE=true
-POWERLEVEL9K_RPROMPT_ON_NEWLINE=false
-
-POWERLEVEL9K_SHORTEN_DIR_LENGTH=2
-POWERLEVEL9K_ICON_BEFORE_CONTENT=true
-POWERLEVEL9K_OS_ICON_CONTENT_EXPANSION='${P9K_CONTENT} $(whoami | grep -v "^root\$")'
-POWERLEVEL9K_OS_ICON_BACKGROUND=#8d36fe
-POWERLEVEL9K_OS_ICON_FOREGROUND=#fff
-POWERLEVEL9K_ROOT_INDICATOR_BACKGROUND=black
-POWERLEVEL9K_ROOT_INDICATOR_FOREGROUND=red
-
-POWERLEVEL9K_SSH_BACKGROUND=white
-POWERLEVEL9K_SSH_FOREGROUND=blue
-POWERLEVEL9K_FOLDER_ICON=
-
-POWERLEVEL9K_DIR_BACKGROUND=cyan
-POWERLEVEL9K_DIR_FOREGROUND=black
-POWERLEVEL9K_DIR_WRITABLE_BACKGROUND=white
-POWERLEVEL9K_DIR_WRITABLE_FOREGROUND=red
-
-POWERLEVEL9K_VCS_CLEAN_FOREGROUND='white'
-POWERLEVEL9K_VCS_CLEAN_BACKGROUND='yellow'
-POWERLEVEL9K_VCS_UNTRACKED_FOREGROUND='red'
-POWERLEVEL9K_VCS_UNTRACKED_BACKGROUND='green'
-POWERLEVEL9K_VCS_MODIFIED_FOREGROUND='black'
-POWERLEVEL9K_VCS_MODIFIED_BACKGROUND='blue'
-POWERLEVEL9K_VCS_UNTRACKED_ICON=●
-POWERLEVEL9K_VCS_UNSTAGED_ICON=±
-POWERLEVEL9K_VCS_INCOMING_CHANGES_ICON=↓
-POWERLEVEL9K_VCS_OUTGOING_CHANGES_ICON=↑
-POWERLEVEL9K_VCS_COMMIT_ICON=$s
-
-POWERLEVEL9K_STATUS_VERBOSE=false
-POWERLEVEL9K_STATUS_VERBOSE=false
-POWERLEVEL9K_STATUS_OK_IN_NON_VERBOSE=true
-
-POWERLEVEL9K_EXECUTION_TIME_ICON=$s
-
-POWERLEVEL9K_COMMAND_EXECUTION_TIME_THRESHOLD=0
-POWERLEVEL9K_COMMAND_EXECUTION_TIME_BACKGROUND=black
-POWERLEVEL9K_COMMAND_EXECUTION_TIME_FOREGROUND=blue
-POWERLEVEL9K_COMMAND_BACKGROUND_JOBS_BACKGROUND=black
-POWERLEVEL9K_COMMAND_BACKGROUND_JOBS_FOREGROUND=cyan
-
-POWERLEVEL9K_TIME_ICON=
-POWERLEVEL9K_TIME_FORMAT='%D{%I:%M}'
-POWERLEVEL9K_TIME_BACKGROUND=black
-POWERLEVEL9K_TIME_FOREGROUND=white
-
-POWERLEVEL9K_RAM_ICON=
-POWERLEVEL9K_RAM_FOREGROUND=black
-POWERLEVEL9K_RAM_BACKGROUND=cyan
-
-POWERLEVEL9K_VI_MODE_FOREGROUND=black
-POWERLEVEL9K_VI_COMMAND_MODE_STRING=NORMAL
-POWERLEVEL9K_VI_MODE_NORMAL_BACKGROUND=green
-POWERLEVEL9K_VI_VISUAL_MODE_STRING=VISUAL
-POWERLEVEL9K_VI_MODE_VISUAL_BACKGROUND=blue
-POWERLEVEL9K_VI_OVERWRITE_MODE_STRING=OVERTYPE
-POWERLEVEL9K_VI_MODE_OVERWRITE_BACKGROUND=red
-POWERLEVEL9K_VI_INSERT_MODE_STRING=
-
-POWERLEVEL9K_MULTILINE_FIRST_PROMPT_PREFIX='%F{blue}╭─'
-POWERLEVEL9K_MULTILINE_LAST_PROMPT_PREFIX='%F{blue}╰%f '
-POWERLEVEL9K_MULTILINE_FIRST_PROMPT_SUFFIX='%F{blue}─╮'
-POWERLEVEL9K_MULTILINE_LAST_PROMPT_SUFFIX='%F{blue}─╯'
-ZLE_RPROMPT_INDENT=0
-
-POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(
-  os_icon
-  root_indicator
-  ssh
-  dir
-  dir_writable
-  vcs
-)
-
-POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS=(
-  status
-  command_execution_time
-  ram
-)
 
 . /usr/local/opt/asdf/libexec/asdf.sh
 
