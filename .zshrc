@@ -91,23 +91,6 @@ setopt INTERACTIVECOMMENTS # recognize comments
 
 autoload colors && colors
 
-up-line-or-local-history() {
-  zle set-local-history 1
-  zle up-line-or-history
-  zle set-local-history 0
-}
-zle -N up-line-or-local-history
-down-line-or-local-history() {
-  zle set-local-history 1
-  zle down-line-or-history
-  zle set-local-history 0
-}
-zle -N down-line-or-local-history
-
-# Global history
-bindkey "^[[1;5A" up-line-or-history   # [CTRL] + Cursor up
-bindkey "^[[1;5B" down-line-or-history # [CTRL] + Cursor down
-
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 
 # FUNCTIONS
@@ -128,26 +111,28 @@ export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
 export FZF_CTRL_T_OPTS='--preview="bat --color=always --style=header {} 2>/dev/null" --preview-window=right:60%:wrap'
 export FZF_ALT_C_COMMAND='fd -t d -d 1'
 export FZF_ALT_C_OPTS='--preview="exa -1 --icons --git --git-ignore {}" --preview-window=right:60%:wrap'
-bindkey '^F' fzf-file-widget
-# FZF custom OneDark theme
+
+# FZF custom Aura theme
 export FZF_DEFAULT_OPTS=$FZF_DEFAULT_OPTS'
 --ansi
 --color=fg:-1,bg:-1,border:#4B5164,hl:#d19a66
 --color=fg+:#a6accd,bg+:#2c323d,hl+:#e5c07b
---color=info:#ffcb6b,prompt:#7982B4,pointer:#c792ea
---color=marker:#ffcb6b,spinner:#e06c75,header:#98c379'
+--color=info:#ffcb6b,prompt:#82e2ff,pointer:#c792ea
+--color=marker:#ffcb6b,spinner:#e06c75,header:#a277ff'
 # FZF options for zoxide prompt (zi)
 export _ZO_FZF_OPTS=$FZF_DEFAULT_OPTS'
 --height=10'
 
-# alias preview="fzf --preview 'bat --color \"always\" {}'"
-# export FZF_DEFAULT_OPTS="
-# --bind='ctrl-o:execute(nvim {})+abort'
-# --inline-info
-# --color=spinner:#c594c5,hl:#82aaff
-# --color=fg:#a6accd,header:#7982B4,info:#ffcb6b,pointer:#c792ea
-# --color=marker:#ffcb6b,fg+:#a6accd,prompt:#c792ea,hl+:#c792ea
-# "
+# disable sort when completing `git checkout`
+zstyle ':completion:*:git-checkout:*' sort false
+# set descriptions format to enable group support
+zstyle ':completion:*:descriptions' format '[%d]'
+# set list-colors to enable filename colorizing
+zstyle ':completion:*' list-colors ${(s.:.)LS_COLORS}
+# preview directory's content with exa when completing cd
+zstyle ':fzf-tab:complete:cd:*' fzf-preview 'exa -1 --color=always $realpath'
+# switch group using `,` and `.`
+zstyle ':fzf-tab:*' switch-group ',' '.'
 
 [[ -f $DOTFILES/zsh/.p10k.zsh ]] && source $DOTFILES/zsh/.p10k.zsh
 
