@@ -11,29 +11,22 @@ source "${HOME}/.zinit/bin/zinit.zsh"
 autoload -Uz _zinit
 (( ${+_comps} )) && _comps[zinit]=_zinit
 
-zinit ice depth=1; zinit light romkatv/powerlevel10k
-[[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
+zinit light spaceship-prompt/spaceship-prompt
+
+# Load starship theme
+# zinit ice as"command" from"gh-r" \ # `starship` binary as command, from github release
+#           atclone"./starship init zsh > init.zsh; ./starship completions zsh > _starship" \ # starship setup at clone(create init.zsh, completion)
+#           atpull"%atclone" src"init.zsh" # pull behavior same as clone, source init.zsh
+# zinit light starship/starship
 
 # SSH-AGENT
 zinit light bobsoppe/zsh-ssh-agent
-
-ZSH_AUTOSUGGEST_BUFFER_MAX_SIZE=20
-zinit ice wait'0a' lucid atload'_zsh_autosuggest_start'
-zinit light zsh-users/zsh-autosuggestions
 
 
 # ENHANCD
 zinit ice wait'0b' lucid
 zinit light b4b4r07/enhancd
 export ENHANCD_FILTER=fzf:fzy:peco
-
-# HISTORY SUBSTRING SEARCHING
-zinit ice wait'0b' lucid atload'bindkey "$terminfo[kcuu1]" history-substring-search-up; bindkey "$terminfo[kcud1]" history-substring-search-down'
-zinit light zsh-users/zsh-history-substring-search
-bindkey '^[[A' history-substring-search-up
-bindkey '^[[B' history-substring-search-down
-bindkey -M vicmd 'k' history-substring-search-up
-bindkey -M vicmd 'j' history-substring-search-down
 
 # TAB COMPLETIONS
 zinit light-mode for \
@@ -58,39 +51,7 @@ else
   zstyle ':completion:*' list-colors ''
 fi
 
-# zstyle ':completion:*' completer _expand _complete _ignored _approximate
-# zstyle ':completion:*' matcher-list 'm:{a-z}={A-Z}'
-# zstyle ':completion:*' menu select=2
-# zstyle ':completion:*' select-prompt '%SScrolling active: current selection at %p%s'
-# zstyle ':completion:*:descriptions' format '-- %d --'
-# zstyle ':completion:*:processes' command 'ps -au$USER'
-# zstyle ':completion:complete:*:options' sort false
-# zstyle ':fzf-tab:*' query-string prefix first
-# # zstyle ':fzf-tab:complete:_zlua:*' query-string input
-# zstyle ':fzf-tab:*' continuous-trigger '/'
-# zstyle ':completion:*:*:*:*:processes' command "ps -u $USER -o pid,user,comm,cmd -w -w"
-# zstyle ':fzf-tab:complete:kill:argument-rest' fzf-flags --preview=$extract'ps --pid=$in[(w)1] -o cmd --no-headers -w -w' --preview-window=down:3:wrap
-# # zstyle ':fzf-tab:complete:cd:*' fzf-preview 'exa -1 --color=always $realpath'  # disable for tmux-popup
-# zstyle ':fzf-tab:*' switch-group ',' '.'
-# zstyle ':fzf-tab:*' fzf-command ftb-tmux-popup
-# zstyle ':fzf-tab:*' popup-pad 0 0
-# zstyle ':completion:*:git-checkout:*' sort false
-# zstyle ':completion:*:exa' file-sort modification
-# zstyle ':completion:*:exa' sort false
-
-# TMUX plugin manager
-zinit ice lucid wait'!0a' as'null' id-as'tpm' \
-  atclone' \
-    mkdir -p $HOME/.tmux/plugins; \
-    ln -s $HOME/.zinit/plugins/tpm $HOME/.tmux/plugins/tpm; \
-    setup_my_tmux_plugin tpm;'
-zinit light tmux-plugins/tpm
-
 zinit ice lucid wait'0c' as'command' pick'bin/fzf-tmux'
-zinit light junegunn/fzf
-
-# BIND MULTIPLE WIDGETS USING FZF
-zinit ice lucid wait'0c' multisrc'shell/{completion,key-bindings}.zsh' id-as'junegunn/fzf_completions' pick'/dev/null'
 zinit light junegunn/fzf
 
 # FZF-TAB
@@ -98,9 +59,16 @@ zinit light junegunn/fzf
 zinit ice wait'1' lucid
 zinit light Aloxaf/fzf-tab
 
-# SYNTAX HIGHLIGHTING
-zinit ice wait'0c' lucid atinit'zpcompinit;zpcdreplay'
-zinit light zdharma/fast-syntax-highlighting
+zinit wait lucid light-mode for \
+  atinit"ZINIT[COMPINIT_OPTS]=-C; zicompinit; zicdreplay" zdharma/fast-syntax-highlighting \
+  blockf zsh-users/zsh-completions \
+  atload"!_zsh_autosuggest_start; export ZSH_AUTOSUGGEST_USE_ASYNC=1" zsh-users/zsh-autosuggestions \
+  atload"ZVM_NO_INSERT_MODE_BINDINGS=true" depth=1 kitagawa-hr/zsh-vi-mode
+
+zinit lucid from'gh-r' as'program' for \
+  mv'zoxide* -> zoxide' atload'eval "$(zoxide init zsh)"' ajeetdsouza/zoxide \
+  mv'mcfly* -> mcfly' atload'eval "$(mcfly init zsh)"; export MCFLY_KEY_SCHEME=vim; export MCFLY_FUZZY=true' cantino/mcfly \
+  mv'skim* -> sk' lotabout/skim
 
 zinit wait'1' lucid for \
     OMZP::command-not-found \
@@ -126,7 +94,7 @@ zinit load junegunn/fzf-bin
 zinit wait lucid for \
 	"agkozak/zsh-z"
 
-  # diff-so-fancy
+# diff-so-fancy
 # https://github.com/so-fancy/diff-so-fancy
 zinit ice wait"1b" lucid as"program" pick"bin/git-dsf"
 zinit light zdharma/zsh-diff-so-fancy
@@ -140,16 +108,6 @@ zinit load 'wfxr/forgit'
 # https://github.com/rupa/z
 zinit ice wait'0c' lucid
 zinit light rupa/z
-
-# Pick from most frecent folders with `Ctrl+g`
-# https://github.com/andrewferrier/fzf-z
-# : zinit ice wait'0b' lucid
-# : zinit load andrewferrier/fzf-z
-
-# lets z+[Tab] and zz+[Tab]
-# https://github.com/changyuheng/fz
-zinit ice wait'0b' lucid
-zinit light changyuheng/fz
 
 # sharkdp/fd
 zinit ice as"program" from"gh-r" mv"fd* -> fd" pick"fd/fd"
