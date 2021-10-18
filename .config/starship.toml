@@ -4,18 +4,19 @@
 ########################################
 
 add_newline = false
+command_timeout = 1000
 format = "$all"
 
 [battery]
-charging_symbol = "⚡️"
+charging_symbol = "⚡️ "
 disabled = false
-discharging_symbol = "💀"
-full_symbol = "�"
+discharging_symbol = "💀 "
+full_symbol = "� "
 
 [shell]
-fish_indicator = ""
-#zsh_indicator = "🦾"
-bash_indicator = "🐚"
+fish_indicator = " "
+#zsh_indicator = "🦾 "
+bash_indicator = "🐚 "
 disabled = false
 powershell_indicator = "_"
 
@@ -35,7 +36,7 @@ style = "bold green"
 
 [username]
 disabled = false
-format = "[$user]($style) in "
+format = "[$user]($style) "
 show_always = true
 style_root = "red bold"
 style_user = "blue bold"
@@ -54,26 +55,12 @@ format = "[$symbol($version )]($style)"
 disabled = false
 
 [directory]
-home_symbol = "🏠 "
+home_symbol = "~"
 read_only = "🔒 "
 style = "bold yellow"
 truncate_to_repo = false
-truncation_length = 2
+truncation_length = 3
 truncation_symbol = "..."
-
-# GIT CONFIG
-[git_branch]
-format = "[$branch$symbol]($style) "
-symbol = " "
-truncation_symbol = ""
-
-[git_commit]
-commit_hash_length = 4
-tag_symbol = "🔖 "
-
-[git_state]
-cherry_pick = "[🍒 PICKING](bold red)"
-format = '[\($state( $progress_current of $progress_total)\)]($style) '
 
 [memory_usage]
 disabled = true
@@ -84,7 +71,7 @@ threshold = -1
 [jobs]
 # doc: https://starship.rs/config/#jobs
 format = "[$symbol $number]($style) "
-symbol = "🏃️"
+symbol = "🏃️ "
 threshold = 4
 
 [terraform]
@@ -94,32 +81,32 @@ disabled = true
 disabled = true
 format = "[$symbol][$time ]($style) "
 style = "bold yellow"
-symbol = "🕙"
+symbol = "🕙 "
 use_12hr = false
 #time_format = "%Y/%m/%d %T"
 time_range = "-" # always: time_range="00:00:00-23:59:59"
 
-[custom.giturl]
-command = """
-GIT_REMOTE=$(command git ls-remote --get-url 2>/dev/null)
-if [[ "$GIT_REMOTE" =~ "github" ]]; then
-    GIT_REMOTE_SYMBOL=""
-elif [[ "$GIT_REMOTE" =~ "gitlab" ]]; then
-    GIT_REMOTE_SYMBOL=""
-elif [[ "$GIT_REMOTE" =~ "bitbucket" ]]; then
-    GIT_REMOTE_SYMBOL=""
-elif [[ "$GIT_REMOTE" =~ "git" ]]; then
-    GIT_REMOTE_SYMBOL=""
-else
-    GIT_REMOTE_SYMBOL=""
-fi
-echo "$GIT_REMOTE_SYMBOL "
-"""
-description = "Display symbol for remote Git server"
-disabled = false
-format = "$output "
-shell = ["bash", "--noprofile", "--norc"]
-when = 'git rev-parse --is-inside-work-tree 2> /dev/null'
+# [custom.giturl]
+# command = """
+# GIT_REMOTE=$(command git ls-remote --get-url 2>/dev/null)
+# if [[ "$GIT_REMOTE" =~ "github" ]]; then
+#     GIT_REMOTE_SYMBOL=""
+# elif [[ "$GIT_REMOTE" =~ "gitlab" ]]; then
+#     GIT_REMOTE_SYMBOL=""
+# elif [[ "$GIT_REMOTE" =~ "bitbucket" ]]; then
+#     GIT_REMOTE_SYMBOL=""
+# elif [[ "$GIT_REMOTE" =~ "git" ]]; then
+#     GIT_REMOTE_SYMBOL=""
+# else
+#     GIT_REMOTE_SYMBOL=""
+# fi
+# echo "$GIT_REMOTE_SYMBOL "
+# """
+# description = "Display symbol for remote Git server"
+# disabled = false
+# format = "$output "
+# shell = ["bash", "--noprofile", "--norc"]
+# when = 'git rev-parse --is-inside-work-tree 2> /dev/null'
 
 [character]
 error_symbol = "[❯](bold red)"
