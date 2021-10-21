@@ -1,0 +1,10 @@
+node_modules
+dist
+.coverage
+coverage
+.nyc_output
+/.vscode-test/**
+/test/**/*.css
+/package.json
+# Unignore config files like .prettierrc.js, because they're ignored by default
+!.*rc.js
