@@ -9,9 +9,7 @@ fi
 
 source "${HOME}/.zinit/bin/zinit.zsh"
 autoload -Uz _zinit
-(( ${+_comps} )) && _comps[zinit]=_zinit
-
-# zinit light spaceship-prompt/spaceship-prompt
+(( ${+_comps} )) && _comps[zinit]=
 
 # Load starship theme
 zinit ice from"gh-r" as"program" atload'!eval $(starship init zsh)'
