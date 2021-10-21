@@ -41,7 +41,6 @@ alias ....='cd ../../..'
 alias .....='cd ../../../..'
 alias wget='wget -c'
 alias mkcd=mcd
-
 alias v="nvim"
 
 alias a='fasd -a'        # any
@@ -54,13 +53,13 @@ alias z='fasd_cd -d'     # cd, same functionality as j in autojump
 alias zz='fasd_cd -d -i' # cd with interactive selection
 
 if which exa &>/dev/null; then
-  alias ls='exa --icons'
+  alias ls='exa --icons --classify'
   alias l='exa -a -lgmH --icons -G'
   # alias lg='l --git'
   alias la='l -@'
   alias ll='l -h'
   # alias llg='ll --git'
-  alias l1='exa -1 --group-directories-first'
+  alias l1='exa-1 --group-directories-first'
   alias la1='l1 -a'
   alias le='exa -a -lgH -s extension --group-directories-first'
   # alias leg='le --git'
