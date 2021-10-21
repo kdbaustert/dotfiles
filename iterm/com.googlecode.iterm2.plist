@@ -4676,7 +4676,7 @@
 			<key>Blur</key>
 			<true/>
 			<key>Blur Radius</key>
-			<real>48.850647066371124</real>
+			<real>48.462513339642399</real>
 			<key>Bold Color</key>
 			<dict>
 				<key>Alpha Component</key>
@@ -4741,13 +4741,13 @@
 				<key>Alpha Component</key>
 				<real>1</real>
 				<key>Blue Component</key>
-				<real>0.792156862745098</real>
+				<real>1</real>
 				<key>Color Space</key>
 				<string>sRGB</string>
 				<key>Green Component</key>
-				<real>1</real>
+				<real>0.46666666666666667</real>
 				<key>Red Component</key>
-				<real>0.38039215686274508</real>
+				<real>0.63529411764705879</real>
 			</dict>
 			<key>Cursor Color (Dark)</key>
 			<dict>
@@ -5258,7 +5258,7 @@
 			<key>Non-ASCII Ligatures</key>
 			<true/>
 			<key>Normal Font</key>
-			<string>FiraCodeNerdFontCompleteM-Retina 16.8</string>
+			<string>FiraCodeNerdFontCompleteM-Retina 16.9</string>
 			<key>Only The Default BG Color Uses Transparency</key>
 			<true/>
 			<key>Open Toolbelt</key>
@@ -5443,7 +5443,7 @@
 			<key>Title Components</key>
 			<integer>128</integer>
 			<key>Transparency</key>
-			<real>0.11158660185810358</real>
+			<real>0.1259989501792472</real>
 			<key>Underline Color</key>
 			<dict>
 				<key>Alpha Component</key>
