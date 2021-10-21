@@ -1,9 +1,14 @@
 {
-  "printWidth": 100,
+  "singleQuote": true,
+  "printWidth": 80,
   "trailingComma": "es5",
   "tabWidth": 2,
   "arrowParens": "avoid",
   "semi": false,
+  "bracketSpacing": true,
+  "bracketSameLine": false,
+  "quoteProps": "as-needed",
+  "proseWrap": "always",
   "overrides": [
     {
       "files": "*.test.js",
@@ -17,7 +22,7 @@
         "*.scss"
       ],
       "options": {
-        "tabWidth": 4
+        "tabWidth": 2
       }
     }
   ]
