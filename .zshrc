@@ -2,19 +2,16 @@
 
 # Created by Kenny B <kenny@gothamx.dev>
 
-# Disaable compfix warning
-ZSH_DISABLE_COMPFIX=true
-
-# Remove percent sign at the beginning
-# https://superuser.com/questions/645599/why-is-a-percent-sign-appearing-before-each-prompt-on-zsh-in-windows
-unsetopt PROMPT_SP
-
 if [ -d "$HOME/.nvm" ]; then
-  export NVM_DIR="$HOME/.nvm"
+	export NVM_DIR="$HOME/.nvm"
 fi
 
 if [ -d "$HOME/.composer/vendor/bin" ]; then
-  export PATH="$HOME/.composer/vendor/bin:$PATH"
+	export PATH="$HOME/.composer/vendor/bin:$PATH"
+fi
+
+if [ -d "$HOME/.config/composer/vendor/bin" ]; then
+	PATH="$HOME/.config/composer/vendor/bin:$PATH"
 fi
 
 [[ -f "$DOTFILES/zsh/zinit.zsh" ]] && source "$DOTFILES/zsh/zinit.zsh"
@@ -87,79 +84,78 @@ export FZF_COMPLETION_TRIGGER=','
 export FZF_DEFAULT_COMMAND='fd --exclude .git --max-depth 5 --hidden'
 export FZF_COMPLETION_TRIGGER=','
 
-function fzf-file() {
-  local find_cmd='fd --exclude .git --max-depth 3 --hidden'
-  local add_slash="awk '{print \$0 \"/\"}'"
-  local preview_dir='exa --tree -L 2 {}'
-  local preview_file='bat --style=header,grid --color=always --line-range :100 {}'
-  local preview_cmd="if [[ {} == */ ]] ; then ${preview_dir}; else ${preview_file}; fi"
-  local fzf_cmd="fzf -0 -1 --preview '${preview_cmd}'"
-  local cmd="{${find_cmd} --type d | ${add_slash}; ${find_cmd} --type f} | ${fzf_cmd}"
-  local ret=$(eval "${cmd}")
-  case $ret in
-    "")  zle reset-prompt && return;;
-    */)  cd $ret ;;
-    *)   ${EDITOR} $ret ;;
-  esac
-  zle accept-line
-}
-
-
-zle -N fzf-file
-bindkey '^O' fzf-file
+# function fzf-file() {
+#   local find_cmd='fd --exclude .git --max-depth 3 --hidden'
+#   local add_slash="awk '{print \$0 \"/\"}'"
+#   local preview_dir='exa --tree -L 2 {}'
+#   local preview_file='bat --style=header,grid --color=always --line-range :100 {}'
+#   local preview_cmd="if [[ {} == */ ]] ; then ${preview_dir}; else ${preview_file}; fi"
+#   local fzf_cmd="fzf -0 -1 --preview '${preview_cmd}'"
+#   local cmd="{${find_cmd} --type d | ${add_slash}; ${find_cmd} --type f} | ${fzf_cmd}"
+#   local ret=$(eval "${cmd}")
+#   case $ret in
+#   "") zle reset-prompt && return ;;
+#   */) cd $ret ;;
+#   *) ${EDITOR} $ret ;;
+#   esac
+#   zle accept-line
+# }
 
 # disable sort when completing `git checkout`
-zstyle ':completion:*:git-checkout:*' sort false
-# set descriptions format to enable group support
-zstyle ':completion:*:descriptions' format '[%d]'
-# set list-colors to enable filename colorizing
-zstyle ':completion:*' list-colors ${(s.:.)LS_COLORS}
-# preview directory's content with exa when completing cd
-zstyle ':fzf-tab:complete:cd:*' fzf-preview 'exa -1 --color=always $realpath'
-# switch group using `,` and `.`
-zstyle ':fzf-tab:*' switch-group ',' '.'
+# zstyle ':completion:*:git-checkout:*' sort false
+# # set descriptions format to enable group support
+# zstyle ':completion:*:descriptions' format '[%d]'
+# # set list-colors to enable filename colorizing
+# zstyle ':completion:*' list-colors ${(s.:.)LS_COLORS}
+# # preview directory's content with exa when completing cd
+# zstyle ':fzf-tab:complete:cd:*' fzf-preview 'exa -1 --color=always $realpath'
+# # switch group using `,` and `.`
+# zstyle ':fzf-tab:*' switch-group ',' '.'
 
 # only for git
-zstyle ':completion:*:*:git:*' fzf-search-display true
-# or for everything
-zstyle ':completion:*' fzf-search-display true
+# zstyle ':completion:*:*:git:*' fzf-search-display true
+# # or for everything
+# zstyle ':completion:*' fzf-search-display true
 
-# basic file preview for ls (you can replace with something more sophisticated than head)
-zstyle ':completion::*:ls::*' fzf-completion-opts --preview='eval head {1}'
+# # basic file preview for ls (you can replace with something more sophisticated than head)
+# zstyle ':completion::*:ls::*' fzf-completion-opts --preview='eval head {1}'
 
-# preview when completing env vars (note: only works for exported variables)
-# eval twice, first to unescape the string, second to expand the $variable
-zstyle ':completion::*:(-command-|-parameter-|-brace-parameter-|export|unset|expand):*' fzf-completion-opts --preview='eval eval echo {1}'
+# # preview when completing env vars (note: only works for exported variables)
+# # eval twice, first to unescape the string, second to expand the $variable
+# zstyle ':completion::*:(-command-|-parameter-|-brace-parameter-|export|unset|expand):*' fzf-completion-opts --preview='eval eval echo {1}'
 
-# preview a `git status` when completing git add
-zstyle ':completion::*:git::git,add,*' fzf-completion-opts --preview='git -c color.status=always status --short'
+# # preview a `git status` when completing git add
+# zstyle ':completion::*:git::git,add,*' fzf-completion-opts --preview='git -c color.status=always status --short'
 
-# if other subcommand to git is given, show a git diff or git log
-zstyle ':completion::*:git::*,[a-z]*' fzf-completion-opts --preview='
-eval set -- {+1}
-for arg in "$@"; do
-    { git diff --color=always -- "$arg" | git log --color=always "$arg" } 2>/dev/null
-done'
+# # if other subcommand to git is given, show a git diff or git log
+# zstyle ':completion::*:git::*,[a-z]*' fzf-completion-opts --preview='
+# eval set -- {+1}
+# for arg in "$@"; do
+#     { git diff --color=always -- "$arg" | git log --color=always "$arg" } 2>/dev/null
+# done'
 
-zstyle ':completion:*' completer _expand _complete _ignored _approximate
-zstyle ':completion:*' matcher-list 'm:{a-z}={A-Z}'
-zstyle ':completion:*' menu select=2
-zstyle ':completion:*' select-prompt '%SScrolling active: current selection at %p%s'
-zstyle ':completion:*:descriptions' format '-- %d --'
-zstyle ':completion:*:processes' command 'ps -au$USER'
-zstyle ':completion:complete:*:options' sort false
-zstyle ':fzf-tab:*' query-string prefix first
+# zstyle ':completion:*' completer _expand _complete _ignored _approximate
+# zstyle ':completion:*' matcher-list 'm:{a-z}={A-Z}'
+# zstyle ':completion:*' menu select=2
+# zstyle ':completion:*' select-prompt '%SScrolling active: current selection at %p%s'
+# zstyle ':completion:*:descriptions' format '-- %d --'
+# zstyle ':completion:*:processes' command 'ps -au$USER'
+# zstyle ':completion:complete:*:options' sort false
+# zstyle ':fzf-tab:*' query-string prefix first
 # zstyle ':fzf-tab:complete:_zlua:*' query-string input
-zstyle ':fzf-tab:*' continuous-trigger '/'
-zstyle ':completion:*:*:*:*:processes' command "ps -u $USER -o pid,user,comm,cmd -w -w"
-zstyle ':fzf-tab:complete:kill:argument-rest' fzf-flags --preview=$extract'ps --pid=$in[(w)1] -o cmd --no-headers -w -w' --preview-window=down:3:wrap
-# zstyle ':fzf-tab:complete:cd:*' fzf-preview 'exa -1 --color=always $realpath'  # disable for tmux-popup
-zstyle ':fzf-tab:*' switch-group ',' '.'
-zstyle ':fzf-tab:*' fzf-command ftb-tmux-popup
-zstyle ':fzf-tab:*' popup-pad 0 0
-zstyle ':completion:*:git-checkout:*' sort false
-zstyle ':completion:*:exa' file-sort modification
-zstyle ':completion:*:exa' sort false
+# zstyle ':fzf-tab:*' continuous-trigger '/'
+# zstyle ':completion:*:*:*:*:processes' command "ps -u $USER -o pid,user,comm,cmd -w -w"
+# zstyle ':fzf-tab:complete:kill:argument-rest' fzf-flags --preview=$extract'ps --pid=$in[(w)1] -o cmd --no-headers -w -w' --preview-window=down:3:wrap
+# # zstyle ':fzf-tab:complete:cd:*' fzf-preview 'exa -1 --color=always $realpath'  # disable for tmux-popup
+# zstyle ':fzf-tab:*' switch-group ',' '.'
+# zstyle ':fzf-tab:*' fzf-command ftb-tmux-popup
+# zstyle ':fzf-tab:*' popup-pad 0 0
+# zstyle ':completion:*:git-checkout:*' sort false
+# zstyle ':completion:*:exa' file-sort modification
+# zstyle ':completion:*:exa' sort false
+
+bindkey -e
+bindkey \^U backward-kill-line
 
 # FUNCTIONS
 [[ -f $DOTFILES/zsh/functions.zsh ]] && source $DOTFILES/zsh/functions.zsh
@@ -170,3 +166,5 @@ zstyle ':completion:*:exa' sort false
 . /usr/local/opt/asdf/libexec/asdf.sh
 
 if [ -e /Users/kenny/.nix-profile/etc/profile.d/nix.sh ]; then . /Users/kenny/.nix-profile/etc/profile.d/nix.sh; fi # added by Nix installer
+export PATH="/usr/local/opt/php-cs-fixer@2/bin:$PATH"
+export PATH="$PATH:$HOME/.composer/vendor/bin"
