@@ -117,6 +117,8 @@ apps=(
 	firefox-developer-edition
 	firefox-beta
 	google-chrome
+	google-chrome-dev
+	brave
 	blisk
 	iterm2-nightly
 	slack
@@ -141,7 +143,7 @@ apps=(
 	malwarebytes
 	imazing
 	bartender
-	archiver
+	phpstorm
 	datagrip
 	airbuddy
 	iina
@@ -159,5 +161,11 @@ apps=(
 	phpmon
 	yt-music
 	lg-onscreen-control
-
+	sketch
+	protonvpn
+	obsidian
+	runjs
+	tabby
+	zoom
+	nucleo
 )
