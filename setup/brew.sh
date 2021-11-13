@@ -119,6 +119,7 @@ apps=(
 	google-chrome
 	google-chrome-dev
 	brave
+	vivaldi
 	blisk
 	iterm2-nightly
 	slack
@@ -168,4 +169,10 @@ apps=(
 	tabby
 	zoom
 	nucleo
+	rectangle
+	keyboard-cleaner
+	anydesk
+	figma
+	framer
+	balenaetcher
 )
