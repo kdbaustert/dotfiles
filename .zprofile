@@ -9,7 +9,9 @@ export LANG='en_US.UTF-8'
 export LC_ALL='en_US.UTF-8'
 export WORDCHARS='~!#$%^&*(){}[]<>?.+;' # sane moving between words on the prompt
 export PATH="/opt/homebrew/bin:$PATH"
-export PATH="$PATH:~/.local/bin" # for pipx
-export PATH="/usr/local/sbin:$PATH"
+export PATH="/usr/local/opt/php-cs-fixer@2/bin:$PATH"
+export PATH="$PATH:$HOME/.composer/vendor/bin"
 
 export GPG_TTY=$(tty)
+
+eval "$(/opt/homebrew/bin/brew shellenv)"
