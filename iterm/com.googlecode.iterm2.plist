@@ -7087,6 +7087,8 @@
 	</array>
 	<key>OnlyWhenMoreTabs</key>
 	<true/>
+	<key>OpenFileInNewWindows</key>
+	<false/>
 	<key>OpenTmuxWindowsIn</key>
 	<integer>0</integer>
 	<key>PMPrintingExpandedStateForPrint2</key>
