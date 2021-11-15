@@ -2,7 +2,7 @@
 call plug#begin()
 
 " Aesthetics - Main
-Plug 'dracula/vim', { 'as': 'dracula' }
+" Plug 'dracula/vim', { 'as': 'dracula' }
 Plug 'vim-airline/vim-airline'
 Plug 'vim-airline/vim-airline-themes'
 Plug 'bryanmylee/vim-colorscheme-icons'
@@ -14,6 +14,8 @@ Plug 'junegunn/vim-journal'
 Plug 'junegunn/rainbow_parentheses.vim'
 Plug 'nightsense/forgotten'
 Plug 'zaki/zazen'
+
+Plug 'Rigellute/rigel'
 
 " Aethetics - Additional
 Plug 'nightsense/nemo'
@@ -54,6 +56,7 @@ Plug 'nvim-telescope/telescope.nvim'
 Plug 'nvim-lua/plenary.nvim'
 Plug 'MunifTanjim/nui.nvim'
 Plug 'fhill2/xplr.nvim', { 'do': ':lua require\"xplr\".install({hide=true})' }
+Plug 'pangloss/vim-javascript'
 
 call plug#end()
 
@@ -83,21 +86,27 @@ function! TransparentBackground()
 endfunction
 
 function! DraculaPMenu()
-    highlight Pmenu guibg=#363948
-    highlight PmenuSbar guibg=#363948
+    " highlight Pmenu guibg=#363948
+    " highlight PmenuSbar guibg=#363948
 endfunction
 
 augroup MyColors
     autocmd!
-    autocmd ColorScheme dracula call DraculaPMenu()
+    autocmd ColorScheme rigel call DraculaPMenu()
     autocmd ColorScheme * call TransparentBackground()
 augroup END
 
 " Main Coloring Configurations
-syntax on
-color dracula
 
+"""" enable 24bit true color
 set termguicolors
+
+"""" enable the theme
+syntax enable
+colorscheme rigel
+
+" Once vim-javascript is installed you enable flow highlighting
+let g:javascript_plugin_flow = 1
 
 """ Plugin Configurations
 
@@ -293,7 +302,7 @@ autocmd FileType htmldjango inoremap {# {#  #}<left><left><left>
 autocmd FileType markdown setlocal shiftwidth=2 tabstop=2 softtabstop=2
 autocmd FileType journal setlocal shiftwidth=2 tabstop=2 softtabstop=2
 
-""" Custom Functions
+let g:rigel_airline = 1
 
 " Trim Whitespaces
 function! TrimWhitespace()
@@ -304,28 +313,28 @@ endfunction
 
 " Dracula Mode (Dark)
 function! ColorDracula()
-    let g:airline_theme='dracula'
-    color dracula
+    let g:airline_theme='rigel'
+    color rigel
 endfunction
 
 " Seoul256 Mode (Dark & Light)
 function! ColorSeoul256()
-    let g:airline_theme='silver'
-    color seoul256
+    let g:airline_theme='rigel'
+    color rigel
 endfunction
 
 " Forgotten Mode (Light)
 function! ColorForgotten()
     " Other light airline themes: tomorrow, silver, alduin
-    let g:airline_theme='tomorrow'
+    let g:airline_theme='rigel'
     " Other light colors: forgotten-light, nemo-light
-    color forgotten-light
+    color rigel
 endfunction
 
 " Zazen Mode (Black & White)
 function! ColorZazen()
-    let g:airline_theme='minimalist'
-    color zazen
+    let g:airline_theme='rigel'
+    color rigel
 endfunction
 
 """ Custom Mappings
