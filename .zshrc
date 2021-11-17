@@ -84,25 +84,8 @@ export FZF_COMPLETION_TRIGGER=','
 export FZF_DEFAULT_COMMAND='fd --exclude .git --max-depth 5 --hidden'
 export FZF_COMPLETION_TRIGGER=','
 
-# function fzf-file() {
-#   local find_cmd='fd --exclude .git --max-depth 3 --hidden'
-#   local add_slash="awk '{print \$0 \"/\"}'"
-#   local preview_dir='exa --tree -L 2 {}'
-#   local preview_file='bat --style=header,grid --color=always --line-range :100 {}'
-#   local preview_cmd="if [[ {} == */ ]] ; then ${preview_dir}; else ${preview_file}; fi"
-#   local fzf_cmd="fzf -0 -1 --preview '${preview_cmd}'"
-#   local cmd="{${find_cmd} --type d | ${add_slash}; ${find_cmd} --type f} | ${fzf_cmd}"
-#   local ret=$(eval "${cmd}")
-#   case $ret in
-#   "") zle reset-prompt && return ;;
-#   */) cd $ret ;;
-#   *) ${EDITOR} $ret ;;
-#   esac
-#   zle accept-line
-# }
-
 # disable sort when completing `git checkout`
-zstyle ':completion:*:git-checkout:*' sort false
+# zstyle ':completion:*:git-checkout:*' sort false
 # set descriptions format to enable group support
 zstyle ':completion:*:descriptions' format '[%d]'
 # set list-colors to enable filename colorizing
@@ -122,7 +105,7 @@ zstyle ':completion:complete:*:options' sort false
 zstyle ':fzf-tab:*' query-string prefix first
 zstyle ':fzf-tab:complete:_zlua:*' query-string input
 zstyle ':fzf-tab:*' continuous-trigger '/'
-zstyle ':completion:*:*:*:*:processes' command "ps -u $USER -o pid,user,comm,cmd -w -w"
+# zstyle ':completion:*:*:*:*:processes' command "ps -u $USER -o pid,user,comm,cmd -w -w"
 zstyle ':fzf-tab:complete:kill:argument-rest' fzf-flags --preview=$extract'ps --pid=$in[(w)1] -o cmd --no-headers -w -w' --preview-window=down:3:wrap
 zstyle ':fzf-tab:complete:cd:*' fzf-preview 'exa -1 --color=always $realpath'  # disable for tmux-popup
 zstyle ':fzf-tab:*' switch-group ',' '.'
@@ -135,17 +118,12 @@ zstyle ':completion:*:exa' sort false
 # Highlight the current autocomplete option
 zstyle ':completion:*' list-colors "${(s.:.)LS_COLORS}"
 
-# Better SSH/Rsync/SCP Autocomplete
-zstyle ':completion:*:(scp|rsync):*' tag-order ' hosts:-ipaddr:ip\ address hosts:-host:host files'
-zstyle ':completion:*:(ssh|scp|rsync):*:hosts-host' ignored-patterns '*(.|:)*' loopback ip6-loopback localhost ip6-localhost broadcasthost
-zstyle ':completion:*:(ssh|scp|rsync):*:hosts-ipaddr' ignored-patterns '^(<->.<->.<->.<->|(|::)([[:xdigit:].]##:(#c,2))##(|%*))' '127.0.0.<->' '255.255.255.255' '::1' 'fe80::*'
-
 # Allow for autocomplete to be case insensitive
 zstyle ':completion:*' matcher-list '' 'm:{[:lower:][:upper:]}={[:upper:][:lower:]}' \
   '+l:|?=** r:|?=**'
 
-# bindkey -e
-# bindkey \^U backward-kill-line
+bindkey -e
+bindkey \^U backward-kill-line
 
 # FUNCTIONS
 [[ -f $DOTFILES/zsh/functions.zsh ]] && source $DOTFILES/zsh/functions.zsh
