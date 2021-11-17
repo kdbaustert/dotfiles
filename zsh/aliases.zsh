@@ -28,7 +28,7 @@ alias cyabai="code $HOME/.yabairc"
 alias czshrc="code $HOME/.zshrc"
 alias czshrc="code $HOME/.spacebarrc"
 alias cnvims="code $HOME/.config/nvim/init.vim"
-alias valetconfig="code /usr/local/etc/nginx/valet/valet.conf"
+# alias valetconfig="code /usr/local/etc/nginx/valet/valet.conf"
 
 # Common aliases
 alias x="xplr"
@@ -53,38 +53,38 @@ alias z='fasd_cd -d'     # cd, same functionality as j in autojump
 alias zz='fasd_cd -d -i' # cd with interactive selection
 
 if which exa &>/dev/null; then
-  alias ls='exa --icons --classify'
-  alias l='exa -a -lgmH --icons -G'
-  # alias lg='l --git'
-  alias la='l -@'
-  alias ll='l -h'
-  # alias llg='ll --git'
-  alias l1='exa-1 --group-directories-first'
-  alias la1='l1 -a'
-  alias le='exa -a -lgH -s extension --group-directories-first'
-  # alias leg='le --git'
-  alias lm='exa -a -lghH -s modified -m'
-  # alias lmg='lm --git'
-  alias lu='exa -a -lghH -s modified -uU'
-  # alias lug='lu --git'
-  alias lt='exa -T'
-  alias llt='exa -a -lgHh -R -T'
-  alias tree='llt'
-  alias lr='exa -a -lgHh -R -L 2'
-  # alias lrg='command exa -a -lgHh -R -L 2 --git'
-  alias lrr='exa -a -lgHh -R'
+	alias ls='exa --icons --classify'
+	alias l='exa -a -lgmH --icons -G'
+	# alias lg='l --git'
+	alias la='l -@'
+	alias ll='l -h'
+	# alias llg='ll --git'
+	alias l1='exa-1 --group-directories-first'
+	alias la1='l1 -a'
+	alias le='exa -a -lgH -s extension --group-directories-first'
+	# alias leg='le --git'
+	alias lm='exa -a -lghH -s modified -m'
+	# alias lmg='lm --git'
+	alias lu='exa -a -lghH -s modified -uU'
+	# alias lug='lu --git'
+	alias lt='exa -T'
+	alias llt='exa -a -lgHh -R -T'
+	alias tree='llt'
+	alias lr='exa -a -lgHh -R -L 2'
+	# alias lrg='command exa -a -lgHh -R -L 2 --git'
+	alias lrr='exa -a -lgHh -R'
 else
-  alias ls='lsd'
-  alias la='ls -a'
-  alias lla='ls -la'
-  alias lt='ls --tree'
-  alias ll='colorls --group-directories-first --almost-all --long'
-  alias lc='colorls -lA --sd'
-  alias l='colorls --group-directories-first --almost-all --tree=1'
-  alias ll='colorls --group-directories-first --almost-all --long'
-  alias ld='colorls --group-directories-first --almost-all --dirs --tree=1'
-  alias lf='colorls --group-directories-first --almost-all --files --tree=1'
-  alias lt1='colorls --group-directories-first --almost-all --tree=1'
+	alias ls='lsd'
+	alias la='ls -a'
+	alias lla='ls -la'
+	alias lt='ls --tree'
+	alias ll='colorls --group-directories-first --almost-all --long'
+	alias lc='colorls -lA --sd'
+	alias l='colorls --group-directories-first --almost-all --tree=1'
+	alias ll='colorls --group-directories-first --almost-all --long'
+	alias ld='colorls --group-directories-first --almost-all --dirs --tree=1'
+	alias lf='colorls --group-directories-first --almost-all --files --tree=1'
+	alias lt1='colorls --group-directories-first --almost-all --tree=1'
 fi
 
 # Mac Helpers
