@@ -136,13 +136,11 @@ apps=(
   carbon-copy-cloner
   aerial
   hammerspoon
-  bettertouchtool
   visual-studio-code
   insomnia
   github
   little-snitch
   onyx
-  inkdrop
   forkLift
   atom-nightly
   malwarebytes
@@ -150,22 +148,15 @@ apps=(
   bartender
   phpstorm
   datagrip
-  airbuddy
   iina
-  yippy
-  pushplaylabs-sidekick
   zeplin
-  dissenter-browser
   messenger
   kitty
   raindropio
   optimage
   parallels
-  hackintool
-  opencore-configurator
   phpmon
   yt-music
-  lg-onscreen-control
   sketch
   protonvpn
   obsidian
