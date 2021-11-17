@@ -13,6 +13,9 @@ disabled = false
 discharging_symbol = "💀 "
 full_symbol = "� "
 
+[git_status]
+disabled=true
+
 [shell]
 fish_indicator = " "
 #zsh_indicator = "🦾 "
