@@ -32,7 +32,6 @@ binaries=(
   mas
   ssh-copy-id
   terminal-notifier
-  wifi-password
   task
   fzy
   tree
@@ -43,12 +42,9 @@ binaries=(
   colordiff
   ranger
   htop
-  koekeishiya/formulae/yabai
-  khanhas/tap/spicetify-cli
   skhd
   go
   neovim
-  selecta
   gitui
   pinentry-mac
   fortune
@@ -120,18 +116,16 @@ apps=(
   alfred
   dropbox
   firefox-developer-edition
-  firefox-beta
   google-chrome
-  google-chrome-dev
+  google-chrome-canary
   brave
   blisk
-  iterm2-nightly
+  iterm2
   slack
   duet
   spotify
   karabiner-elements
   1password
-  captin
   brooklyn
   carbon-copy-cloner
   aerial
@@ -152,7 +146,6 @@ apps=(
   zeplin
   messenger
   kitty
-  raindropio
   optimage
   parallels
   phpmon
