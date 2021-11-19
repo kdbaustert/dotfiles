@@ -3,18 +3,18 @@
 #
 
 # group matches and describe.
-# zstyle ':completion:*:*:*:*:*' menu select
-# zstyle ':completion:*:matches' group yes
-# zstyle ':completion:*:options' description yes
-# zstyle ':completion:*:options' auto-description '%d'
-# zstyle ':completion:*:corrections' format '%F{green}-- %d (errors: %e) --%f'
-# zstyle ':completion:*:descriptions' format '%F{yellow}-- %d --%f'
-# zstyle ':completion:*:messages' format '%F{purple}-- %d --%f'
-# zstyle ':completion:*:warnings' format '%F{red}-- no matches found --%f'
-# zstyle ':completion:*' format '%F{yellow}-- %d --%f'
-# zstyle ':completion:*' group-name ''
-# zstyle ':completion:*' verbose yes
-# zstyle ':completion:*' matcher-list 'm:{a-zA-Z}={A-Za-z}' '+r:|?=**'
+zstyle ':completion:*:*:*:*:*' menu select
+zstyle ':completion:*:matches' group yes
+zstyle ':completion:*:options' description yes
+zstyle ':completion:*:options' auto-description '%d'
+zstyle ':completion:*:corrections' format '%F{green}-- %d (errors: %e) --%f'
+zstyle ':completion:*:descriptions' format '%F{yellow}-- %d --%f'
+zstyle ':completion:*:messages' format '%F{purple}-- %d --%f'
+zstyle ':completion:*:warnings' format '%F{red}-- no matches found --%f'
+zstyle ':completion:*' format '%F{yellow}-- %d --%f'
+zstyle ':completion:*' group-name ''
+zstyle ':completion:*' verbose yes
+zstyle ':completion:*' matcher-list 'm:{a-zA-Z}={A-Za-z}' '+r:|?=**'
 
 # directories
 if (( ! ${+LS_COLORS} )); then
@@ -37,10 +37,6 @@ zstyle ':completion:*:functions' ignored-patterns '(_*|pre(cmd|exec)|prompt_*)'
 
 # completion sorting
 zstyle ':completion:*:*:-subscript-:*' tag-order indexes parameters
-
-# Man
-zstyle ':completion:*:manuals' separate-sections true
-zstyle ':completion:*:manuals.(^1*)' insert-sections true
 
 # history
 zstyle ':completion:*:history-words' stop yes
