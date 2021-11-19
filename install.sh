@@ -31,72 +31,72 @@ else
 fi
 
 # Check for Homebrew
-if test ! $(which brew); then
-  info 'Installing homebrew...'
-  ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
-else
-  info 'Homebrew is already installed!'
-  info 'Updating homebrew && upgrading all formulas'
-  brew update && brew upgrade
-fi
+# if test ! $(which brew); then
+#   info 'Installing homebrew...'
+#   arm /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
+# else
+#   info 'Homebrew is already installed!'
+#   info 'Updating homebrew && upgrading all formulas'
+#   brew update && brew upgrade
+# fi
 
-info ${taps[@]}
-brew install ${taps[@]}
+# info ${taps[@]}
+# brew install ${taps[@]}
 
-brew update
+# brew update
 
 # Homebrew Binaries
 info 'Intalling brew binaries'
 brew install ${binaries[@]}
 
 # Homebrew Fonts
-info 'Intalling brew fonts'
-info ${fonts[@]}
-brew install ${fonts[@]}
+# info 'Intalling brew fonts'
+# info ${fonts[@]}
+# brew install ${fonts[@]}
 
 # Homebrew Applications
-info 'Intalling brew applications'
-brew install ${apps[@]}
+# info 'Intalling brew applications'
+# brew install ${apps[@]}
 
-# Composer Global packages
-info "Installing composer global packages."
-info ${composer[@]}
-composer global require ${composer[@]}
+# # Composer Global packages
+# info "Installing composer global packages."
+# info ${composer[@]}
+# composer global require ${composer[@]}
 
-# NPM Global packages
-info "Installing npm global packages."
-info ${npm[@]}
-npm install -g ${npm[@]}
+# # NPM Global packages
+# info "Installing npm global packages."
+# info ${npm[@]}
+# npm install -g ${npm[@]}
 
 # Setup Symlinks
-info "Creating file symlinks."
-ln -s "$HOME/dotfiles/.zshrc" $HOME/
-ln -s "$HOME/dotfiles/skhd/.skhdrc" $HOME/
-ln -s "$HOME/dotfiles/yabai/.yabairc" $HOME/
-ln -s "$HOME/dotfiles/spacebar/.spacebarrc" $HOME/
-ln -s "$HOME/dotfiles/neofetch/config.conf" "$HOME/.config/neofetch"
+# info "Creating file symlinks."
+# ln -s "$HOME/dotfiles/.zshrc" $HOME/
+# ln -s "$HOME/dotfiles/skhd/.skhdrc" $HOME/
+# ln -s "$HOME/dotfiles/yabai/.yabairc" $HOME/
+# ln -s "$HOME/dotfiles/spacebar/.spacebarrc" $HOME/
+# ln -s "$HOME/dotfiles/neofetch/config.conf" "$HOME/.config/neofetch"
 
-info "Setting chmod for ~/.ssh"
-chmod 700 "$HOME/.ssh"
+# info "Setting chmod for ~/.ssh"
+# chmod 700 "$HOME/.ssh"
 
-# Gem gobal packages
-gem install colorls
+# # Gem gobal packages
+# gem install colorls
 
-info "Installing Laravel Valet"
-valet composer
-mkdir "$HOME/Sites"
-mkdir "$HOME/Dev"
-cd "$HOME/Sites"
-valet park
+# info "Installing Laravel Valet"
+# valet composer
+# mkdir "$HOME/Sites"
+# mkdir "$HOME/Dev"
+# cd "$HOME/Sites"
+# valet park
 
-# Global ignore
-git config --global core.excludesFile "$HOME/.gitignore"
+# # Global ignore
+# git config --global core.excludesFile "$HOME/.gitignore"
 
-# Setup git user config
-git config --global user.name "Kenny Baustert"
-git config --global user.email "kenny@gothamx.dev"
+# # Setup git user config
+# git config --global user.name "Kenny Baustert"
+# git config --global user.email "kenny@gothamx.dev"
 
-touch "$HOME/.hushlogin"
+# touch "$HOME/.hushlogin"
 
-# vim-plug
-curl -fLo ~/.config/nvim/autoload/plug.vim --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+# # vim-plug
+# curl -fLo ~/.config/nvim/autoload/plug.vim --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
