@@ -4,9 +4,10 @@
 brew tap homebrew/cask-fonts
 brew tap homebrew/cask-versions
 brew tap koekeishiya/formulae
-brew tap shopify/shopify
+brew tap henkrehorst/php
 brew tap cantino/mcfly
 brew tap nicoverbruggen/homebrew-cask
+brew tap elastic/tap
 
 binaries=(
   bash      # Latest Bash version
@@ -42,7 +43,6 @@ binaries=(
   colordiff
   ranger
   htop
-  skhd
   go
   neovim
   gitui
@@ -67,9 +67,7 @@ binaries=(
   asdf
   git-delta
   exa
-  stormssh
   assh
-  dust
   broot
   procs
   dog
@@ -78,7 +76,6 @@ binaries=(
   nvm
   php
   php@7.4
-  php@7.3
   nginx
   php-cs-fixer
   mariadb
@@ -87,6 +84,7 @@ binaries=(
   wp-cli
   firebase-cli
   vivid
+  elastic/tap/elasticsearch-full
 )
 
 # Homebrew Fonts
