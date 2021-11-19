@@ -2,6 +2,10 @@
 
 # Created by Kenny B <kenny@gothamx.dev>
 
+arm() {
+  arch -x86_64 $@
+}
+
 if [ -d "$HOME/.nvm" ]; then
 	export NVM_DIR="$HOME/.nvm"
 fi
