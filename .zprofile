@@ -10,8 +10,12 @@ export LANG='en_US.UTF-8'
 export LC_ALL='en_US.UTF-8'
 export WORDCHARS='~!#$%^&*(){}[]<>?.+;'
 export PATH="/opt/homebrew/bin:$PATH"
+export PATH="/opt/homebrew/sbin:$PATH"
 export PATH="$PATH:$HOME/.composer/vendor/bin"
 export TERM="xterm-256color"
+export LDFLAGS="-L/opt/homebrew/opt/pcre2/lib"
+export CPPFLAGS="-I/opt/homebrew/opt/pcre2/include"
+export PKG_CONFIG_PATH="/opt/homebrew/opt/pcre2/lib/pkgconfig"
 # export SSH_AUTH_SOCK=$(gpgconf --list-dirs agent-ssh-socket)
 # gpgconf --launch gpg-agent
 
