@@ -11,7 +11,7 @@
 sudo yabai --load-sa
 yabai -m signal --add event=dock_did_restart action="sudo yabai --load-sa"
 
-yabai -m config external_bar all:23:0
+yabai -m config external_bar all:10:0
 
 # global settings
 yabai -m config mouse_follows_focus off
@@ -37,7 +37,7 @@ yabai -m config mouse_drop_action swap
 
 # general space settings
 yabai -m config layout bsp
-yabai -m config top_padding 20
+yabai -m config top_padding 0
 yabai -m config bottom_padding 10
 yabai -m config left_padding 12
 yabai -m config right_padding 12
@@ -61,23 +61,16 @@ yabai -m rule --add app='Tabby' space=1
 yabai -m rule --add app='Google Chrome' space=2
 yabai -m rule --add app='Brave' space=2
 yabai -m rule --add app='Firefox Developer Edition' space=2
-yabai -m rule --add app='Microsoft Edge Dev' space=2
 yabai -m rule --add app='Safari' space=2
-yabai -m rule --add app='Brave' space=2
 yabai -m rule --add app='Google Chrome Canary' space=2
-yabai -m rule --add app='Sidekick' space=2
-yabai -m rule --add app='Blisk' space=2
 
 # Tools
 yabai -m rule --add app='^Cyberduck$' space=3
 yabai -m rule --add app='^Transmit$' space=3
 yabai -m rule --add app='GitHub Desktop' space=3
-yabai -m rule --add app='Fork' space=3
 yabai -m rule --add app='Insomnia' space=3
 yabai -m rule --add app='TablePlus' space=3
 yabai -m rule --add app='GitKraken' space=3
-yabai -m rule --add app='Adobe Illustrator' space=3
-yabai -m rule --add app='Adobe Photoshop' space=3
 yabai -m rule --add app='Sketch' space=3
 yabai -m rule --add app='Zeplin' space=3
 
@@ -93,12 +86,9 @@ yabai -m rule --add app='Music' space=5
 yabai -m rule --add app='YT Music' space=5
 
 # Float
-yabai -m rule --add app='^BetterTouchTool$' space=6
-yabai -m rule --add app='IconChamp' space=6
 yabai -m rule --add app='Parallels Desktop' space=6
 yabai -m rule --add app='Folx' space=6
 yabai -m rule --add app='CleanMyMac X' space=6
-yabai -m rule --add app='IconJar' space=6
 yabai -m rule --add app='Carbon Copy Cloner' space=6
 
 #UNMANAGED
