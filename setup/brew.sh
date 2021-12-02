@@ -8,6 +8,7 @@ brew tap henkrehorst/php
 brew tap cantino/mcfly
 brew tap nicoverbruggen/homebrew-cask
 brew tap elastic/tap
+brew tap shivammathur/php
 
 binaries=(
 	bash      # Latest Bash version
@@ -85,7 +86,6 @@ binaries=(
 	firebase-cli
 	vivid
 	elastic/tap/elasticsearch-full
-	termius
 )
 
 # Homebrew Fonts
@@ -157,4 +157,5 @@ apps=(
 	zoom
 	nucleo
 	sourcetree-beta
+	raycast
 )
