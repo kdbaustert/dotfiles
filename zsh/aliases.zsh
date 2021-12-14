@@ -158,7 +158,7 @@ alias brewsl='brew services list'
 # FZF
 alias hist="history | fzf"
 
-#
+# WordPress
 alias wp_get_salts="curl https://api.wordpress.org/secret-key/1.1/salt/"
 alias wp_export_staging='wp @staging db export - > "staging_db_$(date +%F_$R).sql"'
 alias wp_export_production='wp @production db export - > "production_db_$(date +%F_$R).sql"'
@@ -192,20 +192,27 @@ alias npmu='npm run uninstall'
 alias npmc='npm install & composer install'
 
 # Yarn
-alias y="yarn"
-alias yi="yarn init"
-alias ya="yarn add"
-alias yad="yarn add --dev"
-alias yga="yarn global add"
-alias yr="yarn run"
-alias ys="yarn start"
-alias yis="yarn install && yarn start"
-alias yrm="yarn remove"
-alias yup="yarn upgrade"
-alias ycl="yarn clean"
-alias ych="yarn check"
-alias yt="yarn test"
-alias ycc="yarn cache clean"
+alias y='yarn'
+alias yi='yarn init'
+alias ya='yarn add'
+alias yad='yarn add --dev'
+alias yga='yarn global add'
+alias yr='yarn run'
+alias ys='yarn start'
+alias yis='yarn install && yarn start'
+alias yrm='yarn remove'
+alias yup='yarn upgrade'
+alias ycl='yarn clean'
+alias ych='yarn check'
+alias yt='yarn test'
+alias ycc='yarn cache clean'
+
+# Nvm
+alias nvmci='nvm install'
+alias nvmu='nvm uninstall'
+alias nvmc='nvm current'
+alias nvmv='nvm version'
+alias nvmlr='nvm ls-remote'
 
 # Git
 alias g='git'
