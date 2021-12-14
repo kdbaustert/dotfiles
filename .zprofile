@@ -1,3 +1,7 @@
+#### FIG ENV VARIABLES ####
+# Please make sure this block is at the start of this file.
+[ -s ~/.fig/shell/pre.sh ] && source ~/.fig/shell/pre.sh
+#### END FIG ENV VARIABLES ####
 export CLICOLOR=1
 export DOTFILES=$HOME/dotfiles
 export EXA_ICON_SPACING=1
@@ -13,9 +17,14 @@ export PATH="/opt/homebrew/bin:$PATH"
 export PATH="/opt/homebrew/sbin:$PATH"
 export PATH="$PATH:$HOME/.composer/vendor/bin"
 export TERM="xterm-256color"
-# export SSH_AUTH_SOCK=$(gpgconf --list-dirs agent-ssh-socket)
-# gpgconf --launch gpg-agents
-
 export GPG_TTY=$(tty)
+export XDEBUG_CONFIG="IDEKEY=VSCODE"
+export NTL_RUNNER=yarn
+export NVM_COLORS='cmgRY'
 
 eval "$(/opt/homebrew/bin/brew shellenv)"
+
+#### FIG ENV VARIABLES ####
+# Please make sure this block is at the end of this file.
+[ -s ~/.fig/fig.sh ] && source ~/.fig/fig.sh
+#### END FIG ENV VARIABLES ####
