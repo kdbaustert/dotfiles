@@ -72,6 +72,7 @@ binaries=(
 	broot
 	procs
 	dog
+	ripgrep
 
 	# Development
 	nvm
@@ -116,7 +117,6 @@ apps=(
 	dropbox
 	firefox-developer-edition
 	google-chrome
-	google-chrome-canary
 	brave
 	blisk
 	iterm2
@@ -136,7 +136,6 @@ apps=(
 	onyx
 	forkLift
 	atom-nightly
-	malwarebytes
 	imazing
 	bartender
 	phpstorm
@@ -148,7 +147,6 @@ apps=(
 	optimage
 	parallels
 	phpmon
-	yt-music
 	sketch
 	protonvpn
 	obsidian
