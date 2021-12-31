@@ -156,4 +156,9 @@ apps=(
 	nucleo
 	sourcetree-beta
 	raycast
+	maintenance
+	sketch-beta
+	gitkraken
+	fontplop
+	microsoft-edge-dev
 )
