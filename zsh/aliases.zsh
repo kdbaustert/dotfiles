@@ -21,6 +21,7 @@ alias dev="cd $HOME/Development"
 alias sites="cd $HOME/Sites"
 alias dl="cd $HOME/Downloads"
 alias dotfiles="cd $HOME/dotfiles"
+alias phpdir="cd /opt/homebrew/etc/php"
 
 alias caliases="code $DOTFILES/aliases.zsh"
 alias chammerspoon="code $HOME/.hammerspoon/init.lua"
