@@ -1,4 +1,4 @@
-### Added by Zinit's installer
+# Added by Zinit's installer
 if [[ ! -f $HOME/.zinit/bin/zinit.zsh ]]; then
   print -P "%F{33}▓▒░ %F{220}Installing %F{33}DHARMA%F{220} Initiative Plugin Manager (%F{33}zdharma/zinit%F{220})…%f"
   command mkdir -p "$HOME/.zinit" && command chmod g-rwX "$HOME/.zinit"
@@ -51,8 +51,6 @@ fi
 zinit ice lucid wait'0c' as'command' pick'bin/fzf-tmux'
 zinit light junegunn/fzf
 
-# FZF-TAB
-
 zinit ice wait'1' lucid
 zinit light Aloxaf/fzf-tab
 
@@ -71,10 +69,10 @@ zinit light xav-b/zsh-extend-history
 zinit wait"2" lucid as"program" from"gh-r" for \
       mv"lsd-*/lsd -> lsd" atload"alias ls='lsd'" Peltoche/lsd
 
-# prettyping
-zinit ice wait lucid as'program' mv'prettyping* -> prettyping' \
-    atload"alias ping='prettyping --nolegend'"
-zinit light denilsonsa/prettyping
+# # prettyping
+# zinit ice wait lucid as'program' mv'prettyping* -> prettyping' \
+#     atload"alias ping='prettyping --nolegend'"
+# zinit light denilsonsa/prettyping
 
 # fzf - fuzzy finder
 zinit ice from"gh-r" as"program"
@@ -84,9 +82,9 @@ zinit load junegunn/fzf-bin
 zinit wait lucid for \
 	"agkozak/zsh-z"
 
-# FORGIT
-zinit ice wait lucid id-as'forgit' atload'alias gr=forgit::checkout::file'
-zinit load 'wfxr/forgit'
+# # FORGIT
+# zinit ice wait lucid id-as'forgit' atload'alias gr=forgit::checkout::file'
+# zinit load 'wfxr/forgit'
 
 # ─── fuzzy movement and directory choosing ────────────────────────────────────
 # autojump command
@@ -94,7 +92,7 @@ zinit load 'wfxr/forgit'
 zinit ice wait'0c' lucid
 zinit light rupa/z
 
-# sharkdp/fd
+# # sharkdp/fd
 zinit ice as"program" from"gh-r" mv"fd* -> fd" pick"fd/fd"
 zinit light sharkdp/fd
 
