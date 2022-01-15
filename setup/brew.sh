@@ -3,8 +3,7 @@
 # Homebrew taps
 brew tap homebrew/cask-fonts
 brew tap homebrew/cask-versions
-brew tap koekeishiya/formulae
-brew tap henkrehorst/php
+brew tap koekeishiya/formula
 brew tap cantino/mcfly
 brew tap nicoverbruggen/homebrew-cask
 brew tap elastic/tap
@@ -73,6 +72,7 @@ binaries=(
 	procs
 	dog
 	ripgrep
+	nnn
 
 	# Development
 	nvm
