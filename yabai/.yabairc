@@ -11,9 +11,6 @@
 sudo yabai --load-sa
 yabai -m signal --add event=dock_did_restart action="sudo yabai --load-sa"
 
-yabai -m config external_bar all:10:0
-
-# global settings
 yabai -m config mouse_follows_focus off
 yabai -m config focus_follows_mouse off
 yabai -m config window_placement second_child
@@ -76,7 +73,7 @@ yabai -m rule --add app='Zeplin' space=3
 
 # Social
 yabai -m rule --add app='Slack' space=4
-yabai -m rule --add app='Messages' space=4
+yabai -m rule --add app='^Messages$' space=4
 yabai -m rule --add app='Spark' space=4
 yabai -m rule --add app='Messenger' space=4
 
@@ -89,7 +86,6 @@ yabai -m rule --add app='YT Music' space=5
 yabai -m rule --add app='Parallels Desktop' space=6
 yabai -m rule --add app='Folx' space=6
 yabai -m rule --add app='CleanMyMac X' space=6
-yabai -m rule --add app='Carbon Copy Cloner' space=6
 
 #UNMANAGED
 yabai -m rule --add label="Archiver" app='Archiver' manage=off
@@ -103,38 +99,9 @@ yabai -m rule --add app='^1Password 7$' manage=off sticky=on
 
 yabai -m rule --add app='Google Chrome'
 yabai -m rule --add title='.*Install.*' manage=off
-# yabai -m rule --add app='Transmit' title='(General|Sync|Advanced|Rules)' manage=off
 yabai -m rule --add app='Google Chrome' title='^Picture in Picture$' manage=off
 yabai -m rule --add app='Brave' title='^Picture in Picture$' manage=off
 yabai -m rule --add app='Firefox' title='^Opening .*$' manage=off
 yabai -m rule --add app='Firefox*' title='^File Upload$' manage=off
 yabai -m rule --add app='^Safari$' title='^(General||Password|Website|Extension)s|AutoFill|Se(arch|curity)|Privacy|Advance)$' manage=off
-
-# Refresh spaces widget on space change
-#yabai -m signal --add event=space_changed action="osascript -e 'tell application id \"tracesOf.Uebersicht\" to refresh widget id \"simple-bar-spaces-jsx\"'"
-# Refresh spaces widget on display focus change
-#yabai -m signal --add event=display_changed action="osascript -e 'tell application id \"tracesOf.Uebersicht\" to refresh widget id \"simple-bar-spaces-jsx\"'"
-# Refresh spaces widget on window resize
-#yabai -m signal --add event=window_resized action="osascript -e 'tell application id \"tracesOf.Uebersicht\" to refresh widget id \"simple-bar-spaces-jsx\"'"
-# Refresh process widget on space change
-#yabai -m signal --add event=space_changed action="osascript -e 'tell application id \"tracesOf.Uebersicht\" to refresh widget id \"simple-bar-process-jsx\"'"
-
-# Refresh process widget on when focused application changes
-#yabai -m signal --add event=window_focused action="osascript -e 'tell application id \"tracesOf.Uebersicht\" to refresh widget id \"simple-bar-process-jsx\"'"
-# Refresh spaces widget on when focused application changes
-#yabai -m signal --add event=window_focused action="osascript -e 'tell application id \"tracesOf.Uebersicht\" to refresh widget id \"simple-bar-spaces-jsx\"'"
-
-# Refresh process widget on when focused application changes
-#yabai -m signal --add event=application_front_switched action="osascript -e 'tell application id \"tracesOf.Uebersicht\" to refresh widget id \"simple-bar-process-jsx\"'"
-# Refresh spaces widget on when focused application changes
-#yabai -m signal --add event=application_front_switched action="osascript -e 'tell application id \"tracesOf.Uebersicht\" to refresh widget id \"simple-bar-spaces-jsx\"'"
-
-# Refresh process widget on when an application window is closed
-#yabai -m signal --add event=window_destroyed action="osascript -e 'tell application id \"tracesOf.Uebersicht\" to refresh widget id \"simple-bar-process-jsx\"'"
-# Refresh spaces widget on when an application window is closed
-#yabai -m signal --add event=window_destroyed action="osascript -e 'tell application id \"tracesOf.Uebersicht\" to refresh widget id \"simple-bar-spaces-jsx\"'"
-
-# Refresh process widget when current window title changes
-#yabai -m signal --add event=window_title_changed action="osascript -e 'tell application id \"tracesOf.Uebersicht\" to refresh widget id \"simple-bar-process-jsx\"'"
-
 echo "yabai configuration loaded.."
