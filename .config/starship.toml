@@ -7,6 +7,11 @@ add_newline = false
 command_timeout = 9000
 format = "$all"
 
+[character]
+success_symbol = "[❯](#ffb86c)[❯](#bd93f9)[❯](#50fa7b)"
+error_symbol = "[❯](#ff5555)[❯](#ff5555)[❯](#ff5555)"
+vicmd_symbol = "[N](#bd93f9)"
+
 [battery]
 charging_symbol = "⚡️ "
 disabled = false
@@ -108,7 +113,3 @@ disabled = false
 format = "$output "
 shell = ["bash", "--noprofile", "--norc"]
 when = 'git rev-parse --is-inside-work-tree 2> /dev/null'
-
-[character]
-error_symbol = "[❯](bold red)"
-success_symbol = "[❯](bold purple)"
