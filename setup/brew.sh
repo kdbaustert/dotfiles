@@ -161,4 +161,5 @@ apps=(
 	gitkraken
 	fontplop
 	microsoft-edge-dev
+	fig
 )
