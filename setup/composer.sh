@@ -4,11 +4,15 @@ composer=(
 	laravel/installer
 	laravel/valet
 	phpunit/phpunit
-	squizlabs/php_codesniffer
-	escapestudios/symfony2-coding-standard
-	wp-coding-standards/wpcs
-	phpcompatibility/phpcompatibility-wp
 	friendsofphp/php-cs-fixer
-	wptrt/wpthemereview
+	squizlabs/php_codesniffer
+	automattic/phpcs-neutron-standard
+	automattic/phpcs-neutron-ruleset
 	dealerdirect/phpcodesniffer-composer-installer
+	phpmd/phpmd
+	phpstan/phpstan
+	szepeviktor/phpstan-wordpress
+	php-stubs/woocommerce-stubs
+	wp-coding-standards/wpcs
+	wptrt/wpthemereview
 )
