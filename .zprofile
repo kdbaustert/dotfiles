@@ -1,3 +1,4 @@
+
 #### FIG ENV VARIABLES ####
 # Please make sure this block is at the start of this file.
 [ -s ~/.fig/shell/pre.sh ] && source ~/.fig/shell/pre.sh
@@ -21,9 +22,7 @@ export GPG_TTY=$(tty)
 export XDEBUG_CONFIG="IDEKEY=VSCODE"
 export NTL_RUNNER=yarn
 export NVM_COLORS='cmgRY'
-
 eval "$(/opt/homebrew/bin/brew shellenv)"
-
 #### FIG ENV VARIABLES ####
 # Please make sure this block is at the end of this file.
 [ -s ~/.fig/fig.sh ] && source ~/.fig/fig.sh
