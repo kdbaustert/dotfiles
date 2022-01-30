@@ -1,4 +1,3 @@
-
 #### FIG ENV VARIABLES ####
 # Please make sure this block is at the start of this file.
 [ -s ~/.fig/shell/pre.sh ] && source ~/.fig/shell/pre.sh
@@ -7,9 +6,9 @@
 
 # Created by Kenny B <kenny@gothamx.dev>
 
-arm() {
-  arch -x86_64 $@
-}
+# arm() {
+# 	arch -x86_64 $@
+# }
 
 if [ -d "$HOME/.nvm" ]; then
 	export NVM_DIR="$HOME/.nvm"
@@ -74,8 +73,6 @@ autoload colors && colors
 
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 
-export FZF_DEFAULT_COMMAND='fd --exclude .git --max-depth 5 --hidden'
-
 # FZF custom Aura theme
 export FZF_DEFAULT_OPTS=$FZF_DEFAULT_OPTS'
 --reverse
@@ -96,44 +93,6 @@ export FZF_COMPLETION_TRIGGER=','
 export FZF_DEFAULT_COMMAND='fd --exclude .git --max-depth 5 --hidden'
 export FZF_COMPLETION_TRIGGER=','
 
-# disable sort when completing `git checkout`
-# zstyle ':completion:*:git-checkout:*' sort false
-# set descriptions format to enable group support
-zstyle ':completion:*:descriptions' format '[%d]'
-# set list-colors to enable filename colorizing
-zstyle ':completion:*' list-colors ${(s.:.)LS_COLORS}
-# preview directory's content with exa when completing cd
-zstyle ':fzf-tab:complete:cd:*' fzf-preview 'exa -1 --color=always $realpath'
-# switch group using `,` and `.`
-zstyle ':fzf-tab:*' switch-group ',' '.'
-
-zstyle ':completion:*' completer _expand _complete _ignored _approximate
-zstyle ':completion:*' matcher-list 'm:{a-z}={A-Z}'
-zstyle ':completion:*' menu select=2
-zstyle ':completion:*' select-prompt '%SScrolling active: current selection at %p%s'
-zstyle ':completion:*:descriptions' format '-- %d --'
-zstyle ':completion:*:processes' command 'ps -au$USER'
-zstyle ':completion:complete:*:options' sort false
-zstyle ':fzf-tab:*' query-string prefix first
-zstyle ':fzf-tab:complete:_zlua:*' query-string input
-zstyle ':fzf-tab:*' continuous-trigger '/'
-# zstyle ':completion:*:*:*:*:processes' command "ps -u $USER -o pid,user,comm,cmd -w -w"
-zstyle ':fzf-tab:complete:kill:argument-rest' fzf-flags --preview=$extract'ps --pid=$in[(w)1] -o cmd --no-headers -w -w' --preview-window=down:3:wrap
-zstyle ':fzf-tab:complete:cd:*' fzf-preview 'exa -1 --color=always $realpath'  # disable for tmux-popup
-zstyle ':fzf-tab:*' switch-group ',' '.'
-zstyle ':fzf-tab:*' fzf-command ftb-tmux-popup
-zstyle ':fzf-tab:*' popup-pad 0 0
-zstyle ':completion:*:git-checkout:*' sort false
-zstyle ':completion:*:exa' file-sort modification
-zstyle ':completion:*:exa' sort false
-
-# Highlight the current autocomplete option
-zstyle ':completion:*' list-colors "${(s.:.)LS_COLORS}"
-
-# Allow for autocomplete to be case insensitive
-zstyle ':completion:*' matcher-list '' 'm:{[:lower:][:upper:]}={[:upper:][:lower:]}' \
-  '+l:|?=** r:|?=**'
-
 bindkey -e
 bindkey \^U backward-kill-line
 
@@ -143,20 +102,14 @@ bindkey \^U backward-kill-line
 # ALIASES
 [[ -f $DOTFILES/zsh/aliases.zsh ]] && source $DOTFILES/zsh/aliases.zsh
 
-if [ -e /Users/kenny/.nix-profile/etc/profile.d/nix.sh ]; then . /Users/kenny/.nix-profile/etc/profile.d/nix.sh; fi # added by Nix installer
-
 . /opt/homebrew/opt/asdf/asdf.sh
 
-test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
-
-
+nvim() {
+	unset -f nvim
+	_zsh_nvm_load
+	nvim "$@"
+}
 #### FIG ENV VARIABLES ####
 # Please make sure this block is at the end of this file.
 [ -s ~/.fig/fig.sh ] && source ~/.fig/fig.sh
 #### END FIG ENV VARIABLES ####
-
-nvim () {
-    unset -f nvim
-    _zsh_nvm_load
-    nvim "$@"
-}
