@@ -4602,7 +4602,7 @@
 			<key>Non-ASCII Ligatures</key>
 			<true/>
 			<key>Normal Font</key>
-			<string>JetBrainsMonoNerdFontCompleteM-Medium 17.4</string>
+			<string>RobotoMonoForPowerline-Medium 17.4</string>
 			<key>Only The Default BG Color Uses Transparency</key>
 			<true/>
 			<key>Option Key Sends</key>
@@ -4877,7 +4877,7 @@
 			<key>Title Components</key>
 			<integer>384</integer>
 			<key>Transparency</key>
-			<real>0.40252160904255324</real>
+			<real>0.3290425531914894</real>
 			<key>Underline Color (Dark)</key>
 			<dict>
 				<key>Alpha Component</key>
