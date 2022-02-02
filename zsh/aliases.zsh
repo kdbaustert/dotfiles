@@ -53,45 +53,65 @@ alias sf='fasd -sif'     # interactive file selection
 alias z='fasd_cd -d'     # cd, same functionality as j in autojump
 alias zz='fasd_cd -d -i' # cd with interactive selection
 
-if which exa &>/dev/null; then
-	alias ls='exa --icons --classify'
-	alias l='exa -a -lgmH --icons -G'
-	# alias lg='l --git'
-	alias la='l -@'
-	alias ll='l -h'
-	# alias llg='ll --git'
-	alias l1='exa-1 --group-directories-first'
-	alias la1='l1 -a'
-	alias le='exa -a -lgH -s extension --group-directories-first'
-	# alias leg='le --git'
-	alias lm='exa -a -lghH -s modified -m'
-	# alias lmg='lm --git'
-	alias lu='exa -a -lghH -s modified -uU'
-	# alias lug='lu --git'
-	alias lt='exa -T'
-	alias llt='exa -a -lgHh -R -T'
-	alias tree='llt'
-	alias lr='exa -a -lgHh -R -L 2'
-	# alias lrg='command exa -a -lgHh -R -L 2 --git'
-	alias lrr='exa -a -lgHh -R'
-else
-	alias ls='lsd'
-	alias la='ls -a'
-	alias lla='ls -la'
-	alias lt='ls --tree'
-	alias ll='colorls --group-directories-first --almost-all --long'
-	alias lc='colorls -lA --sd'
-	alias l='colorls --group-directories-first --almost-all --tree=1'
-	alias ll='colorls --group-directories-first --almost-all --long'
-	alias ld='colorls --group-directories-first --almost-all --dirs --tree=1'
-	alias lf='colorls --group-directories-first --almost-all --files --tree=1'
-	alias lt1='colorls --group-directories-first --almost-all --tree=1'
+if $(gls &>/dev/null); then
+	alias gls="tmux select-pane -P bg=default,fg=default &> /dev/null; gls --color=auto --group-directories-first"
+	alias ls="gls -FA"
+	alias lst="gls -FAt"
+	alias l="gls -lAh"
+	alias lt="gls -lAht"
+	alias ll="gls -l"
+	alias la="gls -A"
 fi
 
-# Mac Helpers
-alias showfiles="defaults write com.apple.finder AppleShowAllFiles -bool true && killall Finder"
-alias hidefiles='defaults write com.apple.finder AppleShowAllFiles -bool false && killall Finder'
-alias killdock='killall Dock'
+alias ls="exa -gahF --group-directories-first"
+alias l="exa -lahF --icons --group-directories-first --git"
+alias s="ls"
+alias last='ls *(.om[1])'
+alias cat='bat'
+alias du="ncdu --color dark -rr -x --exclude .git --exclude node_modules"
+
+# if which exa &>/dev/null; then
+# 	alias ls='exa --icons --classify'
+# 	alias l='exa -a -lgmH --icons -G'
+# 	# alias lg='l --git'
+# 	alias la='l -@'
+# 	alias ll='l -h'
+# 	# alias llg='ll --git'
+# 	alias l1='exa-1 --group-directories-first'
+# 	alias la1='l1 -a'
+# 	alias le='exa -a -lgH -s extension --group-directories-first'
+# 	# alias leg='le --git'
+# 	alias lm='exa -a -lghH -s modified -m'
+# 	# alias lmg='lm --git'
+# 	alias lu='exa -a -lghH -s modified -uU'
+# 	# alias lug='lu --git'
+# 	alias lt='exa -T'
+# 	alias llt='exa -a -lgHh -R -T'
+# 	alias tree='llt'
+# 	alias lr='exa -a -lgHh -R -L 2'
+# 	# alias lrg='command exa -a -lgHh -R -L 2 --git'
+# 	alias lrr='exa -a -lgHh -R'
+# else
+# 	alias ls='lsd'
+# 	alias la='ls -a'
+# 	alias lla='ls -la'
+# 	alias lt='ls --tree'
+# 	alias ll='colorls --group-directories-first --almost-all --long'
+# 	alias lc='colorls -lA --sd'
+# 	alias l='colorls --group-directories-first --almost-all --tree=1'
+# 	alias ll='colorls --group-directories-first --almost-all --long'
+# 	alias ld='colorls --group-directories-first --almost-all --dirs --tree=1'
+# 	alias lf='colorls --group-directories-first --almost-all --files --tree=1'
+# 	alias lt1='colorls --group-directories-first --almost-all --tree=1'
+# fi
+
+alias pkey="pbcopy < ~/.ssh/id_rsa.pub"
+alias pubkey="more ~/.ssh/id_rsa.pub | pbcopy | echo '=> Public key copied to pasteboard.'"
+
+# Fix LSD pegging the CPU
+# https://discussions.apple.com/message/30186026#message30186026
+alias fixlsd="/System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.fram ework/Support/lsregister -kill -r -domain local -domain system -domain user ; killall Dock"
+alias resetlsd=fixlsd
 
 # computer power options
 alias reboot='sudo /sbin/reboot'
@@ -131,7 +151,7 @@ alias permission='chmod +x'
 alias update='brew update; brew upgrade; brew cleanup; npm install npm -g; npm update -g; sudo gem update colorls; composer global update; zinit update'
 
 # Recursively remove .DS_Store files
-alias cleanup="find . -name '*.DS_Store' -type f -ls -delete"
+alias dsnuke="find . -name '*.DS_Store' -type f -ls -delete"
 
 # Kill all the tabs in Chrome to free up memory
 # [C] explained: http://www.commandlinefu.com/commands/view/402/exclude-grep-from-your-grepped-output-of-ps-alias-included-in-description
@@ -251,5 +271,11 @@ alias cu='composer update'
 alias codewp='phpcs --config-set default_standard WordPress'
 alias codelaravel='phpcs --config-set default_standard Laravel'
 
+alias ibrew='arch -x86_64 /usr/local/bin/brew'
+
 # Print each PATH entry on a separate line
 alias path='echo -e ${PATH//:/\\n}'
+
+alias brew='env PATH="${PATH//$(pyenv root)\/shims:/}" brew'
+
+# alias python=python3
