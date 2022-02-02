@@ -11,10 +11,10 @@
 sudo yabai --load-sa
 yabai -m signal --add event=dock_did_restart action="sudo yabai --load-sa"
 
-yabai -m config mouse_follows_focus off
-yabai -m config focus_follows_mouse off
+yabai -m config mouse_follows_focus on
+yabai -m config focus_follows_mouse on
 yabai -m config window_placement second_child
-yabai -m config window_topmost off
+yabai -m config window_topmost on
 yabai -m config window_shadow on
 yabai -m config window_opacity off
 yabai -m config window_opacity_duration 0.0
@@ -26,8 +26,8 @@ yabai -m config active_window_border_color 0xff775759
 yabai -m config normal_window_border_color 0xff555555
 yabai -m config insert_feedback_color 0xffd75f5f
 yabai -m config split_ratio 0.50
-yabai -m config auto_balance on
-yabai -m config mouse_modifier fn
+yabai -m config auto_balance off
+yabai -m config mouse_modifier ctrl
 yabai -m config mouse_action1 move
 yabai -m config mouse_action2 resize
 yabai -m config mouse_drop_action swap
@@ -71,6 +71,12 @@ yabai -m rule --add app='GitKraken' space=3
 yabai -m rule --add app='Sketch' space=3
 yabai -m rule --add app='Zeplin' space=3
 
+# Design
+yabai -m rule --add app='Illustrator 2022' space=6
+yabai -m rule --add app='InDesign 2022' space=6
+yabai -m rule --add app='XD' space=6
+yabai -m rule --add app='Adobe Creative Cloud' space=6
+
 # Social
 yabai -m rule --add app='Slack' space=4
 yabai -m rule --add app='^Messages$' space=4
@@ -81,11 +87,6 @@ yabai -m rule --add app='Messenger' space=4
 yabai -m rule --add app='^Spotify$' space=5
 yabai -m rule --add app='Music' space=5
 yabai -m rule --add app='YT Music' space=5
-
-# Float
-yabai -m rule --add app='Parallels Desktop' space=6
-yabai -m rule --add app='Folx' space=6
-yabai -m rule --add app='CleanMyMac X' space=6
 
 #UNMANAGED
 yabai -m rule --add label="Archiver" app='Archiver' manage=off
