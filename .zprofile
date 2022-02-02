@@ -1,4 +1,3 @@
-
 #### FIG ENV VARIABLES ####
 # Please make sure this block is at the start of this file.
 [ -s ~/.fig/shell/pre.sh ] && source ~/.fig/shell/pre.sh
@@ -14,6 +13,8 @@ export VISUAL=$EDITOR
 export LANG='en_US.UTF-8'
 export LC_ALLs='en_US.UTF-8'
 export WORDCHARS='~!#$%^&*(){}[]<>?.+;'
+export PATH=/usr/local/bin:/usr/local/sbin:$PATH
+export PATH=/usr/local/opt/python/libexec/bin:$PATH
 export PATH="/opt/homebrew/bin:$PATH"
 export PATH="/opt/homebrew/sbin:$PATH"
 export PATH="$PATH:$HOME/.composer/vendor/bin"
@@ -22,8 +23,20 @@ export GPG_TTY=$(tty)
 export XDEBUG_CONFIG="IDEKEY=VSCODE"
 export NTL_RUNNER=yarn
 export NVM_COLORS='cmgRY'
+
 eval "$(/opt/homebrew/bin/brew shellenv)"
 #### FIG ENV VARIABLES ####
 # Please make sure this block is at the end of this file.
 [ -s ~/.fig/fig.sh ] && source ~/.fig/fig.sh
 #### END FIG ENV VARIABLES ####
+
+# Setting PATH for Python 3.10
+# The original version is saved in .zprofile.pysave
+PATH="/Library/Frameworks/Python.framework/Versions/3.10/bin:${PATH}"
+export PATH
+
+# Setting PATH for Python 3.10
+# The original version is saved in .zprofile.pysave
+PATH="/Library/Frameworks/Python.framework/Versions/3.10/bin:${PATH}"
+export PATH
+eval "$(pyenv init --path)"
