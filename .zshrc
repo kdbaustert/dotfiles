@@ -102,7 +102,7 @@ bindkey \^U backward-kill-line
 # ALIASES
 [[ -f $DOTFILES/zsh/aliases.zsh ]] && source $DOTFILES/zsh/aliases.zsh
 
-. /opt/homebrew/opt/asdf/asdf.sh
+source /opt/homebrew/opt/asdf/asdf.sh
 
 nvim() {
 	unset -f nvim
@@ -113,3 +113,4 @@ nvim() {
 # Please make sure this block is at the end of this file.
 [ -s ~/.fig/fig.sh ] && source ~/.fig/fig.sh
 #### END FIG ENV VARIABLES ####
+eval "$(pyenv init -)"
