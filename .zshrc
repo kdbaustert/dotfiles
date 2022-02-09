@@ -1,14 +1,6 @@
-#### FIG ENV VARIABLES ####
-# Please make sure this block is at the start of this file.
-[ -s ~/.fig/shell/pre.sh ] && source ~/.fig/shell/pre.sh
-#### END FIG ENV VARIABLES ####
 #!/usr/bin/env zsh
 
 # Created by Kenny B <kenny@gothamx.dev>
-
-# arm() {
-# 	arch -x86_64 $@
-# }
 
 if [ -d "$HOME/.nvm" ]; then
 	export NVM_DIR="$HOME/.nvm"
@@ -109,8 +101,7 @@ nvim() {
 	_zsh_nvm_load
 	nvim "$@"
 }
-#### FIG ENV VARIABLES ####
-# Please make sure this block is at the end of this file.
-[ -s ~/.fig/fig.sh ] && source ~/.fig/fig.sh
-#### END FIG ENV VARIABLES ####
+
 eval "$(pyenv init -)"
+
+echo -e -n "\x1b[\x30 q"
