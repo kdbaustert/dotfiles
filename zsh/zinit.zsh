@@ -137,26 +137,26 @@ zinit light b4b4r07/enhancd
 export ENHANCD_FILTER=fzf:fzy:peco
 
 # TAB COMPLETIONS
-# zinit light-mode for \
-#     blockf \
-#         zsh-users/zsh-completions \
-#     as'program' atclone'rm -f ^(rgg|agv)' \
-#         lilydjwg/search-and-view \
-#     atclone'dircolors -b LS_COLORS > c.zsh' atpull'%atclone' pick'c.zsh' \
-#         trapd00r/LS_COLORS \
-#     src'etc/git-extras-completion.zsh' \
-#         tj/git-extras
-# zinit wait'1' lucid for \
-#     OMZ::lib/git.zsh
+zinit light-mode for \
+    blockf \
+        zsh-users/zsh-completions \
+    as'program' atclone'rm -f ^(rgg|agv)' \
+        lilydjwg/search-and-view \
+    atclone'dircolors -b LS_COLORS > c.zsh' atpull'%atclone' pick'c.zsh' \
+        trapd00r/LS_COLORS \
+    src'etc/git-extras-completion.zsh' \
+        tj/git-extras
+zinit wait'1' lucid for \
+    OMZ::lib/git.zsh
 
-# if whence dircolors >/dev/null; then
-#   eval "$(dircolors -b)"
-#   zstyle ':completion:*' list-colors ${(s.:.)LS_COLORS}
-#   alias ls='ls --color'
-# else
-#   export CLICOLOR=1
-#   zstyle ':completion:*' list-colors ''
-# fi
+if whence dircolors >/dev/null; then
+  eval "$(dircolors -b)"
+  zstyle ':completion:*' list-colors ${(s.:.)LS_COLORS}
+  alias ls='ls --color'
+else
+  export CLICOLOR=1
+  zstyle ':completion:*' list-colors ''
+fi
 
 zinit ice wait'1' lucid
 zinit light Aloxaf/fzf-tab
@@ -181,6 +181,9 @@ zinit wait lucid for \
 # https://github.com/rupa/z
 zinit ice wait'0c' lucid
 zinit light rupa/z
+
+zinit ice wait'1' lucid
+zinit light zpm-zsh/colors
 
 zinit ice wait'1' lucid
 zinit light laggardkernel/zsh-thefuck
