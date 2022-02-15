@@ -117,8 +117,6 @@ apps=(
 	dropbox
 	firefox-developer-edition
 	google-chrome
-	brave
-	blisk
 	iterm2
 	slack
 	duet
@@ -138,8 +136,6 @@ apps=(
 	atom-nightly
 	imazing
 	bartender
-	phpstorm
-	datagrip
 	iina
 	zeplin
 	messenger
@@ -160,6 +156,6 @@ apps=(
 	sketch-beta
 	gitkraken
 	fontplop
-	microsoft-edge-dev
 	fig
+	arctype
 )
