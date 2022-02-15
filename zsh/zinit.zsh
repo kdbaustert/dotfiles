@@ -172,21 +172,15 @@ zinit load junegunn/fzf-bin
 zinit wait lucid for \
 	"agkozak/zsh-z"
 
-# # FORGIT
-# zinit ice wait lucid id-as'forgit' atload'alias gr=forgit::checkout::file'
-# zinit load 'wfxr/forgit'
-
 # ─── fuzzy movement and directory choosing ────────────────────────────────────
 # autojump command
 # https://github.com/rupa/z
 zinit ice wait'0c' lucid
 zinit light rupa/z
 
-zinit ice wait'1' lucid
-zinit light zpm-zsh/colors
-
-zinit ice wait'1' lucid
-zinit light laggardkernel/zsh-thefuck
+zinit for \
+    light-mode zpm-zsh/colors \
+    light-mode laggardkernel/zsh-thefuck
 
 export NVM_LAZY_LOAD=true
 zinit light lukechilds/zsh-nvm
