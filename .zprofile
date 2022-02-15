@@ -22,6 +22,7 @@ export GPG_TTY=$(tty)
 # export XDEBUG_CONFIG="IDEKEY=VSCODE"
 export NTL_RUNNER=yarn
 # export NVM_COLORS='cmgRY'
+export PATH=/usr/local/clamav/bin:/usr/local/clamav/sbin:$PATH
 
 if [[ -z "$TMUX" ]]; then
 	export TERM="xterm-256color"
