@@ -6173,7 +6173,7 @@
 			<key>Non-ASCII Ligatures</key>
 			<true/>
 			<key>Normal Font</key>
-			<string>JetBrainsMonoMediumNerdFontCompleteM-Medium 17.7</string>
+			<string>JetBrainsMonoMediumNerdFontCompleteM-Medium 17.9</string>
 			<key>Only The Default BG Color Uses Transparency</key>
 			<true/>
 			<key>Option Key Sends</key>
@@ -6530,7 +6530,7 @@
 			<key>Title Components</key>
 			<integer>384</integer>
 			<key>Transparency</key>
-			<real>0.4221941489361703</real>
+			<real>0.33854222074468093</real>
 			<key>Underline Color (Dark)</key>
 			<dict>
 				<key>Alpha Component</key>
