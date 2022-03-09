@@ -1,26 +1,43 @@
 {
-  "extends": [
-    "stylelint-scss",
-    "stylelint-config-prettier"
-  ],
-  "rules": {
-    "at-rule-no-unknown": [
-      true,
-      {
-        "ignoreAtRules": [
-          "extends",
-          "ignores"
-        ]
-      }
-    ],
-    "indentation": 2,
-    "unit-whitelist": [
-      "em",
-      "rem",
-      "s",
-      "%",
-      "px"
-    ],
-    "block-closing-brace-newline-after": "always"
-  }
+	"extends": [
+		"stylelint-scss",
+		"stylelint-config-prettier",
+		"stylelint-config-standard"
+	],
+	"rules": {
+		"indentation": "tab",
+		"string-quotes": "double",
+		"no-duplicate-selectors": true,
+		"color-hex-case": "upper",
+		"color-named": "always-where-possible",
+		"selector-combinator-space-after": "always",
+		"selector-attribute-operator-space-before": "always",
+		"selector-attribute-operator-space-after": "always",
+		"declaration-block-trailing-semicolon": "always",
+		"declaration-colon-space-before": "never",
+		"declaration-colon-space-after": "always",
+		"number-leading-zero": "always",
+		"comment-empty-line-before": "always",
+		"rule-empty-line-before": "always-multi-line",
+		"selector-pseudo-element-colon-notation": "double",
+		"media-feature-parentheses-space-inside": "always",
+		"value-keyword-case": "lower",
+		"at-rule-no-unknown": [
+			true,
+			{
+				"ignoreAtRules": [
+					"extends",
+					"ignores"
+				]
+			}
+		],
+		"unit-whitelist": [
+			"em",
+			"rem",
+			"s",
+			"%",
+			"px"
+		],
+		"block-closing-brace-newline-after": "always"
+	}
 }
