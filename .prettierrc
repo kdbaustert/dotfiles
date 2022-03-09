@@ -7,23 +7,5 @@
   "semi": false,
   "bracketSpacing": true,
   "bracketSameLine": false,
-  "quoteProps": "as-needed",
-  "proseWrap": "always",
-  "overrides": [
-    {
-      "files": "*.test.js",
-      "options": {
-        "semi": true
-      }
-    },
-    {
-      "files": [
-        "*.md",
-        "*.scss"
-      ],
-      "options": {
-        "tabWidth": 2
-      }
-    }
-  ]
+  "endOfLine": "crlf"
 }
