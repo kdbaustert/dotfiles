@@ -276,6 +276,4 @@ alias ibrew='arch -x86_64 /usr/local/bin/brew'
 # Print each PATH entry on a separate line
 alias path='echo -e ${PATH//:/\\n}'
 
-alias brew='env PATH="${PATH//$(pyenv root)\/shims:/}" brew'
-
 # alias python=python3
