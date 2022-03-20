@@ -102,9 +102,6 @@ nvim() {
 	nvim "$@"
 }
 
-eval "$(pyenv init -)"
-
 echo -e -n "\x1b[\x30 q"
 
 test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
-
