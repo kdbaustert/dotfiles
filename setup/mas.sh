@@ -6,3 +6,4 @@ mas install 1456386228 # Clockology
 mas install 1436522307 # Transmit 5
 mas install 937984704  # Amphetamine
 mas install 1176895641 # Spark
+mas install 1212019923 # Antivirus Zap
