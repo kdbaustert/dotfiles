@@ -86,7 +86,11 @@ yabai -m rule --add app='Messenger' space=4
 # Music
 yabai -m rule --add app='^Spotify$' space=5
 yabai -m rule --add app='Music' space=5
-yabai -m rule --add app='YT Music' space=5
+yabai -m rule --add app='^YT Music$' space=5
+
+# Float
+yabai -m rule --add app='^ClamXAV$' space=6
+yabai -m rule --add app='^Avast$' space=6
 
 #UNMANAGED
 yabai -m rule --add label="Archiver" app='Archiver' manage=off
