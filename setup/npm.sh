@@ -9,6 +9,7 @@ npm=(
   eslint-config-prettier
   eslint-plugin-vue
   babel-eslint
+  typescript
   generator-code
   yo
   fast-cli
@@ -26,7 +27,9 @@ npm=(
   alfred-fkill
   browser-sync
   gulp-cli
+  gatsby-cli
   svgo
   npm-check-updates
   blade-formatter
+  update
 )
