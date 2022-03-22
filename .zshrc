@@ -102,6 +102,5 @@ nvim() {
 	nvim "$@"
 }
 
-echo -e -n "\x1b[\x30 q"
-
-test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
+eval "$(pyenv init -)"
+export PATH="$PATH:$HOME/.spicetify"
