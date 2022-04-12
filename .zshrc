@@ -103,4 +103,6 @@ nvim() {
 }
 
 eval "$(pyenv init -)"
-export PATH="$PATH:$HOME/.spicetify"
+
+# autoload -U add-zsh-hook
+# add-zsh-hook -Uz chpwd (){ ls -a; }
