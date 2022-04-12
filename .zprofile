@@ -20,7 +20,11 @@ export PATH="$PATH:$HOME/.composer/vendor/bin"
 export GPG_TTY=$(tty)
 export NTL_RUNNER=yarn
 # export NVM_COLORS='cmgRY'
+export PATH="$PATH:$HOME/.spicetify"
+export PATH="/opt/homebrew/opt/unzip/bin:$PATH"
 export PATH=/usr/local/clamav/bin:/usr/local/clamav/sbin:$PATH
+export PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
+export PUPPETEER_EXECUTABLE_PATH=`which chromium`
 
 if [[ -z "$TMUX" ]]; then
 	export TERM="xterm-256color"
