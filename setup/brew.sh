@@ -76,6 +76,7 @@ binaries=(
   koekeishiya/formulae/skhd
   koekeishiya/formulae/yabai
   vivid
+  virustotal-cli
 
   # Development
   nvm
@@ -171,4 +172,5 @@ apps=(
   utm
   keepingyouawake
   omnidisksweeper
+  local
 )
