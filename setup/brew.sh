@@ -67,7 +67,6 @@ binaries=(
   git-delta
   exa
   assh
-  broot
   procs
   dog
   ripgrep
@@ -76,7 +75,7 @@ binaries=(
   koekeishiya/formulae/skhd
   koekeishiya/formulae/yabai
   vivid
-  virustotal-cli
+  jump
 
   # Development
   nvm
