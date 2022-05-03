@@ -101,8 +101,3 @@ nvim() {
 	_zsh_nvm_load
 	nvim "$@"
 }
-
-eval "$(pyenv init -)"
-
-# autoload -U add-zsh-hook
-# add-zsh-hook -Uz chpwd (){ ls -a; }
