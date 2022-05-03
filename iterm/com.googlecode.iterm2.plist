@@ -4859,7 +4859,7 @@
 	<array>
 		<dict>
 			<key>ASCII Anti Aliased</key>
-			<true/>
+			<false/>
 			<key>ASCII Ligatures</key>
 			<true/>
 			<key>AWDS Pane Directory</key>
@@ -5351,13 +5351,13 @@
 				<key>Alpha Component</key>
 				<real>1</real>
 				<key>Blue Component</key>
-				<real>0.90196078431372551</real>
+				<real>0.63161593675613403</real>
 				<key>Color Space</key>
-				<string>sRGB</string>
+				<string>Calibrated</string>
 				<key>Green Component</key>
-				<real>0.40392156862745099</real>
+				<real>0.7447054386138916</real>
 				<key>Red Component</key>
-				<real>0.69803921568627447</real>
+				<real>0.21860760450363159</real>
 			</dict>
 			<key>Ansi 6 Color (Dark)</key>
 			<dict>
@@ -5654,13 +5654,13 @@
 				<key>Alpha Component</key>
 				<real>1</real>
 				<key>Blue Component</key>
-				<real>1</real>
+				<real>0.99818909168243408</real>
 				<key>Color Space</key>
-				<string>sRGB</string>
+				<string>Calibrated</string>
 				<key>Green Component</key>
 				<real>0.0</real>
 				<key>Red Component</key>
-				<real>0.51764705882352946</real>
+				<real>0.0</real>
 			</dict>
 			<key>Cursor Color (Dark)</key>
 			<dict>
@@ -5732,13 +5732,13 @@
 				<key>Alpha Component</key>
 				<real>1</real>
 				<key>Blue Component</key>
-				<real>1</real>
+				<real>0.99825513362884521</real>
 				<key>Color Space</key>
-				<string>sRGB</string>
+				<string>Calibrated</string>
 				<key>Green Component</key>
-				<real>0.66274509803921566</real>
+				<real>0.0</real>
 				<key>Red Component</key>
-				<real>0.0039215686274509803</real>
+				<real>0.21830230951309204</real>
 			</dict>
 			<key>Cursor Text Color (Dark)</key>
 			<dict>
@@ -6159,7 +6159,7 @@
 				<real>0.0</real>
 			</dict>
 			<key>Minimum Contrast</key>
-			<real>0.099999999999999992</real>
+			<real>0.13014322916666668</real>
 			<key>Minimum Contrast (Dark)</key>
 			<real>0.0</real>
 			<key>Minimum Contrast (Light)</key>
@@ -6169,13 +6169,13 @@
 			<key>Name</key>
 			<string>Kenny-zsh</string>
 			<key>Non Ascii Font</key>
-			<string>HackNerdFontComplete-Regular 17.5</string>
+			<string>HackNerdFontComplete-Regular 17.7</string>
 			<key>Non-ASCII Anti Aliased</key>
 			<true/>
 			<key>Non-ASCII Ligatures</key>
 			<true/>
 			<key>Normal Font</key>
-			<string>MonoLisaNerdFontComplete-Medium 17.5</string>
+			<string>MonoLisaNerdFontComplete-Medium 18</string>
 			<key>Only The Default BG Color Uses Transparency</key>
 			<true/>
 			<key>Option Key Sends</key>
@@ -6532,7 +6532,7 @@
 			<key>Title Components</key>
 			<integer>384</integer>
 			<key>Transparency</key>
-			<real>0.56069980053191482</real>
+			<real>0.4182097739361702</real>
 			<key>Underline Color (Dark)</key>
 			<dict>
 				<key>Alpha Component</key>
