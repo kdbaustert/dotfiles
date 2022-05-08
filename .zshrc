@@ -1,3 +1,5 @@
+# Fig pre block. Keep at the top of this file.
+. "$HOME/.fig/shell/zshrc.pre.zsh"
 #!/usr/bin/env zsh
 
 # Created by Kenny B <kenny@gothamx.dev>
@@ -101,3 +103,6 @@ nvim() {
 	_zsh_nvm_load
 	nvim "$@"
 }
+
+# Fig post block. Keep at the bottom of this file.
+. "$HOME/.fig/shell/zshrc.post.zsh"
