@@ -21,11 +21,6 @@ zinit lucid for \
     as"command" from"gh-r" atload'eval "$(starship init zsh)"' \
     starship/starship \
 
-# IMPORTANT:
-# Ohmyzsh plugins and libs are loaded first as some these sets some defaults which are required later on.
-# Otherwise something will look messed up
-# ie. some settings help zsh-autosuggestions to clear after tab completion
-
 setopt promptsubst
 
 # Explanation:
@@ -180,7 +175,12 @@ zinit light rupa/z
 
 zinit for \
     light-mode zpm-zsh/colors \
-    light-mode laggardkernel/zsh-thefuck
+    light-mode laggardkernel/zsh-thefuck \
+	ntnyq/omz-plugin-pnpm
 
 export NVM_LAZY_LOAD=true
 zinit light lukechilds/zsh-nvm
+
+source "$HOME/.zinit/bin/zinit.zsh"
+zinit ice lucid nocompile wait'0e' nocompletions
+zinit load MenkeTechnologies/zsh-more-completions
