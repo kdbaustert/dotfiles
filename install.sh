@@ -86,7 +86,4 @@ ln -sfv "$DOTFILES_DIR/.config/lsd" ~/.config
 info "Setting chmod for ~/.ssh"
 chmod 700 "$HOME/.ssh"
 
-info "Setting chmod for ~/.gnupg"
-chmod 700 ~/.gnupg
-
 touch "$HOME/.hushlogin"
