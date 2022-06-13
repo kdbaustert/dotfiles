@@ -24,11 +24,10 @@ export PATH="/opt/homebrew/opt/unzip/bin:$PATH"
 export PNPM_HOME="/Users/kenny/Library/pnpm"
 export PATH="$PNPM_HOME:$PATH"
 export SSH_AUTH_SOCK=~/Library/Group\ Containers/2BUA8C4S2C.com.1password/t/agent.sock
-export LDFLAGS="-L/usr/local/opt/zlib/lib -L/usr/local/opt/bzip2/lib"
-export CPPFLAGS="-I/usr/local/opt/zlib/include -I/usr/local/opt/bzip2/include"
-export PATH="/opt/homebrew/bin:/usr/local/bin:${PATH}"
-export PATH=/opt/homebrew/bin:/usr/local/bin:$PATH
-export PATH=/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin
+# export LDFLAGS="-L/usr/local/opt/zlib/lib -L/usr/local/opt/bzip2/lib"
+# export CPPFLAGS="-I/usr/local/opt/zlib/include -I/usr/local/opt/bzip2/include"
+
+source /Users/kenny/.zi/plugins/tj---git-extras/etc/git-extras-completion.zsh
 
 if [ -d "$HOME/.composer/vendor/bin" ]; then
   export PATH="$HOME/.composer/vendor/bin:$PATH"
@@ -44,3 +43,4 @@ fi
 
 # Fig post block. Keep at the bottom of this file.
 . "$HOME/.fig/shell/zprofile.post.zsh"
+export PATH="/usr/local/mysql/bin:$PATH"
