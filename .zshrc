@@ -1,7 +1,7 @@
-#!/usr/bin/env zsh
-
 # Fig pre block. Keep at the top of this file.
 . "$HOME/.fig/shell/zshrc.pre.zsh"
+#!/usr/bin/env zsh
+
 
 # Prompt for spelling correction of commands.
 setopt CORRECT
@@ -121,3 +121,5 @@ eval "$(/opt/homebrew/bin/brew shellenv)"
 
 # Fig post block. Keep at the bottom of this file.
 . "$HOME/.fig/shell/zshrc.post.zsh"
+
+source /Users/kenny/.config/broot/launcher/bash/br
