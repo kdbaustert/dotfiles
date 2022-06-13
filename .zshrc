@@ -1,24 +1,16 @@
-# Fig pre block. Keep at the top of this file.
-. "$HOME/.fig/shell/zshrc.pre.zsh"
 #!/usr/bin/env zsh
 
-# Created by Kenny B <kenny@gothamx.dev>
+# Fig pre block. Keep at the top of this file.
+. "$HOME/.fig/shell/zshrc.pre.zsh"
 
-if [ -d "$HOME/.nvm" ]; then
-	export NVM_DIR="$HOME/.nvm"
-fi
+# Prompt for spelling correction of commands.
+setopt CORRECT
 
-if [ -d "$HOME/.composer/vendor/bin" ]; then
-	export PATH="$HOME/.composer/vendor/bin:$PATH"
-fi
+# Customize spelling correction prompt.
+SPROMPT='zsh: correct %F{red}%R%f to %F{green}%r%f [nyae]? '
 
-if [ -d "$HOME/.config/composer/vendor/bin" ]; then
-	PATH="$HOME/.config/composer/vendor/bin:$PATH"
-fi
-
-[[ -f "$DOTFILES/zsh/zinit.zsh" ]] && source "$DOTFILES/zsh/zinit.zsh"
-
-[[ -f "$DOTFILES/zsh/completion.zsh" ]] && source "$DOTFILES/zsh/completion.zsh"
+# Remove path separator from WORDCHARS.
+WORDCHARS=${WORDCHARS//[\/]}
 
 # Delete % at the beginning
 unsetopt PROMPT_SP
@@ -65,9 +57,13 @@ setopt INTERACTIVECOMMENTS # recognize comments
 
 autoload colors && colors
 
-[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+[ -f "$DOTFILES/zsh/zinit.zsh" ] && source "$DOTFILES/zsh/zinit.zsh"
 
-# FZF custom Aura theme
+# COMPLETION
+source "$DOTFILES/zsh/extra/completion.zsh"
+
+[ -f "$DOTFILES/zsh/extra/fzf.zsh" ] && source "$DOTFILES/zsh/extra/fzf.zsh"
+
 export FZF_DEFAULT_OPTS=$FZF_DEFAULT_OPTS'
 --reverse
 --color=fg:-1,bg:-1,border:#4B5164,hl:#d19a66
@@ -90,19 +86,38 @@ export FZF_COMPLETION_TRIGGER=','
 bindkey -e
 bindkey \^U backward-kill-line
 
+# disable sort when completing `git checkout`
+zstyle ':completion:*:git-checkout:*' sort false
+# set descriptions format to enable group support
+zstyle ':completion:*:descriptions' format '[%d]'
+# set list-colors to enable filename colorizing
+zstyle ':completion:*' list-colors ${(s.:.)LS_COLORS}
+# preview directory's content with exa when completing cd
+zstyle ':fzf-tab:complete:cd:*' fzf-preview 'exa -1 --color=always $realpath'
+# switch group using `,` and `.`
+zstyle ':fzf-tab:*' switch-group ',' '.'
+
 # FUNCTIONS
-[[ -f $DOTFILES/zsh/functions.zsh ]] && source $DOTFILES/zsh/functions.zsh
+source "$DOTFILES/zsh/functions.zsh"
 
 # ALIASES
-[[ -f $DOTFILES/zsh/aliases.zsh ]] && source $DOTFILES/zsh/aliases.zsh
-
-source /opt/homebrew/opt/asdf/asdf.sh
+source "$DOTFILES/zsh/aliases.zsh"
 
 nvim() {
-	unset -f nvim
-	_zsh_nvm_load
-	nvim "$@"
+  unset -f nvim
+  _zsh_nvm_load
+  nvim "$@"
 }
+
+eval "$(op completion zsh)"
+
+eval $(thefuck --alias)
+
+eval "$(/opt/homebrew/bin/brew shellenv)"
+
+# tabtab source for packages
+# uninstall by removing these lines
+[[ -f ~/.config/tabtab/zsh/__tabtab.zsh ]] && . ~/.config/tabtab/zsh/__tabtab.zsh || true
 
 # Fig post block. Keep at the bottom of this file.
 . "$HOME/.fig/shell/zshrc.post.zsh"
