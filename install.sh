@@ -1,12 +1,36 @@
 #! /usr/bin/env sh
 
-DIR=$(dirname "$0")
-cd "$DIR"
+DOTFILES_DIR=$HOME/dotfiles
 
-. scripts/functions.sh
-. setup/brew.sh
-. setup/composer.sh
-. setup/npm.sh
+COLOR_GRAY="\033[1;38;5;243m"
+COLOR_BLUE="\033[1;34m"
+COLOR_GREEN="\033[1;32m"
+COLOR_RED="\033[1;31m"
+COLOR_PURPLE="\033[1;35m"
+COLOR_YELLOW="\033[1;33m"
+COLOR_NONE="\033[0m"
+
+title() {
+  echo -e "\n${COLOR_PURPLE}$1${COLOR_NONE}"
+  echo -e "${COLOR_GRAY}==============================${COLOR_NONE}\n"
+}
+
+error() {
+  echo -e "${COLOR_RED}Error: ${COLOR_NONE}$1"
+  exit 1
+}
+
+warning() {
+  echo -e "${COLOR_YELLOW}Warning: ${COLOR_NONE}$1"
+}
+
+info() {
+  echo -e "${COLOR_BLUE}Info: ${COLOR_NONE}$1"
+}
+
+success() {
+  echo -e "${COLOR_GREEN}$1${COLOR_NONE}"
+}
 
 info "Prompting for sudo password..."
 if sudo -v; then
@@ -30,73 +54,39 @@ else
   error "Failed to install XCode command line tools."
 fi
 
-# Check for Homebrew
-# if test ! $(which brew); then
-#   info 'Installing homebrew...'
-#   arm /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
-# else
-#   info 'Homebrew is already installed!'
-#   info 'Updating homebrew && upgrading all formulas'
-#   brew update && brew upgrade
-# fi
+if test ! $(which brew); then
+  info 'Installing homebrew...'
+  /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+else
+  info 'Homebrew is already installed!'
+  info 'Updating homebrew && upgrading all formulas'
+  brew update && brew upgrade
+fi
 
-# info ${taps[@]}
-# brew install ${taps[@]}
+DIR=$(dirname "$0")
+cd "$DIR"
 
-# brew update
+info "=> Installing dependencies from Brewfile..."
+brew bundle --file=$DOTFILES_DIR/homebrew/Brewfile --force
+brew analytics off
+brew doctor
 
-# Homebrew Binaries
-info 'Intalling brew binaries'
-brew install ${binaries[@]}
+info "Installing composer packages"
+composer global require "${composer[@]}"
 
-# Homebrew Fonts
-# info 'Intalling brew fonts'
-# info ${fonts[@]}
-# brew install ${fonts[@]}
+info "Creating file symlinks."
+ln -sfv "$DOTFILES_DIR/.config/colorls" ~/.config
+ln -sfv "$DOTFILES_DIR/.config/dircolors" ~/.config
+ln -sfv "$DOTFILES_DIR/.config/colorls" ~/.config
+ln -sfv "$DOTFILES_DIR/.config/svgo" ~/.config
+ln -sfv "$DOTFILES_DIR/.config/starship.toml" ~/.config
+ln -sfv "$DOTFILES_DIR/.config/fish" ~/.config
+ln -sfv "$DOTFILES_DIR/.config/lsd" ~/.config
 
-# Homebrew Applications
-# info 'Intalling brew applications'
-# brew install ${apps[@]}
+info "Setting chmod for ~/.ssh"
+chmod 700 "$HOME/.ssh"
 
-# # Composer Global packages
-# info "Installing composer global packages."
-# info ${composer[@]}
-# composer global require ${composer[@]}
+info "Setting chmod for ~/.gnupg"
+chmod 700 ~/.gnupg
 
-# # NPM Global packages
-# info "Installing npm global packages."
-# info ${npm[@]}
-# npm install -g ${npm[@]}
-
-# Setup Symlinks
-# info "Creating file symlinks."
-# ln -s "$HOME/dotfiles/.zshrc" $HOME/
-# ln -s "$HOME/dotfiles/skhd/.skhdrc" $HOME/
-# ln -s "$HOME/dotfiles/yabai/.yabairc" $HOME/
-# ln -s "$HOME/dotfiles/spacebar/.spacebarrc" $HOME/
-# ln -s "$HOME/dotfiles/neofetch/config.conf" "$HOME/.config/neofetch"
-
-# info "Setting chmod for ~/.ssh"
-# chmod 700 "$HOME/.ssh"
-
-# # Gem gobal packages
-# gem install colorls
-
-# info "Installing Laravel Valet"
-# valet composer
-# mkdir "$HOME/Sites"
-# mkdir "$HOME/Dev"
-# cd "$HOME/Sites"
-# valet park
-
-# # Global ignore
-# git config --global core.excludesFile "$HOME/.gitignore"
-
-# # Setup git user config
-# git config --global user.name "Kenny Baustert"
-# git config --global user.email "kenny@gothamx.dev"
-
-# touch "$HOME/.hushlogin"
-
-# # vim-plug
-# curl -fLo ~/.config/nvim/autoload/plug.vim --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+touch "$HOME/.hushlogin"
