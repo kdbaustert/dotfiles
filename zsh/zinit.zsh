@@ -1,186 +1,128 @@
-# Added by Zinit's installer
-if [[ ! -f $HOME/.zinit/bin/zinit.zsh ]]; then
-  print -P "%F{33}▓▒░ %F{220}Installing %F{33}DHARMA%F{220} Initiative Plugin Manager (%F{33}zdharma/zinit%F{220})…%f"
-  command mkdir -p "$HOME/.zinit" && command chmod g-rwX "$HOME/.zinit"
-  command git clone https://github.com/zdharma-continuum/zinit.git "$HOME/.zinit/bin" &&
-    print -P "%F{33}▓▒░ %F{34}Installation successful.%f%b" ||
+# #==============================================================#
+# ## Setup zinit                                                ##
+# #==============================================================#
+
+if [[ ! -f $HOME/.zi/bin/zi.zsh ]]; then
+  print -P "%F{33}▓▒░ %F{160}Installing (%F{33}z-shell/zi%F{160})…%f"
+  command mkdir -p "$HOME/.zi" && command chmod g-rwX "$HOME/.zi"
+  command git clone -q --depth=1 --branch "main" https://github.com/z-shell/zi "$HOME/.zi/bin" && \
+    print -P "%F{33}▓▒░ %F{34}Installation successful.%f%b" || \
     print -P "%F{160}▓▒░ The clone has failed.%f%b"
 fi
 
-source "${HOME}/.zinit/bin/zinit.zsh"
-autoload -Uz _zinit
-(( ${+_comps} )) && _comps[zinit]=
+source "$HOME/.zi/bin/zi.zsh"
+autoload -Uz _zi
+(( ${+_comps} )) && _comps[zi]=_zi
 
-# SSH-AGENT
-zinit light bobsoppe/zsh-ssh-agent
+declare -A _bpicks=()
+if [[ $OSTYPE == darwin* ]] && [[ $CPUTYPE == arm* ]]; then
+  _bpicks[rust]='*(x86_64|arm)*darwin*'
+  _bpicks[haskell]='*darwin*(x86_64|arm)*'
+  _bpicks[jq]='*osx*(amd64|arm)*'
+  _bpicks[gh]='*macos*(amd64|arm)*'
+  _bpicks[exa]='*macos*(x86_64|arm)*'
+  _bpicks[starship]="*aarch64-apple*.tar.gz"
+fi
 
-#####################
-# PROMPT            #
-#####################
-zinit lucid for \
-    as"command" from"gh-r" atload'eval "$(starship init zsh)"' \
-    starship/starship \
+zi light-mode for z-shell/z-a-meta-plugins @annexes @ext-git
+
+zi lucid light-mode for \
+  as"command" from"gh-r" atload'eval "$(starship init zsh)"' bpick="*aarch64-apple*.tar.gz" \
+  starship/starship
 
 setopt promptsubst
 
-# Explanation:
-# - Loading tmux first, to prevent jumps when tmux is loaded after .zshrc
-# - History plugin is loaded early (as it has some defaults) to prevent empty history stack for other plugins
-zinit lucid for \
-    atinit"
-        export ZSH_TMUX_FIXTERM=false
-        export ZSH_TMUX_AUTOSTART=false
-        export ZSH_TMUX_AUTOCONNECT=true
-        export ZSH_TMUX_DEFAULT_SESSION_NAME='</>'
-    " \
-    OMZP::tmux \
-    atinit"HIST_STAMPS=dd.mm.yyyy" \
-    OMZL::history.zsh \
+zi ice lucid wait="0" pick="asdf.sh"
+zi light $HOME/.asdf
 
+zi snippet OMZ::lib/key-bindings.zsh
 
-zinit wait lucid for \
-	OMZL::clipboard.zsh \
-	OMZL::compfix.zsh \
-	OMZL::completion.zsh \
-	OMZL::correction.zsh \
-    atload'
-        alias ..="cd .."
-        alias ...="cd ../.."
-        alias ....="cd ../../.."
-        alias .....="cd ../../../.."
-        function take() {
-            mkdir -p $@ && cd ${@:$#}
-        }
-        alias rm="rm -rf"
-    ' \
-	OMZL::directories.zsh \
-	OMZL::git.zsh \
-	OMZL::key-bindings.zsh \
-	OMZL::termsupport.zsh \
-    atload"
-        alias gcd='git checkout dev'
-        alias gce='git commit -a -e'
-    " \
-	OMZP::git \
-    djui/alias-tips \
-    https://github.com/junegunn/fzf/blob/master/shell/key-bindings.zsh \
-    https://github.com/junegunn/fzf/blob/master/shell/completion.zsh \
+zi from"gh-r" as"null" for \
+  sbin"**/fd" @sharkdp/fd \
+  sbin"**/bat" @sharkdp/bat \
+  sbin"**/bat" @sharkdp/bat \
+  sbin"**/exa -> exa" atclone"cp -vf completions/exa.zsh _exa" ogham/exa
 
-# IMPORTANT:
-# These plugins should be loaded after ohmyzsh plugins
+zi light-mode for pick'misc/quitcd/quitcd.zsh' as'program' nocompile \
+  sbin make \
+    jarun/nnn`  `
 
-zinit wait lucid for \
-    light-mode blockf atpull'zinit creinstall -q .' \
-    atinit"
-        zstyle ':completion:*' completer _expand _complete _ignored _approximate
-        zstyle ':completion:*' matcher-list 'm:{a-z}={A-Z}'
-        zstyle ':completion:*' menu select=2
-        zstyle ':completion:*' select-prompt '%SScrolling active: current selection at %p%s'
-        zstyle ':completion:*:descriptions' format '-- %d --'
-        zstyle ':completion:*:processes' command 'ps -au$USER'
-        zstyle ':completion:complete:*:options' sort false
-        zstyle ':fzf-tab:complete:_zlua:*' query-string input
-        zstyle ':completion:*:*:*:*:processes' command 'ps -u $USER -o pid,user,comm,cmd -w -w'
-        zstyle ':fzf-tab:complete:kill:argument-rest' extra-opts --preview=$extract'ps --pid=$in[(w)1] -o cmd --no-headers -w -w' --preview-window=down:3:wrap
-        zstyle ':fzf-tab:complete:cd:*' extra-opts --preview=$extract'exa -1 --color=always ${~ctxt[hpre]}$in'
-    " \
-        zsh-users/zsh-completions \
-    light-mode atinit"ZSH_AUTOSUGGEST_BUFFER_MAX_SIZE=20" atload"_zsh_autosuggest_start" \
-        zsh-users/zsh-autosuggestions \
-    light-mode atinit"
-        typeset -gA FAST_HIGHLIGHT;
-        FAST_HIGHLIGHT[git-cmsg-len]=100;
-        zpcompinit;
-        zpcdreplay;
-    " \
-        zdharma-continuum/fast-syntax-highlighting \
-        zdharma-continuum/history-search-multi-word \
-				xav-b/zsh-extend-history
+zi ice lucid wait has'fzf'
+zi light Aloxaf/fzf-tab
 
-#####################
-# PROGRAMS          #
-#####################
+zi ice wait'0b' lucid
+zi light b4b4r07/enhancd
 
-zinit wait lucid light-mode as'command' for \
-    from'gh-r' atinit'export PATH="$HOME/.yarn/bin:$PATH"' mv'yarn* -> yarn' pick"yarn/bin/yarn" bpick'*.tar.gz' \
-        yarnpkg/yarn \
+zi lucid light-mode for pick"z.sh" z-shell/z
 
-zinit wait"1a" lucid light-mode from"gh-r" as"command" for \
-    atload'
-        eval "$(zoxide init --no-aliases zsh)"
-        alias z="__zoxide_z"
-    ' mv'zoxide* -> zoxide' pick'zoxide/zoxide' \
-        @ajeetdsouza/zoxide \
-        @junegunn/fzf \
-    mv'ripgrep* -> rg' pick'rg/rg' \
-        @BurntSushi/ripgrep \
-    mv'fd* -> fd' pick'fd/fd' \
-        @sharkdp/fd \
-    mv'bat* -> bat' pick'bat/bat' \
-        @sharkdp/bat \
-    mv'delta* -> delta' pick'delta/delta' \
-        @dandavison/delta \
-    atload'
-        unalias l
-        alias l="exa -abghHlS --git --group-directories-first"
-    ' pick'bin/exa' \
-        @ogham/exa \
+zi ice lucid wait as'completion' blockf has'fd'
+zi snippet https://github.com/ohmyzsh/ohmyzsh/blob/master/plugins/fd/_fd
 
-# ENHANCD
-zinit ice wait'0b' lucid
-zinit light b4b4r07/enhancd
-export ENHANCD_FILTER=fzf:fzy:peco
+zi ice lucid wait as'completion'
+zi light zsh-users/zsh-completions
 
-# TAB COMPLETIONS
-zinit light-mode for \
-    blockf \
-        zsh-users/zsh-completions \
-    as'program' atclone'rm -f ^(rgg|agv)' \
-        lilydjwg/search-and-view \
-    atclone'dircolors -b LS_COLORS > c.zsh' atpull'%atclone' pick'c.zsh' \
-        trapd00r/LS_COLORS \
-    src'etc/git-extras-completion.zsh' \
-        tj/git-extras
-zinit wait'1' lucid for \
-    OMZ::lib/git.zsh
+zi ice wait lucid as'program' from'gh-r' sbin'**/delta -> delta'
+zi light dandavison/delta
 
-if whence dircolors >/dev/null; then
-  eval "$(dircolors -b)"
-  zstyle ':completion:*' list-colors ${(s.:.)LS_COLORS}
-  alias ls='ls --color'
-else
-  export CLICOLOR=1
-  zstyle ':completion:*' list-colors ''
-fi
+zi ice lucid wait as'program' from"gh-r" has'fzf'
+zi light denisidoro/navi
 
-zinit ice wait'1' lucid
-zinit light Aloxaf/fzf-tab
+zi ice wait"2" as"command" from"gh-r" lucid \
+  mv"*zoxide* -> zoxide" \
+  atclone"./zoxide init --cmd j zsh > init.zsh" \
+  atpull"%atclone" src"init.zsh" nocompile'!'
+zi light ajeetdsouza/zoxide
 
-zinit wait"2" lucid as"program" from"gh-r" for \
-      mv"lsd-*/lsd -> lsd" atload"alias ls='lsd'" Peltoche/lsd
+zi light-mode for id-as'pnpm' from'gh-r' bpick'*macos*(amd64|arm)*' as'program' \
+  atinit'export PNPM_HOME=$ZPFX/bin; [[ -z $NODE_PATH ]] && \
+  export NODE_PATH=$PWD' sbin'pnpm* -> pnpm' nocompile \
+  pnpm/pnpm
 
-# # fzf - fuzzy finder
-zinit ice from"gh-r" as"program"
-zinit load junegunn/fzf-bin
+zi ice from'gh-r' as'program' mv'vivid* vivid' sbin'**/vivid(.exe|) -> vivid'
+zi light @sharkdp/vivid
 
-# z - jump around
-zinit wait lucid for \
-	"agkozak/zsh-z"
+zi lucid as'command' pick'bin/pyenv' atinit'export PYENV_ROOT="$PWD"' \
+    atclone'PYENV_ROOT="$PWD" ./libexec/pyenv init - > zpyenv.zsh' \
+    atpull"%atclone" src"zpyenv.zsh" nocompile'!' for \
+        pyenv/pyenv
 
-# ─── fuzzy movement and directory choosing ────────────────────────────────────
-# autojump command
-# https://github.com/rupa/z
-zinit ice wait'0c' lucid
-zinit light rupa/z
+zi wait lucid for \
+ atinit"ZI[COMPINIT_OPTS]=-C; zicompinit; zicdreplay" \
+  z-shell/fast-syntax-highlighting \
+ blockf \
+    zsh-users/zsh-completions \
+ atload"!_zsh_autosuggest_start" \
+  zsh-users/zsh-autosuggestions
 
-zinit for \
-    light-mode zpm-zsh/colors \
-    light-mode laggardkernel/zsh-thefuck \
-	ntnyq/omz-plugin-pnpm
+zi ice lucid wait as'completion' blockf pick'src/go' src'src/zsh'
+zi light zchee/zsh-completions
+
+ZSH_AUTOSUGGEST_USE_ASYNC=true
+
+zi ice wait lucid
+zi snippet "OMZ::lib/completion.zsh"
+
+zi wait lucid for \
+  has'exa' atinit'AUTOCD=1' \
+  zplugin/zsh-exa
+
+zi ice wait lucid pick"h.sh"
+zi light paoloantinori/hhighlighter
+
+zi load ellie/atuin
+
+zi ice wait lucid reset \
+ atclone"[[ -z \${commands[dircolors]} ]] && local P=g
+    \${P}sed -i '/DIR/c\DIR 38;5;63;1' LS_COLORS
+    \${P}dircolors -b LS_COLORS >! clrs.zsh" \
+ atpull'%atclone' pick"clrs.zsh" nocompile'!' \
+ atload'zstyle ":completion:*:default" list-colors "${(s.:.)LS_COLORS}";'
+zi light trapd00r/LS_COLORS
+
+zi light-mode for from'gh-r' as'program' \
+  atinit'export PATH="$HOME/.yarn/bin:$PATH"' mv'yarn* -> yarn' \
+  pick"yarn/bin/yarn" bpick'*.tar.gz' \
+    yarnpkg/yarn
 
 export NVM_LAZY_LOAD=true
-zinit light lukechilds/zsh-nvm
-
-source "$HOME/.zinit/bin/zinit.zsh"
-zinit ice lucid nocompile wait'0e' nocompletions
-zinit load MenkeTechnologies/zsh-more-completions
+zi light lukechilds/zsh-nvm
