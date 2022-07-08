@@ -67,11 +67,15 @@ zi light dandavison/delta
 zi ice lucid wait as'program' from"gh-r" has'fzf'
 zi light denisidoro/navi
 
-zi ice wait"2" as"command" from"gh-r" lucid \
-  mv"*zoxide* -> zoxide" \
-  atclone"./zoxide init --cmd j zsh > init.zsh" \
-  atpull"%atclone" src"init.zsh" nocompile'!'
+zi light zpm-zsh/dircolors-material
+
+zi ice as"command" from"gh-r" mv"zoxide* -> zoxide" \
+  eval"./zoxide init zsh"
 zi light ajeetdsouza/zoxide
+
+zi ice eval"dircolors -b LS_COLORS" \
+  atload'zstyle ":completion:*" list-colors “${(s.:.)LS_COLORS}”'
+zi light trapd00r/LS_COLORS
 
 zi light-mode for id-as'pnpm' from'gh-r' bpick'*macos*(amd64|arm)*' as'program' \
   atinit'export PNPM_HOME=$ZPFX/bin; [[ -z $NODE_PATH ]] && \
@@ -126,3 +130,12 @@ zi light-mode for from'gh-r' as'program' \
 
 export NVM_LAZY_LOAD=true
 zi light lukechilds/zsh-nvm
+
+zi ice wait"0" lucid
+zi light htlsne/zinit-rbenv
+
+myfzf () {
+        local bindir="/home/sg/.zi/plugins/junegunn---fzf"
+        local -x GEM_HOME="/home/sg/.zi/plugins/junegunn---fzf"
+        "$bindir"/"fzf" "$@"
+}
