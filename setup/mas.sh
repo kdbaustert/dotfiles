@@ -1,3 +1,5 @@
+#!/usr/bin/env zsh
+
 mas install 497799835  # Xcode
 mas install 975937182  # Fantastical
 mas install 1507782672 # Pixea
