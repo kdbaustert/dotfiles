@@ -1,6 +1,7 @@
 # Fig pre block. Keep at the top of this file.
-. "$HOME/.fig/shell/zprofile.pre.zsh"
-# export LS_COLORS=$(vivid generate ayu)
+[[ -f "$HOME/.fig/shell/zprofile.pre.zsh" ]] && . "$HOME/.fig/shell/zprofile.pre.zsh"
+
+export LS_COLORS=$(vivid generate ayu)
 export LANG=en_US.UTF-8
 export LC_ALL=en_US.UTF-8
 export COLORTERM="truecolor"
@@ -26,6 +27,7 @@ export PATH="$PNPM_HOME:$PATH"
 export SSH_AUTH_SOCK=~/Library/Group\ Containers/2BUA8C4S2C.com.1password/t/agent.sock
 # export LDFLAGS="-L/usr/local/opt/zlib/lib -L/usr/local/opt/bzip2/lib"
 # export CPPFLAGS="-I/usr/local/opt/zlib/include -I/usr/local/opt/bzip2/include"
+export PATH="/opt/homebrew/bin:/usr/local/bin:${PATH}"
 
 source /Users/kenny/.zi/plugins/tj---git-extras/etc/git-extras-completion.zsh
 
@@ -41,6 +43,7 @@ if [[ -z "$TMUX" ]]; then
   export TERM="xterm-256color"
 fi
 
-# Fig post block. Keep at the bottom of this file.
-. "$HOME/.fig/shell/zprofile.post.zsh"
 export PATH="/usr/local/mysql/bin:$PATH"
+
+# Fig post block. Keep at the bottom of this file.
+[[ -f "$HOME/.fig/shell/zprofile.post.zsh" ]] && . "$HOME/.fig/shell/zprofile.post.zsh"
