@@ -82,6 +82,7 @@ ln -sfv "$DOTFILES_DIR/.config/svgo" ~/.config
 ln -sfv "$DOTFILES_DIR/.config/starship.toml" ~/.config
 ln -sfv "$DOTFILES_DIR/.config/fish" ~/.config
 ln -sfv "$DOTFILES_DIR/.config/lsd" ~/.config
+ln -sfv "$DOTFILES_DIR/.config/kitty" ~/.config
 
 info "Setting chmod for ~/.ssh"
 chmod 700 "$HOME/.ssh"
