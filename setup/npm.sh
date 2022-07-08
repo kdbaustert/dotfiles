@@ -22,7 +22,6 @@ npm=(
   firebase-tools
   ntl
   prettier-init
-  typescript
   generator-alfred
   alfred-fkill
   browser-sync
@@ -31,5 +30,5 @@ npm=(
   svgo
   npm-check-updates
   blade-formatter
-  update
+  gitignore.cli
 )
