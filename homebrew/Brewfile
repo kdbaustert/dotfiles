@@ -78,7 +78,6 @@ brew "mkcert"
 brew "nss"
 brew "shfmt"
 brew "shellcheck"
-brew "broot"
 brew "khanhas/tap/spicetify-cli"
 
 # Development
