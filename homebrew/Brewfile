@@ -81,7 +81,6 @@ brew "shellcheck"
 brew "khanhas/tap/spicetify-cli"
 
 # Development
-brew "nvm"
 brew "php"
 brew "php@8.0"
 brew "php@7.4"
