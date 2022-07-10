@@ -24,7 +24,7 @@ if [[ $OSTYPE == darwin* ]] && [[ $CPUTYPE == arm* ]]; then
   _bpicks[starship]="*aarch64-apple*.tar.gz"
 fi
 
-zi light-mode for z-shell/z-a-meta-plugins @annexes @ext-git
+zi light-mode for z-shell/z-a-meta-plugins @annexes @ext-git z-shell/H-S-MW
 
 zi lucid light-mode for \
   as"command" from"gh-r" atload'eval "$(starship init zsh)"' bpick="*aarch64-apple*.tar.gz" \
@@ -82,8 +82,8 @@ zi light-mode for id-as'pnpm' from'gh-r' bpick'*macos*(amd64|arm)*' as'program' 
   export NODE_PATH=$PWD' sbin'pnpm* -> pnpm' nocompile \
   pnpm/pnpm
 
-zi ice from'gh-r' as'program' mv'vivid* vivid' sbin'**/vivid(.exe|) -> vivid'
-zi light @sharkdp/vivid
+# zi ice from'gh-r' as'program' mv'vivid* vivid' sbin'**/vivid(.exe|) -> vivid'
+# zi light @sharkdp/vivid
 
 zi lucid as'command' pick'bin/pyenv' atinit'export PYENV_ROOT="$PWD"' \
     atclone'PYENV_ROOT="$PWD" ./libexec/pyenv init - > zpyenv.zsh' \
@@ -91,7 +91,7 @@ zi lucid as'command' pick'bin/pyenv' atinit'export PYENV_ROOT="$PWD"' \
         pyenv/pyenv
 
 zi wait lucid for \
- atinit"ZI[COMPINIT_OPTS]=-C; zicompinit; zicdreplay" \
+ atinit"ZI[COMPINIT_OPTS]=-C; zpcompinit; zicompinit; zicdreplay" \
   z-shell/fast-syntax-highlighting \
  blockf \
     zsh-users/zsh-completions \
@@ -112,6 +112,7 @@ zi wait lucid for \
 
 zi ice wait lucid pick"h.sh"
 zi light paoloantinori/hhighlighter
+zi light zpm-zsh/ssh
 
 zi load ellie/atuin
 
@@ -127,9 +128,6 @@ zi light-mode for from'gh-r' as'program' \
   atinit'export PATH="$HOME/.yarn/bin:$PATH"' mv'yarn* -> yarn' \
   pick"yarn/bin/yarn" bpick'*.tar.gz' \
     yarnpkg/yarn
-
-export NVM_LAZY_LOAD=true
-zi light lukechilds/zsh-nvm
 
 zi ice wait"0" lucid
 zi light htlsne/zinit-rbenv
