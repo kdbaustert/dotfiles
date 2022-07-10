@@ -144,6 +144,7 @@ alias ip="dig +short myip.opendns.com @resolver1.opendns.com"
 alias stfu="osascript -e 'set volume output muted true'"
 
 # Brew
+alias brew='env PATH="${PATH//$(pyenv root)\/shims:/}" brew'
 alias brewl='brew list'
 alias brewi='brew install'
 alias brewri='brew reinstall'
