@@ -5804,13 +5804,13 @@
 			<key>Name</key>
 			<string>Kenny</string>
 			<key>Non Ascii Font</key>
-			<string>HackNerdFontComplete-Regular 17</string>
+			<string>HackNerdFontComplete-Regular 16.5</string>
 			<key>Non-ASCII Anti Aliased</key>
 			<true/>
 			<key>Non-ASCII Ligatures</key>
 			<true/>
 			<key>Normal Font</key>
-			<string>FiraMonoNerdFontCompleteM-Medium 17</string>
+			<string>JetBrainsMonoRoman-Bold 16.5</string>
 			<key>Only The Default BG Color Uses Transparency</key>
 			<true/>
 			<key>Option Key Sends</key>
