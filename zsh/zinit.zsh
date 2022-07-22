@@ -132,6 +132,9 @@ zi light-mode for from'gh-r' as'program' \
 zi ice wait"0" lucid
 zi light htlsne/zinit-rbenv
 
+export NVM_LAZY_LOAD=true
+zi light lukechilds/zsh-nvm
+
 myfzf () {
         local bindir="/home/sg/.zi/plugins/junegunn---fzf"
         local -x GEM_HOME="/home/sg/.zi/plugins/junegunn---fzf"
