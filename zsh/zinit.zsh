@@ -77,13 +77,10 @@ zi ice eval"dircolors -b LS_COLORS" \
   atload'zstyle ":completion:*" list-colors “${(s.:.)LS_COLORS}”'
 zi light trapd00r/LS_COLORS
 
-zi light-mode for id-as'pnpm' from'gh-r' bpick'*macos*(amd64|arm)*' as'program' \
+zi light-mode for id-as'pnpm' from'gh-r' bpick'*-linux-x64' as'program' \
   atinit'export PNPM_HOME=$ZPFX/bin; [[ -z $NODE_PATH ]] && \
   export NODE_PATH=$PWD' sbin'pnpm* -> pnpm' nocompile \
-  pnpm/pnpm
-
-# zi ice from'gh-r' as'program' mv'vivid* vivid' sbin'**/vivid(.exe|) -> vivid'
-# zi light @sharkdp/vivid
+    pnpm/pnpm
 
 zi lucid as'command' pick'bin/pyenv' atinit'export PYENV_ROOT="$PWD"' \
     atclone'PYENV_ROOT="$PWD" ./libexec/pyenv init - > zpyenv.zsh' \
@@ -134,6 +131,9 @@ zi light htlsne/zinit-rbenv
 
 export NVM_LAZY_LOAD=true
 zi light lukechilds/zsh-nvm
+
+zi ice wait'0'
+zi light wfxr/forgit
 
 myfzf () {
         local bindir="/home/sg/.zi/plugins/junegunn---fzf"
