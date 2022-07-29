@@ -53,6 +53,11 @@ alias sf='fasd -sif'     # interactive file selection
 alias z='fasd_cd -d'     # cd, same functionality as j in autojump
 alias zz='fasd_cd -d -i' # cd with interactive selection
 
+# FD / Find
+alias f=fd
+alias find=fd
+alias ffind=find
+
 if which exa &>/dev/null; then
   alias ls='exa --icons --classify'
   alias l='exa -a -lgmH --icons -G'
@@ -191,22 +196,39 @@ alias npmsd='npm install --save-dev'
 alias npmrw='npm run watch'
 alias npmu='npm run uninstall'
 alias npmc='npm install & composer install'
+alias nx="npx"
+
+#PNPM
+alias pi="pnpm install"
+alias pid="pnpm install --save-dev"
+alias pr="pnpm run"
+alias prb="pnpm run build"
+alias prcl="pnpm run clean"
+alias prc="pnpm run check"
+alias prd="pnpm run dev"
+alias prdp="pnpm run deploy"
+alias prf="pnpm run fmt"
+alias prl="pnpm run lint"
+alias prs="pnpm run start"
+alias prt="pnpm run test"
+alias px="pnpx"
 
 # Yarn
-alias y='yarn'
-alias yi='yarn init'
-alias ya='yarn add'
-alias yad='yarn add --dev'
-alias yga='yarn global add'
-alias yr='yarn run'
-alias ys='yarn start'
-alias yis='yarn install && yarn start'
-alias yrm='yarn remove'
-alias yup='yarn upgrade'
-alias ycl='yarn clean'
-alias ych='yarn check'
-alias yt='yarn test'
-alias ycc='yarn cache clean'
+alias y="yarn"
+alias ya="yarn add"
+alias yad="yarn add -D"
+alias yb="yarn build"
+alias yc="yarn clean"
+alias yd="yarn dev"
+alias yi="yarn install"
+alias yl="yarn lint"
+alias yr="yarn run"
+alias yrm="yarn remove"
+alias ys="yarn start"
+alias yt="yarn test"
+alias yu="yarn upgrade-interactive --latest"
+alias yw="yarn workspace"
+alias yws="yarn workspaces"
 
 # Nvm
 alias nvmci='nvm install'
@@ -216,24 +238,39 @@ alias nvmv='nvm version'
 alias nvmlr='nvm ls-remote'
 
 # Git
-alias g='git'
-alias ga='git add'
-alias gaa='git add --all'
-alias gb='git branch'
-alias gc='git commit -v'
-alias gc!='git commit -v --amend'
-alias gca='git commit -v -a'
-alias gca!='git commit -v -a --amend'
-alias gco='git checkout'
-alias gd='git diff'
-alias gl='git pull'
-alias glg='git log --stat'
-alias glog='git log --oneline --decorate --graph'
-alias gm='git merge'
-alias gp='git push'
-alias gst='git status'
-alias lg='lazygit'
-alias gcl='git clone'
+alias g="git"
+alias ga="git add"
+alias gaa="git add --all"
+alias gb="git branch"
+alias gc!="git commit --amend --no-edit"
+alias gc="git commit"
+alias gca!="git commit -a --amend --no-edit"
+alias gca="git commit -a"
+alias gcam!="git commit -a --amend"
+alias gcam="git commit -am"
+alias gcl="git clean"
+alias gcm!="git commit --amend"
+alias gcm="git commit -m"
+alias gco="git checkout"
+alias gcob="git checkout -b"
+alias gd="git diff"
+alias gds="git diff --staged"
+alias gd~="git diff HEAD~"
+alias gf="git fetch"
+alias gl='git log --pretty=oneline --abbrev-commit'
+alias gp="git pull"
+alias gps="git push"
+alias gr="git reset"
+alias gr~="git reset HEAD~"
+alias grh="git reset --hard"
+alias grs="git reset --soft"
+alias gs="git status -sb"
+alias gst="git stash"
+alias gstp="git stash pop"
+alias gsts="git stash save"
+alias gui="gitui"
+alias gwip!="git add --all && git commit -a --amend --no-edit"
+alias gwip="git add --all && git commit -am 'WIP'"
 
 # Git Large Storage
 alias gitli='git lfs install'
