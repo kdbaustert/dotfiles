@@ -132,9 +132,6 @@ zi light htlsne/zinit-rbenv
 export NVM_LAZY_LOAD=true
 zi light lukechilds/zsh-nvm
 
-zi ice wait'0'
-zi light wfxr/forgit
-
 myfzf () {
         local bindir="/home/sg/.zi/plugins/junegunn---fzf"
         local -x GEM_HOME="/home/sg/.zi/plugins/junegunn---fzf"
