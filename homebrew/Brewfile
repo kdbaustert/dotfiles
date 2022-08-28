@@ -81,6 +81,7 @@ brew "shellcheck"
 brew "khanhas/tap/spicetify-cli"
 brew "switchaudio-osx"
 brew "bluetoothconnector"
+brew "atuin"
 
 # Development
 brew "php"
