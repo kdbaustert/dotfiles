@@ -13,6 +13,7 @@ alias search-history='$(history | cut -c8- | sort -u | pick)'
 alias genpass='LC_ALL=C tr -dc "[:alnum:]" < /dev/urandom | head -c 20 | pbcopy'
 alias purgemem='sudo purge'
 alias clearDNSCache='sudo dscacheutil -flushcache && sudo killall -HUP mDNSResponder'
+alias cleandotfiles=find . -type f -name '*.DS_Store' -ls -delete
 
 # Directories
 alias desk="cd ~/desktop"
@@ -44,19 +45,14 @@ alias wget='wget -c'
 alias mkcd=mcd
 alias v="nvim"
 
-alias a='fasd -a'        # any
-alias s='fasd -si'       # show / search / select
-alias d='fasd -d'        # directory
-alias f='fasd -f'        # file
+alias a='fasd -a'  # any
+alias s='fasd -si' # show / search / select
+alias d='fasd -d'  # directory
+# alias f='fasd -f'        # file
 alias sd='fasd -sid'     # interactive directory selection
 alias sf='fasd -sif'     # interactive file selection
 alias z='fasd_cd -d'     # cd, same functionality as j in autojump
 alias zz='fasd_cd -d -i' # cd with interactive selection
-
-# FD / Find
-alias f=fd
-alias find=fd
-alias ffind=find
 
 if which exa &>/dev/null; then
   alias ls='exa --icons --classify'
