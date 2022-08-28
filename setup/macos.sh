@@ -8,9 +8,9 @@ sudo -v
 
 # Keep-alive: update existing `sudo` time stamp until `.macos` has finished
 while true; do
-	sudo -n true
-	sleep 60
-	kill -0 "$$" || exit
+  sudo -n true
+  sleep 60
+  kill -0 "$$" || exit
 done 2>/dev/null &
 
 ## General UI/UXs
@@ -137,7 +137,7 @@ defaults write com.apple.screensaver askForPasswordDelay -int 0
 
 # Finder Location to Home Folder
 defaults write com.apple.finder NewWindowTarget -string "PfLo" &&
-	defaults write com.apple.finder NewWindowTargetPath -string "file://${HOME}"
+  defaults write com.apple.finder NewWindowTargetPath -string "file://${HOME}"
 
 # Finder: disable window animations and Get Info animations
 defaults write com.apple.finder DisableAllAnimations -bool true
