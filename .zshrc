@@ -1,7 +1,4 @@
-# Fig pre block. Keep at the top of this file.
-[[ -f "$HOME/.fig/shell/zshrc.pre.zsh" ]] && . "$HOME/.fig/shell/zshrc.pre.zsh"
 #!/usr/bin/env zsh
-
 
 # Prompt for spelling correction of commands.
 setopt CORRECT
@@ -122,6 +119,3 @@ eval "$(/opt/homebrew/bin/brew shellenv)"
 source /Users/kenny/.config/broot/launcher/bash/br
 
 eval "$(rbenv init - zsh)"
-
-# Fig post block. Keep at the bottom of this file.
-[[ -f "$HOME/.fig/shell/zshrc.post.zsh" ]] && . "$HOME/.fig/shell/zshrc.post.zsh"
