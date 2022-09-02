@@ -31,4 +31,5 @@ npm=(
   npm-check-updates
   blade-formatter
   gitignore.cli
+  @phartenfeller/alfred-vscode-workspaces
 )
