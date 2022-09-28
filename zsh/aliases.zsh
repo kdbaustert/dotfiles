@@ -13,7 +13,7 @@ alias search-history='$(history | cut -c8- | sort -u | pick)'
 alias genpass='LC_ALL=C tr -dc "[:alnum:]" < /dev/urandom | head -c 20 | pbcopy'
 alias purgemem='sudo purge'
 alias clearDNSCache='sudo dscacheutil -flushcache && sudo killall -HUP mDNSResponder'
-alias cleandotfiles=find . -type f -name '*.DS_Store' -ls -delete
+alias cleandotfiles="find . -type f -name '*.DS_Store' -ls -delete"
 
 # Directories
 alias desk="cd ~/desktop"
