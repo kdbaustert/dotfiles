@@ -4513,7 +4513,7 @@
 			<key>Guid</key>
 			<string>A5BF518C-DD4F-409B-BB00-E22DA7F31513</string>
 			<key>Horizontal Spacing</key>
-			<real>0.96999999999999997</real>
+			<real>0.91000000000000003</real>
 			<key>Icon</key>
 			<integer>1</integer>
 			<key>Idle Code</key>
@@ -4864,7 +4864,7 @@
 			<key>Non-ASCII Ligatures</key>
 			<true/>
 			<key>Normal Font</key>
-			<string>RobotoMonoNerdFontCompleteM-Regular 17</string>
+			<string>RobotoMonoNerdFontCompleteM-Medium 16.5</string>
 			<key>Only The Default BG Color Uses Transparency</key>
 			<true/>
 			<key>Option Key Sends</key>
