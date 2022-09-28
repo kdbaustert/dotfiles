@@ -132,6 +132,9 @@ zi light htlsne/zinit-rbenv
 export NVM_LAZY_LOAD=true
 zi light lukechilds/zsh-nvm
 
+# zi ice lucid wait"0a" from"gh-r" as"program" atload'eval "$(mcfly init zsh)"'
+# zi light cantino/mcfly
+
 myfzf () {
         local bindir="/home/sg/.zi/plugins/junegunn---fzf"
         local -x GEM_HOME="/home/sg/.zi/plugins/junegunn---fzf"
