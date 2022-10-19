@@ -53,7 +53,7 @@ zi light Aloxaf/fzf-tab
 zi ice wait'0b' lucid
 zi light b4b4r07/enhancd
 
-zi lucid light-mode for pick"z.sh" z-shell/z
+# zi lucid light-mode for pick"z.sh" z-shell/z
 
 zi ice lucid wait as'completion' blockf has'fd'
 zi snippet https://github.com/ohmyzsh/ohmyzsh/blob/master/plugins/fd/_fd
