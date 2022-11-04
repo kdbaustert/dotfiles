@@ -1,3 +1,5 @@
+# Fig pre block. Keep at the top of this file.
+[[ -f "$HOME/.fig/shell/zshrc.pre.zsh" ]] && builtin source "$HOME/.fig/shell/zshrc.pre.zsh"
 #!/usr/bin/env zsh
 
 # Prompt for spelling correction of commands.
@@ -116,6 +118,13 @@ eval "$(/opt/homebrew/bin/brew shellenv)"
 # uninstall by removing these lines
 [[ -f ~/.config/tabtab/zsh/__tabtab.zsh ]] && . ~/.config/tabtab/zsh/__tabtab.zsh || true
 
-source /Users/kenny/.config/broot/launcher/bash/br
+# source /Users/kenny/.config/broot/launcher/bash/br
 
 eval "$(rbenv init - zsh)"
+
+eval "$(atuin init zsh)"
+
+source /Users/kenny/.config/broot/launcher/bash/br
+
+# Fig post block. Keep at the bottom of this file.
+[[ -f "$HOME/.fig/shell/zshrc.post.zsh" ]] && builtin source "$HOME/.fig/shell/zshrc.post.zsh"
