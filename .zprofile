@@ -1,3 +1,5 @@
+# Fig pre block. Keep at the top of this file.
+[[ -f "$HOME/.fig/shell/zprofile.pre.zsh" ]] && builtin source "$HOME/.fig/shell/zprofile.pre.zsh"
 # export LS_COLORS=$(vivid generate ayu)
 export LANG=en_US.UTF-8
 export LC_ALL=en_US.UTF-8
@@ -39,3 +41,6 @@ if [[ -z "$TMUX" ]]; then
 fi
 
 export PATH="/usr/local/mysql/bin:$PATH"
+
+# Fig post block. Keep at the bottom of this file.
+[[ -f "$HOME/.fig/shell/zprofile.post.zsh" ]] && builtin source "$HOME/.fig/shell/zprofile.post.zsh"
