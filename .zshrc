@@ -126,5 +126,7 @@ eval "$(atuin init zsh)"
 
 source /Users/kenny/.config/broot/launcher/bash/br
 
+source /Users/kenny/.config/op/plugins.sh
+
 # Fig post block. Keep at the bottom of this file.
 [[ -f "$HOME/.fig/shell/zshrc.post.zsh" ]] && builtin source "$HOME/.fig/shell/zshrc.post.zsh"
