@@ -1,33 +1,31 @@
 [user]
-name = kdbaustert
-email = kenny@gothamx.dev
-	signingkey = 4A77FB33FAFB95DA
+name = Kenny Baustert
+email = kenny@kennyb.dev
+signingkey = ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIE8Pf89XbvcJ3WHvjrP/03p+vNco/62fkAvRUGf/EPwc
 [credential]
-helper = osxkeychain
+helper = cache --timeout=36000
 [filter "lfs"]
 smudge = git-lfs smudge -- %f
 process = git-lfs filter-process
 required = true
 clean = git-lfs clean -- %f
 [init]
-	defaultBranch = master
-[commit]
-	gpgsign = true
+defaultBranch = master
 [color]
-  ui = auto
+ui = auto
 
 [color "branch"]
-  current = yellow
-  local = 241
-  remote = green
+current = yellow
+local = 241
+remote = green
 
 [color "diff"]
-  meta = yellow
-  frag = magenta
-  old = red
-  new = green
+meta = yellow
+frag = magenta
+old = red
+new = green
 
 [color "status"]
-  added = green
-  changed = yellow
-  untracked = magenta
+added = green
+changed = yellow
+untracked = magenta
