@@ -1,5 +1,3 @@
-# Fig pre block. Keep at the top of this file.
-[[ -f "$HOME/.fig/shell/zprofile.pre.zsh" ]] && builtin source "$HOME/.fig/shell/zprofile.pre.zsh"
 # export LS_COLORS=$(vivid generate ayu)
 export LANG=en_US.UTF-8
 export LC_ALL=en_US.UTF-8
@@ -16,21 +14,20 @@ export VISUAL=$EDITOR
 export WORDCHARS='~!#$%^&*(){}[]<>?.+;'
 export PATH="/opt/homebrew/bin:$PATH"
 export PATH="/opt/homebrew/sbin:$PATH"
-export PATH="/opt/homebrew/bin:/usr/local/bin:${PATH}"
+# export PATH="/opt/homebrew/bin:/usr/local/bin:${PATH}"
 export PYENV_ROOT="$HOME/.pyenv"
 export GPG_TTY=$(tty)
 export NTL_RUNNER=yarn
 export NVM_COLORS='cmgRY'
 export PATH="$PATH:$HOME/.spicetify"
-export PATH="/opt/homebrew/opt/unzip/bin:$PATH"
-export SSH_AUTH_SOCK=~/Library/Group\ Containers/2BUA8C4S2C.com.1password/t/agent.sock
-export PATH="/opt/homebrew/bin:/usr/local/bin:${PATH}"
+# export PATH="/opt/homebrew/opt/unzip/bin:$PATH"
+# export PATH="/opt/homebrew/bin:/usr/local/bin:${PATH}"
 
-source /Users/kenny/.zi/plugins/tj---git-extras/etc/git-extras-completion.zsh
+# source /Users/kenny/.zi/plugins/tj---git-extras/etc/git-extras-completion.zsh
 
-if [ -d "$HOME/.composer/vendor/bin" ]; then
-  export PATH="$HOME/.composer/vendor/bin:$PATH"
-fi
+# if [ -d "$HOME/.composer/vendor/bin" ]; then
+#   export PATH="$HOME/.composer/vendor/bin:$PATH"
+# fi
 
 if [ -d "$HOME/.nvm" ]; then
   export NVM_DIR="$HOME/.nvm"
@@ -39,8 +36,3 @@ fi
 if [[ -z "$TMUX" ]]; then
   export TERM="xterm-256color"
 fi
-
-export PATH="/usr/local/mysql/bin:$PATH"
-
-# Fig post block. Keep at the bottom of this file.
-[[ -f "$HOME/.fig/shell/zprofile.post.zsh" ]] && builtin source "$HOME/.fig/shell/zprofile.post.zsh"
