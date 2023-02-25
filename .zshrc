@@ -123,3 +123,5 @@ eval "$(rbenv init - zsh)"
 eval "$(atuin init zsh)"
 
 # source /Users/kenny/.config/broot/launcher/bash/br
+
+source /Users/kenny/.config/broot/launcher/bash/br
