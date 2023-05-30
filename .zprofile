@@ -14,7 +14,6 @@ export VISUAL=$EDITOR
 export WORDCHARS='~!#$%^&*(){}[]<>?.+;'
 export PATH="/opt/homebrew/bin:$PATH"
 export PATH="/opt/homebrew/sbin:$PATH"
-# export PATH="/opt/homebrew/bin:/usr/local/bin:${PATH}"
 export PYENV_ROOT="$HOME/.pyenv"
 export GPG_TTY=$(tty)
 export NTL_RUNNER=yarn
@@ -25,9 +24,13 @@ export PATH="$PATH:$HOME/.spicetify"
 
 # source /Users/kenny/.zi/plugins/tj---git-extras/etc/git-extras-completion.zsh
 
-# if [ -d "$HOME/.composer/vendor/bin" ]; then
-#   export PATH="$HOME/.composer/vendor/bin:$PATH"
-# fi
+#if [ -d "$HOME/.composer/vendor/bin" ]; then
+#export PATH="$HOME/.config/composer/vendor/bin:$PATH"
+#fi
+
+if [ -d "$HOME/.config/composer/vendor/bin:$PATH" ]; then
+  export PATH="$HOME/.config/composer/vendor/bin:$PATH"
+fi
 
 if [ -d "$HOME/.nvm" ]; then
   export NVM_DIR="$HOME/.nvm"
