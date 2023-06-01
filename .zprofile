@@ -1,3 +1,9 @@
+# Fig pre block. Keep at the top of this file.
+[[ -f "$HOME/.fig/shell/zprofile.pre.zsh" ]] && builtin source "$HOME/.fig/shell/zprofile.pre.zsh"
+emulate sh
+source ~/.profile
+emulate zsh
+
 # export LS_COLORS=$(vivid generate ayu)
 export LANG=en_US.UTF-8
 export LC_ALL=en_US.UTF-8
@@ -19,6 +25,12 @@ export GPG_TTY=$(tty)
 export NTL_RUNNER=yarn
 export NVM_COLORS='cmgRY'
 export PATH="$PATH:$HOME/.spicetify"
+export HOMEBREW_BREWFILE=$HOME/.brewfile
+
+# export HOMEBREW_CASK_OPTS="--appdir=$HOME/MyApplications"
+
+export PATH=$HOME/bin:~/.config/phpmon/bin:$PATH
+
 # export PATH="/opt/homebrew/opt/unzip/bin:$PATH"
 # export PATH="/opt/homebrew/bin:/usr/local/bin:${PATH}"
 
@@ -39,3 +51,6 @@ fi
 if [[ -z "$TMUX" ]]; then
   export TERM="xterm-256color"
 fi
+
+# Fig post block. Keep at the bottom of this file.
+[[ -f "$HOME/.fig/shell/zprofile.post.zsh" ]] && builtin source "$HOME/.fig/shell/zprofile.post.zsh"
