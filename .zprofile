@@ -26,9 +26,6 @@ export NTL_RUNNER=yarn
 export NVM_COLORS='cmgRY'
 export PATH="$PATH:$HOME/.spicetify"
 export HOMEBREW_BREWFILE=$HOME/.brewfile
-
-# export HOMEBREW_CASK_OPTS="--appdir=$HOME/MyApplications"
-
 export PATH=$HOME/bin:~/.config/phpmon/bin:$PATH
 
 # export PATH="/opt/homebrew/opt/unzip/bin:$PATH"
@@ -36,10 +33,12 @@ export PATH=$HOME/bin:~/.config/phpmon/bin:$PATH
 
 # source /Users/kenny/.zi/plugins/tj---git-extras/etc/git-extras-completion.zsh
 
+# Intel macs
 #if [ -d "$HOME/.composer/vendor/bin" ]; then
 #export PATH="$HOME/.config/composer/vendor/bin:$PATH"
 #fi
 
+# M1 Macs
 if [ -d "$HOME/.config/composer/vendor/bin:$PATH" ]; then
   export PATH="$HOME/.config/composer/vendor/bin:$PATH"
 fi
