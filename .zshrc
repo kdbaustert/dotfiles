@@ -128,6 +128,7 @@ eval "$(atuin init zsh)"
 
 source /Users/kenny/.config/broot/launcher/bash/br
 
+export PATH=$PATH:/Users/kenny/.spicetify
+
 # Fig post block. Keep at the bottom of this file.
 [[ -f "$HOME/.fig/shell/zshrc.post.zsh" ]] && builtin source "$HOME/.fig/shell/zshrc.post.zsh"
-export PATH=$PATH:/Users/kenny/.spicetify
