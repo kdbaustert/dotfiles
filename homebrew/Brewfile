@@ -8,6 +8,7 @@ tap "homebrew/cask"
 tap "shivammathur/php"
 tap "nicoverbruggen/cask"
 tap "shopify/shopify"
+tap "elastic/tap"
 
 brew "bash"
 brew "coreutils"
@@ -83,6 +84,7 @@ brew "khanhas/tap/spicetify-cli"
 brew "switchaudio-osx"
 brew "bluetoothconnector"
 brew "atuin"
+brew "elastic/tap/elasticsearch-full"
 
 # Development
 brew "php"
