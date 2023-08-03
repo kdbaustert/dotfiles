@@ -44,6 +44,7 @@ alias .....='cd ../../../..'
 alias wget='wget -c'
 alias mkcd=mcd
 alias v="nvim"
+alias lg="lazygit"
 
 alias a='fasd -a'  # any
 alias s='fasd -si' # show / search / select
@@ -86,6 +87,9 @@ fi
 alias pkey="pbcopy < ~/.ssh/id_rsa.pub"
 alias pubkey="more ~/.ssh/id_rsa.pub | pbcopy | echo '=> Public key copied to pasteboard.'"
 
+# MacOS commands
+alias testspeed="networkQuality"
+
 # Fix LSD pegging the CPU
 # https://discussions.apple.com/message/30186026#message30186026
 alias fixlsd="/System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.fram ework/Support/lsregister -kill -r -domain local -domain system -domain user ; killall Dock"
@@ -116,6 +120,9 @@ alias vls='valet links'
 alias vl='valet link'
 alias vul='valet unlink'
 alias vssl='valet secure'
+
+# PHP Artisan
+alias phpa='php artisan'
 
 # SSH
 alias sshconfig='cd ~/.ssh; code config'
