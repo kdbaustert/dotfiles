@@ -122,3 +122,10 @@ zreload() {
   # Use $SHELL if available; remove leading dash if login shell
   [[ -n "$SHELL" ]] && exec ${SHELL#-} || exec zsh
 }
+
+fd() {
+  local dir
+  dir=$(find ${1:-.} -path '*/\.*' -prune \
+    -o -type d -print 2>/dev/null | fzf +m) &&
+    cd "$dir"
+}
