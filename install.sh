@@ -76,7 +76,7 @@ composer global require "${composer[@]}"
 
 ln -sfv "$DOTFILRD_DIR/.zshrc/" $HOME
 ln -sfv "$DOTFILES_DIR/.zprofile" $HOME/.profile
-ln -sfv "$DOTFILES_DIR/.gitconfig $HOME/
+ln -sfv "$DOTFILES_DIR/.gitconfig" $HOME/
 
 info "Creating file symlinks."
 ln -sfv "$DOTFILES_DIR/.config/colorls" ~/.config
