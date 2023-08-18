@@ -53,8 +53,6 @@ zi light Aloxaf/fzf-tab
 zi ice wait'0b' lucid
 zi light b4b4r07/enhancd
 
-# zi lucid light-mode for pick"z.sh" z-shell/z
-
 zi ice lucid wait as'completion' blockf has'fd'
 zi snippet https://github.com/ohmyzsh/ohmyzsh/blob/master/plugins/fd/_fd
 
@@ -132,8 +130,11 @@ zi light htlsne/zinit-rbenv
 export NVM_LAZY_LOAD=true
 zi light lukechilds/zsh-nvm
 
-# zi ice lucid wait"0a" from"gh-r" as"program" atload'eval "$(mcfly init zsh)"'
-# zi light cantino/mcfly
+zi ice lucid wait"0a" from"gh-r" as"program" atload'eval "$(mcfly init zsh)"'
+zi light cantino/mcfly
+
+zi ice lucid wait as'completion' blockf has'fd'
+zi snippet https://github.com/ohmyzsh/ohmyzsh/blob/master/plugins/fd/_fd
 
 myfzf () {
         local bindir="/home/sg/.zi/plugins/junegunn---fzf"
