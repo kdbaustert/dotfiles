@@ -36,6 +36,10 @@ export PATH=$HOME/bin:~/.config/phpmon/bin:$PATH
 #export PATH="$HOME/.config/composer/vendor/bin:$PATH"
 #fi
 
+if [-d "$HOME/.spicetify"]; then
+  export PATH=$PATH:/Users/kenny/.spicetify
+fi
+
 # M1 Macs
 if [ -d "$HOME/.config/composer/vendor/bin:$PATH" ]; then
   export PATH="$HOME/.config/composer/vendor/bin:$PATH"
