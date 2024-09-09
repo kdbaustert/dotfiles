@@ -25,6 +25,8 @@ export NVM_COLORS='cmgRY'
 export PATH="$PATH:$HOME/.spicetify"
 export HOMEBREW_BREWFILE=$HOME/.brewfile
 export PATH=$HOME/bin:~/.config/phpmon/bin:$PATH
+#export PATH=$PATH:/Users/kenny/.spicetify
+
 
 # export PATH="/opt/homebrew/opt/unzip/bin:$PATH"
 # export PATH="/opt/homebrew/bin:/usr/local/bin:${PATH}"
@@ -35,10 +37,6 @@ export PATH=$HOME/bin:~/.config/phpmon/bin:$PATH
 #if [ -d "$HOME/.composer/vendor/bin" ]; then
 #export PATH="$HOME/.config/composer/vendor/bin:$PATH"
 #fi
-
-if [-d "$HOME/.spicetify"]; then
-  export PATH=$PATH:/Users/kenny/.spicetify
-fi
 
 # M1 Macs
 if [ -d "$HOME/.config/composer/vendor/bin:$PATH" ]; then
