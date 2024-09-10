@@ -35,7 +35,7 @@ setopt promptsubst
 zi ice lucid wait="0" pick="asdf.sh"
 zi light $HOME/.asdf
 
-zi snippet OMZ::lib/key-bindings.zsh
+# zi snippet OMZ::lib/key-bindings.zsh
 
 zi from"gh-r" as"null" for \
   sbin"**/fd" @sharkdp/fd \
@@ -53,8 +53,8 @@ zi light Aloxaf/fzf-tab
 zi ice wait'0b' lucid
 zi light b4b4r07/enhancd
 
-zi ice lucid wait as'completion' blockf has'fd'
-zi snippet https://github.com/ohmyzsh/ohmyzsh/blob/master/plugins/fd/_fd
+# zi ice lucid wait as'completion' blockf has'fd'
+# zi snippet https://github.com/ohmyzsh/ohmyzsh/blob/master/plugins/fd/_fd
 
 zi ice lucid wait as'completion'
 zi light zsh-users/zsh-completions
@@ -98,8 +98,8 @@ zi light zchee/zsh-completions
 
 ZSH_AUTOSUGGEST_USE_ASYNC=true
 
-zi ice wait lucid
-zi snippet "OMZ::lib/completion.zsh"
+# zi ice wait lucid
+# zi snippet "OMZ::lib/completion.zsh"
 
 zi wait lucid for \
   has'exa' atinit'AUTOCD=1' \
@@ -132,9 +132,6 @@ zi light lukechilds/zsh-nvm
 
 zi ice lucid wait"0a" from"gh-r" as"program" atload'eval "$(mcfly init zsh)"'
 zi light cantino/mcfly
-
-zi ice lucid wait as'completion' blockf has'fd'
-zi snippet https://github.com/ohmyzsh/ohmyzsh/blob/master/plugins/fd/_fd
 
 myfzf () {
         local bindir="/home/sg/.zi/plugins/junegunn---fzf"
