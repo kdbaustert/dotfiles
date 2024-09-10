@@ -106,7 +106,7 @@ nvim() {
   nvim "$@"
 }
 
-eval "$(op completion zsh)"
+# eval "$(op completion zsh)"
 
 eval $(thefuck --alias)
 
@@ -118,10 +118,8 @@ eval "$(/opt/homebrew/bin/brew shellenv)"
 
 # source /Users/kenny/.config/broot/launcher/bash/br
 
-eval "$(rbenv init - zsh)"
+# eval "$(rbenv init - zsh)"
 
 eval "$(atuin init zsh)"
-
-# source /Users/kenny/.config/broot/launcher/bash/br
 
 source /Users/kenny/.config/broot/launcher/bash/br
