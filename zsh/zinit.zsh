@@ -124,8 +124,8 @@ zi light-mode for from'gh-r' as'program' \
   pick"yarn/bin/yarn" bpick'*.tar.gz' \
     yarnpkg/yarn
 
-zi ice wait"0" lucid
-zi light htlsne/zinit-rbenv
+# zi ice wait"0" lucid
+# zi light htlsne/zinit-rbenv
 
 export NVM_LAZY_LOAD=true
 zi light lukechilds/zsh-nvm
