@@ -1,7 +1,6 @@
 cask_args appdir: '/Applications'
 
 tap "homebrew/bundle"
-tap "homebrew/cask-versions"
 tap "homebrew/cask-fonts"
 tap "shivammathur/php"
 tap "nicoverbruggen/cask"
@@ -78,11 +77,11 @@ brew "mkcert"
 brew "nss"
 brew "shfmt"
 brew "shellcheck"
-brew "khanhas/tap/spicetify-cli"
+# brew "khanhas/tap/spicetify-cli"
 brew "switchaudio-osx"
 brew "bluetoothconnector"
 brew "atuin"
-brew "elastic/tap/elasticsearch-full"
+# brew "elastic/tap/elasticsearch-full"
 
 # Development
 brew "php"
