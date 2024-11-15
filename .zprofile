@@ -9,9 +9,9 @@ export COLORTERM="truecolor"
 export TERM="xterm-256color"
 export DOTFILES=$HOME/dotfiles
 # export EXA_COLORS="ur=35;nnn:gr=35;nnn:tr=35;nnn:uw=34;nnn:gw=34;nnn:tw=34;nnn:ux=36;nnn:ue=36;nnn:gx=36;nnn:tx=36;nnn:uu=36;nnn:uu=38;5;235:da=38;5;238"
-export EXA_ICON_SPACING=1
-export EXA_GRID_ROWS=5
-export EXA_COLUMNS=80 exa
+export EZA_ICON_SPACING=1
+export EZA_GRID_ROWS=5
+export EZA_COLUMNS=80 exa
 export LSCOLORS=ExFxBxDxCxegedabagacad
 export EDITOR='nvim'
 export VISUAL=$EDITOR
@@ -25,8 +25,8 @@ export NVM_COLORS='cmgRY'
 export PATH="$PATH:$HOME/.spicetify"
 export HOMEBREW_BREWFILE=$HOME/.brewfile
 export PATH=$HOME/bin:~/.config/phpmon/bin:$PATH
+export PATH="$HOME/.config/composer/vendor/bin:$PATH"
 #export PATH=$PATH:/Users/kenny/.spicetify
-
 
 # export PATH="/opt/homebrew/opt/unzip/bin:$PATH"
 # export PATH="/opt/homebrew/bin:/usr/local/bin:${PATH}"
@@ -39,9 +39,9 @@ export PATH=$HOME/bin:~/.config/phpmon/bin:$PATH
 #fi
 
 # M1 Macs
-if [ -d "$HOME/.config/composer/vendor/bin:$PATH" ]; then
-  export PATH="$HOME/.config/composer/vendor/bin:$PATH"
-fi
+# if [ -d "$HOME/.config/composer/vendor/bin:$PATH" ]; then
+#   export PATH="$HOME/.config/composer/vendor/bin:$PATH"
+# fi
 
 if [ -d "$HOME/.nvm" ]; then
   export NVM_DIR="$HOME/.nvm"
