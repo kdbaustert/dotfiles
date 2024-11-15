@@ -122,4 +122,10 @@ eval "$(/opt/homebrew/bin/brew shellenv)"
 
 eval "$(atuin init zsh)"
 
-source /Users/kenny/.config/broot/launcher/bash/br
+
+# Herd injected PHP 8.3 configuration.
+export HERD_PHP_83_INI_SCAN_DIR="/Users/kenny/Library/Application Support/Herd/config/php/83/"
+
+
+# Herd injected PHP binary.
+export PATH="/Users/kenny/Library/Application Support/Herd/bin/":$PATH
