@@ -55,21 +55,21 @@ alias sf='fasd -sif'     # interactive file selection
 alias z='fasd_cd -d'     # cd, same functionality as j in autojump
 alias zz='fasd_cd -d -i' # cd with interactive selection
 
-if which exa &>/dev/null; then
-  alias ls='exa --icons --classify'
-  alias l='exa -a -lgmH --icons -G'
+if which eza &>/dev/null; then
+  alias ls='eza --icons --classify'
+  alias l='eza -a -lgmH --icons -G'
   alias la='l -@'
   alias ll='l -h'
-  alias l1='exa-1 --group-directories-first'
+  alias l1='eza-1 --group-directories-first'
   alias la1='l1 -a'
-  alias le='exa -a -lgH -s extension --group-directories-first'
-  alias lm='exa -a -lghH -s modified -m'
-  alias lu='exa -a -lghH -s modified -uU'
-  alias lt='exa -T'
-  alias llt='exa -a -lgHh -R -T'
+  alias le='eza -a -lgH -s extension --group-directories-first'
+  alias lm='eza -a -lghH -s modified -m'
+  alias lu='eza -a -lghH -s modified -uU'
+  alias lt='eza -T'
+  alias llt='eza -a -lgHh -R -T'
   alias tree='llt'
-  alias lr='exa -a -lgHh -R -L 2'
-  alias lrr='exa -a -lgHh -R'
+  alias lr='eza -a -lgHh -R -L 2'
+  alias lrr='eza -a -lgHh -R'
 else
   alias ls='lsd'
   alias la='ls -a'
