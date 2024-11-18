@@ -82,6 +82,7 @@ brew "shellcheck"
 # brew "bluetoothconnector"
 brew "atuin"
 # brew "elastic/tap/elasticsearch-full"
+brew "helix"
 
 # Development
 brew "php"
@@ -140,3 +141,4 @@ cask "raindropio"
 # cask "fman"
 cask "alt-tab"
 cask "iina"
+cask "arc"
