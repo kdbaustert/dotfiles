@@ -12,6 +12,22 @@
     {
       "files": "*.html.tpl",
       "options": { "parser": "html" }
+    },
+    {
+      "files": ["*.php"],
+      "options": {
+        "parser": "php",
+        "plugins": ["@prettier/plugin-php"],
+        "printWidth": 120,
+        "tabWidth": 4,
+        "useTabs": true,
+        "singleQuote": false,
+        "phpVersion": "8.1",
+        "trailingCommaPHP": false,
+        "braceStyle": "per-cs",
+        "requirePragma": false,
+        "insertPragma": false
+      }
     }
   ]
 }
