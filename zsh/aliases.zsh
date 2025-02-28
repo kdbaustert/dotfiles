@@ -1,6 +1,6 @@
 #!/usr/bin
 
-# Shourtcuts
+# Shortcuts
 alias c='clear'
 alias o='open .'
 alias x='exit'
@@ -23,6 +23,7 @@ alias sites="cd $HOME/Sites"
 alias dl="cd $HOME/Downloads"
 alias dotfiles="cd $HOME/dotfiles"
 alias phpdir="cd /opt/homebrew/etc/php"
+alias vscode="$HOME/Library/Application Support/Code/"
 
 alias caliases="code $DOTFILES/aliases.zsh"
 alias chammerspoon="code $HOME/.hammerspoon/init.lua"
@@ -86,6 +87,10 @@ fi
 
 alias pkey="pbcopy < ~/.ssh/id_rsa.pub"
 alias pubkey="more ~/.ssh/id_rsa.pub | pbcopy | echo '=> Public key copied to pasteboard.'"
+
+# CLAMSCAN
+alias clamf="sudo clamscan -r /"
+alias claimdb="freshclam"
 
 # MacOS commands
 alias testspeed="networkQuality"
@@ -152,6 +157,7 @@ alias ip="dig +short myip.opendns.com @resolver1.opendns.com"
 alias stfu="osascript -e 'set volume output muted true'"
 
 # Brew
+alias brewf='$(brew --prefix)'
 alias brew='env PATH="${PATH//$(pyenv root)\/shims:/}" brew'
 alias brewl='brew list'
 alias brewi='brew install'
@@ -186,7 +192,7 @@ alias wp_pages="wp post list --post_type='page'"
 # Vue cli
 alias vinspect='vue inspect'
 alias vrules='vue inspect --rules'
-alias vrule='vue inspect --rule $1'
+alias vrule='vue inspect --rule'
 alias vplugins='vue inspect --plugins'
 
 # Node.js
@@ -215,6 +221,7 @@ alias prl="pnpm run lint"
 alias prs="pnpm run start"
 alias prt="pnpm run test"
 alias px="pnpx"
+alias pug="pnpm list -g --json | jq '.[] | .dependencies | keys | .[]' -r  | xargs pnpm add -g"
 
 # Yarn
 alias y="yarn"
@@ -277,7 +284,7 @@ alias gwip="git add --all && git commit -am 'WIP'"
 
 # Git Large Storage
 alias gitli='git lfs install'
-alias gitlt='git lfs track $1'
+alias gitlt='git lfs track'
 
 # Composer
 alias c='composer'
