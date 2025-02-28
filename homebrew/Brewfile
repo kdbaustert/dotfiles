@@ -142,3 +142,14 @@ cask "raindropio"
 cask "alt-tab"
 cask "iina"
 cask "arc"
+cask "jetbrains-toolbox"
+cask "zen-browser"
+cask "mist"
+cask "chatgpt"
+cask "ghostty"
+
+## Fonts
+cask "font-fira-code"
+cask "font-monaspace"
+
+
