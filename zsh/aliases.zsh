@@ -24,6 +24,9 @@ alias dl="cd $HOME/Downloads"
 alias dotfiles="cd $HOME/dotfiles"
 alias phpdir="cd /opt/homebrew/etc/php"
 alias vscode="$HOME/Library/Application Support/Code/"
+alias icloud="$HOME/Library/Mobile\ Documents"
+alias cnc-claims="$HOME/Development/cnc-claims"
+alias claimsource="$HOME/Development/cnc-claimsource"
 
 alias caliases="code $DOTFILES/aliases.zsh"
 alias chammerspoon="code $HOME/.hammerspoon/init.lua"
@@ -46,15 +49,6 @@ alias wget='wget -c'
 alias mkcd=mcd
 alias v="nvim"
 alias lg="lazygit"
-
-alias a='fasd -a'  # any
-alias s='fasd -si' # show / search / select
-alias d='fasd -d'  # directory
-# alias f='fasd -f'        # file
-alias sd='fasd -sid'     # interactive directory selection
-alias sf='fasd -sif'     # interactive file selection
-alias z='fasd_cd -d'     # cd, same functionality as j in autojump
-alias zz='fasd_cd -d -i' # cd with interactive selection
 
 if which eza &>/dev/null; then
   alias ls='eza --icons --classify'
@@ -172,6 +166,7 @@ alias brewsl='brew services list'
 
 # FZF
 alias hist="history | fzf"
+alias f="fzf"
 
 # WordPress
 alias wp_get_salts="curl https://api.wordpress.org/secret-key/1.1/salt/"
@@ -302,3 +297,6 @@ alias ibrew='arch -x86_64 /usr/local/bin/brew'
 
 # Print each PATH entry on a separate line
 alias path='echo -e ${PATH//:/\\n}'
+
+alias ziu='zi update --all'
+alias zic='zi cclear'
