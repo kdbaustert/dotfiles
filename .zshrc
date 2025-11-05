@@ -1,7 +1,6 @@
-#!/usr/bin/env zsh
-
-# Prompt for spelling correction of commands.
-setopt CORRECT
+#!/usr/bin/env bash
+# Amazon Q pre block. Keep at the top of this file.
+[[ -f "${HOME}/Library/Application Support/amazon-q/shell/zshrc.pre.zsh" ]] && builtin source "${HOME}/Library/Application Support/amazon-q/shell/zshrc.pre.zsh"
 
 # Customize spelling correction prompt.
 SPROMPT='zsh: correct %F{red}%R%f to %F{green}%r%f [nyae]? '
@@ -22,6 +21,7 @@ SAVEHIST=10000000
 #####################
 # SETOPT            #
 #####################
+setopt CORRECT                # Prompt for spelling correction of commands.
 setopt EXTENDED_HISTORY       # record timestamp of command in HISTFILE
 setopt HIST_EXPIRE_DUPS_FIRST # delete duplicates first when HISTFILE size exceeds HISTSIZE
 setopt HIST_IGNORE_ALL_DUPS   # ignore duplicated commands history list
@@ -30,7 +30,7 @@ setopt HIST_IGNORE_SPACE      # ignore commands that start with space
 setopt SHAREHISTORY           # global history
 setopt HIST_VERIFY            # show command with history expansion to user before running it
 setopt INC_APPEND_HISTORY     # add commands to HISTFILE in order of execution
-setopt COMPLETEALIASES        # complete alisases
+setopt COMPLETEALIASES        # complete aliases
 setopt NOCORRECT              # spelling correction for commands
 setopt COMPLETE_IN_WORD       # allow completion from within a word/phrase
 setopt LIST_AMBIGUOUS         # complete as much of a completion until it gets ambiguous.
@@ -38,10 +38,10 @@ setopt HASH_LIST_ALL          # hash everything before completion
 setopt GLOB_DOTS              # no special treatment for file names with a leading dot
 setopt NO_AUTO_MENU           # require an extra TAB press to open the completion menu
 setopt NOTIFY                 # Report the status of background jobs immediately, rather than waiting until just before printing a prompt.
-setopt NO_BG_NICE             # Prevent runing all background jobs at a lower priority.
+setopt NO_BG_NICE             # Prevent running all background jobs at a lower priority.
 setopt NO_CHECK_JOBS          # Prevent reporting the status of background and suspended jobs before exiting a shell with job control. NO_CHECK_JOBS is best used only in combination with NO_HUP, else such jobs will be killed automatically.
 setopt NO_HUP                 # Prevent sending the HUP signal to running jobs when the shell exits.
-setopt NO_BEEP                # Don't beep on erros (overrides /etc/zshrc in Catalina)
+setopt NO_BEEP                # Don't beep on errors (overrides /etc/zshrc in Catalina)
 setopt ALWAYS_TO_END          # If a completion is performed with the cursor within a word, and a full completion is inserted, the cursor is moved to the end of the word
 setopt PATH_DIRS              # Perform a path search even on command names with slashes in them.
 unsetopt CASE_GLOB            # Make globbing (filename generation) not sensitive to case.
@@ -51,6 +51,7 @@ setopt LISTPACKED
 setopt AUTOMENU
 setopt AUTOCD
 setopt INTERACTIVECOMMENTS # recognize comments
+# setopt PROMPT_SUBST
 
 autoload colors && colors
 
@@ -72,13 +73,15 @@ export _ZO_FZF_OPTS=$FZF_DEFAULT_OPTS'
 --height=45%'
 
 export FZF_COMPLETION_TRIGGER=','
-
+export FUNCNEST=5000
+export NVM_LAZY_LOAD=true
 # ------------------------------------
 # Fuzzy Finder
 # ------------------------------------
 
 export FZF_DEFAULT_COMMAND='fd --exclude .git --max-depth 5 --hidden'
 export FZF_COMPLETION_TRIGGER=','
+export ZSH_AUTOSUGGEST_USE_ASYNC=true
 
 bindkey -e
 bindkey \^U backward-kill-line
@@ -122,10 +125,5 @@ eval "$(/opt/homebrew/bin/brew shellenv)"
 
 eval "$(atuin init zsh)"
 
-
-# Herd injected PHP 8.3 configuration.
-export HERD_PHP_83_INI_SCAN_DIR="/Users/kenny/Library/Application Support/Herd/config/php/83/"
-
-
-# Herd injected PHP binary.
-export PATH="/Users/kenny/Library/Application Support/Herd/bin/":$PATH
+# Amazon Q post block. Keep at the bottom of this file.
+[[ -f "${HOME}/Library/Application Support/amazon-q/shell/zshrc.post.zsh" ]] && builtin source "${HOME}/Library/Application Support/amazon-q/shell/zshrc.post.zsh"
