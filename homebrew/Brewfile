@@ -83,6 +83,9 @@ brew "shellcheck"
 brew "atuin"
 # brew "elastic/tap/elasticsearch-full"
 brew "helix"
+brew "yazi ffmpeg sevenzip jq poppler fd ripgrep fzf zoxide imagemagick font-symbols-only-nerd-font"
+brew "yazi"
+brew "btop"
 
 # Development
 brew "php"
@@ -146,10 +149,16 @@ cask "jetbrains-toolbox"
 cask "zen-browser"
 cask "mist"
 cask "chatgpt"
-cask "ghostty"
+# cask "ghostty"
+# cask "wins"
+# cask "zed"
+# cask "zen"
+# cask "cursor"
+# cask "flyenv"
 
 ## Fonts
 cask "font-fira-code"
 cask "font-monaspace"
+cask "font-symbols-only-nerd-font"
 
 
