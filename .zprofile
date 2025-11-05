@@ -1,3 +1,5 @@
+# Amazon Q pre block. Keep at the top of this file.
+[[ -f "${HOME}/Library/Application Support/amazon-q/shell/zprofile.pre.zsh" ]] && builtin source "${HOME}/Library/Application Support/amazon-q/shell/zprofile.pre.zsh"
 emulate sh
 source ~/.profile
 emulate zsh
@@ -26,6 +28,7 @@ export PATH="$PATH:$HOME/.spicetify"
 export HOMEBREW_BREWFILE=$HOME/.brewfile
 export PATH=$HOME/bin:~/.config/phpmon/bin:$PATH
 export PATH="$HOME/.config/composer/vendor/bin:$PATH"
+export PATH="/Users/kenny/Library/Electron/alias:$PATH"
 #export PATH=$PATH:/Users/kenny/.spicetify
 
 # export PATH="/opt/homebrew/opt/unzip/bin:$PATH"
@@ -43,6 +46,10 @@ export PATH="$HOME/.config/composer/vendor/bin:$PATH"
 #   export PATH="$HOME/.config/composer/vendor/bin:$PATH"
 # fi
 
+# if command -v ngrok &>/dev/null; then
+# 	eval "$(ngrok completion)"
+# fi
+
 if [ -d "$HOME/.nvm" ]; then
   export NVM_DIR="$HOME/.nvm"
 fi
@@ -50,3 +57,6 @@ fi
 if [[ -z "$TMUX" ]]; then
   export TERM="xterm-256color"
 fi
+
+# Amazon Q post block. Keep at the bottom of this file.
+[[ -f "${HOME}/Library/Application Support/amazon-q/shell/zprofile.post.zsh" ]] && builtin source "${HOME}/Library/Application Support/amazon-q/shell/zprofile.post.zsh"
