@@ -1,31 +1,62 @@
-[user]
-name = Kenny Baustert
-email = kenny@kennyb.dev
-signingkey = ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIE8Pf89XbvcJ3WHvjrP/03p+vNco/62fkAvRUGf/EPwc
-[credential]
-helper = cache --timeout=36000
 [filter "lfs"]
-smudge = git-lfs smudge -- %f
-process = git-lfs filter-process
-required = true
-clean = git-lfs clean -- %f
-[init]
-defaultBranch = master
-[color]
-ui = auto
+	clean = git-lfs clean -- %f
+	smudge = git-lfs smudge -- %f
+	process = git-lfs filter-process
+	required = true
+# [user]
+# 	email = kenny@kennyb.dev
+# 	name = Kenny B
+# 	signingkey = ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOISHjId1mlt/MUYsl1rA/J8ox77BFvqQL7e8dZWWvc5
+# [gpg]
+# 	format = ssh
+# [gpg "ssh"]
+# 	program = /Applications/1Password.app/Contents/MacOS/op-ssh-sign
+# [commit]
+# 	gpgsign = true
 
-[color "branch"]
-current = yellow
-local = 241
-remote = green
+[user]
+	email = kenny@kennyb.dev
+	name = Kenny Baustert
+[core]
+	editor = /opt/homebrew/bin/nvim
+[safe]
+	directory = /opt/homebrew/Library/Taps/homebrew/homebrew-core
+	directory = /opt/homebrew/Library/Taps/homebrew/homebrew-cask
+	directory = /opt/homebrew/Library/Taps/homebrew/homebrew-core
+	directory = /opt/homebrew/Library/Taps/homebrew/homebrew-cask
+	directory = /opt/homebrew/Library/Taps/homebrew/homebrew-core
+	directory = /opt/homebrew/Library/Taps/homebrew/homebrew-cask
+	directory = /opt/homebrew/Library/Taps/homebrew/homebrew-core
+	directory = /opt/homebrew/Library/Taps/homebrew/homebrew-cask
 
-[color "diff"]
-meta = yellow
-frag = magenta
-old = red
-new = green
+# [user]
+# name = Kenny Baustert
+# email = kenny@kennyb.dev
+# signingkey = ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIE8Pf89XbvcJ3WHvjrP/03p+vNco/62fkAvRUGf/EPwc
+# [credential]
+# helper = cache --timeout=36000
+# [filter "lfs"]
+# smudge = git-lfs smudge -- %f
+# process = git-lfs filter-process
+# required = true
+# clean = git-lfs clean -- %f
+# [init]
+# defaultBranch = master
+# [color]
+# ui = auto
 
-[color "status"]
-added = green
-changed = yellow
-untracked = magenta
+# [color "branch"]
+# current = yellow
+# local = 241
+# remote = green
+
+# [color "diff"]
+# meta = yellow
+# frag = magenta
+# old = red
+# new = green
+
+# [color "status"]
+# added = green
+# changed = yellow
+# untracked = magenta

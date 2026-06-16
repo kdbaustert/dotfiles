@@ -1,4 +1,4 @@
-#!/usr/bin
+#!/usr/bin/env zsh
 
 # Shortcuts
 alias c='clear'
@@ -32,9 +32,13 @@ alias caliases="code $DOTFILES/aliases.zsh"
 alias chammerspoon="code $HOME/.hammerspoon/init.lua"
 alias cyabai="code $HOME/.yabairc"
 alias czshrc="code $HOME/.zshrc"
-alias czshrc="code $HOME/.spacebarrc"
+alias cspacebar="code $HOME/.spacebarrc"
 alias cnvims="code $HOME/.config/nvim/init.vim"
 # alias valetconfig="code /usr/local/etc/nginx/valet/valet.conf"
+
+# History search (atuin)
+alias ms='atuin search -i'
+alias msm='atuin search'
 
 # Common aliases
 alias x="xplr"
@@ -55,7 +59,7 @@ if which eza &>/dev/null; then
   alias l='eza -a -lgmH --icons -G'
   alias la='l -@'
   alias ll='l -h'
-  alias l1='eza-1 --group-directories-first'
+  alias l1='eza -1 --group-directories-first'
   alias la1='l1 -a'
   alias le='eza -a -lgH -s extension --group-directories-first'
   alias lm='eza -a -lghH -s modified -m'
@@ -91,7 +95,7 @@ alias testspeed="networkQuality"
 
 # Fix LSD pegging the CPU
 # https://discussions.apple.com/message/30186026#message30186026
-alias fixlsd="/System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.fram ework/Support/lsregister -kill -r -domain local -domain system -domain user ; killall Dock"
+alias fixlsd="/System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister -kill -r -domain local -domain system -domain user ; killall Dock"
 alias resetlsd=fixlsd
 
 # computer power options

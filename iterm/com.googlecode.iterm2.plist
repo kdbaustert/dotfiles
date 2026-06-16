@@ -2,11 +2,35 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>AIFeatureFunctionCalling</key>
+	<true/>
+	<key>AIFeatureHostedCodeInterpeter</key>
+	<true/>
+	<key>AIFeatureHostedFileSearch</key>
+	<true/>
+	<key>AIFeatureHostedWebSearch</key>
+	<true/>
+	<key>AIFeatureStreamingResponses</key>
+	<true/>
+	<key>AITermAPI</key>
+	<integer>2</integer>
+	<key>AIVectorStore</key>
+	<integer>0</integer>
 	<key>AdjustWindowForFontSizeChange</key>
 	<false/>
+	<key>AiMaxTokens</key>
+	<integer>1050000</integer>
+	<key>AiModel</key>
+	<string>gpt-5.4</string>
+	<key>AiResponseMaxTokens</key>
+	<integer>128000</integer>
+	<key>AitermURL</key>
+	<string>https://api.openai.com/v1/responses</string>
 	<key>BracketedPasteMode</key>
 	<true/>
 	<key>CheckTestRelease</key>
+	<true/>
+	<key>ClaudeCodeHooksInstalled</key>
 	<true/>
 	<key>Command</key>
 	<string>/usr/local/bin/fish</string>
@@ -3877,6 +3901,8 @@
 	<true/>
 	<key>HotkeyMigratedFromSingleToMulti</key>
 	<true/>
+	<key>IRMemory</key>
+	<integer>2</integer>
 	<key>MinimalDeslectedColoredTabAlpha</key>
 	<real>0.10000000149011612</real>
 	<key>MinimalTabStyleBackgroundColorDifference</key>
@@ -5661,6 +5687,8 @@
 			<string>/Users/kenny</string>
 		</dict>
 	</array>
+	<key>NumberOfLinesForAccessibility</key>
+	<integer>20000</integer>
 	<key>OnlyWhenMoreTabs</key>
 	<false/>
 	<key>PasteSpecialRegex</key>
@@ -5732,13 +5760,44 @@
 	<false/>
 	<key>ToolbeltTools</key>
 	<array>
-		<string>Profiles</string>
-		<string>Snippets</string>
+		<string>Session Status</string>
 	</array>
 	<key>VisualIndicatorForEsc</key>
 	<false/>
 	<key>WindowNumber</key>
 	<false/>
+	<key>Workgroups</key>
+	<data>
+	W3sic2Vzc2lvbnMiOlt7InRvb2xiYXJJdGVtcyI6W3sia2luZCI6Im1vZGVTd2l0Y2hl
+	ciJ9LHsia2luZCI6ImdpdFN0YXR1cyJ9XSwia2luZCI6eyJraW5kIjoicm9vdCJ9LCJ1
+	cmxTdHJpbmciOiIiLCJwZXJGaWxlQ29tbWFuZCI6IiIsImRpc3BsYXlOYW1lIjoiQ2xh
+	dWRlIENvZGUiLCJjb21tYW5kIjoiIiwidW5pcXVlSWRlbnRpZmllciI6ImJ1aWx0aW4u
+	Y2xhdWRlQ29kZS5tYWluIiwibW9kZSI6InJlZ3VsYXIifSx7Im1vZGUiOiJkaWZmIiwi
+	dG9vbGJhckl0ZW1zIjpbeyJraW5kIjoibW9kZVN3aXRjaGVyIn0seyJraW5kIjoiY2hh
+	bmdlZEZpbGVTZWxlY3RvciJ9LHsicmVsb2FkU2hvcnRjdXQiOnsic2VyaWFsaXplZCI6
+	IjB4NzItMHgxMDAwMDAtMHhmIn0sImZvcndhcmRTaG9ydGN1dCI6eyJzZXJpYWxpemVk
+	IjoiMHhmNzAzLTB4MzQwMDAwLTB4N2MifSwiYmFja1Nob3J0Y3V0Ijp7InNlcmlhbGl6
+	ZWQiOiIweGY3MDItMHgzNDAwMDAtMHg3YiJ9LCJraW5kIjoibmF2aWdhdGlvbiJ9XSwi
+	a2luZCI6eyJraW5kIjoicGVlciJ9LCJ1cmxTdHJpbmciOiIiLCJwZXJGaWxlQ29tbWFu
+	ZCI6ImdpdCBkaWZmdG9vbCAteSAteCB2aW1kaWZmIEhFQUQgLS0gXFwoZmlsZSkiLCJk
+	aXNwbGF5TmFtZSI6IkRpZmYiLCJjb21tYW5kIjoiZ2l0IGRpZmZ0b29sIC15IC14IHZp
+	bWRpZmYgSEVBRCIsInVuaXF1ZUlkZW50aWZpZXIiOiJidWlsdGluLmNsYXVkZUNvZGUu
+	ZGlmZiIsInBhcmVudElEIjoiYnVpbHRpbi5jbGF1ZGVDb2RlLm1haW4ifSx7Im1vZGUi
+	OiJjb2RlUmV2aWV3IiwidG9vbGJhckl0ZW1zIjpbeyJraW5kIjoibW9kZVN3aXRjaGVy
+	In0seyJzaG9ydGN1dCI6eyJzZXJpYWxpemVkIjoiMHg3Mi0weDEwMDAwMC0weGYifSwi
+	a2luZCI6InJlbG9hZCJ9XSwia2luZCI6eyJraW5kIjoicGVlciJ9LCJ1cmxTdHJpbmci
+	OiIiLCJwZXJGaWxlQ29tbWFuZCI6IiIsImRpc3BsYXlOYW1lIjoiQ29kZSBSZXZpZXci
+	LCJjb21tYW5kIjoiY2xhdWRlIFxcKGNvZGVSZXZpZXdQcm9tcHQpIC0tYXBwZW5kLXN5
+	c3RlbS1wcm9tcHQtZmlsZSBcL0FwcGxpY2F0aW9uc1wvaVRlcm0uYXBwXC9Db250ZW50
+	c1wvUmVzb3VyY2VzXC9jb2RlLXJldmlldy1zeXN0ZW0tcHJvbXB0LnR4dCAtLXNldHRp
+	bmdzICd7XCJhdXRvTW9kZVwiOntcImFsbG93XCI6W1wiJGRlZmF1bHRzXCIsXCJSdW5u
+	aW5nIGBpdDIgc2Vzc2lvbiBhZGQtY2xpcHBpbmdgIGlzIGFsbG93ZWQ6IGl0IHBpcGVz
+	IGNvbnRlbnQgdG8gdGhlIGxvY2FsIGlUZXJtMiBzZXNzaW9uIHBlciB0aGUgdXNlcuKA
+	mXMgcmVxdWVzdC5cIl19fSciLCJ1bmlxdWVJZGVudGlmaWVyIjoiYnVpbHRpbi5jbGF1
+	ZGVDb2RlLnJldmlldyIsInBhcmVudElEIjoiYnVpbHRpbi5jbGF1ZGVDb2RlLm1haW4i
+	fV0sInVuaXF1ZUlkZW50aWZpZXIiOiJidWlsdGluLmNsYXVkZUNvZGUiLCJuYW1lIjoi
+	Q2xhdWRlIENvZGUifV0=
+	</data>
 	<key>findMode_iTerm</key>
 	<integer>0</integer>
 	<key>kCPKSelectionViewPreferredModeKey</key>

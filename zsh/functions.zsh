@@ -43,10 +43,6 @@ shell() {
   ps | grep $(echo $$) | awk '{ print $4 }'
 }
 
-function compress() {
-  tar cvzf $1.tar.gz $1
-}
-
 # Create a data URL from a file
 function dataurl() {
   local mimeType=$(file -b --mime-type "$1")
@@ -123,9 +119,11 @@ zreload() {
   [[ -n "$SHELL" ]] && exec ${SHELL#-} || exec zsh
 }
 
-fd() {
+# Fuzzy-cd into a subdirectory (renamed from `fd` so it no longer shadows the
+# `fd` binary that fzf/eza/etc. rely on). `z`/`zi` from zoxide cover most cases.
+fcd() {
   local dir
-  dir=$(find ${1:-.} -path '*/\.*' -prune \
+  dir=$(find "${1:-.}" -path '*/\.*' -prune \
     -o -type d -print 2>/dev/null | fzf +m) &&
     cd "$dir"
 }

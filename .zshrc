@@ -1,129 +1,116 @@
-#!/usr/bin/env bash
-# Amazon Q pre block. Keep at the top of this file.
-[[ -f "${HOME}/Library/Application Support/amazon-q/shell/zshrc.pre.zsh" ]] && builtin source "${HOME}/Library/Application Support/amazon-q/shell/zshrc.pre.zsh"
+#!/usr/bin/env zsh
+#==============================================================================
+#  .zshrc — interactive shell configuration
+#  Login/environment setup lives in .zprofile; this file is interactive-only.
+#==============================================================================
 
-# Customize spelling correction prompt.
-SPROMPT='zsh: correct %F{red}%R%f to %F{green}%r%f [nyae]? '
+# Kiro CLI pre block. Keep at the top of this file.
+[[ -f "${HOME}/Library/Application Support/kiro-cli/shell/zshrc.pre.zsh" ]] && builtin source "${HOME}/Library/Application Support/kiro-cli/shell/zshrc.pre.zsh"
 
-# Remove path separator from WORDCHARS.
-WORDCHARS=${WORDCHARS//[\/]}
-
-# Delete % at the beginning
-unsetopt PROMPT_SP
-
-#####################
-# HISTORY           #
-#####################
+#------------------------------------------------------------------------------
+# History
+#------------------------------------------------------------------------------
 HISTFILE="$HOME/.zsh_history"
 HISTSIZE=10000000
 SAVEHIST=10000000
 
-#####################
-# SETOPT            #
-#####################
-setopt CORRECT                # Prompt for spelling correction of commands.
-setopt EXTENDED_HISTORY       # record timestamp of command in HISTFILE
-setopt HIST_EXPIRE_DUPS_FIRST # delete duplicates first when HISTFILE size exceeds HISTSIZE
-setopt HIST_IGNORE_ALL_DUPS   # ignore duplicated commands history list
-setopt SHARE_HISTORY          # share command history data
-setopt HIST_IGNORE_SPACE      # ignore commands that start with space
-setopt SHAREHISTORY           # global history
-setopt HIST_VERIFY            # show command with history expansion to user before running it
-setopt INC_APPEND_HISTORY     # add commands to HISTFILE in order of execution
-setopt COMPLETEALIASES        # complete aliases
-setopt NOCORRECT              # spelling correction for commands
-setopt COMPLETE_IN_WORD       # allow completion from within a word/phrase
-setopt LIST_AMBIGUOUS         # complete as much of a completion until it gets ambiguous.
-setopt HASH_LIST_ALL          # hash everything before completion
-setopt GLOB_DOTS              # no special treatment for file names with a leading dot
-setopt NO_AUTO_MENU           # require an extra TAB press to open the completion menu
-setopt NOTIFY                 # Report the status of background jobs immediately, rather than waiting until just before printing a prompt.
-setopt NO_BG_NICE             # Prevent running all background jobs at a lower priority.
-setopt NO_CHECK_JOBS          # Prevent reporting the status of background and suspended jobs before exiting a shell with job control. NO_CHECK_JOBS is best used only in combination with NO_HUP, else such jobs will be killed automatically.
-setopt NO_HUP                 # Prevent sending the HUP signal to running jobs when the shell exits.
-setopt NO_BEEP                # Don't beep on errors (overrides /etc/zshrc in Catalina)
-setopt ALWAYS_TO_END          # If a completion is performed with the cursor within a word, and a full completion is inserted, the cursor is moved to the end of the word
-setopt PATH_DIRS              # Perform a path search even on command names with slashes in them.
-unsetopt CASE_GLOB            # Make globbing (filename generation) not sensitive to case.
-unsetopt LIST_BEEP            # Don't beep on an ambiguous completion.
-setopt NOLISTTYPES
-setopt LISTPACKED
-setopt AUTOMENU
-setopt AUTOCD
-setopt INTERACTIVECOMMENTS # recognize comments
-# setopt PROMPT_SUBST
+setopt EXTENDED_HISTORY        # record timestamp of each command
+setopt HIST_EXPIRE_DUPS_FIRST  # trim duplicates first when HISTFILE overflows
+setopt HIST_IGNORE_ALL_DUPS    # never store a duplicate of an existing entry
+setopt HIST_IGNORE_SPACE       # don't record commands that start with a space
+setopt HIST_VERIFY             # expand history, but let me confirm before running
+setopt INC_APPEND_HISTORY      # append as commands run, not at shell exit
+setopt SHARE_HISTORY           # share history live across sessions
 
-autoload colors && colors
+#------------------------------------------------------------------------------
+# Shell options
+#------------------------------------------------------------------------------
+setopt AUTOCD                  # `dir` == `cd dir`
+setopt INTERACTIVE_COMMENTS    # allow # comments at the interactive prompt
+setopt ALWAYS_TO_END           # move cursor to word end after completion
+setopt COMPLETE_IN_WORD        # complete from the cursor, not just the word end
+setopt PATH_DIRS               # path-search command names containing slashes
+setopt GLOB_DOTS               # include dotfiles in globbing
+setopt HASH_LIST_ALL           # hash the command path before first completion
+setopt LIST_PACKED             # use compact, variable-width completion columns
+setopt NO_AUTO_MENU            # require a second TAB to open the menu
+setopt NO_BEEP                 # no audible bell
+setopt NO_LIST_BEEP            # no bell on ambiguous completion
+setopt NOTIFY                  # report background-job status immediately
+setopt NO_BG_NICE              # don't re-nice background jobs
+setopt NO_HUP                  # don't HUP running jobs on exit
+setopt NO_CHECK_JOBS           # don't warn about background jobs on exit
+unsetopt CASE_GLOB             # case-insensitive globbing
+unsetopt CORRECT               # no command auto-correction (it gets in the way)
 
+WORDCHARS=${WORDCHARS//[\/]}   # treat / as a word boundary (e.g. for ^W)
+
+autoload -Uz colors && colors
+
+#------------------------------------------------------------------------------
+# Keybindings (emacs-style)
+#------------------------------------------------------------------------------
+bindkey -e
+bindkey '^U' backward-kill-line
+
+#------------------------------------------------------------------------------
+# Plugins (zinit) — loads prompt, completions, autosuggestions, highlighting
+#------------------------------------------------------------------------------
 [ -f "$DOTFILES/zsh/zinit.zsh" ] && source "$DOTFILES/zsh/zinit.zsh"
 
-# COMPLETION
+#------------------------------------------------------------------------------
+# Completion styling
+#------------------------------------------------------------------------------
 source "$DOTFILES/zsh/extra/completion.zsh"
 
-[ -f "$DOTFILES/zsh/extra/fzf.zsh" ] && source "$DOTFILES/zsh/extra/fzf.zsh"
-
-export FZF_DEFAULT_OPTS=$FZF_DEFAULT_OPTS'
---reverse
---color=fg:-1,bg:-1,border:#4B5164,hl:#d19a66
---color=fg+:#a6accd,bg+:#2c323d,hl+:#e5c07b
---color=info:#ffcb6b,prompt:#82e2ff,pointer:#c792ea
---color=marker:#ffcb6b,spinner:#e06c75,header:#a277ff'
-# FZF options for zoxide prompt (zi)
-export _ZO_FZF_OPTS=$FZF_DEFAULT_OPTS'
---height=45%'
-
-export FZF_COMPLETION_TRIGGER=','
-export FUNCNEST=5000
-export NVM_LAZY_LOAD=true
-# ------------------------------------
-# Fuzzy Finder
-# ------------------------------------
-
-export FZF_DEFAULT_COMMAND='fd --exclude .git --max-depth 5 --hidden'
-export FZF_COMPLETION_TRIGGER=','
-export ZSH_AUTOSUGGEST_USE_ASYNC=true
-
-bindkey -e
-bindkey \^U backward-kill-line
-
-# disable sort when completing `git checkout`
-zstyle ':completion:*:git-checkout:*' sort false
-# set descriptions format to enable group support
+# fzf-tab tweaks
+zstyle ':completion:*:git-checkout:*' sort false           # keep git ref order
 zstyle ':completion:*:descriptions' format '[%d]'
-# set list-colors to enable filename colorizing
-zstyle ':completion:*' list-colors ${(s.:.)LS_COLORS}
-# preview directory's content with exa when completing cd
-zstyle ':fzf-tab:complete:cd:*' fzf-preview 'exa -1 --color=always $realpath'
-# switch group using `,` and `.`
-zstyle ':fzf-tab:*' switch-group ',' '.'
+zstyle ':fzf-tab:complete:cd:*' fzf-preview 'eza -1 --color=always $realpath'
+zstyle ':fzf-tab:*' switch-group ',' '.'                   # cycle groups with , / .
 
-# FUNCTIONS
+#------------------------------------------------------------------------------
+# fzf — fuzzy finder
+#------------------------------------------------------------------------------
+[ -f "$DOTFILES/zsh/extra/fzf.zsh" ] && source "$DOTFILES/zsh/extra/fzf.zsh"
+# Ctrl-T (files) and Alt-C (cd) keybindings + completion. Ctrl-R is owned by atuin.
+command -v fzf &>/dev/null && source <(fzf --zsh)
+
+export FZF_COMPLETION_TRIGGER=','
+export _ZO_FZF_OPTS="$FZF_DEFAULT_OPTS --height=45%"   # zoxide's `zi` picker
+export FUNCNEST=5000
+
+#------------------------------------------------------------------------------
+# Functions & aliases
+#------------------------------------------------------------------------------
 source "$DOTFILES/zsh/functions.zsh"
-
-# ALIASES
 source "$DOTFILES/zsh/aliases.zsh"
 
-nvim() {
-  unset -f nvim
-  _zsh_nvm_load
-  nvim "$@"
-}
+#------------------------------------------------------------------------------
+# Tool integrations
+#------------------------------------------------------------------------------
+# zoxide — smarter `cd` (provides `z` and `zi`)
+command -v zoxide &>/dev/null && eval "$(zoxide init zsh)"
 
-# eval "$(op completion zsh)"
+# pyenv — Python version management. PYENV_ROOT is exported in .zprofile; the
+# shell integration is loaded via zinit turbo (see zinit.zsh) so it doesn't
+# block startup. Nothing to init synchronously here.
 
-eval $(thefuck --alias)
+# atuin — shell history (owns Ctrl-R / Up). Initialised exactly once.
+[ -f "$HOME/.atuin/bin/env" ] && . "$HOME/.atuin/bin/env"
+command -v atuin &>/dev/null && eval "$(atuin init zsh)"
 
-eval "$(/opt/homebrew/bin/brew shellenv)"
+# navi — interactive cheatsheets (Ctrl-G)
+command -v navi &>/dev/null && eval "$(navi widget zsh)"
 
-# tabtab source for packages
-# uninstall by removing these lines
+# thefuck — lazy-loaded so it doesn't spawn Python on every shell start
+fuck() { unset -f fuck; eval "$(thefuck --alias)"; fuck "$@"; }
+
+# zsh-autosuggestions: async fetch
+export ZSH_AUTOSUGGEST_USE_ASYNC=true
+
+# tabtab completions (serverless, etc.)
 [[ -f ~/.config/tabtab/zsh/__tabtab.zsh ]] && . ~/.config/tabtab/zsh/__tabtab.zsh || true
 
-# source /Users/kenny/.config/broot/launcher/bash/br
-
-# eval "$(rbenv init - zsh)"
-
-eval "$(atuin init zsh)"
-
-# Amazon Q post block. Keep at the bottom of this file.
-[[ -f "${HOME}/Library/Application Support/amazon-q/shell/zshrc.post.zsh" ]] && builtin source "${HOME}/Library/Application Support/amazon-q/shell/zshrc.post.zsh"
+# Kiro CLI post block. Keep at the bottom of this file.
+[[ -f "${HOME}/Library/Application Support/kiro-cli/shell/zshrc.post.zsh" ]] && builtin source "${HOME}/Library/Application Support/kiro-cli/shell/zshrc.post.zsh"

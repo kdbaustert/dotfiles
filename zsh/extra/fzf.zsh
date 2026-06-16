@@ -1,4 +1,4 @@
-#!/bin/zsh
+#!/bin/bash
 
 #######################################
 # FZF deserves its own config         #
