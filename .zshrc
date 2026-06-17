@@ -7,6 +7,10 @@
 # Kiro CLI pre block. Keep at the top of this file.
 [[ -f "${HOME}/Library/Application Support/kiro-cli/shell/zshrc.pre.zsh" ]] && builtin source "${HOME}/Library/Application Support/kiro-cli/shell/zshrc.pre.zsh"
 
+# $DOTFILES is normally exported by .zprofile, but that only runs for login
+# shells. Fall back to the default so this file works in non-login shells too.
+: "${DOTFILES:=$HOME/dotfiles}"
+
 #------------------------------------------------------------------------------
 # History
 #------------------------------------------------------------------------------
