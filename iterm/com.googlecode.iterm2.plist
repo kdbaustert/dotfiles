@@ -3909,6 +3909,10 @@
 	<real>0.029999999329447746</real>
 	<key>MinimalTabStyleOutlineStrength</key>
 	<real>0.019999999552965164</real>
+	<key>NeverWarnAboutShortLivedSessions_A5BF518C-DD4F-409B-BB00-E22DA7F31513</key>
+	<true/>
+	<key>NeverWarnAboutShortLivedSessions_A5BF518C-DD4F-409B-BB00-E22DA7F31513_selection</key>
+	<integer>0</integer>
 	<key>New Bookmarks</key>
 	<array>
 		<dict>

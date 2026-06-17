@@ -63,11 +63,29 @@ bindkey '^U' backward-kill-line
 #------------------------------------------------------------------------------
 source "$DOTFILES/zsh/extra/completion.zsh"
 
+# LS_COLORS via vivid — colorizes the completion menu (and fzf-tab previews).
+command -v vivid &>/dev/null && export LS_COLORS="$(vivid generate catppuccin-mocha)"
+zstyle ':completion:*' list-colors "${(s.:.)LS_COLORS}"
+
 # fzf-tab tweaks
 zstyle ':completion:*:git-checkout:*' sort false           # keep git ref order
 zstyle ':completion:*:descriptions' format '[%d]'
-zstyle ':fzf-tab:complete:cd:*' fzf-preview 'eza -1 --color=always $realpath'
 zstyle ':fzf-tab:*' switch-group ',' '.'                   # cycle groups with , / .
+
+# fzf-tab previews — show context for the candidate under the cursor
+zstyle ':fzf-tab:complete:cd:*'                fzf-preview 'eza -1 --color=always --icons $realpath'
+zstyle ':fzf-tab:complete:__zoxide_z:*'        fzf-preview 'eza -1 --color=always --icons $realpath'
+zstyle ':fzf-tab:complete:(cat|bat|less|nvim|vim|vi|nano):*' \
+                                               fzf-preview 'bat --color=always --style=numbers --line-range=:200 $realpath 2>/dev/null || eza -1 --color=always $realpath'
+zstyle ':fzf-tab:complete:(-command-|export|unset):*' \
+                                               fzf-preview 'echo ${(P)word}'        # env-var values
+zstyle ':fzf-tab:complete:(kill|ps):argument-rest:*' \
+                                               fzf-preview 'ps -p $word -o comm= -o args 2>/dev/null'
+zstyle ':fzf-tab:complete:(kill|ps):argument-rest:*' fzf-flags '--preview-window=down:3:wrap'
+zstyle ':fzf-tab:complete:(ssh|scp|sftp):*'    fzf-preview 'dig +short $word 2>/dev/null'
+zstyle ':fzf-tab:complete:git-(add|diff|restore|checkout|stash):*' \
+                                               fzf-preview 'git diff --color=always $word 2>/dev/null | delta'
+zstyle ':fzf-tab:complete:git-(log|show):*'    fzf-preview 'git show --color=always $word 2>/dev/null | delta'
 
 #------------------------------------------------------------------------------
 # fzf — fuzzy finder

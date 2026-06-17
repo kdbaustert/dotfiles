@@ -49,6 +49,41 @@ zinit ice wait lucid id-as'pyenv-init' \
   atload'eval "$(pyenv init - --no-rehash zsh)"'
 zinit light zdharma-continuum/null
 
+# --- Tool completions not shipped via Homebrew --------------------------------
+# gh emits a clean `#compdef` script. Cache it once and prepend to fpath *before*
+# compinit runs (zicompinit, in the turbo block below). Delete the cache file to
+# refresh after a `gh` upgrade. (pnpm needs node, which we lazy-load, so it can't
+# be generated at startup; Taskwarrior's `task` ships its own completions.)
+() {
+  local cache="${XDG_CACHE_HOME:-$HOME/.cache}/zsh/completions"
+  [[ -d $cache ]] || command mkdir -p "$cache"
+  if [[ ! -s $cache/_gh ]] && (( $+commands[gh] )); then
+    gh completion -s zsh > "$cache/_gh"
+  fi
+  fpath=("$cache" $fpath)
+}
+
+# pnpm completion — pnpm shells out to `node` (lazy-loaded via nvm) to print its
+# completion, and the script it emits calls `compdef`. Neither is ready at
+# startup, so a precmd hook retries each prompt until both exist, then generates
+# + caches once, sources it, and removes itself. Subsequent shells hit the cache
+# on the first prompt after compinit. Delete the cache file to refresh.
+() {
+  local cache="${XDG_CACHE_HOME:-$HOME/.cache}/zsh/completions/pnpm.zsh"
+  autoload -Uz add-zsh-hook
+  _pnpm_comp_setup() {
+    (( $+functions[compdef] )) || return            # wait for compinit (turbo)
+    if [[ ! -s $cache ]]; then
+      (( $+commands[node] && $+commands[pnpm] )) || return   # wait for nvm/node
+      pnpm completion zsh >| "$cache" 2>/dev/null || { command rm -f "$cache"; return; }
+    fi
+    source "$cache"
+    add-zsh-hook -d precmd _pnpm_comp_setup         # one-shot
+    unfunction _pnpm_comp_setup
+  }
+  add-zsh-hook precmd _pnpm_comp_setup
+}
+
 # --- Completions, fzf-tab, autosuggestions, syntax highlighting ---------------
 # One ordered turbo block:
 #   1. zsh-completions     — extra completion definitions (blockf: don't pollute fpath)
@@ -65,3 +100,30 @@ zinit wait lucid for \
   atload"!_zsh_autosuggest_start" \
     zsh-users/zsh-autosuggestions \
   zdharma-continuum/fast-syntax-highlighting
+
+# --- Extra behavior plugins (turbo) -------------------------------------------
+#   - zsh-autopair        — auto-insert/delete matching brackets, quotes, parens
+#   - zsh-you-should-use  — nags when a full command has an existing alias
+#   - forgit              — fzf-powered git (glo, gss, gcb…); honours delta
+#   - zsh-auto-notify     — desktop notification when a long command finishes
+#                           (uses terminal-notifier, installed via Homebrew)
+#
+# forgit: rename the 4 helpers that collide with our plain-git aliases in
+# aliases.zsh (ga/gd/grh/gco). The f-prefixed names give the interactive
+# versions; the originals stay as our git shortcuts. Must be set before load.
+forgit_add=fga
+forgit_diff=fgd
+forgit_reset_head=fgrh
+forgit_checkout_commit=fgco
+
+# auto-notify: only ping for commands slower than the threshold, and never for
+# interactive/long-lived TUIs we run in the foreground on purpose.
+export AUTO_NOTIFY_THRESHOLD=20
+export AUTO_NOTIFY_IGNORE=(nvim hx micro vim man less ssh tmux fzf navi \
+  yazi ranger nnn xplr lazygit gitui btop htop top watch tail)
+
+zinit wait lucid for \
+  hlissner/zsh-autopair \
+  MichaelAquilina/zsh-you-should-use \
+  wfxr/forgit \
+  MichaelAquilina/zsh-auto-notify
