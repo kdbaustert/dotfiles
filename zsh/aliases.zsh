@@ -14,6 +14,8 @@ alias genpass='LC_ALL=C tr -dc "[:alnum:]" < /dev/urandom | head -c 20 | pbcopy'
 alias purgemem='sudo purge'
 alias clearDNSCache='sudo dscacheutil -flushcache && sudo killall -HUP mDNSResponder'
 alias cleandotfiles="find . -type f -name '*.DS_Store' -ls -delete"
+alias claude-clean='for d in backups cache file-history projects session-env; do rm -rf "$HOME/.claude/$d"/* "$HOME/.claude/$d"/.[!.]* 2>/dev/null; done; echo "Cleared ~/.claude/{backups,cache,file-history,projects,session-env}"'
+
 
 # Directories
 alias desk="cd ~/desktop"
