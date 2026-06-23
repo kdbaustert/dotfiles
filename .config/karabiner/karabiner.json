@@ -1,0 +1,23 @@
+{
+    "profiles": [
+        {
+            "complex_modifications": {
+                "rules": [
+                    {
+                        "description": "F4 (Spotlight key) opens Alfred instead of Spotlight",
+                        "manipulators": [
+                            {
+                                "from": { "key_code": "f4", "modifiers": { "optional": ["any"] } },
+                                "to": [{ "shell_command": "/usr/bin/osascript -e 'tell application id \"com.runningwithcrayons.Alfred\" to search \"\"'" }],
+                                "type": "basic"
+                            }
+                        ]
+                    }
+                ]
+            },
+            "name": "Default profile",
+            "selected": true,
+            "virtual_hid_keyboard": { "keyboard_type_v2": "ansi" }
+        }
+    ]
+}
