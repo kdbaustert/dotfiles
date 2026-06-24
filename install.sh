@@ -124,6 +124,10 @@ if command -v zsh &>/dev/null; then
     || warning "Plugin bootstrap incomplete — it finishes on first interactive shell."
 fi
 
+### Add Touch ID support for sudo (macOS 10.12.2+)
+echo 'auth       sufficient     pam_tid.so' | sudo tee /etc/pam.d/sudo_local >/dev/null
+sudo sed -i '' '/pam_tid.so/d' /etc/pam.d/sudo
+
 #------------------------------------------------------------------------------
 title "Optional setup scripts"
 #------------------------------------------------------------------------------
