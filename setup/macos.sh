@@ -53,6 +53,13 @@ defaults write com.apple.LaunchServices LSQuarantine -bool false
 sudo systemsetup -setrestartfreeze on
 
 ###############################################################################
+# Appearance                                                                  #
+###############################################################################
+
+# Use the Dark interface style
+defaults write NSGlobalDomain AppleInterfaceStyle -string "Dark"
+
+###############################################################################
 # Keyboard & input                                                            #
 ###############################################################################
 
@@ -99,6 +106,26 @@ defaults write com.apple.desktopservices DSDontWriteUSBStores -bool true
 # Show the ~/Library folder
 chflags nohidden ~/Library && xattr -d com.apple.FinderInfo ~/Library 2>/dev/null
 
+# Use icon view in all Finder windows by default
+# Four-letter codes: `icnv` icon, `Nlsv` list, `clmv` column, `glyv` gallery
+defaults write com.apple.finder FXPreferredViewStyle -string "icnv"
+
+# Default icon-view options for new folders (match the live configuration)
+finder_plist="${HOME}/Library/Preferences/com.apple.finder.plist"
+for view in StandardViewSettings DesktopViewSettings; do
+  /usr/libexec/PlistBuddy -c "Set :${view}:IconViewSettings:arrangeBy name" "${finder_plist}" 2>/dev/null
+  /usr/libexec/PlistBuddy -c "Set :${view}:IconViewSettings:iconSize 64" "${finder_plist}" 2>/dev/null
+  /usr/libexec/PlistBuddy -c "Set :${view}:IconViewSettings:gridSpacing 54" "${finder_plist}" 2>/dev/null
+  /usr/libexec/PlistBuddy -c "Set :${view}:IconViewSettings:textSize 12" "${finder_plist}" 2>/dev/null
+  /usr/libexec/PlistBuddy -c "Set :${view}:IconViewSettings:labelOnBottom true" "${finder_plist}" 2>/dev/null
+  /usr/libexec/PlistBuddy -c "Set :${view}:IconViewSettings:showItemInfo false" "${finder_plist}" 2>/dev/null
+  /usr/libexec/PlistBuddy -c "Set :${view}:IconViewSettings:showIconPreview true" "${finder_plist}" 2>/dev/null
+done
+
+# List view: sort by name and use relative dates (Today/Yesterday)
+/usr/libexec/PlistBuddy -c "Set :StandardViewSettings:ListViewSettings:sortColumn name" "${finder_plist}" 2>/dev/null
+/usr/libexec/PlistBuddy -c "Set :StandardViewSettings:ListViewSettings:useRelativeDates 1" "${finder_plist}" 2>/dev/null
+
 ###############################################################################
 # Dock & Mission Control                                                       #
 ###############################################################################
@@ -111,6 +138,14 @@ defaults write com.apple.dock show-recents -bool false
 
 # Don’t automatically rearrange Spaces based on most recent use
 defaults write com.apple.dock mru-spaces -bool false
+
+###############################################################################
+# Menu bar                                                                    #
+###############################################################################
+
+# Menu bar clock: show the day of week but hide the date
+defaults write com.apple.menuextra.clock ShowDayOfWeek -bool true
+defaults write com.apple.menuextra.clock ShowDate -int 0
 
 ###############################################################################
 # Network                                                                     #
