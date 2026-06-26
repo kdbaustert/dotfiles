@@ -136,3 +136,11 @@ export ZSH_AUTOSUGGEST_USE_ASYNC=true
 
 # Kiro CLI post block. Keep at the bottom of this file.
 [[ -f "${HOME}/Library/Application Support/kiro-cli/shell/zshrc.post.zsh" ]] && builtin source "${HOME}/Library/Application Support/kiro-cli/shell/zshrc.post.zsh"
+export PATH="${HOME}/Library/FlyEnv/alias:${HOME}/Library/FlyEnv/env/php/bin:${HOME}/Library/FlyEnv/env/php:$PATH"
+# pnpm
+export PNPM_HOME="${HOME}/Library/pnpm"
+case ":$PATH:" in
+  *":$PNPM_HOME/bin:"*) ;;
+  *) export PATH="$PNPM_HOME/bin:$PATH" ;;
+esac
+# pnpm end
