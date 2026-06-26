@@ -12,6 +12,16 @@
                                 "type": "basic"
                             }
                         ]
+                    },
+                    {
+                        "description": "Alt+Tab acts as Command+Tab (app switcher)",
+                        "manipulators": [
+                            {
+                                "from": { "key_code": "tab", "modifiers": { "mandatory": ["option"], "optional": ["shift"] } },
+                                "to": [{ "key_code": "tab", "modifiers": ["left_command"] }],
+                                "type": "basic"
+                            }
+                        ]
                     }
                 ]
             },

@@ -68,21 +68,23 @@ zinit light zdharma-continuum/null
 # startup, so a precmd hook retries each prompt until both exist, then generates
 # + caches once, sources it, and removes itself. Subsequent shells hit the cache
 # on the first prompt after compinit. Delete the cache file to refresh.
-() {
-  local cache="${XDG_CACHE_HOME:-$HOME/.cache}/zsh/completions/pnpm.zsh"
-  autoload -Uz add-zsh-hook
-  _pnpm_comp_setup() {
+autoload -Uz add-zsh-hook
+_pnpm_comp_setup() {
+    # NB: compute cache here, not in an outer scope — zsh functions aren't
+    # closures, so a `local` from the defining context is gone by the time this
+    # precmd hook fires (would leave $cache empty → `>| ""` redirect error).
+    local cache="${XDG_CACHE_HOME:-$HOME/.cache}/zsh/completions/pnpm.zsh"
     (( $+functions[compdef] )) || return            # wait for compinit (turbo)
     if [[ ! -s $cache ]]; then
       (( $+commands[node] && $+commands[pnpm] )) || return   # wait for nvm/node
+      [[ -d ${cache:h} ]] || command mkdir -p "${cache:h}"    # ensure cache dir (>| opens before 2>/dev/null)
       pnpm completion zsh >| "$cache" 2>/dev/null || { command rm -f "$cache"; return; }
     fi
     source "$cache"
     add-zsh-hook -d precmd _pnpm_comp_setup         # one-shot
     unfunction _pnpm_comp_setup
-  }
-  add-zsh-hook precmd _pnpm_comp_setup
 }
+add-zsh-hook precmd _pnpm_comp_setup
 
 # --- Completions, fzf-tab, autosuggestions, syntax highlighting ---------------
 # One ordered turbo block:
