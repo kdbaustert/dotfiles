@@ -15,6 +15,8 @@ alias purgemem='sudo purge'
 alias clearDNSCache='sudo dscacheutil -flushcache && sudo killall -HUP mDNSResponder'
 alias cleandotfiles="find . -type f -name '*.DS_Store' -ls -delete"
 alias claude-clean='for d in backups cache file-history projects session-env; do rm -rf "$HOME/.claude/$d"/*(N) "$HOME/.claude/$d"/.[!.]*(N) 2>/dev/null; done; echo "Cleared ~/.claude/{backups,cache,file-history,projects,session-env}"'
+alias ngroka='ngrok config add-authtoken'
+alias ngrok='ngrok http --url=engaged-obviously-ferret.ngrok-free.app 80'
 
 
 # Directories
@@ -94,6 +96,9 @@ alias claimdb="freshclam"
 
 # MacOS commands
 alias testspeed="networkQuality"
+
+# Delete all screenshots from the Desktop
+alias rmshots="find ~/Desktop -maxdepth 1 -type f \( -name 'Screenshot *.png' -o -name 'Screen Shot *.png' \) -print -delete"
 
 # Fix LSD pegging the CPU
 # https://discussions.apple.com/message/30186026#message30186026
