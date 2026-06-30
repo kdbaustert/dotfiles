@@ -1,0 +1,7 @@
+keybinding:
+  universal:
+    # Left arrow always goes "back" — from the diff/staging view it returns
+    # focus to the files panel (the file select tree). Right arrow goes forward.
+    return: [<esc>, <left>]
+    prevBlock: [h, <backtab>]
+    nextBlock: [<right>, l, <tab>]
