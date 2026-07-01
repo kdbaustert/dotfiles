@@ -1,0 +1,25 @@
+# See the full configuration reference: https://rioterm.com/docs/config
+
+padding = [10, 30]  # top/bottom: 10px, left/right: 30px
+confirm-before-quit = false
+
+[fonts]
+family = "JetBrainsMonoNL Nerd Font Mono"
+size = 15.5
+
+[navigation]
+use-current-path = true  # new tabs/splits open in the current working directory
+
+[cursor]
+shape = 'underline'
+blinking = true
+
+[window]
+# width = 1024
+# height = 768
+opacity = 0.45
+blur = true
+
+[editor]
+program = "code"
+args = ["--wait"]
