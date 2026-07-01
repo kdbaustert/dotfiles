@@ -15,6 +15,11 @@ zstyle ':completion:*:functions' ignored-patterns '(_*|pre(cmd|exec))'
 zstyle ':completion:*' use-cache true
 zstyle ':completion:*' rehash true
 
+# Let TAB expand an alias in place (offer its expansion as a candidate) before
+# falling back to normal completion. e.g. `ll<TAB>` → `eza -la`.
+zstyle ':completion:*' completer _expand_alias _complete _ignored
+zstyle ':completion:*:expand-alias:*' group-name aliases
+
 # fzf-tab captures the completion list itself, so zsh's own menu must be off.
 zstyle ':completion:*' menu no
 

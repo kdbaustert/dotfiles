@@ -79,6 +79,11 @@ zstyle ':fzf-tab:*' switch-group ',' '.'                   # cycle groups with ,
 # fzf-tab previews — show context for the candidate under the cursor
 zstyle ':fzf-tab:complete:cd:*'                fzf-preview 'eza -1 --color=always --icons $realpath'
 zstyle ':fzf-tab:complete:__zoxide_z:*'        fzf-preview 'eza -1 --color=always --icons $realpath'
+
+# Command position (incl. aliases/functions): show what the candidate resolves
+# to — `command -V` prints "x is an alias for …" / "… is a shell function" / path.
+zstyle ':fzf-tab:complete:-command-:*'         fzf-preview 'command -V $word 2>/dev/null | head -20 || echo $word'
+zstyle ':fzf-tab:complete:-command-:*'         fzf-flags '--preview-window=down:3:wrap'
 zstyle ':fzf-tab:complete:(cat|bat|less|nvim|vim|vi|nano):*' \
                                                fzf-preview 'bat --color=always --style=numbers --line-range=:200 $realpath 2>/dev/null || eza -1 --color=always $realpath'
 zstyle ':fzf-tab:complete:(-command-|export|unset):*' \
@@ -133,6 +138,12 @@ export ZSH_AUTOSUGGEST_USE_ASYNC=true
 
 # tabtab completions (serverless, etc.)
 [[ -f ~/.config/tabtab/zsh/__tabtab.zsh ]] && . ~/.config/tabtab/zsh/__tabtab.zsh || true
+
+# Emit OSC 7 so terminals (e.g. Rio) can open new tabs in the current directory
+_osc7_cwd() { printf '\e]7;file://%s%s\e\\' "$HOST" "$PWD"; }
+autoload -Uz add-zsh-hook
+add-zsh-hook chpwd _osc7_cwd
+_osc7_cwd
 
 # Kiro CLI post block. Keep at the bottom of this file.
 [[ -f "${HOME}/Library/Application Support/kiro-cli/shell/zshrc.post.zsh" ]] && builtin source "${HOME}/Library/Application Support/kiro-cli/shell/zshrc.post.zsh"

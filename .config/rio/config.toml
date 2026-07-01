@@ -4,7 +4,7 @@ padding = [10, 30]  # top/bottom: 10px, left/right: 30px
 confirm-before-quit = false
 
 [fonts]
-family = "JetBrainsMonoNL Nerd Font Mono"
+family = "RobotoMono Nerd Font"
 size = 15.5
 
 [navigation]
@@ -23,3 +23,9 @@ blur = true
 [editor]
 program = "code"
 args = ["--wait"]
+
+[bindings]
+keys = [
+  { key = "left",  with = "super", action = "SelectPrevTab" },
+  { key = "right", with = "super", action = "SelectNextTab" },
+]
