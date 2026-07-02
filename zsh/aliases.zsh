@@ -162,27 +162,12 @@ alias brew='env PATH="${PATH//$(pyenv root)\/shims:/}" brew'
 alias hist="history | fzf"
 alias f="fzf"
 
-# WordPress
-alias wp_get_salts="curl https://api.wordpress.org/secret-key/1.1/salt/"
-alias wp_export_staging='wp @staging db export - > "staging_db_$(date +%F_$R).sql"'
-alias wp_export_production='wp @production db export - > "production_db_$(date +%F_$R).sql"'
+# WordPress — wp-cli commands moved to abbreviations (zsh/abbreviations).
+# These stay as aliases: they point to shell functions, not commands.
 alias newwp=install_wp
-alias wp_core='wp core download'
-alias new_wpconfig='wp config create'
-alias newwpplugin='wp scaffold plugin'
 alias wp_ignore='wp_gitignore'
-alias wp_dbcheck='wp db check'
-alias wp_repairdb='wp db repair'
-alias wp_optimize='wp db optimize'
-alias wp_child_theme='wp scaffold child-theme'
-alias wp_update_plugins='wp plugin update --all'
-alias wp_pages="wp post list --post_type='page'"
 
-# Vue cli
-alias vinspect='vue inspect'
-alias vrules='vue inspect --rules'
-alias vrule='vue inspect --rule'
-alias vplugins='vue inspect --plugins'
+# Vue cli — moved to abbreviations (zsh/abbreviations)
 
 # Node.js — npm prefixes moved to abbreviations (zsh/abbreviations)
 alias npmc='npm install & composer install'
