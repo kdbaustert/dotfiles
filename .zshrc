@@ -62,6 +62,12 @@ autoload -Uz colors && colors
 bindkey -e
 bindkey '^U' backward-kill-line
 
+# Ctrl-X Ctrl-E — open the current command line in $EDITOR (nvim); on save it
+# runs. Invaluable for long/multiline commands.
+autoload -Uz edit-command-line
+zle -N edit-command-line
+bindkey '^X^E' edit-command-line
+
 #------------------------------------------------------------------------------
 # Plugins (zinit) — loads prompt, completions, autosuggestions, highlighting
 #------------------------------------------------------------------------------

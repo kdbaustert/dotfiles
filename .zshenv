@@ -18,6 +18,12 @@ export XDG_DATA_HOME="$HOME/.local/share"
 export XDG_CACHE_HOME="$HOME/.cache"
 export XDG_STATE_HOME="$HOME/.local/state"
 
+# zsh's own cache dir (compdump + zrecompile output). zreload() in
+# functions.zsh relies on this being set; without it compinit -d would try to
+# write to /zcomp-$HOST. mkdir guard is a no-op once it exists.
+export ZSH_CACHE_DIR="$XDG_CACHE_HOME/zsh"
+[[ -d $ZSH_CACHE_DIR ]] || command mkdir -p "$ZSH_CACHE_DIR"
+
 # Locale — needed by scripts and tools, not just interactive shells.
 export LANG=en_US.UTF-8
 export LC_ALL=en_US.UTF-8

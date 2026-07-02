@@ -36,9 +36,9 @@ abbr gstp='git stash pop'
 abbr gsts='git stash save'
 
 # --- pnpm --------------------------------------------------------------------
-abbr pn='pnpm install'
-abbr pnd='pnpm install --save-dev'
-abbr pn='pnpm run'
+abbr pni='pnpm install'
+abbr pnid='pnpm install --save-dev'
+abbr pnr='pnpm run'
 abbr pnb='pnpm run build'
 abbr pncl='pnpm run clean'
 abbr pnc='pnpm run check'
@@ -48,7 +48,7 @@ abbr pnf='pnpm run fmt'
 abbr pnl='pnpm run lint'
 abbr pns='pnpm run start'
 abbr pnt='pnpm run test'
-abbr pn='pnpx'
+abbr pnx='pnpx'
 
 # --- yarn --------------------------------------------------------------------
 abbr y='yarn'

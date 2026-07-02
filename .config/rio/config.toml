@@ -3,69 +3,86 @@
 [colors]
 # LunarVim (lunar / TokyoNight Night) theme
 # Regular colors
-background = '#1A1B26'
-black = '#15161E'
-blue = '#7AA2F7'
-cyan = '#7DCFFF'
-foreground  = '#C0CAF5'
-green = '#9ECE6A'
-magenta = '#BB9AF7'
-red = '#F7768E'
-white = '#A9B1D6'
-yellow = '#E0AF68'
+# background = '#1A1B26'
+# black = '#15161E'
+# blue = '#7AA2F7'
+# cyan = '#7DCFFF'
+# foreground  = '#C0CAF5'
+# green = '#9ECE6A'
+# magenta = '#BB9AF7'
+# red = '#F7768E'
+# white = '#A9B1D6'
+# yellow = '#E0AF68'
 
 # Cursor
-cursor = '#C0CAF5'
-vi-cursor = '#BB9AF7'
+# cursor = '#C0CAF5'
+# vi-cursor = '#BB9AF7'
 
 # Navigation
-tabs = '#545C7E'  # Inactive tab text and border color
-tabs-active = '#C0CAF5'  # Active tab text color
-bar = '#16161E'
-split = '#292E42'
+# tabs = '#545C7E'  # Inactive tab text and border color
+# tabs-active = '#C0CAF5'  # Active tab text color
+# bar = '#16161E'
+# split = '#292E42'
 
 # Search
-search-match-background = '#3D59A1'
-search-match-foreground = '#C0CAF5'
-search-focused-match-background = '#7AA2F7'
-search-focused-match-foreground = '#15161E'
+# search-match-background = '#3D59A1'
+# search-match-foreground = '#C0CAF5'
+# search-focused-match-background = '#7AA2F7'
+# search-focused-match-foreground = '#15161E'
 
 # Hints
-hint-foreground = '#1A1B26'
-hint-background = '#E0AF68'
+# hint-foreground = '#1A1B26'
+# hint-background = '#E0AF68'
 
 # Selection
-selection-foreground = '#C0CAF5'
-selection-background = '#283457'
+# selection-foreground = '#C0CAF5'
+# selection-background = '#283457'
 
 # Dim colors
-dim-black = '#0C0C14'
-dim-blue = '#5A7FD4'
-dim-cyan = '#5AA8D4'
-dim-foreground = '#A9B1D6'
-dim-green = '#7FB356'
-dim-magenta = '#9A7FD4'
-dim-red = '#C53B4E'
-dim-white = '#9AA5CE'
-dim-yellow = '#C39A5A'
+# dim-black = '#0C0C14'
+# dim-blue = '#5A7FD4'
+# dim-cyan = '#5AA8D4'
+# dim-foreground = '#A9B1D6'
+# dim-green = '#7FB356'
+# dim-magenta = '#9A7FD4'
+# dim-red = '#C53B4E'
+# dim-white = '#9AA5CE'
+# dim-yellow = '#C39A5A'
 
 # Light colors
-light-black = '#414868'
-light-blue = '#7AA2F7'
-light-cyan = '#7DCFFF'
-light-foreground = '#C0CAF5'
-light-green = '#9ECE6A'
-light-magenta = '#BB9AF7'
-light-red = '#F7768E'
-light-white = '#C0CAF5'
-light-yellow = '#E0AF68'
+# light-black = '#414868'
+# light-blue = '#7AA2F7'
+# light-cyan = '#7DCFFF'
+# light-foreground = '#C0CAF5'
+# light-green = '#9ECE6A'
+# light-magenta = '#BB9AF7'
+# light-red = '#F7768E'
+# light-white = '#C0CAF5'
+# light-yellow = '#E0AF68'
 
-padding = [10, 30]  # top/bottom: 10px, left/right: 30px
+padding = [10, 5, 15, 20]
 confirm-before-quit = false
 
 [fonts]
 family = "RobotoMono Nerd Font"
 size = 15.5
+line-height = 1.5
+
+#[fonts.regular]
+#family = "cascadiacode"
+#style = "default"
+
+#[fonts.bold]
+#family = "cascadiacode"
+#style = "default"
+
+#[fonts.italic]
+#family = "cascadiacode"
+#style = "default"
+
+#[fonts.bold-italic]
+#family = "cascadiacode"
+#style = "default"
 
 [navigation]
 mode = "NativeTab"       # macOS native tabs — each tab gets an "×" close button
@@ -89,3 +106,21 @@ keys = [
   { key = "left",  with = "super", action = "SelectPrevTab" },
   { key = "right", with = "super", action = "SelectNextTab" },
 ]
+
+[bell]
+audio = false
+
+[panel]
+padding = [10, 5]
+row-gap = 10  # 10px vertical gap between panels
+column-gap = 15  # 15px horizontal gap between panels
+border-width = 2.0  # 2px border around panels
+border-radius = 8.0  # 8px rounded corners
+
+#[platform]
+# macOS: Override only specific fields
+#macos.theme = "dracula"
+#macos.env-vars = ["HOMEBREW_PREFIX=/opt/homebrew"]
+#macos.window.opacity = 1.0  # Other window fields preserved
+#macos.renderer.backend = "Metal"
+#macos.shell = { program = "/bin/zsh", args = ["-l"] }

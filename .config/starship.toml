@@ -22,7 +22,6 @@ full_symbol = "� "
 disabled=true
 
 [shell]
-fish_indicator = " "
 #zsh_indicator = "🦾 "
 bash_indicator = "🐚 "
 disabled = false
