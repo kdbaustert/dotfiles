@@ -1,0 +1,116 @@
+# zsh-abbr user abbreviations — seeded from zsh/aliases.zsh.
+#
+# Loaded via $ABBR_USER_ABBREVIATIONS_FILE (set in zsh/zinit.zsh). Unlike an
+# alias, an abbreviation expands inline as you type (SPACE/ENTER), so the full
+# command is what runs AND what lands in history. Manage with `abbr add NAME=…`,
+# `abbr erase NAME`, `abbr list`.
+#
+# NOTE: abbr rewrites this file on `abbr add`/`erase` and does not preserve
+# comments — this header and the section breaks below survive only until the
+# first such mutation.
+
+# --- git ---------------------------------------------------------------------
+abbr g='git'
+abbr ga='git add'
+abbr gaa='git add --all'
+abbr gb='git branch'
+abbr gc='git commit'
+abbr gcm='git commit -m'
+abbr gca='git commit -a'
+abbr gcam='git commit -am'
+abbr gcl='git clean'
+abbr gco='git checkout'
+abbr gcob='git checkout -b'
+abbr gd='git diff'
+abbr gds='git diff --staged'
+abbr gf='git fetch'
+abbr gl='git log --pretty=oneline --abbrev-commit'
+abbr gp='git pull'
+abbr gps='git push'
+abbr gr='git reset'
+abbr grh='git reset --hard'
+abbr grs='git reset --soft'
+abbr gs='git status -sb'
+abbr gst='git stash'
+abbr gstp='git stash pop'
+abbr gsts='git stash save'
+
+# --- pnpm --------------------------------------------------------------------
+abbr pi='pnpm install'
+abbr pid='pnpm install --save-dev'
+abbr pr='pnpm run'
+abbr prb='pnpm run build'
+abbr prcl='pnpm run clean'
+abbr prc='pnpm run check'
+abbr prd='pnpm run dev'
+abbr prdp='pnpm run deploy'
+abbr prf='pnpm run fmt'
+abbr prl='pnpm run lint'
+abbr prs='pnpm run start'
+abbr prt='pnpm run test'
+abbr px='pnpx'
+
+# --- yarn --------------------------------------------------------------------
+abbr y='yarn'
+abbr ya='yarn add'
+abbr yad='yarn add -D'
+abbr yb='yarn build'
+abbr yc='yarn clean'
+abbr yd='yarn dev'
+abbr yi='yarn install'
+abbr yl='yarn lint'
+abbr yr='yarn run'
+abbr yrm='yarn remove'
+abbr ys='yarn start'
+abbr yt='yarn test'
+abbr yu='yarn upgrade-interactive --latest'
+abbr yw='yarn workspace'
+abbr yws='yarn workspaces'
+
+# --- npm ---------------------------------------------------------------------
+abbr npmg='npm install -g'
+abbr npmi='npm install'
+abbr npms='npm install --save'
+abbr npmsd='npm install --save-dev'
+abbr npmrw='npm run watch'
+abbr npmu='npm run uninstall'
+abbr npmgl='npm list -g --depth 0'
+abbr npmgroot='npm root -g'
+abbr nx='npx'
+
+# --- composer ----------------------------------------------------------------
+abbr cda='composer dump-autoload'
+abbr ci='composer install'
+abbr cr='composer require'
+abbr crm='composer remove'
+abbr cu='composer update'
+
+# --- brew --------------------------------------------------------------------
+abbr brewl='brew list'
+abbr brewi='brew install'
+abbr brewri='brew reinstall'
+abbr brewr='brew remove'
+abbr brewcl='brew list --cask'
+abbr brewci='brew install --cask'
+abbr brewd='brew doctor'
+abbr brews='brew search'
+abbr brewsr='brew services restart'
+abbr brewsl='brew services list'
+
+# --- valet -------------------------------------------------------------------
+abbr vs='valet start'
+abbr vst='valet stop'
+abbr vls='valet links'
+abbr vl='valet link'
+abbr vul='valet unlink'
+abbr vssl='valet secure'
+
+# --- nvm ---------------------------------------------------------------------
+abbr nvmci='nvm install'
+abbr nvmu='nvm uninstall'
+abbr nvmc='nvm current'
+abbr nvmv='nvm version'
+abbr nvmlr='nvm ls-remote'
+
+# --- php ---------------------------------------------------------------------
+abbr phpa='php artisan'

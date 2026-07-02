@@ -123,16 +123,9 @@ alias yabrestart='brew services start yabai && brew services start skhd'
 alias yabrestop='brew services stop yabai && brew services stop skhd'
 alias yabupdate='brew services stop yabai && brew upgrade yabai && sudo yabai --uninstall-sa && sudo yabai --install-sa && brew services start yabai'
 
-# Valet
-alias vs='valet start'
-alias vst='valet stop'
-alias vls='valet links'
-alias vl='valet link'
-alias vul='valet unlink'
-alias vssl='valet secure'
+# Valet — moved to abbreviations (zsh/abbreviations)
 
-# PHP Artisan
-alias phpa='php artisan'
+# PHP Artisan — `phpa` moved to abbreviations (zsh/abbreviations)
 
 # SSH
 alias sshconfig='cd ~/.ssh; code config'
@@ -161,19 +154,9 @@ alias ip="dig +short myip.opendns.com @resolver1.opendns.com"
 # 🔇
 alias stfu="osascript -e 'set volume output muted true'"
 
-# Brew
+# Brew — subcommands moved to abbreviations (zsh/abbreviations)
 alias brewf='$(brew --prefix)'
 alias brew='env PATH="${PATH//$(pyenv root)\/shims:/}" brew'
-alias brewl='brew list'
-alias brewi='brew install'
-alias brewri='brew reinstall'
-alias brewr='brew remove'
-alias brewcl='brew list --cask'
-alias brewci='brew install --cask'
-alias brewd='brew doctor'
-alias brews='brew search'
-alias brewsr='brew services restart'
-alias brewsl='brew services list'
 
 # FZF
 alias hist="history | fzf"
@@ -201,89 +184,24 @@ alias vrules='vue inspect --rules'
 alias vrule='vue inspect --rule'
 alias vplugins='vue inspect --plugins'
 
-# Node.js
-alias npmgroot='npm root -g'
-alias npmgl='npm list -g --depth 0'
-alias npmg='npm install -g'
-alias npmi='npm install'
-alias npms='npm install --save'
-alias npmsd='npm install --save-dev'
-alias npmrw='npm run watch'
-alias npmu='npm run uninstall'
+# Node.js — npm prefixes moved to abbreviations (zsh/abbreviations)
 alias npmc='npm install & composer install'
-alias nx="npx"
 
-#PNPM
-alias pi="pnpm install"
-alias pid="pnpm install --save-dev"
-alias pr="pnpm run"
-alias prb="pnpm run build"
-alias prcl="pnpm run clean"
-alias prc="pnpm run check"
-alias prd="pnpm run dev"
-alias prdp="pnpm run deploy"
-alias prf="pnpm run fmt"
-alias prl="pnpm run lint"
-alias prs="pnpm run start"
-alias prt="pnpm run test"
-alias px="pnpx"
+#PNPM — prefixes moved to abbreviations (zsh/abbreviations)
 alias pug="pnpm list -g --json | jq '.[] | .dependencies | keys | .[]' -r  | xargs pnpm add -g"
 
-# Yarn
-alias y="yarn"
-alias ya="yarn add"
-alias yad="yarn add -D"
-alias yb="yarn build"
-alias yc="yarn clean"
-alias yd="yarn dev"
-alias yi="yarn install"
-alias yl="yarn lint"
-alias yr="yarn run"
-alias yrm="yarn remove"
-alias ys="yarn start"
-alias yt="yarn test"
-alias yu="yarn upgrade-interactive --latest"
-alias yw="yarn workspace"
-alias yws="yarn workspaces"
+# Yarn — moved to abbreviations (zsh/abbreviations)
 
-# Nvm
-alias nvmci='nvm install'
-alias nvmu='nvm uninstall'
-alias nvmc='nvm current'
-alias nvmv='nvm version'
-alias nvmlr='nvm ls-remote'
+# Nvm — moved to abbreviations (zsh/abbreviations)
 
-# Git
-alias g="git"
-alias ga="git add"
-alias gaa="git add --all"
-alias gb="git branch"
+# Git — prefixes moved to abbreviations (zsh/abbreviations). These stay as
+# aliases: abbr names can't hold ! or ~, and gwip/gui are compound.
 alias gc!="git commit --amend --no-edit"
-alias gc="git commit"
 alias gca!="git commit -a --amend --no-edit"
-alias gca="git commit -a"
 alias gcam!="git commit -a --amend"
-alias gcam="git commit -am"
-alias gcl="git clean"
 alias gcm!="git commit --amend"
-alias gcm="git commit -m"
-alias gco="git checkout"
-alias gcob="git checkout -b"
-alias gd="git diff"
-alias gds="git diff --staged"
 alias gd~="git diff HEAD~"
-alias gf="git fetch"
-alias gl='git log --pretty=oneline --abbrev-commit'
-alias gp="git pull"
-alias gps="git push"
-alias gr="git reset"
 alias gr~="git reset HEAD~"
-alias grh="git reset --hard"
-alias grs="git reset --soft"
-alias gs="git status -sb"
-alias gst="git stash"
-alias gstp="git stash pop"
-alias gsts="git stash save"
 alias gui="gitui"
 alias gwip!="git add --all && git commit -a --amend --no-edit"
 alias gwip="git add --all && git commit -am 'WIP'"
@@ -292,13 +210,8 @@ alias gwip="git add --all && git commit -am 'WIP'"
 alias gitli='git lfs install'
 alias gitlt='git lfs track'
 
-# Composer
+# Composer — subcommands moved to abbreviations (zsh/abbreviations)
 alias c='composer'
-alias cda='composer dump-autoload'
-alias ci='composer install'
-alias cr='composer require'
-alias crm='composer remove'
-alias cu='composer update'
 
 # PHP code sniffer
 alias codewp='phpcs --config-set default_standard WordPress'

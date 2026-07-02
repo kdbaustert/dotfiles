@@ -127,7 +127,10 @@ export AUTO_NOTIFY_IGNORE=(nvim hx micro vim man less ssh tmux fzf navi \
 # abbr: fish-style abbreviations that expand inline as you type. Unlike an
 # alias, the *expanded* command is what runs and what lands in history — pairs
 # well with you-should-use. Manage with `abbr add ga='git add'`, `abbr list`,
-# `abbr erase`. Definitions persist in ${XDG_CONFIG_HOME}/zsh-abbr/user-abbreviations.
+# `abbr erase`. Definitions are seeded in $DOTFILES/zsh/abbreviations (pointed
+# at below); abbr reads/writes that file directly so runtime `abbr add`s stay
+# version-controlled. Must be set before the plugin loads.
+export ABBR_USER_ABBREVIATIONS_FILE="$DOTFILES/zsh/abbreviations"
 zinit wait lucid for \
   hlissner/zsh-autopair \
   MichaelAquilina/zsh-you-should-use \
