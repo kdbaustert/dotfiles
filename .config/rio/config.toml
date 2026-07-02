@@ -1,5 +1,10 @@
 # See the full configuration reference: https://rioterm.com/docs/config
 
+# Top-level options must come BEFORE any [section] header, or TOML folds them
+# into the preceding table (e.g. colors.padding) and Rio ignores them.
+padding = [10, 5, 15, 20]  # top, right, bottom, left (CSS order)
+confirm-before-quit = false
+
 [colors]
 # LunarVim (lunar / TokyoNight Night) theme
 # Regular colors
@@ -60,13 +65,11 @@
 # light-white = '#C0CAF5'
 # light-yellow = '#E0AF68'
 
-padding = [10, 5, 15, 20]
-confirm-before-quit = false
-
 [fonts]
 family = "RobotoMono Nerd Font"
 size = 15.5
 line-height = 1.5
+features = ["calt", "liga", "dlig"]  # enable contextual/standard/discretionary ligatures
 
 #[fonts.regular]
 #family = "cascadiacode"
@@ -93,7 +96,7 @@ shape = 'underline'
 blinking = true
 
 [window]
-startup-mode = "Maximized"  # open maximized (fills the screen, keeps title bar)
+startup-mode = "Fullscreen"  # open in true fullscreen (own Space, no title bar)
 opacity = 0.45
 blur = true
 
@@ -106,6 +109,12 @@ keys = [
   { key = "left",  with = "super", action = "SelectPrevTab" },
   { key = "right", with = "super", action = "SelectNextTab" },
 ]
+
+[renderer]
+backend = "Metal"                # GPU backend on macOS (vs Vulkan/GL/DX12/WebGPU)
+target-fps = 120                 # cap render rate — match ProMotion (drop to 60 on non-120Hz displays)
+disable-unfocused-render = true  # stop rendering windows that aren't focused
+disable-occluded-render = true   # stop rendering windows hidden behind others
 
 [bell]
 audio = false
@@ -122,5 +131,4 @@ border-radius = 8.0  # 8px rounded corners
 #macos.theme = "dracula"
 #macos.env-vars = ["HOMEBREW_PREFIX=/opt/homebrew"]
 #macos.window.opacity = 1.0  # Other window fields preserved
-#macos.renderer.backend = "Metal"
 #macos.shell = { program = "/bin/zsh", args = ["-l"] }
