@@ -90,14 +90,18 @@ done
 link "$DOTFILES_DIR/.zprofile" "$HOME/.zprofile"
 link "$DOTFILES_DIR/.zprofile" "$HOME/.profile"
 
-# ~/.config sub-configs (link every entry that exists in the repo's .config).
+# ~/.config sub-configs (link every entry that exists in the repo's .config,
+# including hidden ones like .claude). dotglob so `*` matches dotfiles too;
+# nullglob so an empty dir doesn't leave the literal glob pattern.
 mkdir -p "$HOME/.config"
 if [ -d "$DOTFILES_DIR/.config" ]; then
+  shopt -s dotglob nullglob
   for item in "$DOTFILES_DIR/.config"/*; do
     [ -e "$item" ] || continue
     case "$(basename "$item")" in .DS_Store) continue ;; esac
     link "$item" "$HOME/.config/$(basename "$item")"
   done
+  shopt -u dotglob nullglob
 fi
 
 #------------------------------------------------------------------------------
