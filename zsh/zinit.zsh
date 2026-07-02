@@ -124,8 +124,13 @@ export AUTO_NOTIFY_THRESHOLD=20
 export AUTO_NOTIFY_IGNORE=(nvim hx micro vim man less ssh tmux fzf navi \
   yazi ranger nnn xplr lazygit gitui btop htop top watch tail)
 
+# abbr: fish-style abbreviations that expand inline as you type. Unlike an
+# alias, the *expanded* command is what runs and what lands in history — pairs
+# well with you-should-use. Manage with `abbr add ga='git add'`, `abbr list`,
+# `abbr erase`. Definitions persist in ${XDG_CONFIG_HOME}/zsh-abbr/user-abbreviations.
 zinit wait lucid for \
   hlissner/zsh-autopair \
   MichaelAquilina/zsh-you-should-use \
   wfxr/forgit \
-  MichaelAquilina/zsh-auto-notify
+  MichaelAquilina/zsh-auto-notify \
+  olets/zsh-abbr

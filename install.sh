@@ -81,7 +81,7 @@ brew cleanup
 title "Symlinking dotfiles"
 #------------------------------------------------------------------------------
 # Root-level dotfiles (only those that exist in the repo are linked).
-for f in .zshrc .gitconfig .gitignore .editorconfig .eslintrc .eslintignore \
+for f in .zshenv .zshrc .gitconfig .gitignore .editorconfig .eslintrc .eslintignore \
          .prettierrc .prettierignore .stylelintrc tsconfig.json .default-npm-packages; do
   link "$DOTFILES_DIR/$f" "$HOME/$f"
 done

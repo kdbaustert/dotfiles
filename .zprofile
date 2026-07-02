@@ -7,21 +7,18 @@
 [[ -f "${HOME}/Library/Application Support/kiro-cli/shell/zprofile.pre.zsh" ]] && builtin source "${HOME}/Library/Application Support/kiro-cli/shell/zprofile.pre.zsh"
 
 #------------------------------------------------------------------------------
-# Locale & terminal
+# Terminal
 #------------------------------------------------------------------------------
-export LANG=en_US.UTF-8
-export LC_ALL=en_US.UTF-8
+# Locale (LANG/LC_ALL), EDITOR, DOTFILES, WORDCHARS and the XDG base dirs now
+# live in .zshenv so scripts and non-login shells see them too. TERM is left
+# for the terminal to set — iTerm and Rio each advertise their own; hardcoding
+# xterm-256color here only risked downgrading Rio's capabilities.
 export COLORTERM="truecolor"
-export TERM="xterm-256color"
 
 #------------------------------------------------------------------------------
-# Core
+# Core (DOTFILES/EDITOR/WORDCHARS/locale/XDG now live in .zshenv)
 #------------------------------------------------------------------------------
-export DOTFILES="$HOME/dotfiles"
-export EDITOR='nvim'
-export VISUAL=$EDITOR
 export GPG_TTY=$(tty)
-export WORDCHARS='~!#$%^&*(){}[]<>?.+;'
 
 # eza / ls colors
 export EZA_ICON_SPACING=1
@@ -47,7 +44,7 @@ path=(
   "$HOME/.config/composer/vendor/bin"
   "$HOME/Library/Electron/alias"
   "$HOME/.spicetify"
-  "$PNPM_HOME"
+  "$PNPM_HOME/bin"
   "$HOME/bin"
   "$HOME/.config/phpmon/bin"
   "$PYENV_ROOT/bin"
@@ -75,6 +72,17 @@ eval "$(/opt/homebrew/bin/brew shellenv)"
 # only pyenv work done synchronously (no subprocess); the rest of pyenv's shell
 # integration is loaded via zinit turbo (see zsh/zinit.zsh).
 [ -d "$PYENV_ROOT/shims" ] && path=("$PYENV_ROOT/shims" $path) && typeset -U path PATH
+
+# FlyEnv (PHP dev-environment manager) — prepended last so its PHP wins over
+# Homebrew's, preserving the previous behavior when this lived at the end of
+# .zshrc. Guarded so it's a no-op when FlyEnv isn't installed; a not-yet-created
+# subdir in the list is harmless (zsh just skips missing PATH entries).
+[ -d "$HOME/Library/FlyEnv" ] && path=(
+  "$HOME/Library/FlyEnv/alias"
+  "$HOME/Library/FlyEnv/env/php/bin"
+  "$HOME/Library/FlyEnv/env/php"
+  $path
+) && typeset -U path PATH
 
 # Kiro CLI post block. Keep at the bottom of this file.
 [[ -f "${HOME}/Library/Application Support/kiro-cli/shell/zprofile.post.zsh" ]] && builtin source "${HOME}/Library/Application Support/kiro-cli/shell/zprofile.post.zsh"

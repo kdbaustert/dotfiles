@@ -7,8 +7,8 @@
 # Kiro CLI pre block. Keep at the top of this file.
 [[ -f "${HOME}/Library/Application Support/kiro-cli/shell/zshrc.pre.zsh" ]] && builtin source "${HOME}/Library/Application Support/kiro-cli/shell/zshrc.pre.zsh"
 
-# $DOTFILES is normally exported by .zprofile, but that only runs for login
-# shells. Fall back to the default so this file works in non-login shells too.
+# $DOTFILES is exported by .zshenv (sourced for every zsh). Keep a defensive
+# fallback in case this file is ever sourced without it.
 : "${DOTFILES:=$HOME/dotfiles}"
 
 #------------------------------------------------------------------------------
@@ -22,14 +22,19 @@ setopt EXTENDED_HISTORY        # record timestamp of each command
 setopt HIST_EXPIRE_DUPS_FIRST  # trim duplicates first when HISTFILE overflows
 setopt HIST_IGNORE_ALL_DUPS    # never store a duplicate of an existing entry
 setopt HIST_IGNORE_SPACE       # don't record commands that start with a space
+setopt HIST_REDUCE_BLANKS      # strip superfluous whitespace before recording
+setopt HIST_SAVE_NO_DUPS       # don't write duplicate entries to the history file
 setopt HIST_VERIFY             # expand history, but let me confirm before running
-setopt INC_APPEND_HISTORY      # append as commands run, not at shell exit
-setopt SHARE_HISTORY           # share history live across sessions
+setopt SHARE_HISTORY           # share history live across sessions (implies INC_APPEND)
 
 #------------------------------------------------------------------------------
 # Shell options
 #------------------------------------------------------------------------------
 setopt AUTOCD                  # `dir` == `cd dir`
+setopt AUTO_PUSHD              # cd maintains a dir stack; `cd -<TAB>` to revisit
+setopt PUSHD_IGNORE_DUPS       # no duplicate entries on the dir stack
+setopt PUSHD_SILENT            # don't print the stack after each pushd/popd
+setopt EXTENDED_GLOB           # ^, ~, # glob operators (negation, exclusion, etc.)
 setopt INTERACTIVE_COMMENTS    # allow # comments at the interactive prompt
 setopt ALWAYS_TO_END           # move cursor to word end after completion
 setopt COMPLETE_IN_WORD        # complete from the cursor, not just the word end
@@ -133,6 +138,17 @@ command -v navi &>/dev/null && eval "$(navi widget zsh)"
 # thefuck — lazy-loaded so it doesn't spawn Python on every shell start
 fuck() { unset -f fuck; eval "$(thefuck --alias)"; fuck "$@"; }
 
+# Homebrew command-not-found — when an unknown command is typed, suggest the
+# formula that provides it (`brew which-formula` under the hood). Shipped in
+# Homebrew core now (the old homebrew/command-not-found tap was deprecated).
+# Source the handler directly rather than `eval "$(brew command-not-found-init)"`
+# so we don't spawn brew on every startup; $HOMEBREW_REPOSITORY comes from
+# brew shellenv in .zprofile.
+() {
+  local h="${HOMEBREW_REPOSITORY:-/opt/homebrew}/Library/Homebrew/command-not-found/handler.sh"
+  [[ -r $h ]] && source "$h"
+}
+
 # zsh-autosuggestions: async fetch
 export ZSH_AUTOSUGGEST_USE_ASYNC=true
 
@@ -147,11 +163,3 @@ _osc7_cwd
 
 # Kiro CLI post block. Keep at the bottom of this file.
 [[ -f "${HOME}/Library/Application Support/kiro-cli/shell/zshrc.post.zsh" ]] && builtin source "${HOME}/Library/Application Support/kiro-cli/shell/zshrc.post.zsh"
-export PATH="${HOME}/Library/FlyEnv/alias:${HOME}/Library/FlyEnv/env/php/bin:${HOME}/Library/FlyEnv/env/php:$PATH"
-# pnpm
-export PNPM_HOME="${HOME}/Library/pnpm"
-case ":$PATH:" in
-  *":$PNPM_HOME/bin:"*) ;;
-  *) export PATH="$PNPM_HOME/bin:$PATH" ;;
-esac
-# pnpm end
