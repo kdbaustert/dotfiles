@@ -1,0 +1,9 @@
+# Machine-specific atuin install manifest (written by cargo-dist on
+# install/update). Not portable across machines — keep it local.
+atuin-receipt.json
+
+# Runtime state atuin may drop here; history DB, key and session live under
+# $XDG_DATA_HOME/atuin, but guard against anything sensitive landing here.
+key
+session
+*.db
