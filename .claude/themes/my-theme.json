@@ -1,0 +1,12 @@
+{
+  "name": "My Custom Theme",
+  "base": "dark",
+  "overrides": {
+    "claude": "#bd93f9",
+    "success": "#50fa7b",
+    "error": "#ff5555",
+    "warning": "#f1fa8c",
+    "diffAdded": "#14532d",
+    "diffRemoved": "#7f1d1d"
+  }
+}
