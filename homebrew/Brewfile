@@ -165,5 +165,6 @@ cask "rio"
 cask "font-fira-code"
 cask "font-monaspace"
 cask "font-symbols-only-nerd-font"
+cask "font-jetbrains-mono-nerd-font"  # v3 Nerd Font — Rio + NvChad devicons need v3 glyphs
 
 
