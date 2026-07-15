@@ -78,10 +78,57 @@ brew analytics off
 brew cleanup
 
 #------------------------------------------------------------------------------
+title "pay-respects"
+#------------------------------------------------------------------------------
+# Command correction (the `fuck` alias in .zshrc). Not installed via Homebrew:
+# there is no formula in core, and the tap the upstream README points at
+# (timescam/homebrew-tap) is a 2-star third-party repo owned by someone other
+# than the project author that pins `version "nightly"` — a moving target for a
+# tool that reads the command line. So: pull the author's own signed release,
+# pinned and checksummed, into ~/.local/bin (already on PATH via .zprofile).
+#
+# The release only ships .tar.zst, which is why this isn't a zinit `gh-r` block
+# like starship — zinit's extractor handles zip/tar.gz/tar.xz/7z but not zstd.
+#
+# arm64 only, matching the aarch64 pin on starship in zsh/zinit.zsh.
+# To bump: change PR_VERSION, then update PR_SHA256 from the new asset.
+PR_VERSION="0.8.8"
+PR_SHA256="e834e928dcaf9cd72a99478bb61e0630ba76e32c7b228eb3a7be9c5f404cd548"
+PR_ASSET="pay-respects-${PR_VERSION}-aarch64-apple-darwin.tar.zst"
+PR_URL="https://github.com/iffse/pay-respects/releases/download/v${PR_VERSION}/${PR_ASSET}"
+
+if [ "$(uname -m)" != "arm64" ]; then
+  warning "Skipping pay-respects — this block is pinned to arm64 (found $(uname -m))."
+elif [ -x "$HOME/.local/bin/pay-respects" ] \
+  && [ "$("$HOME/.local/bin/pay-respects" --version 2>/dev/null | grep -oE '[0-9]+\.[0-9]+\.[0-9]+')" = "$PR_VERSION" ]; then
+  info "pay-respects ${PR_VERSION} already installed."
+elif ! command -v unzstd &>/dev/null; then
+  warning "Skipping pay-respects — unzstd not found (expected from the zstd formula)."
+else
+  info "Installing pay-respects ${PR_VERSION}..."
+  pr_tmp="$(mktemp -d)"
+  if curl -sSfL -o "$pr_tmp/$PR_ASSET" "$PR_URL" \
+    && echo "${PR_SHA256}  ${pr_tmp}/${PR_ASSET}" | shasum -a 256 -c - >/dev/null 2>&1 \
+    && tar --use-compress-program=unzstd -xf "$pr_tmp/$PR_ASSET" -C "$pr_tmp"; then
+    mkdir -p "$HOME/.local/bin" "$HOME/.local/share/man/man1" "$HOME/.local/share/man/man5"
+    install -m 755 "$pr_tmp/pay-respects" "$HOME/.local/bin/"
+    # Rules module only. _pay-respects-fallback-100-request-ai is deliberately
+    # NOT installed — it ships failed commands off the machine to an AI endpoint.
+    install -m 755 "$pr_tmp/_pay-respects-module-100-runtime-rules" "$HOME/.local/bin/"
+    install -m 644 "$pr_tmp"/man/*.1 "$HOME/.local/share/man/man1/" 2>/dev/null
+    install -m 644 "$pr_tmp"/man/*.5 "$HOME/.local/share/man/man5/" 2>/dev/null
+    success "pay-respects ${PR_VERSION} installed."
+  else
+    warning "pay-respects install failed (download, checksum, or extract) — skipping."
+  fi
+  rm -rf "$pr_tmp"
+fi
+
+#------------------------------------------------------------------------------
 title "Symlinking dotfiles"
 #------------------------------------------------------------------------------
 # Root-level dotfiles (only those that exist in the repo are linked).
-for f in .zshenv .zshrc .gitconfig .gitignore .editorconfig .eslintrc .eslintignore \
+for f in .zshenv .zshrc .vimrc .gitconfig .gitignore .editorconfig .eslintrc .eslintignore \
          .prettierrc .prettierignore .stylelintrc tsconfig.json .default-npm-packages; do
   link "$DOTFILES_DIR/$f" "$HOME/$f"
 done

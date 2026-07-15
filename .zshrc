@@ -124,15 +124,14 @@ export FUNCNEST=5000
 source "$DOTFILES/zsh/functions.zsh"
 source "$DOTFILES/zsh/aliases.zsh"
 
+# terminal-notifier: ping when a long command finishes while Rio is unfocused
+[ -f "$DOTFILES/zsh/extra/notify.zsh" ] && source "$DOTFILES/zsh/extra/notify.zsh"
+
 #------------------------------------------------------------------------------
 # Tool integrations
 #------------------------------------------------------------------------------
 # zoxide — smarter `cd` (provides `z` and `zi`)
 command -v zoxide &>/dev/null && eval "$(zoxide init zsh)"
-
-# pyenv — Python version management. PYENV_ROOT is exported in .zprofile; the
-# shell integration is loaded via zinit turbo (see zinit.zsh) so it doesn't
-# block startup. Nothing to init synchronously here.
 
 # atuin — shell history (owns Ctrl-R / Up). Initialised exactly once.
 [ -f "$HOME/.atuin/bin/env" ] && . "$HOME/.atuin/bin/env"
@@ -141,15 +140,25 @@ command -v atuin &>/dev/null && eval "$(atuin init zsh)"
 # navi — interactive cheatsheets (Ctrl-G)
 command -v navi &>/dev/null && eval "$(navi widget zsh)"
 
-# thefuck — lazy-loaded so it doesn't spawn Python on every shell start
-fuck() { unset -f fuck; eval "$(thefuck --alias)"; fuck "$@"; }
+# pay-respects — corrects the last failed command (replaces thefuck, whose repo
+# is dead and which spawned a Python interpreter on every invocation). Kept on
+# `fuck` for muscle memory; the binary's own default is `f`, which would collide
+# with our fzf alias. Also binds ^X^X to fix the current line in place.
+#
+# --nocnf is REQUIRED, not cosmetic: without it pay-respects installs its own
+# command_not_found_handler, which does typo-correction but knows nothing about
+# Homebrew (no brew/formula lookup in the binary at all) and would silently
+# shadow the brew handler below — losing "install it with brew install X".
+# Cheap enough (<1ms Rust binary) to init eagerly; no lazy wrapper needed.
+command -v pay-respects &>/dev/null && eval "$(pay-respects zsh --alias fuck --nocnf)"
 
 # Homebrew command-not-found — when an unknown command is typed, suggest the
 # formula that provides it (`brew which-formula` under the hood). Shipped in
 # Homebrew core now (the old homebrew/command-not-found tap was deprecated).
 # Source the handler directly rather than `eval "$(brew command-not-found-init)"`
 # so we don't spawn brew on every startup; $HOMEBREW_REPOSITORY comes from
-# brew shellenv in .zprofile.
+# brew shellenv in .zprofile. With --nocnf above, this is the only handler
+# defined — but keep it last anyway so it wins if that flag is ever dropped.
 () {
   local h="${HOMEBREW_REPOSITORY:-/opt/homebrew}/Library/Homebrew/command-not-found/handler.sh"
   [[ -r $h ]] && source "$h"

@@ -34,7 +34,6 @@ export NTL_RUNNER=yarn
 export NVM_COLORS='cmgRY'
 export NVM_LAZY_LOAD=true          # zsh-nvm: defer nvm.sh until first node/npm/nvm use
 [ -d "$HOME/.nvm" ] && export NVM_DIR="$HOME/.nvm"
-export PYENV_ROOT="$HOME/.pyenv"
 export PNPM_HOME="$HOME/Library/pnpm"
 
 #------------------------------------------------------------------------------
@@ -47,7 +46,6 @@ path=(
   "$PNPM_HOME/bin"
   "$HOME/bin"
   "$HOME/.config/phpmon/bin"
-  "$PYENV_ROOT/bin"
   "$HOME/.local/bin"
   "/opt/homebrew/sbin"
   "/opt/homebrew/bin"
@@ -67,11 +65,6 @@ typeset -U path PATH
 
 # Homebrew environment (sets PATH/MANPATH/INFOPATH for the current arch)
 eval "$(/opt/homebrew/bin/brew shellenv)"
-
-# pyenv shims, prepended last so they win over Homebrew's python. This is the
-# only pyenv work done synchronously (no subprocess); the rest of pyenv's shell
-# integration is loaded via zinit turbo (see zsh/zinit.zsh).
-[ -d "$PYENV_ROOT/shims" ] && path=("$PYENV_ROOT/shims" $path) && typeset -U path PATH
 
 # FlyEnv (PHP dev-environment manager) — prepended last so its PHP wins over
 # Homebrew's, preserving the previous behavior when this lived at the end of

@@ -37,7 +37,7 @@ alias chammerspoon="code $HOME/.hammerspoon/init.lua"
 alias cyabai="code $HOME/.yabairc"
 alias czshrc="code $HOME/.zshrc"
 alias cspacebar="code $HOME/.spacebarrc"
-alias cnvims="code $HOME/.config/nvim/init.vim"
+alias cnvims="code $HOME/.config/nvim"
 # alias valetconfig="code /usr/local/etc/nginx/valet/valet.conf"
 
 # History search (atuin)
@@ -56,6 +56,7 @@ alias .....='cd ../../../..'
 alias wget='wget -c'
 alias mkcd=mcd
 alias v="nvim"
+alias nvmini="NVIM_APPNAME=mini nvim"
 alias lg="lazygit"
 
 if which eza &>/dev/null; then
@@ -74,17 +75,23 @@ if which eza &>/dev/null; then
   alias lr='eza -a -lgHh -R -L 2'
   alias lrr='eza -a -lgHh -R'
 else
+  # Fallback only — eza is in the Brewfile and is what actually runs here. Now
+  # lsd-only on purpose: most of these aliases used to call `colorls`, a Ruby gem
+  # that is not installed and not in the Brewfile, so if eza ever did go missing
+  # this branch would have handed back mostly command-not-found. Deliberately
+  # smaller than the eza set above — only the names with a faithful lsd
+  # equivalent, rather than approximations that behave subtly differently.
   alias ls='lsd'
-  alias la='ls -a'
-  alias lla='ls -la'
-  alias lt='ls --tree'
-  alias ll='colorls --group-directories-first --almost-all --long'
-  alias lc='colorls -lA --sd'
-  alias l='colorls --group-directories-first --almost-all --tree=1'
-  alias ll='colorls --group-directories-first --almost-all --long'
-  alias ld='colorls --group-directories-first --almost-all --dirs --tree=1'
-  alias lf='colorls --group-directories-first --almost-all --files --tree=1'
-  alias lt1='colorls --group-directories-first --almost-all --tree=1'
+  alias l='lsd -A --group-dirs first'
+  alias la='lsd -a'
+  alias ll='lsd -lA --group-dirs first'
+  alias lla='lsd -la'
+  alias l1='lsd -1 --group-dirs first'
+  alias la1='lsd -1a --group-dirs first'
+  alias lt='lsd --tree'
+  alias llt='lsd -lA --tree'
+  alias tree='lsd --tree'
+  alias lr='lsd -lA --tree --depth 2'
 fi
 
 alias pkey="pbcopy < ~/.ssh/id_rsa.pub"
@@ -136,7 +143,7 @@ alias chmodssh='sudo chmod 700 ~/.ssh && chmod 600 ~/.ssh/*'
 alias permission='chmod +x'
 
 # Get macOS Software Updates, and update installed Ruby gems, Homebrew, npm, and their installed packages
-alias update='brew update; brew upgrade; brew cleanup; npm install npm -g; npm update -g; sudo gem update colorls; composer global update; zinit update'
+alias update='brew update; brew upgrade; brew cleanup; npm install npm -g; npm update -g; composer global update; zinit update'
 
 # Recursively remove .DS_Store files
 alias dsnuke="find . -name '*.DS_Store' -type f -ls -delete"
@@ -156,7 +163,10 @@ alias stfu="osascript -e 'set volume output muted true'"
 
 # Brew — subcommands moved to abbreviations (zsh/abbreviations)
 alias brewf='$(brew --prefix)'
-alias brew='env PATH="${PATH//$(pyenv root)\/shims:/}" brew'
+# NB: `brew` used to be aliased to strip pyenv's shims out of PATH first (they
+# shadowed Homebrew's python and broke some formulae). pyenv is gone, so the
+# alias is both unnecessary and actively broken — `$(pyenv root)` is evaluated
+# on every use and would now fail. Don't reintroduce it.
 
 # FZF
 alias hist="history | fzf"

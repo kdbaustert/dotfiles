@@ -37,54 +37,20 @@ zinit light starship/starship
 
 # --- Version managers (turbo) -------------------------------------------------
 # Node — zsh-nvm with lazy loading (NVM_LAZY_LOAD=true, set in .zprofile) so the
-# heavy nvm.sh is only sourced on first `node`/`npm`/`nvm` use.
+# heavy nvm.sh is only sourced on first `node`/`npm`/`nvm` use. Kept on purpose,
+# even though nvm currently manages no versions (~/.nvm/versions/node is empty
+# and nothing in ~/Development or ~/Sites has a .nvmrc): it's here for
+# per-project Node versions when they're needed, and lazy loading means an
+# unused nvm costs ~nothing. Until `nvm install` is run, `node` resolves to
+# Homebrew's (declared in the Brewfile).
 zinit ice wait lucid
 zinit light lukechilds/zsh-nvm
 
-# Python — pyenv. Deferred via turbo so it never blocks the prompt (it was the
-# single biggest synchronous cost, ~0.12s). `--no-rehash` skips rebuilding shims
-# on every shell; rehash still runs automatically on `pyenv install`. The init
-# prepends ~/.pyenv/shims to PATH itself, just a hair after the first prompt.
-zinit ice wait lucid id-as'pyenv-init' \
-  atload'eval "$(pyenv init - --no-rehash zsh)"'
-zinit light zdharma-continuum/null
-
-# --- Tool completions not shipped via Homebrew --------------------------------
-# gh emits a clean `#compdef` script. Cache it once and prepend to fpath *before*
-# compinit runs (zicompinit, in the turbo block below). Delete the cache file to
-# refresh after a `gh` upgrade. (pnpm needs node, which we lazy-load, so it can't
-# be generated at startup; Taskwarrior's `task` ships its own completions.)
-() {
-  local cache="${XDG_CACHE_HOME:-$HOME/.cache}/zsh/completions"
-  [[ -d $cache ]] || command mkdir -p "$cache"
-  if [[ ! -s $cache/_gh ]] && (( $+commands[gh] )); then
-    gh completion -s zsh > "$cache/_gh"
-  fi
-  fpath=("$cache" $fpath)
-}
-
-# pnpm completion — pnpm shells out to `node` (lazy-loaded via nvm) to print its
-# completion, and the script it emits calls `compdef`. Neither is ready at
-# startup, so a precmd hook retries each prompt until both exist, then generates
-# + caches once, sources it, and removes itself. Subsequent shells hit the cache
-# on the first prompt after compinit. Delete the cache file to refresh.
-autoload -Uz add-zsh-hook
-_pnpm_comp_setup() {
-    # NB: compute cache here, not in an outer scope — zsh functions aren't
-    # closures, so a `local` from the defining context is gone by the time this
-    # precmd hook fires (would leave $cache empty → `>| ""` redirect error).
-    local cache="${XDG_CACHE_HOME:-$HOME/.cache}/zsh/completions/pnpm.zsh"
-    (( $+functions[compdef] )) || return            # wait for compinit (turbo)
-    if [[ ! -s $cache ]]; then
-      (( $+commands[node] && $+commands[pnpm] )) || return   # wait for nvm/node
-      [[ -d ${cache:h} ]] || command mkdir -p "${cache:h}"    # ensure cache dir (>| opens before 2>/dev/null)
-      pnpm completion zsh >| "$cache" 2>/dev/null || { command rm -f "$cache"; return; }
-    fi
-    source "$cache"
-    add-zsh-hook -d precmd _pnpm_comp_setup         # one-shot
-    unfunction _pnpm_comp_setup
-}
-add-zsh-hook precmd _pnpm_comp_setup
+# Python — pyenv was removed. It managed zero versions (~/.pyenv/versions empty,
+# `pyenv global` was `system`), so its shims and turbo-deferred `pyenv init`
+# resolved python3 to the same Homebrew python they'd have hit anyway. If
+# per-project Python versions are ever needed, add pyenv back here — or reach
+# for mise and let one tool cover Node and Python together.
 
 # --- Completions, fzf-tab, autosuggestions, syntax highlighting ---------------
 # One ordered turbo block:
@@ -103,12 +69,34 @@ zinit wait lucid for \
     zsh-users/zsh-autosuggestions \
   zdharma-continuum/fast-syntax-highlighting
 
+# --- carapace: completions for tools that ship none we can use ----------------
+# Replaces the hand-rolled `_gh` fpath cache and the pnpm precmd-retry hook that
+# used to live above. Registered per-command ON PURPOSE:
+#
+#   source <(carapace _carapace zsh)   # DON'T — one compdef hijacks 653 commands
+#   source <(carapace gh zsh)          # scoped: emits `compdef _gh_completion gh`
+#
+# The wholesale form would take over `git`, `ssh`, `man`, `tar`, `find`… clobbering
+# zsh's native _git and, with it, the `:completion:*:git-checkout:*` /
+# `:fzf-tab:complete:git-(add|diff|…)` zstyles in .zshrc — those match on _git's
+# sub-context, which _carapace_completer never produces. Add a line per tool that
+# genuinely lacks a good native completion; leave the rest to zsh.
+# Deferred via turbo so the two subprocesses land after the first prompt, and
+# ordered after the block above so compdef exists by the time they run.
+zinit ice wait lucid id-as'carapace-init' has'carapace' \
+  atload'source <(carapace gh zsh); source <(carapace pnpm zsh)'
+zinit light zdharma-continuum/null
+
 # --- Extra behavior plugins (turbo) -------------------------------------------
 #   - zsh-autopair        — auto-insert/delete matching brackets, quotes, parens
 #   - zsh-you-should-use  — nags when a full command has an existing alias
 #   - forgit              — fzf-powered git (glo, gss, gcb…); honours delta
 #   - zsh-auto-notify     — desktop notification when a long command finishes
 #                           (uses terminal-notifier, installed via Homebrew)
+#   - OMZP::sudo          — ESC ESC prepends `sudo` to the current line (or the
+#                           last command, on an empty line). Self-contained: it
+#                           pulls no OMZ lib. ^X^X is pay-respects' inline fixer
+#                           and ^X^E is edit-command-line — no collision.
 #
 # forgit: rename the 4 helpers that collide with our plain-git aliases in
 # aliases.zsh (ga/gd/grh/gco). The f-prefixed names give the interactive
@@ -132,6 +120,7 @@ export AUTO_NOTIFY_IGNORE=(nvim hx micro vim man less ssh tmux fzf navi \
 # version-controlled. Must be set before the plugin loads.
 export ABBR_USER_ABBREVIATIONS_FILE="$DOTFILES/zsh/abbreviations"
 zinit wait lucid for \
+  OMZP::sudo \
   hlissner/zsh-autopair \
   MichaelAquilina/zsh-you-should-use \
   wfxr/forgit \

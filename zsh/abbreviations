@@ -105,13 +105,6 @@ abbr vl='valet link'
 abbr vul='valet unlink'
 abbr vssl='valet secure'
 
-# --- nvm ---------------------------------------------------------------------
-abbr nvmci='nvm install'
-abbr nvmu='nvm uninstall'
-abbr nvmc='nvm current'
-abbr nvmv='nvm version'
-abbr nvmlr='nvm ls-remote'
-
 # --- php ---------------------------------------------------------------------
 abbr phpa='php artisan'
 
