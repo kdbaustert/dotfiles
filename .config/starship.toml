@@ -27,26 +27,26 @@ bash_indicator = "🐚 "
 disabled = false
 powershell_indicator = "_"
 
-[[battery.display]] # "bold red" style when capacity is between 0% and 10%
-style = "bold red"
+[[battery.display]] # red style when capacity is between 0% and 10%
+style = "red"
 threshold = 10
 
-[[battery.display]] # "bold yellow" style when capacity is between 10% and 30%
-style = "bold yellow"
+[[battery.display]] # yellow style when capacity is between 10% and 30%
+style = "yellow"
 threshold = 40
 
 [hostname]
 disabled = false
 format = "@[$hostname]($style)"
 ssh_only = true
-style = "bold green"
+style = "green"
 
 [username]
 disabled = false
 format = " [$user]($style) "
 show_always = true
-style_root = "red bold"
-style_user = "blue bold"
+style_root = "red"
+style_user = "blue"
 
 [php]
 disabled = false
@@ -63,7 +63,7 @@ disabled = false
 [directory]
 home_symbol = "~"
 read_only = "🔒 "
-style = "bold yellow"
+style = "yellow"
 truncate_to_repo = false
 truncation_length = 3
 truncation_symbol = ""
@@ -71,7 +71,7 @@ truncation_symbol = ""
 [memory_usage]
 disabled = true
 format = "[${symbol}RAM: ${ram}]($style) "
-style = "bold dimmed green"
+style = "dimmed green"
 threshold = -1
 
 [jobs]
@@ -85,7 +85,7 @@ disabled = true
 [time]
 disabled = true
 format = "[$symbol][$time ]($style) "
-style = "bold yellow"
+style = "yellow"
 symbol = "🕙 "
 use_12hr = false
 #time_format = "%Y/%m/%d %T"

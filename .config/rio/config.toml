@@ -1,8 +1,11 @@
 # See the full configuration reference: https://rioterm.com/docs/config
 
 # Top-level options must come BEFORE any [section] header, or TOML folds them
-# into the preceding table (e.g. colors.padding) and Rio ignores them.
-padding = [10, 5, 15, 20]  # top, right, bottom, left (CSS order)
+# into the preceding table (e.g. colors.margin) and Rio ignores them.
+# NOTE: this key is `margin` in 0.4.x (the docs site's `padding` is a newer
+# release). Unknown keys are dropped silently, so a typo just does nothing.
+margin = [10, 10, 15, 10]  # top, right, bottom, left (CSS order)
+line-height = 1.5  # top-level, NOT under [fonts]
 confirm-before-quit = false
 
 [colors]
@@ -10,18 +13,18 @@ confirm-before-quit = false
 # Regular colors
 # background = '#1A1B26'
 # black = '#15161E'
-# blue = '#7AA2F7'
-# cyan = '#7DCFFF'
+blue = '#5cc9f5'
+# cyan = '#6bc4fa'
 # foreground  = '#C0CAF5'
-# green = '#9ECE6A'
-# magenta = '#BB9AF7'
-# red = '#F7768E'
+green = '#b3e053'
+magenta = '#6638f0'
+red = '#eb43f4'
 # white = '#A9B1D6'
-# yellow = '#E0AF68'
+yellow = '#fcf58d'
 
 # Cursor
 # cursor = '#C0CAF5'
-# vi-cursor = '#BB9AF7'
+vi-cursor = '#6638f0'
 
 # Navigation
 # tabs = '#545C7E'  # Inactive tab text and border color
@@ -45,47 +48,40 @@ confirm-before-quit = false
 
 # Dim colors
 # dim-black = '#0C0C14'
-# dim-blue = '#5A7FD4'
-# dim-cyan = '#5AA8D4'
+dim-blue = '#5cc9f5'
+dim-cyan = '#5cc9f5'
 # dim-foreground = '#A9B1D6'
-# dim-green = '#7FB356'
+# dim-green = '#b3e053'
 # dim-magenta = '#9A7FD4'
-# dim-red = '#C53B4E'
+dim-red = '#eb43f4'
 # dim-white = '#9AA5CE'
-# dim-yellow = '#C39A5A'
+dim-yellow = '#fcf58d'
 
 # Light colors
 # light-black = '#414868'
-# light-blue = '#7AA2F7'
-# light-cyan = '#7DCFFF'
+light-blue = '#5cc9f5'
+light-cyan = '#5cc9f5'
 # light-foreground = '#C0CAF5'
-# light-green = '#9ECE6A'
-# light-magenta = '#BB9AF7'
-# light-red = '#F7768E'
+light-green = '#b3e053'
+light-magenta = '#6638f0'
+light-red = '#eb43f4'
 # light-white = '#C0CAF5'
-# light-yellow = '#E0AF68'
+light-yellow = '#fcf58d'
 
 [fonts]
-family = "RobotoMono Nerd Font"
+family = "Hack Nerd Font Mono"
 size = 15.5
-line-height = 1.5
 features = ["calt", "liga", "dlig"]  # enable contextual/standard/discretionary ligatures
 
-#[fonts.regular]
-#family = "cascadiacode"
-#style = "default"
+# Pin bold faces to regular weight so bold text renders like normal text.
+[fonts.bold]
+family = "Hack Nerd Font Mono"
+weight = 400
 
-#[fonts.bold]
-#family = "cascadiacode"
-#style = "default"
-
-#[fonts.italic]
-#family = "cascadiacode"
-#style = "default"
-
-#[fonts.bold-italic]
-#family = "cascadiacode"
-#style = "default"
+[fonts.bold-italic]
+family = "Hack Nerd Font Mono"
+style = "italic"
+weight = 400
 
 [navigation]
 mode = "NativeTab"       # macOS native tabs — each tab gets an "×" close button
@@ -120,7 +116,7 @@ disable-occluded-render = true   # stop rendering windows hidden behind others
 audio = false
 
 [panel]
-padding = [10, 5]
+padding = [10, 20]  # vertical, horizontal (CSS shorthand) — space inside each panel
 row-gap = 10  # 10px vertical gap between panels
 column-gap = 15  # 15px horizontal gap between panels
 border-width = 2.0  # 2px border around panels
