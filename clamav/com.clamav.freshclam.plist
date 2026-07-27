@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.clamav.freshclam</string>
+
+    <!-- One-shot update, scheduled by launchd rather than freshclam's own
+         daemon mode (-d). A long-lived freshclam holds an exclusive lock on
+         its log file, which makes a manual `freshclam` fail outright; this
+         way the process exits between runs and manual updates just work. -->
+    <key>ProgramArguments</key>
+    <array>
+        <string>/opt/homebrew/bin/freshclam</string>
+        <string>--config-file=/opt/homebrew/etc/clamav/freshclam.conf</string>
+    </array>
+
+    <key>RunAtLoad</key>
+    <true/>
+
+    <!-- Every 2 hours -->
+    <key>StartInterval</key>
+    <integer>7200</integer>
+
+    <key>StandardOutPath</key>
+    <string>/opt/homebrew/var/log/clamav/freshclam.out.log</string>
+
+    <key>StandardErrorPath</key>
+    <string>/opt/homebrew/var/log/clamav/freshclam.err.log</string>
+
+    <key>ProcessType</key>
+    <string>Background</string>
+
+    <key>LowPriorityIO</key>
+    <true/>
+</dict>
+</plist>

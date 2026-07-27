@@ -127,3 +127,80 @@ fcd() {
     -o -type d -print 2>/dev/null | fzf +m) &&
     cd "$dir"
 }
+
+# Full-disk ClamAV scan (aliased to `clamf`). Reports only — nothing is
+# deleted or quarantined, so a false positive can't cost you a real file.
+#
+# Uses clamscan, NOT clamdscan: clamd runs as $USER and can't read most of
+# the system, so a daemon-based full scan would silently skip nearly all of
+# it. Root + the standalone scanner is the only combination that sees /.
+#
+# The /System/Volumes exclusion is the one that matters on macOS — the data
+# volume is firmlinked in at /System/Volumes/Data, so without it every file
+# on the disk gets scanned twice.
+#
+# Optional args are scan targets; with none it scans /. Passing a path is
+# useful for a deep scan of one tree with the same reporting (and is how the
+# verdict logic below gets tested without sitting through a full run).
+clamfull() {
+  local log="$HOME/clamav-full-scan.log"
+  local tmp; tmp=$(mktemp)
+  local -a targets
+  if (( $# )); then targets=("$@"); else targets=(/); fi
+
+  # Pre-create as $USER so the root scan appends to a file we still own,
+  # rather than leaving a root-owned log in the home directory.
+  [[ -f "$log" ]] || : >"$log"
+
+  echo "Scanning ${targets[*]} — a full / scan takes hours. Log: $log"
+
+  # --alert-exceeds-max is the clamscan equivalent of clamd.conf's
+  # AlertExceedsMax; without it, files past the size/count limits are skipped
+  # silently and the scan still says OK. It's a CLI flag only — the clamd.conf
+  # setting does NOT apply here, since this runs the standalone scanner.
+  #
+  # caffeinate -i: don't let the machine idle-sleep mid-scan.
+  sudo caffeinate -i clamscan -r -i \
+    --alert-exceeds-max \
+    --exclude-dir='^/dev' \
+    --exclude-dir='^/Volumes' \
+    --exclude-dir='^/System/Volumes' \
+    --max-filesize=1000M \
+    --max-scansize=1000M \
+    --max-files=100000 \
+    --log="$log" \
+    "${targets[@]}" | tee "$tmp"
+
+  # rc from clamscan, not tee. clamscan exits 1 on a detection, 2 on error.
+  local rc=${pipestatus[1]}
+
+  # "Heuristics.Limits.Exceeded.*" hits mean "too big to scan", NOT "infected".
+  # clamscan keeps them out of its own "Infected files" tally but clamdscan does
+  # not, and either way they push the exit code to 2 — so split them out here
+  # rather than trusting the summary line.
+  # NB: `grep -c` prints 0 *and* exits 1 when nothing matches, so the obvious
+  # `$(grep -c ... || echo 0)` yields the two-line string "0\n0" and blows up
+  # the arithmetic below. Assign first, then correct only on command failure.
+  local total skipped real
+  total=$(grep -c 'FOUND$' "$tmp" 2>/dev/null) || total=0
+  skipped=$(grep -c 'Heuristics\.Limits\.Exceeded' "$tmp" 2>/dev/null) || skipped=0
+  real=$(( total - skipped ))
+  rm -f "$tmp"
+
+  # Order matters. clamscan exits 2 — normally "error" — when a file merely
+  # exceeds the limits, so checking rc first would report a big git pack as a
+  # failed scan. Real detections are decided by the parsed output, not rc.
+  if [[ $real -gt 0 ]]; then
+    echo "INFECTED: $real detection(s). See $log"
+    rc=1
+  elif [[ $rc -gt 1 && $skipped -eq 0 ]]; then
+    echo "Scan ended with errors (exit $rc). See $log"
+  else
+    echo "Clean — no infections found."
+    rc=0
+  fi
+  (( skipped > 0 )) && \
+    echo "Note: $skipped file(s) too large/complex to scan — grep 'Limits.Exceeded' $log"
+
+  return $rc
+}

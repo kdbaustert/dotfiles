@@ -97,9 +97,34 @@ fi
 alias pkey="pbcopy < ~/.ssh/id_rsa.pub"
 alias pubkey="more ~/.ssh/id_rsa.pub | pbcopy | echo '=> Public key copied to pasteboard.'"
 
-# CLAMSCAN
-alias clamf="sudo clamscan -r /"
-alias claimdb="freshclam"
+# ClamAV
+# Signatures auto-update every 2h via ~/Library/LaunchAgents/com.clamav.freshclam.plist,
+# and clamd runs via `brew services`. These are the manual overrides.
+
+# Scanning
+alias clamf=clamfull                              # full-disk scan (function, see functions.zsh)
+alias clamq='clamdscan --fdpass -m -i'            # quick scan via daemon — `clamq ~/Downloads`
+alias clamdl='clamdscan --fdpass -m -i "$HOME/Downloads"'
+# --fdpass is not optional: clamd runs as $USER, so without the passed file
+# descriptor it can't open much of anything outside your own files.
+
+# Signatures
+alias clamdb='freshclam'                          # update signatures now
+alias clamdbauto='launchctl kickstart gui/501/com.clamav.freshclam'  # trigger the scheduled update
+alias clamdbinfo='sigtool --info /opt/homebrew/var/lib/clamav/daily.cvd | head -5'
+
+# Daemon
+alias clamon='brew services start clamav'
+alias clamoff='brew services stop clamav'
+alias clamrestart='brew services restart clamav'
+alias clamstatus='brew services info clamav'
+alias clamreload='clamdscan --reload'             # re-read signatures without a restart
+
+# Logs
+alias clamlog='tail -f "$HOME/clamav-full-scan.log"'
+alias clamdblog='tail -20 /opt/homebrew/var/log/clamav/freshclam.log'
+alias clamdlog='tail -20 /opt/homebrew/var/log/clamav/clamd.log'
+alias clamcfg='command clamconf | head -40'       # dump effective config
 
 # MacOS commands
 alias testspeed="networkQuality"

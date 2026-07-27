@@ -77,6 +77,9 @@ brew "zstd"
 brew "helix"
 brew "yazi"
 brew "btop"
+# clamav — on-demand AV scanner. Configs live in clamav/ and are symlinked into
+# $(brew --prefix)/etc/clamav by install.sh; signatures update via a LaunchAgent.
+brew "clamav"
 # brew "elastic/tap/elasticsearch-full"
 # brew "khanhas/tap/spicetify-cli"
 # brew "switchaudio-osx"

@@ -152,6 +152,68 @@ if [ -d "$DOTFILES_DIR/.config" ]; then
 fi
 
 #------------------------------------------------------------------------------
+title "ClamAV"
+#------------------------------------------------------------------------------
+# clamav comes from the Brewfile; this wires up config + the signature updater.
+# Configs are symlinked (not copied) so edits in the repo take effect directly.
+if command -v clamscan &>/dev/null; then
+  CLAM_PREFIX="$(brew --prefix)"
+
+  # freshclam refuses to run if these don't exist, and the formula ships none.
+  mkdir -p "$CLAM_PREFIX/var/lib/clamav" \
+           "$CLAM_PREFIX/var/log/clamav" \
+           "$CLAM_PREFIX/var/run/clamav"
+
+  link "$DOTFILES_DIR/clamav/clamd.conf"     "$CLAM_PREFIX/etc/clamav/clamd.conf"
+  link "$DOTFILES_DIR/clamav/freshclam.conf" "$CLAM_PREFIX/etc/clamav/freshclam.conf"
+
+  # The configs hard-code /opt/homebrew and the current user; rewrite both if
+  # this machine differs (Intel prefix, or a different account name).
+  if [ "$CLAM_PREFIX" != "/opt/homebrew" ] || [ "$USER" != "kenny" ]; then
+    warning "ClamAV configs are pinned to /opt/homebrew and user 'kenny' — edit clamav/*.conf for this machine."
+  fi
+
+  mkdir -p "$HOME/Library/LaunchAgents"
+  link "$DOTFILES_DIR/clamav/com.clamav.freshclam.plist" \
+       "$HOME/Library/LaunchAgents/com.clamav.freshclam.plist"
+
+  # Signatures aren't in the repo (~120MB, and they'd be stale anyway).
+  # This also pulls the third-party DBs declared as DatabaseCustomURL in
+  # freshclam.conf (urlhaus, malwarehash, rogue) — see clamav/README.md for
+  # why those three and not the others.
+  if [ ! -f "$CLAM_PREFIX/var/lib/clamav/daily.cvd" ]; then
+    info "Downloading ClamAV signatures (~120MB, takes a minute)..."
+    freshclam || warning "freshclam failed — run it manually later."
+  else
+    info "ClamAV signatures already present — refreshing."
+    freshclam || warning "freshclam refresh failed."
+  fi
+
+  # A third-party mirror can 404 or move without freshclam failing overall,
+  # which would silently leave you with core signatures only. Check explicitly.
+  for db in urlhaus.ndb malwarehash.hsb rogue.hdb; do
+    if [ ! -s "$CLAM_PREFIX/var/lib/clamav/$db" ]; then
+      warning "Third-party signature DB missing: $db — check DatabaseCustomURL in clamav/freshclam.conf"
+    fi
+  done
+
+  # bootout first so a re-run picks up plist changes; ignore "not loaded".
+  launchctl bootout "gui/$(id -u)/com.clamav.freshclam" &>/dev/null
+  if launchctl bootstrap "gui/$(id -u)" "$HOME/Library/LaunchAgents/com.clamav.freshclam.plist" 2>/dev/null; then
+    success "freshclam updater scheduled (every 2h)."
+  else
+    warning "Could not load the freshclam LaunchAgent."
+  fi
+
+  # Non-sudo: clamd runs as $USER and starts at login, not at boot.
+  brew services restart clamav &>/dev/null \
+    && success "clamd running." \
+    || warning "clamd failed to start — check $CLAM_PREFIX/var/log/clamav/clamd.log"
+else
+  warning "Skipping ClamAV setup — clamscan not found (Brewfile install may have failed)."
+fi
+
+#------------------------------------------------------------------------------
 title "Bootstrapping zinit + plugins"
 #------------------------------------------------------------------------------
 # zinit.zsh self-installs on first interactive shell, but cloning it here keeps
