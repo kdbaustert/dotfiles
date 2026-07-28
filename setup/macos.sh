@@ -52,6 +52,9 @@ defaults write com.apple.LaunchServices LSQuarantine -bool false
 # Restart automatically if the computer freezes
 sudo systemsetup -setrestartfreeze on
 
+#Disable the sound effects on boot
+sudo nvram StartupMute=%01
+
 ###############################################################################
 # Appearance                                                                  #
 ###############################################################################

@@ -8,28 +8,28 @@ npm=(
   eslint-plugin-prettier
   eslint-config-prettier
   eslint-plugin-vue
-  babel-eslint
   typescript
-  generator-code
-  yo
-  fast-cli
-  fkill-cli
-  vsce
-  cli-error-notifier
-  npm-check
+  #generator-code
+  #yo
+  #fkill-cli
+  #vsce
+  #cli-error-notifier
+  #npm-check
   stylelint
-  alfred-npms
+  #alfred-npms
   firebase-tools
   ntl
   prettier-init
-  generator-alfred
-  alfred-fkill
-  browser-sync
-  gulp-cli
-  gatsby-cli
+  #generator-alfred
+  #alfred-fkill
+  #browser-sync
+  #gulp-cli
+  #gatsby-cli
   svgo
-  npm-check-updates
-  blade-formatter
+  #npm-check-updates
+  #blade-formatter
   gitignore.cli
-  @phartenfeller/alfred-vscode-workspaces
+  #@phartenfeller/alfred-vscode-workspaces
 )
+
+npm install -g "${npm[@]}"
