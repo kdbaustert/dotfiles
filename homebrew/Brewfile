@@ -56,7 +56,8 @@ brew "assh"
 brew "procs"
 brew "ripgrep"
 brew "nnn"
-# iris — IntelliSense-style shell completion; wired up in .zshrc as `i`. The only
+# iris — IntelliSense-style shell completion; autostarted from .zshrc, which
+# execs it before loading anything else (IRIS_OFF=1 opts a shell out). The only
 # active third-party tap here; the fully-qualified name is enough, `brew bundle`
 # taps versenilvis/iris on its own, so no separate `tap` line is needed.
 brew "versenilvis/iris/iris"
