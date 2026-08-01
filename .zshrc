@@ -4,9 +4,6 @@
 #  Login/environment setup lives in .zprofile; this file is interactive-only.
 #==============================================================================
 
-# Kiro CLI pre block. Keep at the top of this file.
-[[ -f "${HOME}/Library/Application Support/kiro-cli/shell/zshrc.pre.zsh" ]] && builtin source "${HOME}/Library/Application Support/kiro-cli/shell/zshrc.pre.zsh"
-
 # $DOTFILES is exported by .zshenv (sourced for every zsh). Keep a defensive
 # fallback in case this file is ever sourced without it.
 : "${DOTFILES:=$HOME/dotfiles}"
@@ -169,12 +166,3 @@ export ZSH_AUTOSUGGEST_USE_ASYNC=true
 
 # tabtab completions (serverless, etc.)
 [[ -f ~/.config/tabtab/zsh/__tabtab.zsh ]] && . ~/.config/tabtab/zsh/__tabtab.zsh || true
-
-# Emit OSC 7 so terminals (e.g. Rio) can open new tabs in the current directory
-_osc7_cwd() { printf '\e]7;file://%s%s\e\\' "$HOST" "$PWD"; }
-autoload -Uz add-zsh-hook
-add-zsh-hook chpwd _osc7_cwd
-_osc7_cwd
-
-# Kiro CLI post block. Keep at the bottom of this file.
-[[ -f "${HOME}/Library/Application Support/kiro-cli/shell/zshrc.post.zsh" ]] && builtin source "${HOME}/Library/Application Support/kiro-cli/shell/zshrc.post.zsh"

@@ -4,7 +4,7 @@
 ########################################
 
 add_newline = false
-command_timeout = 9000
+command_timeout = 500
 format = "$all"
 
 [character]
@@ -93,7 +93,7 @@ time_range = "-" # always: time_range="00:00:00-23:59:59"
 
 [custom.giturl]
 command = """
-GIT_REMOTE=$(command git ls-remote --get-url 2>/dev/null)
+GIT_REMOTE=$(command git config --get remote.origin.url 2>/dev/null)
 if [[ "$GIT_REMOTE" =~ "github" ]]; then
     GIT_REMOTE_SYMBOL=""
 elif [[ "$GIT_REMOTE" =~ "gitlab" ]]; then

@@ -3,9 +3,6 @@
 #  .zprofile — login shell: environment, PATH, locale (no interactive config)
 #==============================================================================
 
-# Kiro CLI pre block. Keep at the top of this file.
-[[ -f "${HOME}/Library/Application Support/kiro-cli/shell/zprofile.pre.zsh" ]] && builtin source "${HOME}/Library/Application Support/kiro-cli/shell/zprofile.pre.zsh"
-
 #------------------------------------------------------------------------------
 # Terminal
 #------------------------------------------------------------------------------
@@ -52,14 +49,6 @@ path=(
   $path
 )
 
-# PhpWebStudy (only if installed)
-[ -d "$HOME/Library/PhpWebStudy/alias" ] && path=(
-  "$HOME/Library/PhpWebStudy/alias"
-  "$HOME/Library/PhpWebStudy/env/php"
-  "$HOME/Library/PhpWebStudy/env/php/bin"
-  $path
-)
-
 # Deduplicate PATH while preserving order
 typeset -U path PATH
 
@@ -76,6 +65,3 @@ eval "$(/opt/homebrew/bin/brew shellenv)"
   "$HOME/Library/FlyEnv/env/php"
   $path
 ) && typeset -U path PATH
-
-# Kiro CLI post block. Keep at the bottom of this file.
-[[ -f "${HOME}/Library/Application Support/kiro-cli/shell/zprofile.post.zsh" ]] && builtin source "${HOME}/Library/Application Support/kiro-cli/shell/zprofile.post.zsh"
