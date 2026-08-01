@@ -56,6 +56,10 @@ brew "assh"
 brew "procs"
 brew "ripgrep"
 brew "nnn"
+# iris — IntelliSense-style shell completion; wired up in .zshrc as `i`. The only
+# active third-party tap here; the fully-qualified name is enough, `brew bundle`
+# taps versenilvis/iris on its own, so no separate `tap` line is needed.
+brew "versenilvis/iris/iris"
 # node — the default Node here. nvm is loaded (see zsh/zinit.zsh) but manages no
 # versions, so this is what actually resolves. It was installed by hand and left
 # undeclared, meaning `brew bundle` on a fresh box produced a shell with pnpm but

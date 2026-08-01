@@ -166,3 +166,18 @@ export ZSH_AUTOSUGGEST_USE_ASYNC=true
 
 # tabtab completions (serverless, etc.)
 [[ -f ~/.config/tabtab/zsh/__tabtab.zsh ]] && . ~/.config/tabtab/zsh/__tabtab.zsh || true
+
+# iris — IntelliSense-style completion menu (the Fig replacement). Deliberately
+# on-demand: `i` opens an iris-wrapped zsh, and quitting it drops you back here.
+#
+# NOT autostarted. `eval "$(iris init zsh)"` is the documented alternative, but
+# it emits a bare `exec iris` that replaces the shell in every session — a bad
+# binary or config then costs you every new terminal (recoverable only via
+# IRIS_RESCUE=1). Not worth it for a beta tool, and iris' own docs warn it
+# fights zsh-autosuggestions/atuin, both of which are load-bearing here.
+#
+# Conflicts are handled in ~/.config/iris/config.toml, not here: iris swallows
+# its own keys before ZLE sees them, so its defaults are remapped off ctrl+r/up
+# (atuin) and tab (fzf-tab), and ghost-text is off so it doesn't overprint
+# zsh-autosuggestions.
+command -v iris &>/dev/null && alias i="iris"
