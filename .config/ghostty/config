@@ -1,5 +1,5 @@
 # See the full configuration reference: https://ghostty.org/docs/config
-# Ported from .config/rio/config.toml — same LunarVim/TokyoNight look.
+# Ported from .config/rio/config.toml — matched to what Rio actually renders.
 
 # Fonts
 font-family = "Hack Nerd Font Mono"
@@ -28,44 +28,79 @@ window-padding-color = background
 # behavior for a foreground material misused as a window background, not a bug;
 # background-opacity = 0 only mitigates it. This blur is focus-independent.
 # Matches the old .config/rio/config.toml (opacity = 0.45, blur = true).
-# background-blur = macos-glass-regular
-background-opacity = 0.45
-#background-blur = 10
-background-blur = macos-glass-regular
+background-opacity = 0.75
+background-blur = 95
+#background-blur = macos-glass-regular
+
+# Don't dim inactive splits — keep every surface the same background.
+unfocused-split-opacity = 1
+
+# Legibility over the blurred backdrop.
+# background-opacity applies only to the window background by default, so any
+# cell with an explicit bg color stays opaque — which is what Neovim and tmux
+# paint, making the blur vanish inside them. Extend opacity to every cell.
+background-opacity-cells = true
+# macOS defaults alpha-blending to `native`, which darkens glyph edges (worst
+# on saturated pairs, and more visible over a blurred backdrop).
+# linear-corrected drops the fringing without changing apparent text weight.
+alpha-blending = linear-corrected
+# Floor the fg/bg contrast ratio so nothing showing through goes invisible.
+# 1.1 only rescues same-on-same; raise toward 3 for a hard readability floor.
+minimum-contrast = 1.1
+# Bold is pinned to Regular above, so there's no weight contrast to fall back
+# on — thicken strokes so they hold up against a busy background.
+font-thicken = true
+
 confirm-close-surface = false
 window-inherit-working-directory = true
+window-padding-balance = true
+# The accent colors are saturated enough to clip in sRGB on a P3 panel.
+window-colorspace = display-p3
+window-save-state = always
+# Ghostty is installed as a Brew cask (homebrew/Brewfile) — let Brew own
+# updates rather than having Sparkle fight it over the same app bundle.
+auto-update = off
+
+mouse-hide-while-typing = true
+# Needs shell integration / OSC 133, which we have.
+notify-on-command-finish = unfocused
 
 # Cursor
 cursor-style = underline
 cursor-style-blink = true
+# Shell integration's `cursor` feature swaps the cursor to a bar at the prompt,
+# overriding cursor-style. Turn it off so the underline holds everywhere.
+shell-integration-features = no-cursor
 
-# Colors — LunarVim (lunar / TokyoNight Night)
-background = #1A1B26
-foreground = #C0CAF5
-cursor-color = #C0CAF5
-selection-background = #283457
-selection-foreground = #C0CAF5
+background = #0F0D0E
+foreground = #FFFFFF
+cursor-color = #F712FF
+selection-background = #1C191A
+selection-foreground = #44C9F0
 
-# Regular colors (0-7)
-palette = 0=#15161E
+# Regular colors (0-7). 0, 6 and 7 are Rio defaults; the rest are set in Rio.
+palette = 0=#393A3D
 palette = 1=#eb43f4
 palette = 2=#b3e053
 palette = 3=#fcf58d
 palette = 4=#5cc9f5
 palette = 5=#6638f0
-palette = 6=#6bc4fa
-palette = 7=#A9B1D6
+palette = 6=#17d5df
+palette = 7=#E7E7E7
 
-# Bright colors (8-15) — Rio's "light-" set
-palette = 8=#414868
+# Bright colors (8-15) — Rio's "light-" set. 8 and 15 are Rio defaults.
+palette = 8=#6B6B6B
 palette = 9=#eb43f4
 palette = 10=#b3e053
 palette = 11=#fcf58d
 palette = 12=#5cc9f5
 palette = 13=#6638f0
 palette = 14=#5cc9f5
-palette = 15=#C0CAF5
+palette = 15=#F8F8F8
 
 # Keybindings
 keybind = super+left=previous_tab
 keybind = super+right=next_tab
+# Global dropdown terminal. `global:` needs Accessibility permission for
+# Ghostty (System Settings > Privacy & Security > Accessibility).
+keybind = global:cmd+grave_accent=toggle_quick_terminal
