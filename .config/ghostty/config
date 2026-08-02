@@ -1,0 +1,71 @@
+# See the full configuration reference: https://ghostty.org/docs/config
+# Ported from .config/rio/config.toml — same LunarVim/TokyoNight look.
+
+# Fonts
+font-family = "Hack Nerd Font Mono"
+font-size = 15.5
+font-feature = calt
+font-feature = liga
+font-feature = dlig
+
+# Pin bold faces to the regular weight so bold text renders like normal text.
+# font-synthetic-style drops the fake-bold Ghostty would otherwise draw when
+# no real bold face is selected.
+font-style-bold = Regular
+font-style-bold-italic = Italic
+font-synthetic-style = no-bold,italic,no-bold-italic
+
+adjust-cell-height = 50%
+
+# Window
+window-padding-x = 10
+window-padding-y = 10,15
+window-padding-color = background
+# Ghostty's own blur, not macOS glass. macos-glass-* tints an NSGlassEffectView
+# with the background color, and macOS flattens that material when the window
+# changes focus (ghostty-org/ghostty#10170, #10040, #11434) — so the active
+# window reads as having lost the glass. Upstream calls this by-design AppKit
+# behavior for a foreground material misused as a window background, not a bug;
+# background-opacity = 0 only mitigates it. This blur is focus-independent.
+# Matches the old .config/rio/config.toml (opacity = 0.45, blur = true).
+# background-blur = macos-glass-regular
+background-opacity = 0.45
+#background-blur = 10
+background-blur = macos-glass-regular
+confirm-close-surface = false
+window-inherit-working-directory = true
+
+# Cursor
+cursor-style = underline
+cursor-style-blink = true
+
+# Colors — LunarVim (lunar / TokyoNight Night)
+background = #1A1B26
+foreground = #C0CAF5
+cursor-color = #C0CAF5
+selection-background = #283457
+selection-foreground = #C0CAF5
+
+# Regular colors (0-7)
+palette = 0=#15161E
+palette = 1=#eb43f4
+palette = 2=#b3e053
+palette = 3=#fcf58d
+palette = 4=#5cc9f5
+palette = 5=#6638f0
+palette = 6=#6bc4fa
+palette = 7=#A9B1D6
+
+# Bright colors (8-15) — Rio's "light-" set
+palette = 8=#414868
+palette = 9=#eb43f4
+palette = 10=#b3e053
+palette = 11=#fcf58d
+palette = 12=#5cc9f5
+palette = 13=#6638f0
+palette = 14=#5cc9f5
+palette = 15=#C0CAF5
+
+# Keybindings
+keybind = super+left=previous_tab
+keybind = super+right=next_tab
