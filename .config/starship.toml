@@ -57,6 +57,10 @@ symbol = " "
 disabled = false
 format = "[$symbol($version )]($style)"
 
+# `swift --version` takes ~1s on macOS, well past command_timeout
+[swift]
+disabled = true
+
 [package]
 disabled = false
 
