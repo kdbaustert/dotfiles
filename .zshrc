@@ -152,6 +152,10 @@ source "$DOTFILES/zsh/aliases.zsh"
 # terminal-notifier: ping when a long command finishes while Rio is unfocused
 [ -f "$DOTFILES/zsh/extra/notify.zsh" ] && source "$DOTFILES/zsh/extra/notify.zsh"
 
+# OSC 7: tell the terminal our cwd, so new tabs/splits open in the same place.
+# Authoritative, unlike the process-inspection guess iTerm2 and Rio fall back to.
+[ -f "$DOTFILES/zsh/extra/osc7.zsh" ] && source "$DOTFILES/zsh/extra/osc7.zsh"
+
 #------------------------------------------------------------------------------
 # Tool integrations
 #------------------------------------------------------------------------------
