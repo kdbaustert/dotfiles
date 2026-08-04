@@ -68,7 +68,20 @@ zle -N edit-command-line
 bindkey '^X^E' edit-command-line
 
 #------------------------------------------------------------------------------
-# Plugins (zinit) — loads prompt, completions, autosuggestions, highlighting
+# Init caching — `zcache` / `zcache_value`, used throughout this file
+#------------------------------------------------------------------------------
+# Must come before the first zcache call. Turns `eval "$(tool init zsh)"` into a
+# cached `source`, removing seven serial subprocesses from startup. See the file
+# for how invalidation works (binary mtime) and `zcache_clear` to force a rebuild.
+source "$DOTFILES/zsh/extra/cache.zsh"
+
+#------------------------------------------------------------------------------
+# Prompt (starship) — first, so the prompt is ready before anything optional
+#------------------------------------------------------------------------------
+zcache starship starship init zsh
+
+#------------------------------------------------------------------------------
+# Plugins (zinit) — completions, autosuggestions, highlighting (all turbo)
 #------------------------------------------------------------------------------
 [ -f "$DOTFILES/zsh/zinit.zsh" ] && source "$DOTFILES/zsh/zinit.zsh"
 
@@ -78,7 +91,10 @@ bindkey '^X^E' edit-command-line
 source "$DOTFILES/zsh/extra/completion.zsh"
 
 # LS_COLORS via vivid — colorizes the completion menu (and fzf-tab previews).
-command -v vivid &>/dev/null && export LS_COLORS="$(vivid generate catppuccin-mocha)"
+# Cached: vivid re-generates the same ~2KB string every start otherwise. Change
+# the theme here and run `zcache_clear` — mtime invalidation only sees a new
+# vivid binary, not new arguments.
+zcache_value vivid-ls-colors LS_COLORS vivid generate catppuccin-mocha
 zstyle ':completion:*' list-colors "${(s.:.)LS_COLORS}"
 
 # fzf-tab tweaks
@@ -111,7 +127,7 @@ zstyle ':fzf-tab:complete:git-(log|show):*'    fzf-preview 'git show --color=alw
 #------------------------------------------------------------------------------
 [ -f "$DOTFILES/zsh/extra/fzf.zsh" ] && source "$DOTFILES/zsh/extra/fzf.zsh"
 # Ctrl-T (files) and Alt-C (cd) keybindings + completion. Ctrl-R is owned by atuin.
-command -v fzf &>/dev/null && source <(fzf --zsh)
+zcache fzf fzf --zsh
 
 export FZF_COMPLETION_TRIGGER=','
 export _ZO_FZF_OPTS="$FZF_DEFAULT_OPTS --height=45%"   # zoxide's `zi` picker
@@ -133,15 +149,18 @@ source "$DOTFILES/zsh/aliases.zsh"
 #------------------------------------------------------------------------------
 # Tool integrations
 #------------------------------------------------------------------------------
+# All of these print a static zsh integration on stdout; zcache sources it from
+# disk instead of forking the tool on every start. See zsh/extra/cache.zsh.
+
 # zoxide — smarter `cd` (provides `z` and `zi`)
-command -v zoxide &>/dev/null && eval "$(zoxide init zsh)"
+zcache zoxide zoxide init zsh
 
 # atuin — shell history (owns Ctrl-R / Up). Initialised exactly once.
 [ -f "$HOME/.atuin/bin/env" ] && . "$HOME/.atuin/bin/env"
-command -v atuin &>/dev/null && eval "$(atuin init zsh)"
+zcache atuin atuin init zsh
 
 # navi — interactive cheatsheets (Ctrl-G)
-command -v navi &>/dev/null && eval "$(navi widget zsh)"
+zcache navi navi widget zsh
 
 # pay-respects — corrects the last failed command (replaces thefuck, whose repo
 # is dead and which spawned a Python interpreter on every invocation). Kept on
@@ -152,16 +171,18 @@ command -v navi &>/dev/null && eval "$(navi widget zsh)"
 # command_not_found_handler, which does typo-correction but knows nothing about
 # Homebrew (no brew/formula lookup in the binary at all) and would silently
 # shadow the brew handler below — losing "install it with brew install X".
-# Cheap enough (<1ms Rust binary) to init eagerly; no lazy wrapper needed.
-command -v pay-respects &>/dev/null && eval "$(pay-respects zsh --alias fuck --nocnf)"
+#
+# NB: the --alias/--nocnf arguments are baked into the cached output. If they
+# ever change, run `zcache_clear` — mtime invalidation only catches a new binary.
+zcache pay-respects pay-respects zsh --alias fuck --nocnf
 
 # Homebrew command-not-found — when an unknown command is typed, suggest the
 # formula that provides it (`brew which-formula` under the hood). Shipped in
 # Homebrew core now (the old homebrew/command-not-found tap was deprecated).
 # Source the handler directly rather than `eval "$(brew command-not-found-init)"`
-# so we don't spawn brew on every startup; $HOMEBREW_REPOSITORY comes from
-# brew shellenv in .zprofile. With --nocnf above, this is the only handler
-# defined — but keep it last anyway so it wins if that flag is ever dropped.
+# so we don't spawn brew on every startup; $HOMEBREW_REPOSITORY is exported by
+# .zprofile. With --nocnf above, this is the only handler defined — but keep it
+# last anyway so it wins if that flag is ever dropped.
 () {
   local h="${HOMEBREW_REPOSITORY:-/opt/homebrew}/Library/Homebrew/command-not-found/handler.sh"
   [[ -r $h ]] && source "$h"
@@ -172,5 +193,37 @@ export ZSH_AUTOSUGGEST_USE_ASYNC=true
 
 # tabtab completions (serverless, etc.)
 [[ -f ~/.config/tabtab/zsh/__tabtab.zsh ]] && . ~/.config/tabtab/zsh/__tabtab.zsh || true
+
+#------------------------------------------------------------------------------
+# Byte-compile the config
+#------------------------------------------------------------------------------
+# zsh parses these ~850 lines from source on every start unless a .zwc sits
+# next to each file — `source` (and zsh's own startup-file loading) prefers a
+# .zwc that is newer than its source, transparently.
+#
+# Done last, and cheaply: this is a stat per file, and it only writes when a
+# file has actually changed. A recompile therefore costs nothing on a normal
+# start, and an edit is picked up automatically on the *next* shell — no manual
+# `zcompile` step to forget after editing a dotfile.
+#
+# zcompile -R (rather than -M) maps the file eagerly, which is what we want for
+# files this small: no mmap bookkeeping for a few KB.
+() {
+  local f
+  for f in \
+    ${ZDOTDIR:-$HOME}/.zshenv \
+    ${ZDOTDIR:-$HOME}/.zprofile \
+    ${ZDOTDIR:-$HOME}/.zshrc \
+    $DOTFILES/zsh/zinit.zsh \
+    $DOTFILES/zsh/functions.zsh \
+    $DOTFILES/zsh/aliases.zsh \
+    $DOTFILES/zsh/extra/*.zsh(N)
+  do
+    # -nt follows symlinks, so the $HOME/.zshrc → dotfiles/.zshrc links compare
+    # against the real file's mtime and recompile when the repo copy is edited.
+    [[ -s $f && ( ! -s $f.zwc || $f -nt $f.zwc ) ]] && zcompile -R -- $f 2>/dev/null
+  done
+  return 0
+}
 
 

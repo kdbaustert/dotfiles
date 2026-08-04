@@ -105,15 +105,26 @@ install_wp() {
   fi
 }
 
-# reload the zsh session. From OMZ:plugins/zsh_reload
+# Reload the zsh session, rebuilding the completion dump from scratch.
+# (Adapted from OMZ:plugins/zsh_reload.)
+#
+# Use this after installing something whose completions you want *now* — the
+# normal path only re-scans once every 24h (see zsh_compinit in zsh/zinit.zsh).
+#
+# The dump path must match the one zsh_compinit uses, or this would rebuild a
+# file nothing reads: it previously wrote "$ZSH_CACHE_DIR/zcomp-$HOST" while
+# compinit read ~/.zcompdump, so `zreload` never actually refreshed anything.
 zreload() {
-  local cache="$ZSH_CACHE_DIR"
-  autoload -U compinit zrecompile
-  compinit -i -d "$cache/zcomp-$HOST"
+  local dump="${ZINIT[ZCOMPDUMP_PATH]:-${ZSH_CACHE_DIR:-$HOME/.cache/zsh}/zcompdump}"
+  autoload -Uz compinit zrecompile
 
-  for f in ${ZDOTDIR:-~}/.zshrc "$cache/zcomp-$HOST"; do
-    zrecompile -p $f && command rm -f $f.zwc.old
-  done
+  # Drop the old dump so compinit does a full, unconditional rescan.
+  command rm -f "$dump" "$dump.zwc"
+  compinit -i -d "$dump"
+
+  # .zshrc byte-compiles itself (and the modules) on each start, so only the
+  # dump needs an explicit recompile here.
+  zrecompile -p "$dump" && command rm -f "$dump.zwc.old"
 
   # Use $SHELL if available; remove leading dash if login shell
   [[ -n "$SHELL" ]] && exec ${SHELL#-} || exec zsh

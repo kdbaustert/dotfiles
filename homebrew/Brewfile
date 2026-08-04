@@ -68,6 +68,11 @@ brew "nss"
 brew "shfmt"
 brew "shellcheck"
 brew "atuin"
+# starship — the prompt. Previously fetched as a gh-r binary by zinit, which
+# forced zinit to load eagerly (a prompt can't be turbo-deferred) and put ~16ms
+# of plugin machinery on the critical path. Declared here so it's installed like
+# every other CLI binary; zsh/zinit.zsh no longer mentions it.
+brew "starship"
 brew "poppler"
 brew "sevenzip"
 # zstd — provides unzstd, which install.sh needs to unpack the pay-respects

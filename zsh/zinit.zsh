@@ -3,12 +3,12 @@
 #------------------------------------------------------------------------------
 #  Philosophy: zinit manages zsh *plugins* only (completions, autosuggestions,
 #  syntax highlighting, fzf-tab, version managers). CLI *binaries* (eza, bat,
-#  fd, fzf, zoxide, atuin, navi, delta, …) come from Homebrew and are wired up
-#  in .zshrc. Starship is the one binary we fetch via zinit, because it is not
-#  installed through Homebrew on this machine.
+#  fd, fzf, zoxide, atuin, navi, delta, starship, …) come from Homebrew and are
+#  wired up in .zshrc.
 #
 #  This avoids the arm64/x86_64 gh-r mismatches that previously broke mcfly,
-#  and keeps the load in a single, ordered turbo block.
+#  and means EVERY plugin here can be turbo-deferred — nothing zinit loads is
+#  needed before the first prompt, so none of it is on the critical path.
 #==============================================================================
 
 # --- Bootstrap ----------------------------------------------------------------
@@ -26,14 +26,25 @@ source "$ZINIT_HOME/zinit.zsh"
 autoload -Uz _zinit
 (( ${+_comps} )) && _comps[zinit]=_zinit
 
+# Keep the completion dump in the zsh cache dir alongside the other generated
+# artefacts, instead of dropping a 64K ~/.zcompdump in $HOME. Read by zicompinit
+# in the turbo block below, so it must be set before that runs.
+ZINIT[ZCOMPDUMP_PATH]="${ZSH_CACHE_DIR:-$HOME/.cache/zsh}/zcompdump"
+
 setopt PROMPT_SUBST
 
 # --- Prompt: starship ---------------------------------------------------------
-# Fetched as a binary (arm64); init is eval'd on load so it works regardless of
-# whether the plugin dir was freshly cloned.
-zinit ice from"gh-r" as"command" bpick"*aarch64-apple*.tar.gz" \
-  atload'eval "$(starship init zsh)"'
-zinit light starship/starship
+# Starship now comes from Homebrew (declared in homebrew/Brewfile) and is
+# initialised from .zshrc via the cached `starship init zsh` output.
+#
+# It used to be fetched here as a gh-r binary, which made it the ONE plugin
+# loaded eagerly — a prompt cannot be turbo-deferred, since it has to exist
+# before the first prompt is drawn. That put zinit's full plugin-load machinery
+# (~16ms, the single largest entry in `zprof`) on the critical path just to put
+# one binary on $PATH and eval its init. Homebrew already provides every other
+# CLI binary this config uses (eza, bat, fd, fzf, zoxide, atuin, navi, delta,
+# vivid), so this is now consistent with the rest — and `brew upgrade` handles
+# updates instead of `zinit update`.
 
 # --- Version managers (turbo) -------------------------------------------------
 # Node — zsh-nvm with lazy loading (NVM_LAZY_LOAD=true, set in .zprofile) so the
@@ -52,18 +63,59 @@ zinit light lukechilds/zsh-nvm
 # per-project Python versions are ever needed, add pyenv back here — or reach
 # for mise and let one tool cover Node and Python together.
 
+# --- Completion initialisation ------------------------------------------------
+# Replaces the bare `ZINIT[COMPINIT_OPTS]=-C; zicompinit` that used to sit in
+# fzf-tab's atinit. Two things were wrong with that:
+#
+#   1. `compinit -C` trusts the existing dump and never rebuilds it, so a dump
+#      written once was reused forever. This machine's ~/.zcompdump was months
+#      stale, meaning completions for anything installed since simply never
+#      appeared — `rehash true` finds new *commands*, but not new completion
+#      *functions*.
+#   2. When no dump existed at all, the turbo-run zicompinit did not write one
+#      (verified: a manual zicompinit in the same shell does). So a fresh machine
+#      would silently pay a full, uncached compinit on every single start.
+#
+# This does a full, checked compinit once every 24h — and whenever the dump is
+# missing — and takes the cheap cached path the rest of the time.
+zsh_compinit() {
+  # localoptions: (#q…) glob qualifiers need EXTENDED_GLOB. .zshrc happens to
+  # set it, but this function must not silently depend on that — without it the
+  # test below fails open and every start takes the cached path forever.
+  setopt localoptions extendedglob
+  autoload -Uz compinit compdump
+  local dump="${ZINIT[ZCOMPDUMP_PATH]}"
+
+  # (#qN.mh-24) — glob qualifier: exists (N: no error if not), plain file (.),
+  # mtime less than 24h ago (mh-24). A match means "fresh". The qualifier must
+  # be globbed in an array assignment; inside [[ ]] no filename generation
+  # happens at all and the test would always fall through to the cached branch.
+  local -a fresh
+  fresh=( ${dump}(#qN.mh-24) )
+
+  if (( ${#fresh} )); then
+    compinit -C -d "$dump"  # fresh: trust it, skip the security/newness scan
+  else
+    compinit -d "$dump"     # missing or >24h old: full scan, rewrites the dump
+  fi
+
+  # Belt and braces for case 2 above: guarantee a dump exists on disk, so the
+  # next start can take the cached path even if compinit declined to write one.
+  [[ -f $dump ]] || compdump
+}
+
 # --- Completions, fzf-tab, autosuggestions, syntax highlighting ---------------
 # One ordered turbo block:
 #   1. zsh-completions     — extra completion definitions (blockf: don't pollute fpath)
 #   2. fzf-tab             — fzf-driven completion menu; its atinit runs compinit
-#                            ONCE (zicompinit) so completions exist before it hooks
+#                            ONCE (zsh_compinit) so completions exist before it hooks
 #   3. zsh-autosuggestions — fish-style suggestions (started via atload)
 #   4. fast-syntax-highlighting — MUST be loaded last
 zinit wait lucid blockf for \
   zsh-users/zsh-completions
 
 zinit wait lucid for \
-  has'fzf' atinit"ZINIT[COMPINIT_OPTS]=-C; zicompinit; zicdreplay" \
+  has'fzf' atinit"zsh_compinit; zicdreplay" \
     Aloxaf/fzf-tab \
   atload"!_zsh_autosuggest_start" \
     zsh-users/zsh-autosuggestions \
