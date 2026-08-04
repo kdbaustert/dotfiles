@@ -1,4 +1,5 @@
 #!/usr/bin/env zsh
+
 #==============================================================================
 #  .zprofile — login shell: environment, PATH, locale (no interactive config)
 #==============================================================================
@@ -54,6 +55,17 @@ typeset -U path PATH
 
 # Homebrew environment (sets PATH/MANPATH/INFOPATH for the current arch)
 eval "$(/opt/homebrew/bin/brew shellenv)"
+
+# Deliberate overrides of a Homebrew formula — must come after `brew shellenv`,
+# which re-prepends /opt/homebrew/bin and would otherwise shadow them. This is
+# the one exception to "Homebrew wins" above, so it is a dedicated directory
+# rather than ~/.local/bin: only what is explicitly placed here outranks brew,
+# and dropping a binary into ~/.local/bin later can't quietly do so.
+#
+# Currently empty; the directory is kept so an override can be dropped in without
+# touching this file.
+[ -d "$HOME/.local/overrides" ] && path=("$HOME/.local/overrides" $path) \
+  && typeset -U path PATH
 
 # FlyEnv (PHP dev-environment manager) — prepended last so its PHP wins over
 # Homebrew's, preserving the previous behavior when this lived at the end of

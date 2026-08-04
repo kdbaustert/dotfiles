@@ -85,7 +85,11 @@ weight = 400
 
 [navigation]
 mode = "NativeTab"       # macOS native tabs — each tab gets an "×" close button
-current-working-directory = true  # new tabs/splits open in the current dir (renamed from use-current-path; reads the shell's cwd via the OS, not OSC 7)
+# New tabs/splits open in the current dir (renamed from use-current-path).
+# Rio prefers the OSC 7 path the shell reports and only falls back to inspecting
+# the foreground process on its pty. zsh/extra/osc7.zsh is what emits that
+# report — without it this setting is left with the unreliable fallback.
+current-working-directory = true
 
 [cursor]
 shape = 'underline'

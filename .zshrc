@@ -1,4 +1,6 @@
 #!/usr/bin/env zsh
+
+
 #==============================================================================
 #  .zshrc — interactive shell configuration
 #  Login/environment setup lives in .zprofile; this file is interactive-only.
@@ -7,34 +9,6 @@
 # $DOTFILES is exported by .zshenv (sourced for every zsh). Keep a defensive
 # fallback in case this file is ever sourced without it.
 : "${DOTFILES:=$HOME/dotfiles}"
-
-#------------------------------------------------------------------------------
-# iris — autostart (deliberately above everything expensive)
-#------------------------------------------------------------------------------
-# iris is a TTY wrapper, not a plugin: it replaces this shell with itself and
-# spawns a fresh zsh inside, which sources this file again with $IRIS_PID set.
-# Everything the outer shell did before the exec is discarded, so this block
-# sits above zinit/fzf/atuin — anywhere lower and every terminal pays that
-# startup cost twice. The ZLE plumbing for the inner shell is further down.
-#
-# Guards: IRIS_OFF=1 opts a single shell out; IRIS_RESCUE is set by iris itself
-# when it catches a panic, writes ~/.iris/crash.log and re-execs $SHELL, so a
-# bad build lands you at a plain prompt instead of a dead terminal; IRIS_PID
-# means we're already the inner shell; the tty test keeps non-interactive
-# oddities (a zsh sourced into a pipe) out of the wrapper.
-#
-# The tmux clause is verbatim from `iris init zsh`: a new pane inherits IRIS_PID
-# from the server environment without actually being inside that iris, so clear
-# it and let the pane start its own.
-if [[ -n $TMUX && -n $IRIS_PID ]]; then
-  [[ $(ps -o comm= -p $PPID 2>/dev/null) == *tmux* ]] && unset IRIS_PID IRIS_IS_CHILD IRIS_FD
-fi
-
-if [[ -z $IRIS_PID && -z $IRIS_RESCUE && -z $IRIS_OFF ]] && [[ -t 0 && -t 1 ]] \
-   && command -v iris &>/dev/null; then
-  export IRIS_ACTIVE_SHELL="zsh"
-  exec iris
-fi
 
 #------------------------------------------------------------------------------
 # History
@@ -199,46 +173,4 @@ export ZSH_AUTOSUGGEST_USE_ASYNC=true
 # tabtab completions (serverless, etc.)
 [[ -f ~/.config/tabtab/zsh/__tabtab.zsh ]] && . ~/.config/tabtab/zsh/__tabtab.zsh || true
 
-# iris — IntelliSense-style completion menu (the Fig replacement). Autostarted
-# from the block at the top of this file; this is the other half of
-# `iris init zsh` — the ZLE plumbing the inner shell uses to talk to the
-# wrapper. $IRIS_FD is the pipe back to iris and only exists inside it, so a
-# plain zsh (IRIS_OFF=1, rescue shell, ssh to a box without iris) skips this
-# entirely. It lives here rather than up top because it must load after
-# zsh-autosuggestions has installed its own ZLE widgets.
-#
-# line-pre-redraw ships the buffer on every keystroke; chpwd/precmd ship $PWD.
-# The cwd hooks are what make path suggestions resolve against the directory
-# you're actually in — iris' file generator reads the shell-reported cwd, not
-# its own getcwd, so without them `cd s…` would complete against wherever the
-# wrapper was launched.
-#
-# Key conflicts are handled in ~/.config/iris/config.toml, not here: iris
-# swallows its own keys before ZLE sees them, so its defaults are remapped off
-# ctrl+r/up (atuin) and tab (fzf-tab), and ghost-text is off so it doesn't
-# overprint zsh-autosuggestions.
-#
-# The `true >&$IRIS_FD` probe is an addition to what `iris init zsh` emits, and
-# it matters: iris exports IRIS_PID/IRIS_FD into every process it starts, so a
-# GUI app or long-running program launched from inside iris passes them on to
-# whatever shells *it* spawns — shells that are not inside iris and where fd 13
-# is closed or, worse, has been reused for something unrelated. Upstream would
-# install the hooks anyway and print keystrokes at that fd. Probing it first
-# means the hooks only load where the pipe is genuinely live.
-if [[ -n $IRIS_PID && -n $IRIS_FD ]] && { true >&$IRIS_FD } 2>/dev/null; then
-  _iris_send_lbuffer() { print -u $IRIS_FD -N -r -- "$LBUFFER" 2>/dev/null }
-  _iris_sync_cwd()     { print -u $IRIS_FD -N -r -- "IRIS_CWD:$PWD" 2>/dev/null }
-  _iris_preexec()      { print -u $IRIS_FD -N -r -- "IRIS_CMD_START" 2>/dev/null }
-  _iris_precmd() {
-    local iris_exit_code=$?
-    _iris_sync_cwd
-    print -u $IRIS_FD -N -r -- "IRIS_CMD_STOP:$iris_exit_code" 2>/dev/null
-  }
 
-  autoload -Uz add-zle-hook-widget
-  autoload -Uz add-zsh-hook
-  add-zle-hook-widget line-pre-redraw _iris_send_lbuffer
-  add-zsh-hook precmd  _iris_precmd
-  add-zsh-hook preexec _iris_preexec
-  add-zsh-hook chpwd   _iris_sync_cwd
-fi
