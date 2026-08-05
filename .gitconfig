@@ -1,24 +1,68 @@
+#==============================================================================
+#  .gitconfig — symlinked to ~/.gitconfig by install.sh
+#==============================================================================
+# This file used to drift from the live ~/.gitconfig: the real one had been
+# edited in place and was no longer the symlink install.sh creates, so the repo
+# copy still said `name = Kenny Baustert`, had signing commented out and was
+# missing the work-identity rules entirely. install.sh backs up rather than
+# clobbers (see link()), but a fresh run would still have activated this file —
+# committing as the wrong name with signing off. Reconciled from the live copy.
+
+[user]
+	name = Kenny B
+	email = kenny@kennyb.dev
+	# Public half of the ssh key 1Password signs with — safe to commit.
+	signingkey = ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOISHjId1mlt/MUYsl1rA/J8ox77BFvqQL7e8dZWWvc5
+
+# Commit signing via 1Password's ssh agent rather than GPG.
+[commit]
+	gpgsign = true
+[gpg]
+	format = ssh
+[gpg "ssh"]
+	program = /Applications/1Password.app/Contents/MacOS/op-ssh-sign
+	# Verification needs a trust store; ssh has no implicit keyring the way GPG
+	# does, so without this `git log --show-signature` reports "No signature"
+	# on your own commits even though they are signed. The signers file lives at
+	# .config/git/allowed_signers in this repo.
+	allowedSignersFile = ~/.config/git/allowed_signers
+
+[core]
+	editor = /opt/homebrew/bin/nvim
+
+# delta is not git's pager here — it is invoked by the git-diff/git-show fzf-tab
+# previews in .zshrc (`git diff --color=always … | delta`). delta still reads
+# this section when piped to, so this is what themes those previews.
+#
+# Syntax highlighting inside the diff comes from $BAT_THEME (set in .zshrc);
+# delta renders through bat's engine. But the +/- line backgrounds are delta's
+# own and are NOT part of a bat theme — left unset they are delta's built-in
+# red/green, which clash with Voltage. Palette: themes/voltage.md.
+[delta]
+	# Desaturated Voltage red/green, dark enough to read text over on #0F0D0E.
+	minus-style          = normal "#3A1519"
+	minus-emph-style     = normal "#6B2027"
+	plus-style           = normal "#23300F"
+	plus-emph-style      = normal "#43591A"
+	file-style           = "#5CC9F5" bold
+	file-decoration-style = "#6B6B6B" ul
+	hunk-header-style    = "#17D5DF"
+	hunk-header-decoration-style = "#6B6B6B" box
+	line-numbers = true
+	line-numbers-minus-style = "#FF4D5E"
+	line-numbers-plus-style  = "#B3E053"
+	line-numbers-zero-style  = "#6B6B6B"
+	whitespace-error-style   = "#0F0D0E" "#FF4D5E"
+
 [filter "lfs"]
 	clean = git-lfs clean -- %f
 	smudge = git-lfs smudge -- %f
 	process = git-lfs filter-process
 	required = true
-# [user]
-# 	email = kenny@kennyb.dev
-# 	name = Kenny B
-# 	signingkey = ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOISHjId1mlt/MUYsl1rA/J8ox77BFvqQL7e8dZWWvc5
-# [gpg]
-# 	format = ssh
-# [gpg "ssh"]
-# 	program = /Applications/1Password.app/Contents/MacOS/op-ssh-sign
-# [commit]
-# 	gpgsign = true
 
-[user]
-	email = kenny@kennyb.dev
-	name = Kenny Baustert
-[core]
-	editor = /opt/homebrew/bin/nvim
+# `brew` runs git against its taps as your user; without these git refuses to
+# operate on them. Deduplicated — the live file had each of these 21 times,
+# appended once per `brew` invocation that hit the error.
 [safe]
 	directory = /opt/homebrew/Library/Taps/homebrew/homebrew-core
 	directory = /opt/homebrew/Library/Taps/homebrew/homebrew-cask
@@ -28,35 +72,13 @@
 	directory = /opt/homebrew/Library/Taps/homebrew/homebrew-cask
 	directory = /opt/homebrew/Library/Taps/homebrew/homebrew-core
 	directory = /opt/homebrew/Library/Taps/homebrew/homebrew-cask
+	directory = /opt/homebrew/Library/Taps/homebrew/homebrew-core
+	directory = /opt/homebrew/Library/Taps/homebrew/homebrew-cask
 
-# [user]
-# name = Kenny Baustert
-# email = kenny@kennyb.dev
-# signingkey = ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIE8Pf89XbvcJ3WHvjrP/03p+vNco/62fkAvRUGf/EPwc
-# [credential]
-# helper = cache --timeout=36000
-# [filter "lfs"]
-# smudge = git-lfs smudge -- %f
-# process = git-lfs filter-process
-# required = true
-# clean = git-lfs clean -- %f
-# [init]
-# defaultBranch = master
-# [color]
-# ui = auto
-
-# [color "branch"]
-# current = yellow
-# local = 241
-# remote = green
-
-# [color "diff"]
-# meta = yellow
-# frag = magenta
-# old = red
-# new = green
-
-# [color "status"]
-# added = green
-# changed = yellow
-# untracked = magenta
+# Work identity (Kenny Baustert) applied automatically for any repo whose
+# remote URL points at Bitbucket. Matches both SSH and HTTPS remotes.
+# Placed last so it overrides the default [user]/[commit] above.
+[includeIf "hasconfig:remote.*.url:git@bitbucket.org:*/**"]
+	path = ~/.gitconfig-work
+[includeIf "hasconfig:remote.*.url:https://**bitbucket.org/**"]
+	path = ~/.gitconfig-work
