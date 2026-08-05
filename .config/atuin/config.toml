@@ -241,7 +241,17 @@ enter_accept = true
 # exit_past_line_start = true
 
 # Defaults to true. The right arrow key performs the same functionality as Tab and copies the selected line to the command line to be modified.
-# accept_past_line_end = true
+#
+# Set explicitly rather than left to the default: this is the behaviour we
+# actually want from → (select the highlighted command onto the prompt WITHOUT
+# running it), and enter_accept = true above means Enter does run it. Pinning it
+# here means an upstream change to the default can't silently turn → into
+# "execute", which is the one direction of drift that would actually hurt.
+#
+# Only fires when the cursor is at the END of the typed query — mid-query, →
+# moves the cursor as usual. Tab does the same accept-without-running from any
+# cursor position, so that's the one to reach for while editing a query.
+accept_past_line_end = true
 
 # Defaults to false. The left arrow key performs the same functionality as Tab and copies the selected line to the command line to be modified.
 # accept_past_line_start = false

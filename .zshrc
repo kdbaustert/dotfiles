@@ -11,35 +11,6 @@
 : "${DOTFILES:=$HOME/dotfiles}"
 
 #------------------------------------------------------------------------------
-# iris — autostart (deliberately above everything expensive)
-#------------------------------------------------------------------------------
-# iris is a TTY wrapper, not a plugin: it replaces this shell with itself and
-# spawns a fresh zsh inside, which sources this file again with $IRIS_PID set.
-# Everything the outer shell did before the exec is discarded, so this block
-# sits above cache.zsh/starship/zinit/fzf/atuin — anywhere lower and every
-# terminal pays that startup cost twice. The ZLE plumbing for the inner shell
-# is further down.
-#
-# Guards: IRIS_OFF=1 opts a single shell out; IRIS_RESCUE is set by iris itself
-# when it catches a panic, writes ~/.iris/crash.log and re-execs $SHELL, so a
-# bad build lands you at a plain prompt instead of a dead terminal; IRIS_PID
-# means we're already the inner shell; the tty test keeps non-interactive
-# oddities (a zsh sourced into a pipe) out of the wrapper.
-#
-# The tmux clause is verbatim from `iris init zsh`: a new pane inherits IRIS_PID
-# from the server environment without actually being inside that iris, so clear
-# it and let the pane start its own.
-if [[ -n $TMUX && -n $IRIS_PID ]]; then
-  [[ $(ps -o comm= -p $PPID 2>/dev/null) == *tmux* ]] && unset IRIS_PID IRIS_IS_CHILD IRIS_FD
-fi
-
-if [[ -z $IRIS_PID && -z $IRIS_RESCUE && -z $IRIS_OFF ]] && [[ -t 0 && -t 1 ]] \
-   && command -v iris &>/dev/null; then
-  export IRIS_ACTIVE_SHELL="zsh"
-  exec iris
-fi
-
-#------------------------------------------------------------------------------
 # History
 #------------------------------------------------------------------------------
 HISTFILE="$HOME/.zsh_history"
@@ -133,8 +104,8 @@ zcache starship starship init zsh
 # plugin below, because the plugin reads it at source time and defaults it to
 # ${XDG_CACHE_HOME:-~/.cache}/fast-syntax-highlighting — a cache dir, i.e. not
 # in this repo and not reproducible on a new machine. Pointing it here is what
-# makes .config/fsh/current_theme.zsh (the applied Snazzy theme, generated from
-# snazzy.ini by `fast-theme XDG:snazzy`) load automatically on every box.
+# makes .config/fsh/current_theme.zsh (the applied Voltage theme, generated
+# from voltage.ini by `fast-theme XDG:voltage`) load automatically on every box.
 export FAST_WORK_DIR="$HOME/.config/fsh"
 
 #------------------------------------------------------------------------------
@@ -148,32 +119,63 @@ export FAST_WORK_DIR="$HOME/.config/fsh"
 source "$DOTFILES/zsh/extra/completion.zsh"
 
 # LS_COLORS via vivid — colorizes the completion menu (and fzf-tab previews).
+# `voltage` is this repo's own theme (.config/vivid/themes/voltage.yml), not a
+# vivid built-in; vivid resolves a bare name against ~/.config/vivid/themes
+# first, and install.sh symlinks .config/vivid there.
 # Cached: vivid re-generates the same ~2KB string every start otherwise. Change
-# the theme here and run `zcache_clear` — mtime invalidation only sees a new
-# vivid binary, not new arguments.
-zcache_value vivid-ls-colors LS_COLORS vivid generate snazzy
+# the theme here — or edit the theme file — and run `zcache_clear`; mtime
+# invalidation only sees a new vivid binary, not new arguments or a new theme.
+zcache_value vivid-ls-colors LS_COLORS vivid generate voltage
 zstyle ':completion:*' list-colors "${(s.:.)LS_COLORS}"
 
 # fzf-tab tweaks
 zstyle ':completion:*:git-checkout:*' sort false           # keep git ref order
-zstyle ':completion:*:descriptions' format '[%d]'
 zstyle ':fzf-tab:*' switch-group ',' '.'                   # cycle groups with , / .
 
+# No group-header row above the candidate list. 'quiet' returns early from
+# lib/-ftb-generate-header, which leaves $_ftb_groups intact so $group is still
+# available to fzf-preview commands and binds. Don't use 'none' for this: it
+# rewrites the group names to "__hide__<n>", which would leak into $group.
+zstyle ':fzf-tab:*' show-group quiet
+
+# Accept the highlighted candidate and immediately re-complete, so a deep path
+# can be walked with one Tab and then '/' per segment. This is fzf-tab's own
+# default (lib/-ftb-fzf falls back to '/' off-cygwin) — pinned here so it's
+# visible next to switch-group, which owns ',' and '.'.
+# Trade-off: '/' can no longer be typed into the fzf query to narrow matches.
+zstyle ':fzf-tab:*' continuous-trigger '/'
+
+# Taller completion menu. fzf-tab sizes itself as
+#   min(max(candidates + fzf-pad, fzf-min-height), LINES / 3 * 2)
+# so it will never exceed two-thirds of the screen, and `fzf-min-height` can't
+# lift that ceiling. Worse, lib/-ftb-fzf:89 writes the result through
+# ${FZF_TMUX_HEIGHT:=...} without declaring the variable local, so the FIRST
+# completion of the session pins that row count globally and every later menu
+# reuses it regardless of candidate count or window size.
+# Overriding via fzf-flags avoids both: they're appended last (lib/-ftb-fzf:97)
+# and fzf resolves duplicate options in favour of the later one.
+# NB: fzf-flags is most-specific-wins, NOT merged — every context below that
+# sets its own fzf-flags has to repeat $_ftb_height or it falls back to the
+# pinned default. Change the height here, in one place.
+_ftb_height='--height=80%'
+zstyle ':fzf-tab:*' fzf-flags $_ftb_height
+
 # fzf-tab previews — show context for the candidate under the cursor
-zstyle ':fzf-tab:complete:cd:*'                fzf-preview 'eza -1 --color=always --icons $realpath'
-zstyle ':fzf-tab:complete:__zoxide_z:*'        fzf-preview 'eza -1 --color=always --icons $realpath'
+zstyle ':fzf-tab:complete:cd:*'                fzf-preview 'eza -1 --color=always --icons --group-directories-first $realpath'
+zstyle ':fzf-tab:complete:__zoxide_z:*'        fzf-preview 'eza -1 --color=always --icons --group-directories-first $realpath'
 
 # Command position (incl. aliases/functions): show what the candidate resolves
 # to — `command -V` prints "x is an alias for …" / "… is a shell function" / path.
 zstyle ':fzf-tab:complete:-command-:*'         fzf-preview 'command -V $word 2>/dev/null | head -20 || echo $word'
-zstyle ':fzf-tab:complete:-command-:*'         fzf-flags '--preview-window=down:3:wrap'
+zstyle ':fzf-tab:complete:-command-:*'         fzf-flags $_ftb_height '--preview-window=down:3:wrap'
 zstyle ':fzf-tab:complete:(cat|bat|less|nvim|vim|vi|nano):*' \
                                                fzf-preview 'bat --color=always --style=numbers --line-range=:200 $realpath 2>/dev/null || eza -1 --color=always $realpath'
 zstyle ':fzf-tab:complete:(-command-|export|unset):*' \
                                                fzf-preview 'echo ${(P)word}'        # env-var values
 zstyle ':fzf-tab:complete:(kill|ps):argument-rest:*' \
                                                fzf-preview 'ps -p $word -o comm= -o args 2>/dev/null'
-zstyle ':fzf-tab:complete:(kill|ps):argument-rest:*' fzf-flags '--preview-window=down:3:wrap'
+zstyle ':fzf-tab:complete:(kill|ps):argument-rest:*' fzf-flags $_ftb_height '--preview-window=down:3:wrap'
+unset _ftb_height
 zstyle ':fzf-tab:complete:(ssh|scp|sftp):*'    fzf-preview 'dig +short $word 2>/dev/null'
 zstyle ':fzf-tab:complete:git-(add|diff|restore|checkout|stash):*' \
                                                fzf-preview 'git diff --color=always $word 2>/dev/null | delta'
@@ -202,6 +204,11 @@ source "$DOTFILES/zsh/aliases.zsh"
 # OSC 7: tell the terminal our cwd, so new tabs/splits open in the same place.
 # Authoritative, unlike the process-inspection guess iTerm2 and Rio fall back to.
 [ -f "$DOTFILES/zsh/extra/osc7.zsh" ] && source "$DOTFILES/zsh/extra/osc7.zsh"
+
+# auto-ls: list the directory on every cd/pushd/z. Sourced after aliases.zsh so
+# $commands[eza] is already populated; the hook itself never fires until the
+# first directory change, so this costs nothing at startup.
+[ -f "$DOTFILES/zsh/extra/autols.zsh" ] && source "$DOTFILES/zsh/extra/autols.zsh"
 
 #------------------------------------------------------------------------------
 # Tool integrations
@@ -246,18 +253,23 @@ zcache pay-respects pay-respects zsh --alias fuck --nocnf
 }
 
 #------------------------------------------------------------------------------
-# Colors — everything on Snazzy
+# Colors — everything on Voltage
 #------------------------------------------------------------------------------
-# The palette is set in four places, and all four have to agree or the shell
-# looks patched together: vivid (LS_COLORS, above), starship (.config/
-# starship.toml), fzf (zsh/extra/fzf.zsh) and the two below.
+# This repo's own palette; the canonical values and the full list of files that
+# carry it are in themes/voltage.md. It is set in six places, and all six have
+# to agree or the shell looks patched together: the terminal itself
+# (.config/ghostty/config), vivid (LS_COLORS, above), starship
+# (.config/starship.toml), fzf (zsh/extra/fzf.zsh) and the two below.
 
 # bat's theme. This also themes delta, which has no syntax theme of its own —
 # it renders through bat's highlighting engine and reads $BAT_THEME when
 # --syntax-theme isn't passed. delta is used by the git-diff/git-show fzf-tab
 # previews above, so this is what makes those previews match everything else.
-# "Sublime Snazzy" ships with bat; no theme file or `bat cache --build` needed.
-export BAT_THEME="Sublime Snazzy"
+#
+# Unlike the built-in themes, "Voltage" is ours (.config/bat/themes/
+# Voltage.tmTheme) and only exists once `bat cache --build` has run — install.sh
+# does that. If bat ever falls back to its default theme, that build is why.
+export BAT_THEME="Voltage"
 
 # eza's colors. Note this is EZA_COLORS, not EXA_COLORS: the latter is from the
 # pre-rename exa days and eza does not read it. The dead .config/exa/EXA_COLORS
@@ -269,63 +281,24 @@ export BAT_THEME="Sublime Snazzy"
 # has no opinion on: the permission bits, ownership and size columns that
 # `l`/`ll`/`la` show. Without it those columns render in default white and the
 # long listing is a wall of grey with only the filenames colored.
-export EZA_COLORS="ur=38;2;90;247;142:uw=38;2;255;92;87:ux=38;2;87;199;255:ue=38;2;87;199;255:gr=38;2;90;247;142:gw=38;2;255;92;87:gx=38;2;87;199;255:tr=38;2;90;247;142:tw=38;2;255;92;87:tx=38;2;87;199;255:su=38;2;255;106;193:sf=38;2;255;106;193:xa=38;2;154;237;254:sn=38;2;243;249;157:sb=38;2;243;249;157:uu=38;2;239;240;235:un=38;2;104;104;104:gu=38;2;239;240;235:gn=38;2;104;104;104:da=38;2;154;237;254:xx=38;2;104;104;104"
+#
+# Voltage, as 24-bit SGR (eza takes no hex here): read = green #b3e053,
+# write = red #ff4d5e, execute = blue #5cc9f5, setuid/setgid = magenta
+# #eb43f4, size = yellow #fcf58d, date/xattr = cyan #17d5df, names =
+# fg #e7e7e7, absent = subtle #6b6b6b.
+export EZA_COLORS="ur=38;2;179;224;83:uw=38;2;255;77;94:ux=38;2;92;201;245:ue=38;2;92;201;245:gr=38;2;179;224;83:gw=38;2;255;77;94:gx=38;2;92;201;245:tr=38;2;179;224;83:tw=38;2;255;77;94:tx=38;2;92;201;245:su=38;2;235;67;244:sf=38;2;235;67;244:xa=38;2;23;213;223:sn=38;2;252;245;141:sb=38;2;252;245;141:uu=38;2;231;231;231:un=38;2;107;107;107:gu=38;2;231;231;231:gn=38;2;107;107;107:da=38;2;23;213;223:xx=38;2;107;107;107"
 
 # zsh-autosuggestions: async fetch
 export ZSH_AUTOSUGGEST_USE_ASYNC=true
 
 # zsh-autosuggestions: the inline ghost text. The plugin default is 8 (dim
 # grey), which on a bright palette reads as a rendering artifact rather than a
-# suggestion. Snazzy's grey, stated as truecolor so it doesn't depend on how
-# the terminal maps ANSI 8.
-export ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE="fg=#686868"
+# suggestion. Voltage's `subtle`, stated as truecolor so it doesn't depend on
+# how the terminal maps ANSI 8.
+export ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE="fg=#6b6b6b"
 
 # tabtab completions (serverless, etc.)
 [[ -f ~/.config/tabtab/zsh/__tabtab.zsh ]] && . ~/.config/tabtab/zsh/__tabtab.zsh || true
-
-# iris — IntelliSense-style completion menu (the Fig replacement). Autostarted
-# from the block at the top of this file; this is the other half of
-# `iris init zsh` — the ZLE plumbing the inner shell uses to talk to the
-# wrapper. $IRIS_FD is the pipe back to iris and only exists inside it, so a
-# plain zsh (IRIS_OFF=1, rescue shell, ssh to a box without iris) skips this
-# entirely. It lives here rather than up top because it must load after
-# zsh-autosuggestions has installed its own ZLE widgets.
-#
-# line-pre-redraw ships the buffer on every keystroke; chpwd/precmd ship $PWD.
-# The cwd hooks are what make path suggestions resolve against the directory
-# you're actually in — iris' file generator reads the shell-reported cwd, not
-# its own getcwd, so without them `cd s…` would complete against wherever the
-# wrapper was launched.
-#
-# Key conflicts are handled in ~/.config/iris/config.toml, not here: iris
-# swallows its own keys before ZLE sees them, so its defaults are remapped off
-# ctrl+r/up (atuin) and tab (fzf-tab), and ghost-text is off so it doesn't
-# overprint zsh-autosuggestions.
-#
-# The `true >&$IRIS_FD` probe is an addition to what `iris init zsh` emits, and
-# it matters: iris exports IRIS_PID/IRIS_FD into every process it starts, so a
-# GUI app or long-running program launched from inside iris passes them on to
-# whatever shells *it* spawns — shells that are not inside iris and where fd 13
-# is closed or, worse, has been reused for something unrelated. Upstream would
-# install the hooks anyway and print keystrokes at that fd. Probing it first
-# means the hooks only load where the pipe is genuinely live.
-if [[ -n $IRIS_PID && -n $IRIS_FD ]] && { true >&$IRIS_FD } 2>/dev/null; then
-  _iris_send_lbuffer() { print -u $IRIS_FD -N -r -- "$LBUFFER" 2>/dev/null }
-  _iris_sync_cwd()     { print -u $IRIS_FD -N -r -- "IRIS_CWD:$PWD" 2>/dev/null }
-  _iris_preexec()      { print -u $IRIS_FD -N -r -- "IRIS_CMD_START" 2>/dev/null }
-  _iris_precmd() {
-    local iris_exit_code=$?
-    _iris_sync_cwd
-    print -u $IRIS_FD -N -r -- "IRIS_CMD_STOP:$iris_exit_code" 2>/dev/null
-  }
-
-  autoload -Uz add-zle-hook-widget
-  autoload -Uz add-zsh-hook
-  add-zle-hook-widget line-pre-redraw _iris_send_lbuffer
-  add-zsh-hook precmd  _iris_precmd
-  add-zsh-hook preexec _iris_preexec
-  add-zsh-hook chpwd   _iris_sync_cwd
-fi
 
 #------------------------------------------------------------------------------
 # Byte-compile the config

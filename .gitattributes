@@ -1,0 +1,32 @@
+# Belt-and-braces against CRLF creeping back in. .editorconfig now defaults to
+# lf, but it only binds editors that honour it — this binds git itself, so a
+# checkout on any machine (or a file pasted in from elsewhere) is normalised on
+# the way into the index.
+#
+# Why it matters here: everything in this repo is executed, not just read. A \r
+# on the shebang line is a "bad interpreter" error; a \r anywhere else lands
+# inside the token it terminates. See the note in .editorconfig.
+
+# Normalise every text file git detects, and never write CRLF to the worktree.
+* text=auto eol=lf
+
+# Executed by a shell/interpreter — must be lf regardless of git's heuristics.
+*.sh      text eol=lf
+*.zsh     text eol=lf
+*.bash    text eol=lf
+.zshrc    text eol=lf
+.zshenv   text eol=lf
+.zprofile text eol=lf
+.profile  text eol=lf
+
+# Byte-compiled zsh and binary assets: never touch these.
+*.zwc     binary
+*.png     binary
+*.jpg     binary
+*.jpeg    binary
+*.gif     binary
+*.icns    binary
+*.ttf     binary
+*.otf     binary
+*.woff    binary
+*.woff2   binary

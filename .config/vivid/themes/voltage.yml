@@ -1,0 +1,151 @@
+# Voltage — vivid theme (generates LS_COLORS)
+#
+# vivid ships no theme matching this palette, and the built-ins it does ship
+# would put file listings on a different set of hues than the prompt, fzf and
+# the syntax highlighter. Palette: themes/voltage.md.
+#
+# Used by `vivid generate voltage` in .zshrc. vivid resolves a bare theme name
+# against ~/.config/vivid/themes/<name>.yml before falling back to its
+# built-ins, and install.sh symlinks .config/vivid there — so this applies on a
+# fresh machine with no extra step.
+#
+# LS_COLORS is cached (zcache_value). Run `zcache_clear` after editing this
+# file: mtime invalidation only sees a new vivid binary, not a changed theme.
+
+colors:
+  bg: '0f0d0e'
+  sel: '2a2427'
+  black: '393a3d'
+  subtle: '6b6b6b'
+  fg: 'e7e7e7'
+  white: 'f8f8f8'
+
+  red: 'ff4d5e'
+  red_bright: 'ff6b7a'
+  green: 'b3e053'
+  green_bright: 'c6ee6e'
+  yellow: 'fcf58d'
+  yellow_bright: 'fdfab0'
+  blue: '5cc9f5'
+  blue_bright: '7fd8f8'
+  magenta: 'eb43f4'
+  magenta_bright: 'f712ff'
+  cyan: '17d5df'
+  cyan_bright: '4ee3ec'
+  orange: 'ff9a4d'
+
+core:
+  normal_text:
+    foreground: fg
+  regular_file:
+    foreground: fg
+  reset_to_normal:
+    foreground: fg
+
+  directory:
+    foreground: blue
+    font-style: bold
+
+  symlink:
+    foreground: cyan
+  multi_hard_link:
+    foreground: cyan
+
+  fifo:
+    foreground: black
+    background: yellow
+  socket:
+    foreground: black
+    background: magenta
+  door:
+    foreground: black
+    background: magenta
+  block_device:
+    foreground: black
+    background: blue
+  character_device:
+    foreground: black
+    background: cyan
+
+  broken_symlink:
+    foreground: bg
+    background: red
+  missing_symlink_target:
+    foreground: bg
+    background: red
+  orphan_symlink:
+    foreground: bg
+    background: red
+
+  setuid:
+    foreground: bg
+    background: red
+  setgid:
+    foreground: bg
+    background: orange
+  file_with_capability:
+    foreground: red
+    background: black
+
+  sticky:
+    foreground: bg
+    background: blue
+  other_writable:
+    foreground: blue
+    background: sel
+  sticky_other_writable:
+    foreground: bg
+    background: blue
+
+  executable_file:
+    foreground: green
+    font-style: bold
+
+# Text and documents
+text:
+  foreground: fg
+  special:
+    foreground: yellow
+    font-style: bold
+  todo:
+    foreground: yellow
+    font-style: bold
+  licenses:
+    foreground: subtle
+  configuration:
+    foreground: yellow
+  other:
+    foreground: fg
+
+markup:
+  foreground: yellow_bright
+
+programming:
+  foreground: green_bright
+  source:
+    foreground: green_bright
+  tooling:
+    foreground: orange
+    version-control:
+      foreground: subtle
+    build:
+      foreground: orange
+    continuous-integration:
+      foreground: orange
+
+media:
+  foreground: magenta
+
+office:
+  foreground: red_bright
+
+archives:
+  foreground: magenta_bright
+  font-style: bold
+
+executable:
+  foreground: green
+  font-style: bold
+
+unimportant:
+  foreground: subtle

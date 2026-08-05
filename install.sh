@@ -254,6 +254,37 @@ if command -v zsh &>/dev/null; then
 fi
 
 #------------------------------------------------------------------------------
+title "Theme (Voltage)"
+#------------------------------------------------------------------------------
+# Most of the palette is plain config that the symlink step above already put in
+# place (ghostty, starship, fzf, vivid, eza). Two tools compile their theme into
+# a cache instead of reading the file, and need a build step here. See
+# themes/voltage.md.
+
+# bat reads ~/.cache/bat/themes.bin, not the .tmTheme — without this, $BAT_THEME
+# ="Voltage" doesn't resolve and bat silently falls back to its default theme.
+# This also fixes delta, which highlights through bat.
+if command -v bat &>/dev/null; then
+  if bat cache --build &>/dev/null && bat --list-themes 2>/dev/null | grep -q '^Voltage$'; then
+    success "bat theme built (Voltage)."
+  else
+    warning "bat cache build failed — bat/delta will use the default theme. Retry: bat cache --build"
+  fi
+fi
+
+# fast-syntax-highlighting reads .config/fsh/current_theme.zsh, which IS
+# committed — so this is a refresh, not a requirement, and it is best-effort:
+# `fast-theme` is a plugin function, so it only exists once zinit has actually
+# finished installing fast-syntax-highlighting above.
+if command -v zsh &>/dev/null; then
+  if zsh -ic 'if (( $+functions[fast-theme] )); then fast-theme XDG:voltage; else exit 1; fi' &>/dev/null; then
+    success "Syntax-highlighting theme applied (Voltage)."
+  else
+    info "Skipped fast-theme refresh; the committed current_theme.zsh already carries Voltage."
+  fi
+fi
+
+#------------------------------------------------------------------------------
 title "Finishing ClamAV setup"
 #------------------------------------------------------------------------------
 # Collect the background freshclam started above, then do everything that

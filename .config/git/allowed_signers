@@ -1,0 +1,10 @@
+# Signers trusted for `git log --show-signature` / `git verify-commit`.
+# Format: <principal> [options] <key-type> <key>
+# namespaces="git" restricts this key to git signatures, so it cannot be
+# used to satisfy verification for other ssh-signed payloads.
+#
+# Only the personal identity is listed: the work identity (~/.gitconfig-work,
+# applied to bitbucket remotes) sets commit.gpgsign = false and has no
+# signingkey, so those commits are unsigned by design and nothing here would
+# make them verify.
+kenny@kennyb.dev namespaces="git" ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOISHjId1mlt/MUYsl1rA/J8ox77BFvqQL7e8dZWWvc5

@@ -16,9 +16,16 @@ export FZF_DEFAULT_OPTS="
 --prompt '⯈ '
 --marker=+
 --preview-window='right:hidden:wrap'
---color=dark
---color=fg:250,fg+:15,hl:203,hl+:203
---color=info:100,pointer:15,marker:220,spinner:11,header:-1,gutter:-1,prompt:15
+# Voltage (themes/voltage.md), matching ghostty / starship / LS_COLORS / bat /
+# delta. Hex rather than the 256 indices this used before: the old codes (203,
+# 220, 100…) were approximations that drifted from every other tool. bg:-1 and
+# gutter:-1 keep the terminal's own background showing through, so fzf doesn't
+# paint a slightly-off panel over the blur.
+--color=fg:#e7e7e7,fg+:#f8f8f8,bg:-1,bg+:#2a2427
+--color=hl:#eb43f4,hl+:#f712ff
+--color=info:#b3e053,prompt:#ff4d5e,pointer:#5cc9f5
+--color=marker:#fcf58d,spinner:#17d5df,header:#17d5df
+--color=border:#6b6b6b,gutter:-1
 --layout=reverse
 --height=60%
 --border=rounded

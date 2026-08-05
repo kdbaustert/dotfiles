@@ -2,18 +2,27 @@
 zstyle ':completion:*:matches' group 'yes'
 zstyle ':completion:*:options' description 'yes'
 zstyle ':completion:*:options' auto-description '%d'
-zstyle ':completion:*:corrections' format ' %F{green}-- %d (errors: %e) --%f'
-zstyle ':completion:*:descriptions' format ' %F{yellow}-- %d --%f'
-zstyle ':completion:*:messages' format ' %F{purple} -- %d --%f'
-zstyle ':completion:*:warnings' format ' %F{red}-- no matches found --%f'
+# No %F{...}/%f prompt escapes in any `format` value. zsh's native menu expands
+# them, but fzf-tab does not: lib/-ftb-generate-header concatenates group names
+# with raw ANSI and never calls `print -P`, so the escapes render literally
+# ("%F{yellow}-- external command --%f") and their width breaks its column
+# padding. Coloring group headers is fzf-tab's `group-colors` job instead.
+zstyle ':completion:*:corrections' format '[%d (errors: %e)]'
+zstyle ':completion:*:descriptions' format '[%d]'
+zstyle ':completion:*:messages' format '[%d]'
+zstyle ':completion:*:warnings' format '[no matches found]'
 zstyle ':completion:*:default' list-prompt '%S%M matches%s'
-zstyle ':completion:*' format ' %F{yellow}-- %d --%f'
+zstyle ':completion:*' format '[%d]'
 zstyle ':completion:*' group-name ''
 zstyle ':completion:*' verbose yes
 zstyle ':completion:*' matcher-list 'm:{a-zA-Z}={A-Za-z}' 'r:|[._-]=* r:|=*' 'l:|=* r:|=*'
 zstyle ':completion:*:functions' ignored-patterns '(_*|pre(cmd|exec))'
 zstyle ':completion:*' use-cache true
 zstyle ':completion:*' rehash true
+
+# Directories before plain files in file-completion lists (matches the
+# --group-directories-first eza aliases and the fzf-tab previews).
+zstyle ':completion:*' list-dirs-first true
 
 # Let TAB expand an alias in place (offer its expansion as a candidate) before
 # falling back to normal completion. e.g. `ll<TAB>` → `eza -la`.

@@ -12,8 +12,19 @@ Thumbs.db
 # Compiled Python files
 *.pyc
 
+# Byte-compiled zsh — generated next to each config file by the zcompile block
+# at the end of .zshrc. Machine- and zsh-version-specific; never commit.
+*.zwc
+*.zwc.old
+
 # Compiled C++ files
 *.out
+
+# fast-syntax-highlighting downloads this into $FAST_WORK_DIR (.config/fsh) on
+# first run if it isn't present. Not ours and not deterministic — unlike
+# current_theme.zsh next to it, which IS committed: that one is generated from
+# our own voltage.ini and is what makes the theme apply on a fresh machine.
+.config/fsh/secondary_theme.zsh
 
 # Application specific files
 venv

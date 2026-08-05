@@ -4,7 +4,13 @@ root = true
 [*]
 indent_style = space
 indent_size = 2
-end_of_line = crlf
+# lf, not crlf. This is a macOS dotfiles repo: these files are shell scripts and
+# config read by zsh, bash, git and launchd. A CRLF default here is not cosmetic
+# — an editor honouring it appends \r to every line, which turns a shebang into
+# a "bad interpreter" error, hides `then`/`fi` from the parser, and silently
+# appends \r to array elements (`npm install -g '@vue/cli<CR>'`). setup/npm.sh,
+# setup/composer.sh and setup/mas.sh were all broken this way.
+end_of_line = lf
 charset = utf-8
 trim_trailing_whitespace = true
 insert_final_newline = true

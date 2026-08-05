@@ -1,11 +1,16 @@
 #!/usr/bin/env zsh
 
 # Shortcuts
-alias c='clear'
+# `c` and `x` belong to composer and xplr further down this file; they used to be
+# declared here as clear/exit too and were silently shadowed, since a second
+# `alias` on the same name just replaces the first.
+alias cl='clear'
 alias o='open .'
-alias x='exit'
+alias q='exit'
 alias x+="chmod +x"
-alias copyssh="pbcopy < $HOME/.ssh/id_rsa.pub"
+# `copyssh` lives in the SSH block below (ssh-copy-id). The clipboard-copy
+# variant that used to sit here was shadowed by it anyway, and `pkey`/`pubkey`
+# already cover copying the public key.
 alias reload="source ~/.zshrc"
 alias reloaddns="dscacheutil -flushcache && sudo killall -HUP mDNSResponder"
 alias shrug="echo '¯\_(ツ)_/¯' | pbcopy"
@@ -27,12 +32,16 @@ alias sites="cd $HOME/Sites"
 alias dl="cd $HOME/Downloads"
 alias dotfiles="cd $HOME/dotfiles"
 alias phpdir="cd /opt/homebrew/etc/php"
-alias vscode="$HOME/Library/Application Support/Code/"
-alias icloud="$HOME/Library/Mobile\ Documents"
-alias cnc-claims="$HOME/Development/cnc-claims"
-alias claimsource="$HOME/Development/cnc-claimsource"
+# These four were missing the `cd` that every other entry in this block has, so
+# they expanded to a bare path and the shell tried to *execute* the directory.
+# The inner single quotes matter for the two paths containing a space: $HOME is
+# expanded now, at definition time, and the quotes survive into the alias body.
+alias vscode="cd '$HOME/Library/Application Support/Code'"
+alias icloud="cd '$HOME/Library/Mobile Documents'"
+alias cnc-claims="cd '$HOME/Development/cnc-claims'"
+alias claimsource="cd '$HOME/Development/cnc-claimsource'"
 
-alias caliases="code $DOTFILES/aliases.zsh"
+alias caliases="code $DOTFILES/zsh/aliases.zsh"
 alias chammerspoon="code $HOME/.hammerspoon/init.lua"
 alias cyabai="code $HOME/.yabairc"
 alias czshrc="code $HOME/.zshrc"
@@ -140,8 +149,14 @@ alias resetlsd=fixlsd
 # computer power options
 alias reboot='sudo /sbin/reboot'
 alias shutdown='sudo /sbin/shutdown'
-alias lock='/System/Library/CoreServices/"Menu Extras"/User.menu/Contents/Resources/CGSession -suspend'
-alias poweroff='sudo /sbin/poweroff'
+# CGSession is gone: Apple removed the "Menu Extras" bundle that carried it, so
+# the old path fails outright on macOS 26. pmset needs no Accessibility grant
+# (the osascript Ctrl-Cmd-Q route fails silently without one) and locks straight
+# away here, since `sysadminctl -screenLock status` reports an immediate delay.
+alias lock='pmset displaysleepnow'
+# macOS ships no /sbin/poweroff (that's a Linux/systemd name) — only halt,
+# shutdown and reboot. `shutdown -h now` is the faithful equivalent.
+alias poweroff='sudo /sbin/shutdown -h now'
 
 # Removes all node_modules folders older than 4 months:
 alias cnodeold='find . -name "node_modules" -type d -mtime +120 | xargs rm -rf'

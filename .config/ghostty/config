@@ -1,6 +1,9 @@
 # See the full configuration reference: https://ghostty.org/docs/config
 # Ported from .config/rio/config.toml — matched to what Rio actually renders.
 
+#macos-custom-icon = ~/Config/ghostty/icon_256x256@2x.png
+macos-icon = custom
+
 # Fonts
 font-family = "Hack Nerd Font Mono"
 font-size = 15.5
@@ -72,30 +75,34 @@ cursor-style-blink = true
 # overriding cursor-style. Turn it off so the underline holds everywhere.
 shell-integration-features = no-cursor
 
+# Colors — Voltage (see themes/voltage.md for the palette and the tools that
+# share it). Derived from the Rio port that used to live here, with two fixes:
+# slot 1 held magenta rather than a red, and slots 4/12/14 were all the same
+# blue — so ANSI red rendered pink and cyan was indistinguishable from blue.
 background = #0F0D0E
-foreground = #FFFFFF
+foreground = #E7E7E7
 cursor-color = #F712FF
-selection-background = #1C191A
-selection-foreground = #44C9F0
+selection-background = #2A2427
+selection-foreground = #E7E7E7
 
-# Regular colors (0-7). 0, 6 and 7 are Rio defaults; the rest are set in Rio.
+# Regular colors (0-7).
 palette = 0=#393A3D
-palette = 1=#eb43f4
-palette = 2=#b3e053
-palette = 3=#fcf58d
-palette = 4=#5cc9f5
-palette = 5=#6638f0
-palette = 6=#17d5df
+palette = 1=#FF4D5E
+palette = 2=#B3E053
+palette = 3=#FCF58D
+palette = 4=#5CC9F5
+palette = 5=#EB43F4
+palette = 6=#17D5DF
 palette = 7=#E7E7E7
 
-# Bright colors (8-15) — Rio's "light-" set. 8 and 15 are Rio defaults.
+# Bright colors (8-15).
 palette = 8=#6B6B6B
-palette = 9=#eb43f4
-palette = 10=#b3e053
-palette = 11=#fcf58d
-palette = 12=#5cc9f5
-palette = 13=#6638f0
-palette = 14=#5cc9f5
+palette = 9=#FF6B7A
+palette = 10=#C6EE6E
+palette = 11=#FDFAB0
+palette = 12=#7FD8F8
+palette = 13=#F712FF
+palette = 14=#4EE3EC
 palette = 15=#F8F8F8
 
 # Keybindings
