@@ -103,12 +103,23 @@ else
   alias lr='lsd -lA --tree --depth 2'
 fi
 
-alias pkey="pbcopy < ~/.ssh/id_rsa.pub"
-alias pubkey="more ~/.ssh/id_rsa.pub | pbcopy | echo '=> Public key copied to pasteboard.'"
+# Retargeted from ~/.ssh/id_rsa.pub, which does not exist on this machine (nor
+# does a private id_rsa). ~/.ssh/config pins github_1p.pub for github.com via the
+# 1Password agent, so that is the key you actually hand out.
+alias pkey="pbcopy < ~/.ssh/github_1p.pub"
+alias pubkey="pbcopy < ~/.ssh/github_1p.pub && echo '=> Public key copied to pasteboard.'"
 
 # ClamAV
-# Signatures auto-update every 2h via ~/Library/LaunchAgents/com.clamav.freshclam.plist,
-# and clamd runs via `brew services`. These are the manual overrides.
+# Signatures auto-update every 2h via ~/Library/LaunchAgents/com.clamav.freshclam.plist
+# (StartInterval=7200, RunAtLoad). That symlink had gone missing, so nothing was
+# updating them at all — re-linked and re-bootstrapped 2026-08-05.
+#
+# clamd is NOT running (`brew services list` reports clamav "none"), so the three
+# clamdscan aliases below — clamq, clamdl, clamreload — currently fail with
+# "Can't connect to clamd through .../clamd.sock". The clamscan-based ones work
+# regardless, since they load signatures per invocation. Start the daemon with
+# `brew services start clamav` if you want the fast path; note clamd holds the
+# whole signature set resident (~1GB+).
 
 # Scanning
 alias clamf=clamfull                              # full-disk scan (function, see functions.zsh)
@@ -176,8 +187,8 @@ alias yabupdate='brew services stop yabai && brew upgrade yabai && sudo yabai --
 
 # SSH
 alias sshconfig='cd ~/.ssh; code config'
-alias sshkeygen='ssh-keygen -t rsa'
-alias copyssh='ssh-copy-id -i ~/.ssh/id_rsa.pub'
+alias sshkeygen='ssh-keygen -t ed25519'
+alias copyssh='ssh-copy-id -i ~/.ssh/github_1p.pub'
 alias chmodssh='sudo chmod 700 ~/.ssh && chmod 600 ~/.ssh/*'
 
 alias permission='chmod +x'

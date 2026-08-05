@@ -85,6 +85,13 @@ brew "btop"
 # clamav — on-demand AV scanner. Configs live in clamav/ and are symlinked into
 # $(brew --prefix)/etc/clamav by install.sh; signatures update via a LaunchAgent.
 brew "clamav"
+# Installed by hand and left undeclared, so `brew bundle` on a fresh box did not
+# reproduce them. Note subversion is NOT listed here — it is already declared
+# above as brew "svn", which is the same formula under its alias.
+brew "asdf"
+brew "fastfetch"
+brew "firebase-cli"
+brew "zig"
 # brew "elastic/tap/elasticsearch-full"
 # brew "khanhas/tap/spicetify-cli"
 # brew "switchaudio-osx"
@@ -112,19 +119,22 @@ cask "spotify"
 cask "1password-cli" # was brew "1password-cli@beta" (now a cask, beta removed)
 cask "1password@beta"
 cask "brooklyn"
-cask "carbon-copy-cloner"
-cask "aerial"
+# carbon-copy-cloner / aerial / kitty — declared but not installed on this
+# machine; disabled rather than deleted so a fresh box doesn't reinstall apps
+# that were deliberately dropped. Same treatment as the block further down.
+# cask "carbon-copy-cloner"
+# cask "aerial"
 cask "visual-studio-code"
 cask "insomnia"
 cask "github"
 cask "little-snitch"
-cask "kitty"
+# cask "kitty"
 # cask "phpmon"
 cask "obsidian"
 cask "runjs"
 cask "tabby"
 cask "raycast"
-cask "warp"
+# cask "warp"
 cask "rectangle-pro"
 cask "omnidisksweeper"
 cask "hyper"
@@ -132,29 +142,42 @@ cask "etrecheckpro"
 cask "easyfind"
 cask "appcleaner"
 cask "raindropio"
-cask "alt-tab"
+# cask "alt-tab"
 cask "iina"
 cask "arc"
-cask "jetbrains-toolbox"
 cask "zen" # renamed from zen-browser
 cask "mist"
 cask "chatgpt"
 cask "claude"
 cask "flyenv"
 cask "onyx"
-cask "cloudflare-warp"
+# cask "cloudflare-warp"
 cask "adguard"
 cask "balenaetcher"
 cask "brave-browser"
 cask "helium-browser"
-cask "jetbrains-toolbox"
+cask "jetbrains-toolbox"   # was declared twice; deduplicated to this one
 cask "microsoft-office"
 cask "microsoft-teams"
 cask "micro-snitch"
 cask "ngrok"
 cask "rio"
-cask "iconchanger"
+# cask "iconchanger"
 cask "ghostty"
+
+# Installed here but previously undeclared (or commented out despite still being
+# installed), so `brew bundle` on a fresh box produced a different machine.
+# karabiner-elements matters most: .config/karabiner is symlinked and actively
+# managed, so the app has to be declared alongside its config.
+cask "karabiner-elements"
+cask "replacicon"
+cask "utm"
+cask "bettercmdtab"
+cask "memory-cleaner"
+cask "transmission"
+cask "google-chrome@canary"
+cask "google-chrome@dev"
+cask "visual-studio-code@insiders"
 
 # cask "wins"
 # cask "zed"
@@ -163,13 +186,11 @@ cask "ghostty"
 # cask "vscodium"
 # cask "fman"
 # cask "figma"
-# cask "replacicon"
 # cask "utm@beta"
 # cask "monitorcontrol"
 # cask "sketch"
 # cask "forkLift"
 # cask "zeplin"
-# cask "karabiner-elements"
 # cask "hammerspoon"
 
 ## Fonts
@@ -177,5 +198,21 @@ cask "font-fira-code"
 cask "font-monaspace"
 cask "font-symbols-only-nerd-font"
 cask "font-jetbrains-mono-nerd-font"  # v3 Nerd Font — Rio + NvChad devicons need v3 glyphs
+cask "font-hack"   # plain Hack; installed here but was undeclared
+# "Hack Nerd Font Mono" is the family .config/ghostty/config and
+# .config/rio/config.toml actually name, and font-hack above does NOT provide it
+# (it ships only Hack-Regular/Bold/Italic). The faces currently resolve from
+# hand-installed files in ~/Library/Fonts named "Hack * Nerd Font Complete*.ttf"
+# — that's Nerd Font v2 naming, dropped in v3. So a fresh box gets no Nerd Hack
+# at all, and this box has only v2 glyph coverage. Declared for reproducibility;
+# NOT installed yet, because adding v3 faces beside the v2 files would register
+# two fonts claiming the same family name. Remove the v2 files first, then
+# `brew install --cask font-hack-nerd-font`.
+cask "font-hack-nerd-font"
+# Installed but undeclared until now.
+cask "font-fira-code-nerd-font"
+cask "font-fira-mono-nerd-font"
+cask "font-roboto-mono-nerd-font"
+cask "font-sauce-code-pro-nerd-font"
 
 
