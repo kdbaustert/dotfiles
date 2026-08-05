@@ -356,6 +356,26 @@ if grep -q '^[^#]*pam_tid\.so' /etc/pam.d/sudo 2>/dev/null; then
 fi
 
 #------------------------------------------------------------------------------
+title "App preferences"
+#------------------------------------------------------------------------------
+# iTerm2 reads its prefs from a folder rather than a symlinked plist: point it at
+# iterm/ and it picks up com.googlecode.iterm2.plist from there. This was set by
+# hand on the current machine and left out of the script, so a fresh box kept the
+# repo's plist but never loaded it. Written unconditionally — `defaults write` is
+# idempotent, and iTerm2 only reads these at launch.
+if [ -d "$DOTFILES_DIR/iterm" ]; then
+  defaults write com.googlecode.iterm2 PrefsCustomFolder -string "$DOTFILES_DIR/iterm"
+  defaults write com.googlecode.iterm2 LoadPrefsFromCustomFolder -bool true
+  success "iTerm2 prefs folder → $DOTFILES_DIR/iterm"
+fi
+
+# obsidian/ holds the "Amethyst Night" theme. It is intentionally NOT deployed
+# here: Obsidian themes live at <vault>/.obsidian/themes/, and the vault path is
+# per-machine — there is no vault on this one yet (no .obsidian directory exists
+# under $HOME). Copy obsidian/themes/* into <vault>/.obsidian/themes/ by hand
+# once a vault exists; symlinking into a synced vault tends to confuse Obsidian.
+
+#------------------------------------------------------------------------------
 title "Optional setup scripts"
 #------------------------------------------------------------------------------
 # Uncomment to run. macos.sh changes system defaults; review before enabling.

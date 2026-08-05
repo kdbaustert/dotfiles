@@ -175,11 +175,26 @@ zstyle ':fzf-tab:complete:(-command-|export|unset):*' \
 zstyle ':fzf-tab:complete:(kill|ps):argument-rest:*' \
                                                fzf-preview 'ps -p $word -o comm= -o args 2>/dev/null'
 zstyle ':fzf-tab:complete:(kill|ps):argument-rest:*' fzf-flags $_ftb_height '--preview-window=down:3:wrap'
-unset _ftb_height
-zstyle ':fzf-tab:complete:(ssh|scp|sftp):*'    fzf-preview 'dig +short $word 2>/dev/null'
+# Was `dig +short $word` — a DNS query on every cursor move, measured at 53-67ms
+# and unbounded when DNS is slow or a VPN is up. `ssh -G` parses ~/.ssh/config
+# locally (10ms, no network) and is strictly more informative: it resolves Host
+# aliases to the hostname/user/port actually used, which dig can only NXDOMAIN.
+zstyle ':fzf-tab:complete:(ssh|scp|sftp):*' \
+                                               fzf-preview 'ssh -G $word 2>/dev/null | awk "/^(hostname|user|port|identityfile) /{print}"'
+zstyle ':fzf-tab:complete:(ssh|scp|sftp):*'    fzf-flags $_ftb_height '--preview-window=down:5:wrap'
+# `head -300` before delta: these were unbounded, and delta was syntax-
+# highlighting the whole diff even though only a screenful is ever visible. HEAD
+# alone is 622 lines here and there are commits at 541 insertions. Measured
+# 42ms/31ms before the cap.
 zstyle ':fzf-tab:complete:git-(add|diff|restore|checkout|stash):*' \
-                                               fzf-preview 'git diff --color=always $word 2>/dev/null | delta'
-zstyle ':fzf-tab:complete:git-(log|show):*'    fzf-preview 'git show --color=always $word 2>/dev/null | delta'
+                                               fzf-preview 'git diff --color=always -- $word 2>/dev/null | head -300 | delta'
+zstyle ':fzf-tab:complete:git-(log|show):*'    fzf-preview 'git show --color=always $word 2>/dev/null | head -300 | delta'
+# Git previews are the most expensive of the set, so they start hidden and are
+# summoned with ctrl-/ instead of running on every cursor move. This is what
+# FZF_DEFAULT_OPTS already asked for globally; fzf-tab ignores that (see the
+# use-fzf-default-opts note above), so it has to be set here as an explicit flag.
+zstyle ':fzf-tab:complete:git-*:*'             fzf-flags $_ftb_height '--preview-window=right:hidden:wrap' '--bind=ctrl-/:toggle-preview'
+unset _ftb_height   # must stay after the LAST use above
 
 #------------------------------------------------------------------------------
 # fzf — fuzzy finder
