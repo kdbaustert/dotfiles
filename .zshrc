@@ -107,6 +107,23 @@ source "$DOTFILES/zsh/extra/cache.zsh"
 #------------------------------------------------------------------------------
 # Prompt (starship) — first, so the prompt is ready before anything optional
 #------------------------------------------------------------------------------
+# PROMPT and RPROMPT come out of `starship init zsh` single-quoted, so they run
+# starship once per prompt — correct, and why editing starship.toml takes effect
+# without clearing this cache. PROMPT2 (the continuation prompt, shown only after
+# an unterminated quote or a trailing `\`) is the odd one out: upstream emits it
+# *double*-quoted, so it forks and execs starship at source time — on every shell
+# start — to build a string most sessions never display. That single subprocess
+# was ~4.2ms, the largest remaining item in `zprof`.
+#
+# Re-quoting it makes it behave like the other two: expanded by PROMPT_SUBST at
+# the moment it's drawn. Config stays live and the fork only happens if a
+# continuation prompt is actually shown.
+#
+# Done as a cache filter rather than an override after the fact because sourcing
+# the cache is itself what pays the cost — reassigning PROMPT2 afterwards would
+# be too late. Runs once per regeneration; see zcache in zsh/extra/cache.zsh.
+setopt PROMPT_SUBST   # required for the lazy form below; zinit.zsh also sets it
+zcache_post_starship() { sed "s|^PROMPT2=\"\\\$(\(.*\))\"\$|PROMPT2='\$(\1)'|" }
 zcache starship starship init zsh
 
 #------------------------------------------------------------------------------
@@ -242,9 +259,11 @@ zcache pay-respects pay-respects zsh --alias fuck --nocnf
 # "Sublime Snazzy" ships with bat; no theme file or `bat cache --build` needed.
 export BAT_THEME="Sublime Snazzy"
 
-# eza's colors. Note this is EZA_COLORS, not the EXA_COLORS in
-# .config/exa/EXA_COLORS — that file is from the pre-rename exa days, is
-# sourced by nothing, and eza does not read it. Left in place, but it is dead.
+# eza's colors. Note this is EZA_COLORS, not EXA_COLORS: the latter is from the
+# pre-rename exa days and eza does not read it. The dead .config/exa/EXA_COLORS
+# that used to sit alongside this comment has been removed — install.sh links
+# every .config/* entry, so keeping it meant planting a dead symlink in
+# ~/.config on every machine.
 #
 # eza reads LS_COLORS too (set above), so this only overrides what LS_COLORS
 # has no opinion on: the permission bits, ownership and size columns that

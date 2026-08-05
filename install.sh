@@ -128,8 +128,11 @@ fi
 title "Symlinking dotfiles"
 #------------------------------------------------------------------------------
 # Root-level dotfiles (only those that exist in the repo are linked).
-for f in .zshenv .zshrc .vimrc .gitconfig .gitignore .editorconfig .eslintrc .eslintignore \
-         .prettierrc .prettierignore .stylelintrc tsconfig.json .default-npm-packages; do
+# .vimrc and .default-npm-packages were dropped from this list: neither has ever
+# existed in the repo, so they warned on every single run — two guaranteed
+# warnings is exactly how you learn to stop reading them.
+for f in .zshenv .zshrc .gitconfig .gitignore .editorconfig .eslintrc .eslintignore \
+         .prettierrc .prettierignore .stylelintrc tsconfig.json; do
   link "$DOTFILES_DIR/$f" "$HOME/$f"
 done
 
@@ -181,13 +184,89 @@ if command -v clamscan &>/dev/null; then
   # This also pulls the third-party DBs declared as DatabaseCustomURL in
   # freshclam.conf (urlhaus, malwarehash, rogue) — see clamav/README.md for
   # why those three and not the others.
+  #
+  # Started in the BACKGROUND: this is the longest single step in the script and
+  # it is pure network I/O, while the zinit section below is a git clone plus
+  # some CPU. Running them concurrently overlaps the two instead of paying for
+  # both in series. Output goes to a log so it can't interleave with ours; the
+  # wait, the exit status and the DB checks are all handled after zinit, under
+  # "Finishing ClamAV setup".
+  FRESHCLAM_LOG="$(mktemp -t freshclam)"
   if [ ! -f "$CLAM_PREFIX/var/lib/clamav/daily.cvd" ]; then
-    info "Downloading ClamAV signatures (~120MB, takes a minute)..."
-    freshclam || warning "freshclam failed — run it manually later."
+    info "Downloading ClamAV signatures in the background (~120MB)..."
   else
-    info "ClamAV signatures already present — refreshing."
-    freshclam || warning "freshclam refresh failed."
+    info "Refreshing ClamAV signatures in the background..."
   fi
+  freshclam >"$FRESHCLAM_LOG" 2>&1 &
+  FRESHCLAM_PID=$!
+else
+  warning "Skipping ClamAV setup — clamscan not found (Brewfile install may have failed)."
+fi
+
+#------------------------------------------------------------------------------
+title "Bootstrapping zinit + plugins"
+#------------------------------------------------------------------------------
+# zinit.zsh self-installs on first interactive shell, but cloning it here keeps
+# the very first terminal clean and lets us pre-compile the plugins.
+ZINIT_HOME="${XDG_DATA_HOME:-$HOME/.local/share}/zinit/zinit.git"
+if [ ! -f "$ZINIT_HOME/zinit.zsh" ]; then
+  info "Cloning zinit..."
+  mkdir -p "$(dirname "$ZINIT_HOME")"
+  git clone -q --depth=1 https://github.com/zdharma-continuum/zinit "$ZINIT_HOME" \
+    && success "zinit installed." || warning "zinit clone failed — it will retry on first shell."
+else
+  info "zinit already present."
+fi
+
+# Launch a zsh once so zinit installs the declared plugins.
+#
+# Every plugin is turbo-deferred (`wait lucid`), so they are scheduled rather
+# than loaded — a plain `zsh -ic exit` would exit before any of them downloads.
+# This used to be handled with `sleep 3`, which is wrong in both directions: too
+# short on a cold cache or slow link (plugins clone from GitHub), and three
+# wasted seconds when they are already installed.
+#
+# zinit exposes the scheduler directly for exactly this case: `@zinit-scheduler
+# burst` marks every queued task as timed-out and runs them one by one, which is
+# documented upstream as the way to "run package installations from script, not
+# from prompt". It returns when the queue is genuinely drained.
+if command -v zsh &>/dev/null; then
+  info "Installing zsh plugins (first run clones from GitHub — may take a moment)..."
+  if zsh -ic '
+        # Drain the turbo queue synchronously instead of racing a fixed sleep.
+        # Fall back to a bounded poll if this zinit predates `burst`.
+        if (( $+functions[@zinit-scheduler] )); then
+          @zinit-scheduler burst &>/dev/null
+        else
+          for _ in {1..30}; do
+            (( ${#ZINIT_TASKS} <= 1 )) && break
+            sleep 1
+          done
+        fi
+        zinit self-update &>/dev/null
+        zinit compile --all &>/dev/null
+        exit 0
+      ' 2>/dev/null; then
+    success "Plugins installed & compiled."
+  else
+    warning "Plugin bootstrap incomplete — it finishes on first interactive shell."
+  fi
+fi
+
+#------------------------------------------------------------------------------
+title "Finishing ClamAV setup"
+#------------------------------------------------------------------------------
+# Collect the background freshclam started above, then do everything that
+# genuinely depends on the signatures being on disk.
+if [ -n "${FRESHCLAM_PID:-}" ]; then
+  info "Waiting for the signature download to finish..."
+  if wait "$FRESHCLAM_PID"; then
+    success "ClamAV signatures up to date."
+  else
+    warning "freshclam failed — run it manually later. Output:"
+    sed 's/^/    /' "$FRESHCLAM_LOG" >&2
+  fi
+  rm -f "$FRESHCLAM_LOG"
 
   # A third-party mirror can 404 or move without freshclam failing overall,
   # which would silently leave you with core signatures only. Check explicitly.
@@ -209,37 +288,41 @@ if command -v clamscan &>/dev/null; then
   brew services restart clamav &>/dev/null \
     && success "clamd running." \
     || warning "clamd failed to start — check $CLAM_PREFIX/var/log/clamav/clamd.log"
-else
-  warning "Skipping ClamAV setup — clamscan not found (Brewfile install may have failed)."
 fi
 
 #------------------------------------------------------------------------------
-title "Bootstrapping zinit + plugins"
+title "Touch ID for sudo"
 #------------------------------------------------------------------------------
-# zinit.zsh self-installs on first interactive shell, but cloning it here keeps
-# the very first terminal clean and lets us pre-compile the plugins.
-ZINIT_HOME="${XDG_DATA_HOME:-$HOME/.local/share}/zinit/zinit.git"
-if [ ! -f "$ZINIT_HOME/zinit.zsh" ]; then
-  info "Cloning zinit..."
-  mkdir -p "$(dirname "$ZINIT_HOME")"
-  git clone -q --depth=1 https://github.com/zdharma-continuum/zinit "$ZINIT_HOME" \
-    && success "zinit installed." || warning "zinit clone failed — it will retry on first shell."
+# /etc/pam.d/sudo_local is Apple's supported override file (macOS 14+); it is
+# `include`d by /etc/pam.d/sudo and, unlike that file, survives OS updates.
+#
+# Both operations below are now guarded. They used to run unconditionally on
+# every invocation, outside any section heading, which meant a re-run silently
+# rewrote a root-owned PAM file and ran a destructive sed over Apple's own
+# /etc/pam.d/sudo — with no output either way. A mistake there costs you sudo.
+PAM_TID='auth       sufficient     pam_tid.so'
+
+if [ -f /etc/pam.d/sudo_local ] && grep -q '^[^#]*pam_tid\.so' /etc/pam.d/sudo_local; then
+  info "Touch ID for sudo already enabled."
 else
-  info "zinit already present."
+  # Preserve anything already in the file rather than clobbering it — a plain
+  # `tee` here would discard unrelated rules someone had added.
+  if [ -s /etc/pam.d/sudo_local ]; then
+    printf '%s\n' "$PAM_TID" | sudo tee -a /etc/pam.d/sudo_local >/dev/null
+  else
+    printf '%s\n' "$PAM_TID" | sudo tee /etc/pam.d/sudo_local >/dev/null
+  fi
+  success "Touch ID for sudo enabled (/etc/pam.d/sudo_local)."
 fi
 
-# Launch a login zsh once so zinit installs the declared plugins. Turbo plugins
-# load just after the prompt, so give them a moment, then compile.
-if command -v zsh &>/dev/null; then
-  info "Installing zsh plugins (first run may take a moment)..."
-  zsh -ic 'sleep 3; zinit self-update &>/dev/null; zinit compile --all &>/dev/null; exit' 2>/dev/null \
-    && success "Plugins installed & compiled." \
-    || warning "Plugin bootstrap incomplete — it finishes on first interactive shell."
+# Legacy cleanup only: older setups edited /etc/pam.d/sudo directly. With
+# sudo_local in place that line is redundant, but only touch the file if it is
+# actually there — a no-op sed on a system PAM file every run is a needless risk.
+if grep -q '^[^#]*pam_tid\.so' /etc/pam.d/sudo 2>/dev/null; then
+  sudo cp /etc/pam.d/sudo "/etc/pam.d/sudo.backup-$(date +%Y%m%d-%H%M%S)"
+  sudo sed -i '' '/pam_tid.so/d' /etc/pam.d/sudo \
+    && info "Removed the legacy pam_tid line from /etc/pam.d/sudo (backed up)."
 fi
-
-### Add Touch ID support for sudo (macOS 10.12.2+)
-echo 'auth       sufficient     pam_tid.so' | sudo tee /etc/pam.d/sudo_local >/dev/null
-sudo sed -i '' '/pam_tid.so/d' /etc/pam.d/sudo
 
 #------------------------------------------------------------------------------
 title "Optional setup scripts"
