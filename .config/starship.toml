@@ -7,10 +7,19 @@ add_newline = false
 command_timeout = 1000
 format = "$all"
 
+# Snazzy — a deliberately bright, near-neon palette. Named colors below resolve
+# through [palettes.snazzy] at the bottom of this file, so re-theming the whole
+# prompt is a one-line change to this key and no module config needs touching.
+# The rest of the shell is on the same palette: LS_COLORS (vivid snazzy), fzf,
+# bat + delta (Sublime Snazzy) and fast-syntax-highlighting — so completions,
+# file listings, previews and diffs all agree on the same six hues.
+palette = "snazzy"
+
 [character]
-success_symbol = "[❯](#ffb86c)[❯](#bd93f9)[❯](#50fa7b)"
-error_symbol = "[❯](#ff5555)[❯](#ff5555)[❯](#ff5555)"
-vicmd_symbol = "[N](#bd93f9)"
+# Three-symbol gradient — was hardcoded Dracula hex, now the Mocha equivalents.
+success_symbol = "[❯](orange)[❯](magenta)[❯](green)"
+error_symbol = "[❯](red)[❯](red)[❯](red)"
+vicmd_symbol = "[N](magenta)"
 
 [battery]
 charging_symbol = "⚡️ "
@@ -28,34 +37,65 @@ disabled = false
 powershell_indicator = "_"
 
 [[battery.display]] # red style when capacity is between 0% and 10%
-style = "red"
+style = "bold red"
 threshold = 10
 
 [[battery.display]] # yellow style when capacity is between 10% and 30%
-style = "yellow"
+style = "bold orange"
 threshold = 40
 
 [hostname]
 disabled = false
 format = "@[$hostname]($style)"
 ssh_only = true
-style = "green"
+style = "bold cyan"
 
 [username]
 disabled = false
 format = " [$user]($style) "
 show_always = true
-style_root = "red"
-style_user = "blue"
+style_root = "bold red"
+style_user = "bold blue"
 
 [php]
 disabled = false
+style = "bold magenta"
 format = "[$symbol($version )]($style)"
 symbol = " "
 
 [nodejs]
 disabled = false
 format = "[$symbol($version )]($style)"
+style = "bold green"
+
+# Language/tool modules. Each gets its own palette entry rather than starship's
+# defaults, so the colour alone tells you which runtime is in play.
+[python]
+style = "bold yellow"
+
+[rust]
+style = "bold orange"
+
+[golang]
+style = "bold cyan"
+
+[ruby]
+style = "bold red"
+
+[lua]
+style = "bold blue"
+
+[docker_context]
+style = "bold blue"
+
+[git_branch]
+style = "bold magenta"
+
+[git_state]
+style = "bold magenta"
+
+[cmd_duration]
+style = "bold yellow"
 
 # `swift --version` takes ~1s on macOS, well past command_timeout
 [swift]
@@ -63,11 +103,12 @@ disabled = true
 
 [package]
 disabled = false
+style = "bold orange"
 
 [directory]
 home_symbol = "~"
 read_only = "🔒 "
-style = "yellow"
+style = "bold yellow"
 truncate_to_repo = false
 truncation_length = 3
 truncation_symbol = ""
@@ -75,10 +116,11 @@ truncation_symbol = ""
 [memory_usage]
 disabled = true
 format = "[${symbol}RAM: ${ram}]($style) "
-style = "dimmed green"
+style = "dimmed cyan"
 threshold = -1
 
 [jobs]
+style = "bold magenta"
 format = "[$symbol $number]($style) "
 symbol = "🏃️ "
 threshold = 4
@@ -89,7 +131,7 @@ disabled = true
 [time]
 disabled = true
 format = "[$symbol][$time ]($style) "
-style = "yellow"
+style = "bold cyan"
 symbol = "🕙 "
 use_12hr = false
 #time_format = "%Y/%m/%d %T"
@@ -113,6 +155,27 @@ echo "$GIT_REMOTE_SYMBOL "
 """
 description = "Display symbol for remote Git server"
 disabled = false
-format = "$output "
+style = "bold blue"
+format = "[$output]($style) "
 shell = ["bash", "--noprofile", "--norc"]
 when = 'git rev-parse --is-inside-work-tree 2> /dev/null'
+
+########################################
+# Palette — Snazzy
+########################################
+# Selected by `palette = "snazzy"` at the top; every `style` above refers to
+# these names. The first six are Snazzy's own ANSI colors, verbatim. `orange`
+# is NOT part of upstream Snazzy — it is a derived accent added here because the
+# palette has no warm mid-tone and several modules needed to stay distinct from
+# both red and yellow. `fg`/`subtle`/`bg` are the theme's UI tones.
+[palettes.snazzy]
+red = "#ff5c57"
+green = "#5af78e"
+yellow = "#f3f99d"
+blue = "#57c7ff"
+magenta = "#ff6ac1"
+cyan = "#9aedfe"
+orange = "#ff9f43"
+fg = "#eff0eb"
+subtle = "#686868"
+bg = "#282a36"
