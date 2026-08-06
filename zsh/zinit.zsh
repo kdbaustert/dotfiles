@@ -47,13 +47,24 @@ setopt PROMPT_SUBST
 # updates instead of `zinit update`.
 
 # --- Version managers (turbo) -------------------------------------------------
-# Node — zsh-nvm with lazy loading (NVM_LAZY_LOAD=true, set in .zprofile) so the
-# heavy nvm.sh is only sourced on first `node`/`npm`/`nvm` use. Kept on purpose,
-# even though nvm currently manages no versions (~/.nvm/versions/node is empty
-# and nothing in ~/Development or ~/Sites has a .nvmrc): it's here for
-# per-project Node versions when they're needed, and lazy loading means an
-# unused nvm costs ~nothing. Until `nvm install` is run, `node` resolves to
-# Homebrew's (declared in the Brewfile).
+# Node — zsh-nvm with lazy loading (NVM_LAZY_LOAD=true, set in .zprofile): the
+# heavy nvm.sh is never sourced at startup. The plugin instead defines function
+# shims for node/npm/npx/nvm that source it on first call.
+#
+# nvm is the ONLY node version manager here. asdf used to be declared in the
+# Brewfile alongside it, but it had zero plugins installed and was never
+# initialised in any shell file, so it managed nothing — it has been removed
+# rather than wired up.
+#
+# The previous version of this comment claimed nvm managed no versions and that
+# `node` therefore resolved to Homebrew's. Both halves are now wrong:
+# ~/.nvm/versions/node holds v26.5.0 and ~/.nvm/alias/default is `lts`, so in an
+# interactive shell `node` is the shim *function* and gives v26.5.0 — a function
+# outranks any $path lookup, so Homebrew's v26.7.0 does not win despite
+# /opt/homebrew/bin being first in the path array. Homebrew's node is what
+# non-interactive shells and scripts get, since they never load this plugin.
+# Verify with `whence -w node` in a real interactive shell — NOT `zsh -i -c`,
+# which exits before the first prompt and so before turbo fires.
 zinit ice wait lucid
 zinit light lukechilds/zsh-nvm
 
@@ -149,6 +160,8 @@ zinit light zdharma-continuum/null
 #                           last command, on an empty line). Self-contained: it
 #                           pulls no OMZ lib. ^X^X is pay-respects' inline fixer
 #                           and ^X^E is edit-command-line — no collision.
+#   - OMZP::safe-paste    — bracketed-paste-magic; see the block below it, which
+#                           is not optional.
 #
 # forgit: rename the 4 helpers that collide with our plain-git aliases in
 # aliases.zsh (ga/gd/grh/gco). The f-prefixed names give the interactive
@@ -171,10 +184,110 @@ export AUTO_NOTIFY_IGNORE=(nvim hx micro vim man less ssh tmux fzf navi \
 # at below); abbr reads/writes that file directly so runtime `abbr add`s stay
 # version-controlled. Must be set before the plugin loads.
 export ABBR_USER_ABBREVIATIONS_FILE="$DOTFILES/zsh/abbreviations"
+
+# safe-paste: on zsh >= 5.1 (this is 5.9.2) the plugin collapses to three lines —
+# it re-sets the zle_bracketed_paste option and swaps zsh's *built-in*
+# bracketed-paste widget for bracketed-paste-magic. Worth being precise about
+# what that buys, because it is not the obvious thing: the built-in widget
+# already stops a pasted newline from auto-executing. What the magic widget adds
+# is running pasted text through ZLE widgets, so url-quote-magic (URL escaping)
+# applies to a paste instead of being bypassed.
+#
+# That processing is per-character, and per-character is exactly the case
+# zsh-autosuggestions documents as "slow pasting" — every pasted char would
+# otherwise re-enter the autosuggest self-insert wrapper, and with
+# fast-syntax-highlighting also hooked in, a large paste crawls. The two zstyles
+# below are upstream's own fix: swap self-insert to a bare url-quote-magic for
+# the duration of the paste, then restore whatever widget was there. Without
+# them this plugin is a net LOSS on this config — do not add one without the
+# other, and do not reorder them after the plugin list.
+autoload -Uz url-quote-magic
+_zsh_paste_init() {
+  # widgets[self-insert] reads like "user:autosuggest-widget-self-insert";
+  # [2,3] strips the "user:" tag and keeps the function name.
+  OLD_SELF_INSERT=${${(s.:.)widgets[self-insert]}[2,3]}
+  zle -N self-insert url-quote-magic
+}
+_zsh_paste_finish() { zle -N self-insert $OLD_SELF_INSERT }
+zstyle :bracketed-paste-magic paste-init   _zsh_paste_init
+zstyle :bracketed-paste-magic paste-finish _zsh_paste_finish
+
 zinit wait lucid for \
   OMZP::sudo \
+  OMZP::safe-paste \
   hlissner/zsh-autopair \
   MichaelAquilina/zsh-you-should-use \
   wfxr/forgit \
   MichaelAquilina/zsh-auto-notify \
   olets/zsh-abbr
+
+# --- fzf-git.sh (turbo) -------------------------------------------------------
+# fzf widgets that INSERT a git object into the line you are already typing:
+# files, branches, tags, remotes, hashes, stashes, reflogs, each_ref, worktrees.
+# Complements forgit above rather than overlapping it — forgit gives whole
+# interactive *commands* (fga/fgd/glo), this gives *completions* mid-command,
+# e.g. `git rebase -i <^X^G h>`. Previews use bat and delta, both already here.
+#
+# REBOUND OFF ^G, deliberately. Upstream's __fzf_git_init hardcodes
+#   bindkey -M $m '^g^<x>'   and   bindkey -M $m '^g<x>'
+# for every object, in the emacs, viins and vicmd keymaps, with no prefix option
+# to override. That collides with navi's single-key ^G widget (bound in .zshrc
+# from the cached `navi widget zsh`) — though not by deleting it, which is worth
+# stating precisely because the failure is intermittent rather than total:
+#
+#   Binding any '^g<x>' sequence promotes ^G to a PREFIX key. zsh keeps the
+#   standalone ^G binding as a fallback, so `bindkey '^g'` still reports
+#   _navi_widget — but it can only resolve it after KEYTIMEOUT (40 = 0.4s here)
+#   proves no continuation is coming. So navi still works, with a 0.4s stall,
+#   and typing ^G followed quickly by any of f/b/t/r/h/s/l/e/w/? runs fzf-git
+#   instead of navi. A lag that only sometimes ends in the wrong widget is worse
+#   to live with than a clean break, hence moving fzf-git rather than tolerating it.
+#
+# navi keeps ^G — it was here first and is in the muscle memory — so fzf-git
+# moves to ^X^G, matching the ^X^E (edit-command-line) and ^X^X (pay-respects)
+# prefix convention already in use. ^X^G is genuinely free: the emacs keymap
+# binds ^Xg and ^XG to list-expand, but those are ^X-then-g, a different
+# sequence from ^X-then-^G.
+#
+#   ^X^G then f b t r h s l e w   (or ^F ^B ^T … — both forms bound, as upstream)
+#   ^X^G ?                        lists the bindings
+#
+# Change the prefix in one place here. The atload runs immediately after the
+# plugin sources, i.e. after its own bindkey calls, so it can undo them.
+FZF_GIT_PREFIX='^X^G'
+_fzf_git_rebind() {
+  local o k m
+  # Same object list upstream passes to __fzf_git_init; '?list_bindings' is the
+  # odd one out — its widget really is named fzf-git-?list_bindings-widget and
+  # its key is '?', per the ${o[1]} == "?" branch in the plugin.
+  for o in files branches tags remotes hashes stashes lreflogs each_ref \
+           worktrees '?list_bindings'; do
+    k=${o[1]}
+    for m in emacs viins vicmd; do
+      bindkey -M $m -r "^g^$k" "^g$k" 2>/dev/null
+    done
+    bindkey -M emacs "${FZF_GIT_PREFIX}^$k" "fzf-git-$o-widget"
+    bindkey -M emacs "${FZF_GIT_PREFIX}$k"  "fzf-git-$o-widget"
+  done
+  # Removing the ^g<x> sequences above does NOT restore the plain ^G binding the
+  # plugin overwrote when it made ^G a prefix — that has to be put back by hand.
+  (( ${+widgets[_navi_widget]} )) && bindkey -M emacs '^g' _navi_widget
+}
+zinit ice wait lucid has'fzf' pick'fzf-git.sh' atload'_fzf_git_rebind'
+zinit light junegunn/fzf-git.sh
+
+# --- zsh-bench (turbo, program not plugin) ------------------------------------
+# Measures *perceived* interactive latency — first-prompt-lag, first-command-lag,
+# input-lag, exit-time — by driving a real interactive zsh under a pty. This is
+# the thing the turbo-defer architecture at the top of this file is actually
+# optimising for, and the thing zprof cannot see: zprof times shell *functions*,
+# so it attributes nothing to the gap between a keypress and the response.
+#
+# as"program" is load-bearing: it puts the repo directory on $PATH and does NOT
+# source anything, which is correct — this is a benchmark harness, not a plugin.
+# Nothing here runs at shell startup.
+#
+#   zsh-bench                 # summary for the current interactive config
+#   zsh-bench --iters 20      # tighter confidence interval
+zinit ice wait lucid as"program" pick"zsh-bench"
+zinit light romkatv/zsh-bench
