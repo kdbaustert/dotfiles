@@ -118,14 +118,63 @@ export FAST_WORK_DIR="$HOME/.config/fsh"
 #------------------------------------------------------------------------------
 source "$DOTFILES/zsh/extra/completion.zsh"
 
-# LS_COLORS via vivid — colorizes the completion menu (and fzf-tab previews).
-# `voltage` is this repo's own theme (.config/vivid/themes/voltage.yml), not a
-# vivid built-in; vivid resolves a bare name against ~/.config/vivid/themes
-# first, and install.sh symlinks .config/vivid there.
-# Cached: vivid re-generates the same ~2KB string every start otherwise. Change
+# LS_COLORS — colorizes the completion menu, fzf-tab previews and eza listings.
+#
+# Two databases are installed; $LS_COLORS_SOURCE picks which one populates the
+# variable:
+#
+#   vivid     (default) this repo's own Voltage theme, .config/vivid/themes/
+#             voltage.yml — not a vivid built-in; vivid resolves a bare name
+#             against ~/.config/vivid/themes first, and install.sh symlinks
+#             .config/vivid there. 677 entries, and the ONLY option that agrees
+#             with the prompt, fzf, bat, delta and EZA_COLORS. This is the one
+#             themes/voltage.md documents.
+#
+#   trapd00r  github.com/trapd00r/LS_COLORS, cloned by install.sh. Comparable
+#             breadth, but on its own 256-colour scheme — selecting it means
+#             file listings and completion menus deliberately stop matching
+#             everything else in the palette. Installed for comparison, not as
+#             a recommendation; nothing else in this repo tracks its colours.
+#
+# Try it for one shell without editing anything:  LS_COLORS_SOURCE=trapd00r zsh
+: "${LS_COLORS_SOURCE:=vivid}"
+
+if [[ $LS_COLORS_SOURCE == trapd00r ]]; then
+  # gdircolors, NOT dircolors. Upstream's own lscolors.sh calls `dircolors`,
+  # which does not exist on macOS: Homebrew's coreutils installs the GNU tools
+  # g-prefixed, and libexec/gnubin is deliberately absent from the PATH array in
+  # .zprofile. Calling the unprefixed name would fail silently and leave
+  # LS_COLORS empty — hence the explicit probe, with a plain `dircolors` branch
+  # in case one ever does land on PATH first.
+  #
+  # NB: zcache invalidates on the *binary's* mtime, so editing or `git pull`-ing
+  # the database does not rebuild this — install.sh drops the cache file when it
+  # updates the clone, and `zcache_clear` is the manual escape hatch.
+  _ls_colors_db="${XDG_DATA_HOME:-$HOME/.local/share}/LS_COLORS/LS_COLORS"
+  if [[ -r $_ls_colors_db ]]; then
+    if (( ${+commands[gdircolors]} )); then
+      zcache trapd00r-ls-colors gdircolors -b "$_ls_colors_db"
+    else
+      zcache trapd00r-ls-colors dircolors -b "$_ls_colors_db"
+    fi
+  fi
+  unset _ls_colors_db
+fi
+
+# vivid is both the default and the fallback. The `-z` half matters: if the
+# branch above was selected but could not deliver (repo not cloned yet on a
+# fresh box, no dircolors of either name), LS_COLORS would still be empty here,
+# and a shell with no LS_COLORS renders every completion menu and eza listing in
+# flat white. Recovering on the variable rather than on $LS_COLORS_SOURCE makes
+# that automatic instead of a silent downgrade.
+#
+# Cached: vivid re-generates the same ~17KB string every start otherwise. Change
 # the theme here — or edit the theme file — and run `zcache_clear`; mtime
 # invalidation only sees a new vivid binary, not new arguments or a new theme.
-zcache_value vivid-ls-colors LS_COLORS vivid generate voltage
+if [[ $LS_COLORS_SOURCE == vivid || -z $LS_COLORS ]]; then
+  zcache_value vivid-ls-colors LS_COLORS vivid generate voltage
+fi
+
 zstyle ':completion:*' list-colors "${(s.:.)LS_COLORS}"
 
 # fzf-tab tweaks

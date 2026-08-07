@@ -28,6 +28,6 @@ composer=(
   woocommerce/woocommerce-sniffs
 )
 
-# This line was missing: the script declared the array above and then ended, so
-# it had always been a no-op — every run "succeeded" without installing a thing.
+# Idempotent: `composer global require` on an already-present package resolves
+# to the same constraint and no-ops, so this doubles as the update path.
 composer global require "${composer[@]}"

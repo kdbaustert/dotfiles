@@ -20,6 +20,11 @@ Thumbs.db
 # Compiled C++ files
 *.out
 
+# Shell history. HISTFILE points at ~/.zsh_history (see .zshrc), which is real,
+# machine-local and often full of secrets — it is not a config file and has no
+# business in the repo.
+.zsh_history
+
 # fast-syntax-highlighting downloads this into $FAST_WORK_DIR (.config/fsh) on
 # first run if it isn't present. Not ours and not deterministic — unlike
 # current_theme.zsh next to it, which IS committed: that one is generated from
@@ -31,5 +36,8 @@ venv
 node_modules
 .sass-cache
 .config/spicetify/Extracted
-Icon
-Icon
+
+# macOS custom-folder icons. The file on disk is literally "Icon" followed by a
+# carriage return, so a bare `Icon` pattern matches nothing — the `?` is what
+# makes this work. Was listed twice, both times without it.
+Icon?

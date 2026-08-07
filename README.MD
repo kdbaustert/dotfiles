@@ -1,40 +1,81 @@
-# Kenny's dotfiles 
+# Kenny's dotfiles
 
-My personal dotfiles. These are mine take anything you want, but at your own risk.
+My personal dotfiles, for macOS. Take anything you want, but at your own risk.
+
+You should first review the code and remove things you don't want or need.
+Don't blindly use my settings unless you know what that entails.
 
 ## Installation
 
-You should first review the code, and remove things you don’t want or need. Don’t blindly use my settings unless you know what that entails. Use at your own risk!
-
-#### Clone
-
-```
-git clone git://github.com/kdbaustert/dotfiles.git ~/dotfiles
+```sh
+git clone https://github.com/kdbaustert/dotfiles.git ~/dotfiles
+cd ~/dotfiles
+./install.sh
 ```
 
-### This setup requires Disabling System Integrity Protection
+`install.sh` is idempotent — safe to re-run, and re-running is how you update.
+Existing real files are backed up (`.backup-<timestamp>`) before being replaced
+by symlinks; existing symlinks are simply re-pointed.
 
-#### How do I disable System Integrity Protection?
+It will ask for your sudo password up front, and it expects Apple silicon
+(the `pay-respects` step is pinned to arm64 and skips itself elsewhere).
 
-1. Turn off your device
-2. Hold down `command` `⌘R` while booting your device.
-3. In the menu bar, choose `Utilities`, then `Terminal`
+### What it does
 
-#### macOS 11.0.1
+- Installs the Xcode command line tools and Homebrew, then everything in
+  `homebrew/Brewfile`
+- Symlinks the root dotfiles and every `.config/*` entry into `$HOME`
+- Installs `pay-respects` (pinned + checksummed) into `~/.local/bin`
+- Clones the trapd00r `LS_COLORS` database as an alternative to the default
+  vivid/Voltage one — see `themes/voltage.md`
+- Bootstraps zinit and pre-installs/compiles the zsh plugins
+- Builds the Voltage theme caches for `bat` and fast-syntax-highlighting
+- Configures ClamAV (signatures, scheduled `freshclam`, `clamd`)
+- Enables Touch ID for `sudo` via `/etc/pam.d/sudo_local`
+- Points iTerm2 at `iterm/` for its preferences
 
-Requires Filesystem Protections and Debugging Restrictions to be disabled (workaround because --without debug does not work) printed warning can be safely ignored
+### Optional setup scripts
 
+The scripts in `setup/` are opt-in, because they change system defaults or
+install a lot of global packages. Select them by name:
+
+```sh
+SETUP_SCRIPTS="npm composer" ./install.sh
+SETUP_SCRIPTS=all ./install.sh          # macos npm composer mas gh-extensions
 ```
-csrutil disable --with kext --with dtrace --with nvram --with basesystem
-```
 
-#### macOS 10.14 and 10.15
+| Script             | Installs                                          |
+| ------------------ | ------------------------------------------------- |
+| `macos.sh`         | System defaults — **review this one before running** |
+| `npm.sh`           | Global npm packages                               |
+| `composer.sh`      | Global Composer packages                          |
+| `mas.sh`           | Mac App Store apps (sign in to the App Store first) |
+| `gh-extensions.sh` | GitHub CLI extensions                             |
 
-Requires Filesystem Protections and Debugging Restrictions to be disabled (printed warning can be safely ignored)
+## Layout
 
-```
-csrutil enable --without debug --without fs
-```
+| Path         | Contents                                              |
+| ------------ | ----------------------------------------------------- |
+| `.config/`   | Everything symlinked to `~/.config`                    |
+| `zsh/`       | Aliases, functions, zinit config, `extra/` snippets    |
+| `homebrew/`  | `Brewfile`                                             |
+| `setup/`     | The optional scripts above                             |
+| `themes/`    | Voltage — the shared palette; see `themes/voltage.md`  |
+| `clamav/`    | ClamAV config + the `freshclam` LaunchAgent            |
+| `iterm/`     | iTerm2 preferences folder                              |
+| `obsidian/`  | "Amethyst Night" theme                                 |
+
+## Notes
+
+**`obsidian/` and `.claude/` are not deployed by `install.sh`.** Obsidian
+themes live at `<vault>/.obsidian/themes/` and the vault path is per-machine;
+copy them in by hand. `.claude/` is neither in the root-dotfiles list nor under
+`.config/`, so nothing links it — it is kept here for reference only.
+
+**No System Integrity Protection changes are needed.** Earlier versions of this
+README opened with instructions to disable SIP; that was only ever required by
+yabai's scripting addition. yabai and skhd have been removed, so nothing here
+touches SIP any more — leave it on.
 
 ## Credits
 

@@ -5,40 +5,27 @@
 set -uo pipefail
 
 if ! command -v npm >/dev/null 2>&1; then
-  echo "npm not found — skipping." >&2
+  echo "npm not found — skipping (node ships it; install node via the Brewfile first)." >&2
   exit 0
 fi
 
 npm=(
   @vue/cli
   eslint
+  eslint-config-prettier
+  eslint-plugin-prettier
+  eslint-plugin-vue
+  firebase-tools
+  gitignore.cli
+  ntl
   prettier
   @prettier/plugin-php
-  eslint-plugin-prettier
-  eslint-config-prettier
-  eslint-plugin-vue
-  typescript
-  #generator-code
-  #yo
-  #fkill-cli
-  #vsce
-  #cli-error-notifier
-  #npm-check
-  stylelint
-  #alfred-npms
-  firebase-tools
-  ntl
   prettier-init
-  #generator-alfred
-  #alfred-fkill
-  #browser-sync
-  #gulp-cli
-  #gatsby-cli
+  stylelint
   svgo
-  #npm-check-updates
-  #blade-formatter
-  gitignore.cli
-  #@phartenfeller/alfred-vscode-workspaces
+  typescript
 )
 
+# Idempotent as-is: `npm install -g` on an installed package is an upgrade-or-
+# no-op, so this doubles as the update path.
 npm install -g "${npm[@]}"

@@ -43,7 +43,6 @@ alias claimsource="cd '$HOME/Development/cnc-claimsource'"
 
 alias caliases="code $DOTFILES/zsh/aliases.zsh"
 alias chammerspoon="code $HOME/.hammerspoon/init.lua"
-alias cyabai="code $HOME/.yabairc"
 alias czshrc="code $HOME/.zshrc"
 alias cspacebar="code $HOME/.spacebarrc"
 alias cnvims="code $HOME/.config/nvim"
@@ -174,12 +173,6 @@ alias cnodeold='find . -name "node_modules" -type d -mtime +120 | xargs rm -rf'
 
 # Removes all node_modules folders:
 alias cnodeall='find . -name "node_modules" -type d | xargs rm -rf'
-
-# Tiling window manager
-alias yabres='brew services restart yabai && brew services restart skhd'
-alias yabrestart='brew services start yabai && brew services start skhd'
-alias yabrestop='brew services stop yabai && brew services stop skhd'
-alias yabupdate='brew services stop yabai && brew upgrade yabai && sudo yabai --uninstall-sa && sudo yabai --install-sa && brew services start yabai'
 
 # Valet — moved to abbreviations (zsh/abbreviations)
 

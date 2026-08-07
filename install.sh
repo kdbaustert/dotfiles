@@ -125,6 +125,51 @@ else
 fi
 
 #------------------------------------------------------------------------------
+title "LS_COLORS (trapd00r)"
+#------------------------------------------------------------------------------
+# A second LS_COLORS database, kept ALONGSIDE the vivid/Voltage one rather than
+# replacing it: .zshrc chooses between them at runtime via $LS_COLORS_SOURCE,
+# which defaults to vivid. See that block for why Voltage stays the default.
+#
+# Cloned, not fetched as a release: upstream publishes no tarball. Only the
+# LS_COLORS data file is used — its lscolors.sh wrapper is ignored, because it
+# hardcodes `dircolors`, which does not exist on macOS (coreutils installs
+# GNU tools g-prefixed and gnubin is off PATH by design).
+#
+# Deliberately NOT a zinit plugin. Everything zinit loads here is turbo-deferred
+# to after the first prompt, but LS_COLORS has to exist before the
+# `zstyle ':completion:*' list-colors` line in .zshrc reads it. An eager zinit
+# entry would put the plugin machinery back on the critical path — precisely
+# what the starship note in zsh/zinit.zsh took it off.
+LS_COLORS_DIR="${XDG_DATA_HOME:-$HOME/.local/share}/LS_COLORS"
+LS_COLORS_CACHE="${ZSH_CACHE_DIR:-$HOME/.cache/zsh}/init/trapd00r-ls-colors.zsh"
+
+if [ -d "$LS_COLORS_DIR/.git" ]; then
+  info "LS_COLORS already cloned — updating."
+  if git -C "$LS_COLORS_DIR" pull --quiet --ff-only 2>/dev/null; then
+    success "LS_COLORS updated."
+  else
+    warning "LS_COLORS update failed — keeping the existing clone."
+  fi
+else
+  info "Cloning trapd00r/LS_COLORS..."
+  if git clone --quiet --depth=1 https://github.com/trapd00r/LS_COLORS "$LS_COLORS_DIR"; then
+    success "LS_COLORS cloned to $LS_COLORS_DIR."
+  else
+    warning "LS_COLORS clone failed — .zshrc falls back to vivid/Voltage."
+  fi
+fi
+
+# zcache keys off the *binary's* mtime (gdircolors), so a changed database is
+# invisible to it and a pull above would otherwise keep serving the old colours
+# forever. Dropping the cache file here is what makes `install.sh` a complete
+# update path; `zcache_clear` remains the manual equivalent.
+if [ -f "$LS_COLORS_CACHE" ]; then
+  rm -f "$LS_COLORS_CACHE" "$LS_COLORS_CACHE.zwc" \
+    && info "Dropped the trapd00r LS_COLORS cache — it rebuilds on next shell start."
+fi
+
+#------------------------------------------------------------------------------
 title "Symlinking dotfiles"
 #------------------------------------------------------------------------------
 # Root-level dotfiles (only those that exist in the repo are linked).
@@ -140,9 +185,13 @@ done
 link "$DOTFILES_DIR/.zprofile" "$HOME/.zprofile"
 link "$DOTFILES_DIR/.zprofile" "$HOME/.profile"
 
-# ~/.config sub-configs (link every entry that exists in the repo's .config,
-# including hidden ones like .claude). dotglob so `*` matches dotfiles too;
-# nullglob so an empty dir doesn't leave the literal glob pattern.
+# ~/.config sub-configs: link every entry in the repo's .config. dotglob so `*`
+# would also match a hidden entry (there are none today — this is defensive, so
+# adding one later doesn't silently go unlinked); nullglob so an empty dir
+# doesn't leave the literal glob pattern behind.
+#
+# Note that repo-root .claude/ is NOT covered here — it is neither in the
+# root-dotfiles list above nor under .config, so nothing deploys it. See README.
 mkdir -p "$HOME/.config"
 if [ -d "$DOTFILES_DIR/.config" ]; then
   shopt -s dotglob nullglob
@@ -378,11 +427,39 @@ fi
 #------------------------------------------------------------------------------
 title "Optional setup scripts"
 #------------------------------------------------------------------------------
-# Uncomment to run. macos.sh changes system defaults; review before enabling.
-# sh "$DOTFILES_DIR/setup/macos.sh"
-# sh "$DOTFILES_DIR/setup/npm.sh"
-# sh "$DOTFILES_DIR/setup/composer.sh"
-# sh "$DOTFILES_DIR/setup/mas.sh"
-# sh "$DOTFILES_DIR/setup/gh-extensions.sh"
+# Opt-in, and off by default: macos.sh rewrites system defaults, and the other
+# four pull down a lot of global packages. Previously this section was five
+# commented-out lines, which meant editing the installer to enable one — so it
+# printed a heading and did nothing on every run. Select them by name instead:
+#
+#     SETUP_SCRIPTS="npm composer" ./install.sh
+#     SETUP_SCRIPTS=all ./install.sh
+#
+# Executed directly rather than through `sh`: every script in setup/ declares a
+# bash shebang and uses bash arrays, which `sh` survives only by accident on
+# macOS (where /bin/sh is bash in POSIX mode) and not at all where it is dash.
+SETUP_SCRIPTS="${SETUP_SCRIPTS:-}"
+[ "$SETUP_SCRIPTS" = "all" ] && SETUP_SCRIPTS="macos npm composer mas gh-extensions"
+
+if [ -z "$SETUP_SCRIPTS" ]; then
+  info 'None requested — re-run with SETUP_SCRIPTS="npm composer" (or =all) to include them.'
+else
+  # Unquoted on purpose: the variable is a space-separated list of names.
+  for s in $SETUP_SCRIPTS; do
+    setup_script="$DOTFILES_DIR/setup/$s.sh"
+    if [ ! -f "$setup_script" ]; then
+      warning "No such setup script: $s — expected $setup_script"
+    elif [ ! -x "$setup_script" ]; then
+      warning "Not executable: $setup_script — run: chmod +x $setup_script"
+    else
+      info "Running setup/$s.sh..."
+      if "$setup_script"; then
+        success "setup/$s.sh finished."
+      else
+        warning "setup/$s.sh exited non-zero — see the output above."
+      fi
+    fi
+  done
+fi
 
 success "\nDone. Open a new terminal (or run: exec zsh) to load the new shell."

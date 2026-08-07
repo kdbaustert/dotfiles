@@ -27,7 +27,7 @@ vicmd_symbol = "[N](magenta)"
 charging_symbol = "⚡️ "
 disabled = false
 discharging_symbol = "💀 "
-full_symbol = "� "
+full_symbol = "🔋 "
 
 [git_status]
 disabled=true
@@ -42,7 +42,7 @@ powershell_indicator = "_"
 style = "bold red"
 threshold = 10
 
-[[battery.display]] # yellow style when capacity is between 10% and 30%
+[[battery.display]] # orange style when capacity is between 10% and 40%
 style = "bold orange"
 threshold = 40
 

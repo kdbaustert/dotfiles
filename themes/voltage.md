@@ -37,7 +37,7 @@ Rio/Ghostty config already.
 | --------- | ------------ | ------------- |
 | `red`     | `#FF4D5E`    | `#FF6B7A`     |
 | `green`   | `#B3E053`    | `#C6EE6E`     |
-| `yellow`  | `#FCF58D`    | `#FDFAB0`     |
+| `yellow`  | `#F9E906`    | `#F8F079`     |
 | `blue`    | `#5CC9F5`    | `#7FD8F8`     |
 | `magenta` | `#EB43F4`    | `#F712FF`     |
 | `cyan`    | `#17D5DF`    | `#4EE3EC`     |
@@ -70,6 +70,21 @@ All of these have to agree or the shell looks patched together:
 `LS_COLORS` is cached (see `zcache_value` in `.zshrc`); run `zcache_clear`
 after editing the vivid theme, since mtime invalidation only sees a new vivid
 binary, not new arguments or a changed theme file.
+
+### `LS_COLORS` is the one row with an opt-out
+
+`.zshrc` reads `$LS_COLORS_SOURCE`, which selects between the vivid/Voltage
+theme above (`vivid`, the default) and `trapd00r`, a second database cloned by
+`install.sh` to `~/.local/share/LS_COLORS`. trapd00r's carries its own
+256-colour scheme, so selecting it breaks the "all of these have to agree"
+guarantee this table describes — file listings, completion menus and fzf-tab
+previews stop matching the prompt, fzf, bat and `EZA_COLORS`. That is the point
+of it (a side-by-side comparison), not a defect, but nothing else in this repo
+tracks those colours and this table stays true only for the default.
+
+```sh
+LS_COLORS_SOURCE=trapd00r zsh   # one shell, nothing on disk changes
+```
 
 bat and fast-syntax-highlighting both need a build step after an edit —
 `install.sh` runs both, or by hand:

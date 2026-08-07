@@ -61,17 +61,15 @@
 	required = true
 
 # `brew` runs git against its taps as your user; without these git refuses to
-# operate on them. Deduplicated — the live file had each of these 21 times,
-# appended once per `brew` invocation that hit the error.
+# operate on them.
+#
+# Duplicates creep back in: `brew` appends a fresh pair with `git config --add`
+# every time it hits the error, so this block regrows unless it is periodically
+# collapsed. Git only ever needs one entry per path — extra copies are inert,
+# just noise. Re-dedupe with:
+#     git config --global --unset-all safe.directory
+# then restore the two lines below.
 [safe]
-	directory = /opt/homebrew/Library/Taps/homebrew/homebrew-core
-	directory = /opt/homebrew/Library/Taps/homebrew/homebrew-cask
-	directory = /opt/homebrew/Library/Taps/homebrew/homebrew-core
-	directory = /opt/homebrew/Library/Taps/homebrew/homebrew-cask
-	directory = /opt/homebrew/Library/Taps/homebrew/homebrew-core
-	directory = /opt/homebrew/Library/Taps/homebrew/homebrew-cask
-	directory = /opt/homebrew/Library/Taps/homebrew/homebrew-core
-	directory = /opt/homebrew/Library/Taps/homebrew/homebrew-cask
 	directory = /opt/homebrew/Library/Taps/homebrew/homebrew-core
 	directory = /opt/homebrew/Library/Taps/homebrew/homebrew-cask
 

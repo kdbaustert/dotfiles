@@ -1,13 +1,13 @@
-#!/usr/bin/env sh
-
-# ~/.macos — macOS system configuration
+#!/usr/bin/env bash
 #
-# This file reflects the macOS defaults that are ACTUALLY applied on this Mac.
-# It is a curated subset of setup/macos_bk.sh: settings from the backup that are
-# not currently in effect on this machine have been left out, and live values
-# (e.g. the Dock icon size) are used where they differ from the backup.
+# macOS system configuration — the defaults that are ACTUALLY applied on this
+# Mac, rather than an aspirational list. bash, not sh, to match the rest of
+# setup/ and because `&>` below is not POSIX.
 #
-#   sh setup/macos.sh
+# Changes system settings; review before running. Enable it through the
+# installer rather than calling it directly:
+#
+#   SETUP_SCRIPTS=macos ./install.sh
 #
 # Inspired by https://mths.be/macos
 
