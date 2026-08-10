@@ -153,7 +153,8 @@ zinit light zdharma-continuum/null
 # --- Extra behavior plugins (turbo) -------------------------------------------
 #   - zsh-autopair        — auto-insert/delete matching brackets, quotes, parens
 #   - zsh-you-should-use  — nags when a full command has an existing alias
-#   - forgit              — fzf-powered git (glo, gss, gcb…); honours delta
+#   - forgit              — fzf-powered git (glo, gss, gcb…); honours delta,
+#                           and is put on $PATH so `git forgit <cmd>` works
 #   - zsh-auto-notify     — desktop notification when a long command finishes
 #                           (uses terminal-notifier, installed via Homebrew)
 #   - OMZP::sudo          — ESC ESC prepends `sudo` to the current line (or the
@@ -163,13 +164,49 @@ zinit light zdharma-continuum/null
 #   - OMZP::safe-paste    — bracketed-paste-magic; see the block below it, which
 #                           is not optional.
 #
-# forgit: rename the 4 helpers that collide with our plain-git aliases in
-# aliases.zsh (ga/gd/grh/gco). The f-prefixed names give the interactive
-# versions; the originals stay as our git shortcuts. Must be set before load.
+# forgit: rename the 5 helpers whose default names collide with our own git
+# shortcuts — which live in zsh/abbreviations, not aliases.zsh: ga, gd, grh,
+# grs, gco. The f-prefixed names give the interactive versions; the plain names
+# stay as the abbreviations. Must be set before load.
+#
+# The collision is real even though one side is an abbreviation and the other an
+# alias, and it is the confusing kind: zsh-abbr binds SPACE only (plus ^SPACE
+# for a literal space) — it does not touch Enter. So `grs<space>` expands to
+# `git reset --soft `, while a bare `grs<enter>` never expands and runs forgit's
+# alias instead. One name, two behaviours, picked by whether you hit space.
+# Renaming forgit's side keeps each name meaning exactly one thing.
 forgit_add=fga
 forgit_diff=fgd
 forgit_reset_head=fgrh
+forgit_restore=fgrs
 forgit_checkout_commit=fgco
+
+# forgit pagers. forgit resolves its pager as $FORGIT_PAGER → `git config
+# core.pager` → `cat`, and core.pager is deliberately unset in .gitconfig (see
+# the comment above the [delta] section there), so without this every forgit
+# diff and show renders as raw `git diff --color=always` output — no delta, and
+# so nothing matching the fzf-tab git previews in .zshrc, which do pipe through
+# delta. Pointing forgit at delta makes the two agree.
+#
+# FORGIT_PREVIEW_PAGER is separate and NOT optional here: inside an fzf preview
+# there is no TTY, and delta's own paging would otherwise engage and hang the
+# pane. It overrides every other FORGIT_*_PAGER in preview context only.
+#
+# Must be exported, not just set — git-forgit is a separate bash process. The
+# plugin exports stray FORGIT_* vars for us on load, but only with a warning.
+export FORGIT_PAGER='delta'
+export FORGIT_PREVIEW_PAGER='delta --paging=never'
+
+# Directory previews (gcf on a directory, gwt/gwa on a worktree path). forgit
+# defaults to `tree`, falling back to `find` when it is absent — and it is
+# absent on this machine: `tree` here is an alias to `llt` (eza), which a bash
+# subprocess cannot see. eza directly, matching the rest of the config.
+#
+# --icons=always, not the bare --icons used in aliases.zsh: forgit invokes this
+# as `eval "$FORGIT_DIR_VIEW \"$path\""`, so the path lands immediately after
+# the last flag and eza's optional-value parser eats it as --icons' argument
+# ("invalid value 'themes' for --icons"). The = form pins the value.
+export FORGIT_DIR_VIEW='eza --tree --level=2 --color=always --icons=always'
 
 # auto-notify: only ping for commands slower than the threshold, and never for
 # interactive/long-lived TUIs we run in the foreground on purpose.
@@ -217,9 +254,21 @@ zinit wait lucid for \
   OMZP::safe-paste \
   hlissner/zsh-autopair \
   MichaelAquilina/zsh-you-should-use \
-  wfxr/forgit \
+  atload'path+=( "$FORGIT_INSTALL_DIR/bin" )' \
+    wfxr/forgit \
   MichaelAquilina/zsh-auto-notify \
   olets/zsh-abbr
+
+# The atload above is what makes the `git forgit …` sub-command work: forgit
+# ships bin/git-forgit, and git finds a `git-<x>` on $PATH as sub-command <x>.
+# Only the shell functions are wired up without it — which left the completion
+# in place for a command that did not exist, since zinit already symlinks
+# forgit's completions/_git-forgit into its own completions dir (on $fpath).
+# `typeset -U path` in .zprofile keeps a re-source from duplicating the entry.
+#
+# With it, forgit is also reachable through git aliases, e.g.
+#   git config --global alias.cf 'forgit checkout_file'
+# and from non-interactive/bash contexts that never load this plugin file.
 
 # --- fzf-git.sh (turbo) -------------------------------------------------------
 # fzf widgets that INSERT a git object into the line you are already typing:
