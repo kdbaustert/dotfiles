@@ -10,7 +10,6 @@ if ! command -v npm >/dev/null 2>&1; then
 fi
 
 npm=(
-  @vue/cli
   eslint
   eslint-config-prettier
   eslint-plugin-prettier

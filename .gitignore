@@ -35,7 +35,6 @@ Thumbs.db
 venv
 node_modules
 .sass-cache
-.config/spicetify/Extracted
 
 # macOS custom-folder icons. The file on disk is literally "Icon" followed by a
 # carriage return, so a bare `Icon` pattern matches nothing — the `?` is what

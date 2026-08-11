@@ -50,23 +50,6 @@ abbr pns='pnpm run start'
 abbr pnt='pnpm run test'
 abbr pnx='pnpx'
 
-# --- yarn --------------------------------------------------------------------
-abbr y='yarn'
-abbr ya='yarn add'
-abbr yad='yarn add -D'
-abbr yb='yarn build'
-abbr yc='yarn clean'
-abbr yd='yarn dev'
-abbr yi='yarn install'
-abbr yl='yarn lint'
-abbr yr='yarn run'
-abbr yrm='yarn remove'
-abbr ys='yarn start'
-abbr yt='yarn test'
-abbr yu='yarn upgrade-interactive --latest'
-abbr yw='yarn workspace'
-abbr yws='yarn workspaces'
-
 # --- npm ---------------------------------------------------------------------
 abbr npmg='npm install -g'
 abbr npmi='npm install'
@@ -97,33 +80,5 @@ abbr brews='brew search'
 abbr brewsr='brew services restart'
 abbr brewsl='brew services list'
 
-# --- valet -------------------------------------------------------------------
-abbr vs='valet start'
-abbr vst='valet stop'
-abbr vls='valet links'
-abbr vl='valet link'
-abbr vul='valet unlink'
-abbr vssl='valet secure'
-
 # --- php ---------------------------------------------------------------------
 abbr phpa='php artisan'
-
-# --- vue cli -----------------------------------------------------------------
-abbr vinspect='vue inspect'
-abbr vrules='vue inspect --rules'
-abbr vrule='vue inspect --rule'
-abbr vplugins='vue inspect --plugins'
-
-# --- wordpress (wp-cli) ------------------------------------------------------
-abbr wp_get_salts='curl https://api.wordpress.org/secret-key/1.1/salt/'
-abbr wp_export_staging='wp @staging db export - > "staging_db_$(date +%F_$R).sql"'
-abbr wp_export_production='wp @production db export - > "production_db_$(date +%F_$R).sql"'
-abbr wp_core='wp core download'
-abbr new_wpconfig='wp config create'
-abbr newwpplugin='wp scaffold plugin'
-abbr wp_dbcheck='wp db check'
-abbr wp_repairdb='wp db repair'
-abbr wp_optimize='wp db optimize'
-abbr wp_child_theme='wp scaffold child-theme'
-abbr wp_update_plugins='wp plugin update --all'
-abbr wp_pages='wp post list --post_type='\''page'\'''

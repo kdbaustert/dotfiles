@@ -310,7 +310,6 @@ source "$DOTFILES/zsh/aliases.zsh"
 zcache zoxide zoxide init zsh
 
 # atuin — shell history (owns Ctrl-R / Up). Initialised exactly once.
-[ -f "$HOME/.atuin/bin/env" ] && . "$HOME/.atuin/bin/env"
 zcache atuin atuin init zsh
 
 # navi — interactive cheatsheets (Ctrl-G)
@@ -403,9 +402,6 @@ export ZSH_AUTOSUGGEST_USE_ASYNC=true
 # suggestion. Voltage's `subtle`, stated as truecolor so it doesn't depend on
 # how the terminal maps ANSI 8.
 export ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE="fg=#6b6b6b"
-
-# tabtab completions (serverless, etc.)
-[[ -f ~/.config/tabtab/zsh/__tabtab.zsh ]] && . ~/.config/tabtab/zsh/__tabtab.zsh || true
 
 #------------------------------------------------------------------------------
 # Byte-compile the config

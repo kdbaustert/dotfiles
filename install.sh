@@ -176,9 +176,25 @@ title "Symlinking dotfiles"
 # .vimrc and .default-npm-packages were dropped from this list: neither has ever
 # existed in the repo, so they warned on every single run — two guaranteed
 # warnings is exactly how you learn to stop reading them.
-for f in .zshenv .zshrc .gitconfig .gitignore .editorconfig .eslintrc .eslintignore \
-         .prettierrc .prettierignore .stylelintrc tsconfig.json; do
+for f in .zshenv .zshrc .gitconfig .editorconfig .prettierrc; do
   link "$DOTFILES_DIR/$f" "$HOME/$f"
+done
+
+# ~/.hushlogin suppresses the "Last login:" banner. Only its existence matters —
+# the contents are never read — so it is created here rather than symlinked.
+if [ -e "$HOME/.hushlogin" ]; then
+  info "Login banner already suppressed (~/.hushlogin present)."
+else
+  touch "$HOME/.hushlogin" && success "created ~/.hushlogin"
+fi
+
+# Retired links, removed on re-run. Only ever unlinks a SYMLINK whose target is
+# inside $DOTFILES_DIR — a real file of the same name is left alone.
+for f in .gitignore .eslintrc .eslintignore .stylelintrc .prettierignore \
+         tsconfig.json; do
+  if [ -L "$HOME/$f" ] && case "$(readlink "$HOME/$f")" in "$DOTFILES_DIR"/*) true ;; *) false ;; esac; then
+    rm -f "$HOME/$f" && info "Removed retired symlink ~/$f"
+  fi
 done
 
 # .zprofile is the zsh login file; also expose it as ~/.profile for parity.
@@ -201,6 +217,14 @@ if [ -d "$DOTFILES_DIR/.config" ]; then
     link "$item" "$HOME/.config/$(basename "$item")"
   done
   shopt -u dotglob nullglob
+
+  # Sweep ~/.config links left dangling by an entry this repo no longer ships.
+  for item in "$HOME/.config"/*; do
+    if [ -L "$item" ] && [ ! -e "$item" ] \
+      && case "$(readlink "$item")" in "$DOTFILES_DIR"/*) true ;; *) false ;; esac; then
+      rm -f "$item" && info "Removed dangling symlink ~/.config/$(basename "$item")"
+    fi
+  done
 fi
 
 #------------------------------------------------------------------------------

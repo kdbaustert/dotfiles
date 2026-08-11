@@ -85,16 +85,6 @@ brew "btop"
 # clamav — on-demand AV scanner. Configs live in clamav/ and are symlinked into
 # $(brew --prefix)/etc/clamav by install.sh; signatures update via a LaunchAgent.
 brew "clamav"
-# Installed by hand and left undeclared, so `brew bundle` on a fresh box did not
-# reproduce them. Note subversion is NOT listed here — it is already declared
-# above as brew "svn", which is the same formula under its alias.
-# asdf — REMOVED, not disabled. It was declared here and installed, but had zero
-# plugins (`asdf plugin list` was empty), no ~/.asdf data dir, and was never
-# initialised in any shell file — v0.16+ dropped asdf.sh, so wiring it up now
-# means putting $ASDF_DATA_DIR/shims on PATH, and nothing ever did. It therefore
-# managed no runtimes at all. nvm (zsh/zinit.zsh) is the single node version
-# manager; there is deliberately no Python one since pyenv was dropped for the
-# same reason. Re-add with `brew install asdf` if that changes.
 brew "fastfetch"
 brew "firebase-cli"
 brew "zig"
@@ -187,7 +177,6 @@ cask "visual-studio-code@insiders"
 
 # cask "wins"
 # cask "zed"
-# cask "zen"
 # cask "cursor"
 # cask "vscodium"
 # cask "fman"

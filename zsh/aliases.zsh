@@ -14,7 +14,6 @@ alias x+="chmod +x"
 alias reload="source ~/.zshrc"
 alias reloaddns="dscacheutil -flushcache && sudo killall -HUP mDNSResponder"
 alias shrug="echo '¯\_(ツ)_/¯' | pbcopy"
-alias search-history='$(history | cut -c8- | sort -u | pick)'
 alias genpass='LC_ALL=C tr -dc "[:alnum:]" < /dev/urandom | head -c 20 | pbcopy'
 alias purgemem='sudo purge'
 alias clearDNSCache='sudo dscacheutil -flushcache && sudo killall -HUP mDNSResponder'
@@ -42,11 +41,8 @@ alias cnc-claims="cd '$HOME/Development/cnc-claims'"
 alias claimsource="cd '$HOME/Development/cnc-claimsource'"
 
 alias caliases="code $DOTFILES/zsh/aliases.zsh"
-alias chammerspoon="code $HOME/.hammerspoon/init.lua"
 alias czshrc="code $HOME/.zshrc"
-alias cspacebar="code $HOME/.spacebarrc"
 alias cnvims="code $HOME/.config/nvim"
-# alias valetconfig="code /usr/local/etc/nginx/valet/valet.conf"
 
 # History search (atuin)
 alias ms='atuin search -i'
@@ -174,8 +170,6 @@ alias cnodeold='find . -name "node_modules" -type d -mtime +120 | xargs rm -rf'
 # Removes all node_modules folders:
 alias cnodeall='find . -name "node_modules" -type d | xargs rm -rf'
 
-# Valet — moved to abbreviations (zsh/abbreviations)
-
 # PHP Artisan — `phpa` moved to abbreviations (zsh/abbreviations)
 
 # SSH
@@ -216,22 +210,11 @@ alias brewf='$(brew --prefix)'
 alias hist="history | fzf"
 alias f="fzf"
 
-# WordPress — wp-cli commands moved to abbreviations (zsh/abbreviations).
-# These stay as aliases: they point to shell functions, not commands.
-alias newwp=install_wp
-alias wp_ignore='wp_gitignore'
-
-# Vue cli — moved to abbreviations (zsh/abbreviations)
-
 # Node.js — npm prefixes moved to abbreviations (zsh/abbreviations)
 alias npmc='npm install & composer install'
 
 #PNPM — prefixes moved to abbreviations (zsh/abbreviations)
 alias pug="pnpm list -g --json | jq '.[] | .dependencies | keys | .[]' -r  | xargs pnpm add -g"
-
-# Yarn — moved to abbreviations (zsh/abbreviations)
-
-# Nvm — moved to abbreviations (zsh/abbreviations)
 
 # Git — prefixes moved to abbreviations (zsh/abbreviations). These stay as
 # aliases: abbr names can't hold ! or ~, and gwip/gui are compound.
@@ -251,10 +234,6 @@ alias gitlt='git lfs track'
 
 # Composer — subcommands moved to abbreviations (zsh/abbreviations)
 alias c='composer'
-
-# PHP code sniffer
-alias codewp='phpcs --config-set default_standard WordPress'
-alias codelaravel='phpcs --config-set default_standard Laravel'
 
 alias ibrew='arch -x86_64 /usr/local/bin/brew'
 

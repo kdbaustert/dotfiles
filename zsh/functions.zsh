@@ -7,14 +7,13 @@ extract() {
     *.tar.bz2) tar xjf $1 ;;
     *.tar.gz) tar xzf $1 ;;
     *.bz2) bunzip2 $1 ;;
-    *.rar) unrar e $1 ;;
     *.gz) gunzip $1 ;;
     *.tar) tar xf $1 ;;
     *.tbz2) tar xjf $1 ;;
     *.tgz) tar xzf $1 ;;
     *.zip) unzip $1 ;;
     *.Z) uncompress $1 ;;
-    *.7z) 7z x $1 ;;
+    *.7z) 7zz x $1 ;;
     *) echo "'$1' cannot be extracted via extract()" ;;
     esac
   else
@@ -50,59 +49,6 @@ function dataurl() {
     mimeType="${mimeType};charset=utf-8"
   fi
   echo "data:${mimeType};base64,$(openssl base64 -in "$1" | tr -d '\n')"
-}
-
-#Create a new WordPress project install
-install_wp() {
-
-  if [ "$1" != "" ]; then
-    PROJECT_NAME=$1
-
-    # Main projects directory
-    cd ~/Development
-
-    #Create directory & cd into it
-    mkdir $PROJECT_NAME
-    cd $PROJECT_NAME
-
-    # Create gitignore
-    wp_gitignore
-
-    echo "Setting up WordPress core.."
-
-    wp core download
-    wp core config \
-      --dbname=$PROJECT_NAME \
-      --dbuser="root" \
-      --dbpass="root" \
-      --dbprefix="wp_"
-
-    wp db create
-
-    echo "Running valet secure.."
-
-    valet secure
-
-    wp core install \
-      --url="https://${PROJECT_NAME}.test" \
-      --title="$PROJECT_NAME" \
-      --admin_user="kenny" \
-      --admin_password="password" \
-      --admin_email="kenny@growwithom.com"
-
-    # delete default installed plugins and themes we don't need
-    echo "Cleaning up WordPress junk"
-
-    wp plugin delete hello akismet
-    wp theme delete twentynineteen twentyseventeen
-
-    echo "New WordPress install complete"
-
-    echo "https://${PROJECT_NAME}.test"
-
-  else
-    echo "Please enter a project name"
-  fi
 }
 
 # Reload the zsh session, rebuilding the completion dump from scratch.

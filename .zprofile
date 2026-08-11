@@ -30,8 +30,8 @@ export LSCOLORS=ExFxBxDxCxegedabagacad
 #------------------------------------------------------------------------------
 # Tooling
 #------------------------------------------------------------------------------
-export HOMEBREW_BREWFILE="$HOME/.brewfile"
-export NTL_RUNNER=yarn
+export HOMEBREW_BREWFILE="${DOTFILES:-$HOME/dotfiles}/homebrew/Brewfile"
+export NTL_RUNNER=pnpm
 export NVM_COLORS='cmgRY'
 export NVM_LAZY_LOAD=true          # zsh-nvm: defer nvm.sh until first node/npm/nvm use
 [ -d "$HOME/.nvm" ] && export NVM_DIR="$HOME/.nvm"
@@ -82,11 +82,7 @@ path=(
   "/opt/homebrew/bin"
   "/opt/homebrew/sbin"
   "$HOME/.config/composer/vendor/bin"
-  "$HOME/Library/Electron/alias"
-  "$HOME/.spicetify"
   "$PNPM_HOME/bin"
-  "$HOME/bin"
-  "$HOME/.config/phpmon/bin"
   "$HOME/.local/bin"
   $path
 )
