@@ -1,8 +1,8 @@
 # See the full configuration reference: https://ghostty.org/docs/config
 # Ported from .config/rio/config.toml — matched to what Rio actually renders.
 
-#macos-custom-icon = ~/Config/ghostty/icon_256x256@2x.png
-macos-icon = custom
+#macos-icon = custom
+#macos-custom-icon = ~/.config/ghostty/ghostty-mac.icns
 
 # Fonts
 font-family = "Hack Nerd Font Mono"
@@ -104,6 +104,11 @@ palette = 12=#7FD8F8
 palette = 13=#F712FF
 palette = 14=#4EE3EC
 palette = 15=#F8F8F8
+
+mouse-scroll-multiplier = 5
+macos-titlebar-style = tabs
+auto-update = download
+auto-update-channel = stable
 
 # Keybindings
 keybind = super+left=previous_tab

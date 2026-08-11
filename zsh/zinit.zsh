@@ -198,9 +198,11 @@ export FORGIT_PAGER='delta'
 export FORGIT_PREVIEW_PAGER='delta --paging=never'
 
 # Directory previews (gcf on a directory, gwt/gwa on a worktree path). forgit
-# defaults to `tree`, falling back to `find` when it is absent — and it is
-# absent on this machine: `tree` here is an alias to `llt` (eza), which a bash
-# subprocess cannot see. eza directly, matching the rest of the config.
+# defaults to `tree` (declared in the Brewfile, so it would be used) and falls
+# back to `find` only when that is missing. eza instead — not because tree is
+# absent, but because eza is what every other listing here goes through, so it
+# picks up EZA_COLORS/LS_COLORS and the same Nerd Font icons. Swap it back to
+# 'tree -C -L 2' if you prefer tree's output; both work.
 #
 # --icons=always, not the bare --icons used in aliases.zsh: forgit invokes this
 # as `eval "$FORGIT_DIR_VIEW \"$path\""`, so the path lands immediately after

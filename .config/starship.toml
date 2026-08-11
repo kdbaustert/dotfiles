@@ -110,7 +110,9 @@ style = "bold orange"
 [directory]
 home_symbol = "~"
 read_only = "🔒 "
-style = "bold yellow"
+# `green` is the palette's #b3e053 — named, not hardcoded, so the directory
+# still follows a re-theme like every other module.
+style = "bold green"
 truncate_to_repo = false
 truncation_length = 3
 truncation_symbol = ""

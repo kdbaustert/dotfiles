@@ -173,6 +173,32 @@ fi
 # invalidation only sees a new vivid binary, not new arguments or a new theme.
 if [[ $LS_COLORS_SOURCE == vivid || -z $LS_COLORS ]]; then
   zcache_value vivid-ls-colors LS_COLORS vivid generate voltage
+
+  # Markdown on its own hue, #6638f0. vivid offers no per-extension hook: .md
+  # sits in the `markup` group of the filetypes database compiled into the
+  # binary, next to .html/.xml/.rst/.org/.adoc, so retinting it in voltage.yml
+  # would take all of those with it. Rewriting the generated string is the only
+  # place the distinction can be drawn.
+  #
+  # Rewritten in place rather than appended as an override entry: eza and GNU ls
+  # resolve a filename against the *last* matching pattern, zsh's completion
+  # menu against the first, and only an in-place edit reads the same to all
+  # three. `${...%%38;2;*}` preserves whatever attribute prefix vivid emitted,
+  # so the bold that singles out README.md / TODO.md survives the recolour.
+  # ~1.7ms over the 677 entries; not worth its own cache entry.
+  LS_COLORS="${LS_COLORS//(#m)\*[^:]#.(md|markdown|mdown|mdx|mkd)=[^:]#/${MATCH%%=*}=${${MATCH##*=}%%38;2;*}38;2;102;56;240}"
+
+  # vivid emits lowercase patterns only, and LS_COLORS matching is case
+  # sensitive — so this repo's own README.MD matched nothing above. Worse than
+  # falling back to plain text: eza classifies anything named README* as an
+  # "immediate" file and paints its own bold underlined ANSI yellow when no
+  # LS_COLORS pattern claims it, which is the yellow that survives the recolour.
+  # Duplicate the markdown entries with the name uppercased (*README.md ->
+  # *README.MD, *.md -> *.MD) to cover it. Appending is safe here: these are
+  # patterns vivid never emitted, so no consumer has to break a tie.
+  _ls_colors_md=("${(@M)${(@s.:.)LS_COLORS}:#*.(md|markdown|mdown|mdx|mkd)=*}")
+  LS_COLORS+=":${(j.:.)${(@U)_ls_colors_md}}"
+  unset _ls_colors_md
 fi
 
 zstyle ':completion:*' list-colors "${(s.:.)LS_COLORS}"
