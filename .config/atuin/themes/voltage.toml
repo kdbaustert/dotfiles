@@ -1,0 +1,30 @@
+# Voltage for atuin (themes/voltage.md).
+#
+# atuin owns Ctrl-R, so this is the highest-traffic surface in the shell that
+# was still rendering in atuin's stock palette while everything around it had
+# been themed.
+#
+# The config comments advertise only the named-color list from the palette
+# crate, but atuin tries a hex triplet first and falls back to a name, so the
+# exact Voltage values go in here rather than the nearest CSS approximation.
+# Approximating is what the 256-index codes used to do in fzf, and drifting off
+# the palette is precisely what that cleanup removed.
+#
+# atuin exposes seven semantic roles, not per-widget colors:
+#   Base        body text, the history lines themselves
+#   Important   the selected row and other emphasis
+#   Annotation  the time/duration columns -- cyan, matching the `da` (date)
+#               slot in EZA_COLORS so listings and history agree
+#   Guidance    the help bar along the bottom
+#   AlertInfo/Warn/Error  status messages
+[theme]
+name = "voltage"
+
+[colors]
+Base = "#e7e7e7"
+Important = "#eb43f4"
+Annotation = "#17d5df"
+Guidance = "#6b6b6b"
+AlertInfo = "#b3e053"
+AlertWarn = "#f8f079"
+AlertError = "#ff4d5e"

@@ -31,7 +31,21 @@ export FZF_DEFAULT_OPTS="
 --ansi
 --prompt '⯈ '
 --marker=+
+# The preview pane. This window was configured here long before anything filled
+# it: with no --preview command and no toggle bind, it could never be shown or
+# populated. bat renders files through the Voltage theme (see BAT_THEME in
+# .zshrc), eza covers directories -- which is what ALT-C lists -- and the bare
+# echo is the fallback for input that is not a path at all, such as the hist
+# alias piping shell history in. Without that last arm those previews print an
+# eza error instead of the line.
+#
+# It stays hidden by default, so the cost is only paid when it is toggled on.
+--preview 'bat --color=always --style=numbers --line-range=:200 {} 2>/dev/null || eza -1 --color=always --icons=always --group-directories-first {} 2>/dev/null || echo {}'
 --preview-window='right:hidden:wrap'
+# Both spellings: Ctrl-/ is what you press, but most terminals transmit it as
+# 0x1F, which fzf names ctrl-_. Binding only one of the two leaves the pane
+# unreachable on whichever terminal disagrees.
+--bind=ctrl-/:toggle-preview,ctrl-_:toggle-preview
 # Voltage (themes/voltage.md), matching ghostty / starship / LS_COLORS / bat /
 # delta. Hex rather than the 256 indices this used before: the old codes (203,
 # 220, 100…) were approximations that drifted from every other tool. bg:-1 and

@@ -1,0 +1,67 @@
+# Voltage — themes/voltage.md.
+#
+# btop's gauges are three-stop gradients (start/mid/end) rather than flat
+# colors, so most of this file is ramps. The palette has no dedicated ramp, so
+# they are built from existing slots and read left-to-right as severity:
+# green -> yellow -> red for anything where "more" is worse (cpu, temp, used
+# memory), and the cool slots for anything where more is neutral or good.
+
+# Empty rather than a hex: btop then leaves the terminal background alone, so
+# Ghostty's transparency and blur show through. Naming #0f0d0e here would paint
+# an opaque panel over it -- the same reason fzf uses bg:-1.
+theme[main_bg]=""
+theme[main_fg]="#e7e7e7"
+theme[title]="#f8f8f8"
+
+# Highlight / focus, the same magenta accent used by fzf's hl and lazygit's
+# active border.
+theme[hi_fg]="#eb43f4"
+theme[selected_bg]="#2a2427"
+theme[selected_fg]="#f712ff"
+theme[inactive_fg]="#6b6b6b"
+theme[proc_misc]="#b3e053"
+
+# Boxes and dividers on the subtle grey, matching fzf's border.
+theme[cpu_box]="#6b6b6b"
+theme[mem_box]="#6b6b6b"
+theme[net_box]="#6b6b6b"
+theme[proc_box]="#6b6b6b"
+theme[div_line]="#393a3d"
+
+# Temperature: cool blue through yellow to red.
+theme[temp_start]="#5cc9f5"
+theme[temp_mid]="#f9e906"
+theme[temp_end]="#ff4d5e"
+
+# CPU load: green through yellow to red.
+theme[cpu_start]="#b3e053"
+theme[cpu_mid]="#f9e906"
+theme[cpu_end]="#ff4d5e"
+
+# Free memory — more is better, so this ramp runs the opposite way to `used`.
+theme[free_start]="#17d5df"
+theme[free_mid]="#5cc9f5"
+theme[free_end]="#b3e053"
+
+theme[cached_start]="#5cc9f5"
+theme[cached_mid]="#7fd8f8"
+theme[cached_end]="#17d5df"
+
+theme[available_start]="#b3e053"
+theme[available_mid]="#c6ee6e"
+theme[available_end]="#17d5df"
+
+# Used memory — more is worse.
+theme[used_start]="#b3e053"
+theme[used_mid]="#f9e906"
+theme[used_end]="#ff4d5e"
+
+# Network. Down and up are given different hues so the two graphs stay
+# distinguishable at a glance rather than differing only by position.
+theme[download_start]="#17d5df"
+theme[download_mid]="#5cc9f5"
+theme[download_end]="#eb43f4"
+
+theme[upload_start]="#ff9a4d"
+theme[upload_mid]="#f9e906"
+theme[upload_end]="#f712ff"

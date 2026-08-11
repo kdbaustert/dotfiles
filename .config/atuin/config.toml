@@ -301,7 +301,14 @@ autostart = true
 ## The port that should be used for TCP on non unix systems
 # tcp_port = 8889
 
-# [theme]
+[theme]
+## Voltage — themes/voltage.md. The theme file is themes/voltage.toml alongside
+## this config; install.sh symlinks the whole .config/atuin directory, so it is
+## picked up with no extra wiring. Values there are Voltage hex rather than the
+## named colors documented below: atuin parses a hex triplet first and only
+## falls back to the palette-crate names.
+name = "voltage"
+
 ## Color theme to use for rendering in the terminal.
 ## There are some built-in themes, including the base theme ("default"),
 ## "autumn" and "marine". You can add your own themes to the "./themes" subdirectory of your

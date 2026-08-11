@@ -236,8 +236,8 @@ _ftb_height='--height=80%'
 zstyle ':fzf-tab:*' fzf-flags $_ftb_height
 
 # fzf-tab previews — show context for the candidate under the cursor
-zstyle ':fzf-tab:complete:cd:*'                fzf-preview 'eza -1 --color=always --icons --group-directories-first $realpath'
-zstyle ':fzf-tab:complete:__zoxide_z:*'        fzf-preview 'eza -1 --color=always --icons --group-directories-first $realpath'
+zstyle ':fzf-tab:complete:cd:*'                fzf-preview 'eza -1 --color=always --icons=always --group-directories-first $realpath'
+zstyle ':fzf-tab:complete:__zoxide_z:*'        fzf-preview 'eza -1 --color=always --icons=always --group-directories-first $realpath'
 
 # Command position (incl. aliases/functions): show what the candidate resolves
 # to — `command -V` prints "x is an alias for …" / "… is a shell function" / path.
@@ -346,10 +346,12 @@ zcache pay-respects pay-respects zsh --alias fuck --nocnf
 # Colors — everything on Voltage
 #------------------------------------------------------------------------------
 # This repo's own palette; the canonical values and the full list of files that
-# carry it are in themes/voltage.md. It is set in six places, and all six have
-# to agree or the shell looks patched together: the terminal itself
-# (.config/ghostty/config), vivid (LS_COLORS, above), starship
-# (.config/starship.toml), fzf (zsh/extra/fzf.zsh) and the two below.
+# carry it are in themes/voltage.md — which is the list to trust, since the TUIs
+# (atuin, lazygit, yazi, btop, glow) each carry their own theme file and are
+# easy to miss from here. They all have to agree or the shell looks patched
+# together. The ones set in this file are MANPAGER, BAT_THEME and EZA_COLORS
+# below; the terminal itself (.config/ghostty/config), vivid (LS_COLORS, above),
+# starship (.config/starship.toml) and fzf (zsh/extra/fzf.zsh) are elsewhere.
 
 # bat's theme. This also themes delta, which has no syntax theme of its own —
 # it renders through bat's highlighting engine and reads $BAT_THEME when
@@ -360,6 +362,21 @@ zcache pay-respects pay-respects zsh --alias fuck --nocnf
 # Voltage.tmTheme) and only exists once `bat cache --build` has run — install.sh
 # does that. If bat ever falls back to its default theme, that build is why.
 export BAT_THEME="Voltage"
+
+# man pages. Left alone, man emits backspace-overstrike sequences that a plain
+# pager renders as bold/underline and nothing else, so man was the one
+# high-traffic surface with no palette at all. `col -bx` flattens those
+# sequences (bat would otherwise print them literally) and bat re-highlights
+# the result through the `man` syntax, picking up $BAT_THEME above.
+#
+# No MANROFFOPT here: it is the documented companion on groff systems, but
+# macOS ships mandoc, which ignores it — verified identical output either way.
+export MANPAGER="sh -c 'col -bx | bat -l man -p'"
+
+# -R lets ANSI color survive the pager instead of being escaped into visible
+# garbage. bat invokes less itself and wants exactly this, and it is what makes
+# `git log`/`git diff` keep their color when they page.
+export LESS="-R"
 
 # eza's colors. Note this is EZA_COLORS, not EXA_COLORS: the latter is from the
 # pre-rename exa days and eza does not read it. The dead .config/exa/EXA_COLORS

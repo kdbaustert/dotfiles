@@ -66,6 +66,29 @@ All of these have to agree or the shell looks patched together:
 | bat + delta              | `.config/bat/themes/Voltage.tmTheme` |
 | fast-syntax-highlighting | `.config/fsh/voltage.ini`         |
 | eza, autosuggestions     | `.zshrc`                          |
+| man (via bat)            | `.zshrc` — `MANPAGER`             |
+| atuin (owns Ctrl-R)      | `.config/atuin/themes/voltage.toml` |
+| lazygit                  | `.config/lazygit/config.yml`      |
+| yazi                     | `.config/yazi/theme.toml`         |
+| btop                     | `.config/btop/themes/voltage.theme` |
+| glow                     | `.config/glow/voltage.json`       |
+
+### What deliberately has no entry
+
+`rg`, `git`, `jq` and `tree` are missing from that table on purpose. They emit
+**ANSI indices** (`31`, `1;34`) rather than hex, so they already resolve through
+the Ghostty palette at the top of this file and track it for free — a `git`
+deletion is slot 1, which is why moving magenta out of the red slot fixed those
+without anyone touching git's config.
+
+Writing explicit hex for them would make things *worse*, not better: it would
+pin them to these values and stop them following the terminal, which is the
+one mechanism here that cannot drift.
+
+Two tools also need forcing flags rather than colors. Anything rendering inside
+an fzf preview or a pipe has to be told to keep color — `--color=always` for
+`fd`/`eza`/`bat`, and `--icons=always` for eza specifically, whose bare
+`--icons` silently emits nothing when stdout is not a terminal.
 
 `LS_COLORS` is cached (see `zcache_value` in `.zshrc`); run `zcache_clear`
 after editing the vivid theme, since mtime invalidation only sees a new vivid

@@ -1,3 +1,45 @@
+# Voltage — themes/voltage.md.
+#
+# lazygit takes a list per role, where the trailing entries are attributes
+# ("bold"), not extra colors. It accepts hex, so these are the palette values
+# rather than ANSI names, which would otherwise re-inherit whatever the
+# terminal slot holds and drift from the rest of the shell.
+gui:
+  theme:
+    # Focused panel border. Magenta is the accent everything else uses for
+    # "current" (fzf's hl, atuin's Important), so the active panel reads the
+    # same way here.
+    activeBorderColor:
+      - "#eb43f4"
+      - bold
+    # Unfocused borders sit on the subtle grey that fzf's border uses, so the
+    # inactive frame recedes instead of competing with the active one.
+    inactiveBorderColor:
+      - "#6b6b6b"
+    # The search/filter box, deliberately not the active-border magenta so a
+    # search in progress is distinguishable from mere focus.
+    searchingActiveBorderColor:
+      - "#17d5df"
+      - bold
+    optionsTextColor:
+      - "#5cc9f5"
+    selectedLineBgColor:
+      - "#2a2427"
+    inactiveViewSelectedLineBgColor:
+      - "#1c191a"
+    cherryPickedCommitFgColor:
+      - "#0f0d0e"
+    cherryPickedCommitBgColor:
+      - "#17d5df"
+    markedBaseCommitFgColor:
+      - "#0f0d0e"
+    markedBaseCommitBgColor:
+      - "#f8f079"
+    unstagedChangesColor:
+      - "#ff4d5e"
+    defaultFgColor:
+      - "#e7e7e7"
+
 keybinding:
   universal:
     # Left arrow always goes "back" — from the diff/staging view it returns

@@ -1,0 +1,127 @@
+# Voltage — themes/voltage.md.
+#
+# yazi does not read LS_COLORS, so none of the vivid work reaches it; the
+# filetype rules at the bottom are a hand port of the same categories.
+#
+# Section is [mgr], not [manager]: yazi renamed it, and the old spelling is
+# silently ignored rather than rejected, which looks exactly like a theme that
+# did not load.
+[mgr]
+cwd = { fg = "#17d5df" }
+
+# Cursor row. Same magenta-on-panel treatment as fzf's current line.
+hovered = { fg = "#0f0d0e", bg = "#eb43f4" }
+preview_hovered = { underline = true }
+
+# Search. find_keyword is the match itself; find_position is the "3/12"
+# counter, kept distinct so the two do not read as one highlight.
+find_keyword = { fg = "#f9e906", bold = true }
+find_position = { fg = "#f712ff", bg = "reset", bold = true }
+
+# Selection markers, matching git/eza semantics: green added, red removed,
+# yellow held.
+marker_copied = { fg = "#b3e053", bg = "#b3e053" }
+marker_cut = { fg = "#ff4d5e", bg = "#ff4d5e" }
+marker_marked = { fg = "#17d5df", bg = "#17d5df" }
+marker_selected = { fg = "#f8f079", bg = "#f8f079" }
+
+count_copied = { fg = "#0f0d0e", bg = "#b3e053" }
+count_cut = { fg = "#0f0d0e", bg = "#ff4d5e" }
+count_selected = { fg = "#0f0d0e", bg = "#f8f079" }
+
+border_symbol = "│"
+border_style = { fg = "#6b6b6b" }
+
+# The mode indicator. *_main is the filled block, *_alt the trailing chevron,
+# so alt carries main's color as its foreground.
+[mode]
+normal_main = { fg = "#0f0d0e", bg = "#5cc9f5", bold = true }
+normal_alt = { fg = "#5cc9f5", bg = "#2a2427" }
+select_main = { fg = "#0f0d0e", bg = "#eb43f4", bold = true }
+select_alt = { fg = "#eb43f4", bg = "#2a2427" }
+unset_main = { fg = "#0f0d0e", bg = "#ff9a4d", bold = true }
+unset_alt = { fg = "#ff9a4d", bg = "#2a2427" }
+
+[status]
+progress_label = { bold = true }
+progress_normal = { fg = "#5cc9f5", bg = "#2a2427" }
+progress_error = { fg = "#ff4d5e", bg = "#2a2427" }
+
+[input]
+border = { fg = "#eb43f4" }
+title = {}
+value = {}
+selected = { reversed = true }
+
+[pick]
+border = { fg = "#eb43f4" }
+active = { fg = "#f712ff", bold = true }
+inactive = {}
+
+[confirm]
+border = { fg = "#eb43f4" }
+title = { fg = "#eb43f4" }
+content = {}
+list = {}
+btn_yes = { reversed = true }
+btn_no = {}
+
+[tasks]
+border = { fg = "#eb43f4" }
+title = {}
+hovered = { fg = "#f712ff", underline = true }
+
+[which]
+mask = { bg = "#1c191a" }
+cand = { fg = "#17d5df" }
+rest = { fg = "#6b6b6b" }
+desc = {}
+separator = "  "
+separator_style = { fg = "#393a3d" }
+
+[help]
+on = { fg = "#eb43f4" }
+run = { fg = "#17d5df" }
+desc = {}
+hovered = { reversed = true, bold = true }
+footer = { fg = "#e7e7e7", bg = "#2a2427" }
+
+[notify]
+title_info = { fg = "#b3e053" }
+title_warn = { fg = "#f9e906" }
+title_error = { fg = "#ff4d5e" }
+
+# The LS_COLORS port. Ordering matters -- first match wins -- so the directory
+# rules lead and the catch-all closes.
+#
+# Glob matches are keyed on `url`. Most yazi themes in the wild still say
+# `name`, and this version rejects it outright (as it does the old `is = "dir"`
+# form) -- a hard TOML parse error that takes the whole theme down, not just
+# the offending rule.
+[filetype]
+rules = [
+  { mime = "inode/directory", fg = "#5cc9f5", bold = true },
+  { url = "*/", fg = "#5cc9f5", bold = true },
+
+  { mime = "image/*", fg = "#eb43f4" },
+  { mime = "video/*", fg = "#f712ff" },
+  { mime = "audio/*", fg = "#f712ff" },
+
+  { mime = "application/zip", fg = "#ff4d5e" },
+  { mime = "application/gzip", fg = "#ff4d5e" },
+  { mime = "application/x-tar", fg = "#ff4d5e" },
+  { mime = "application/x-bzip2", fg = "#ff4d5e" },
+  { mime = "application/x-7z-compressed", fg = "#ff4d5e" },
+  { mime = "application/x-rar", fg = "#ff4d5e" },
+  { mime = "application/xz", fg = "#ff4d5e" },
+
+  { mime = "application/pdf", fg = "#ff9a4d" },
+  { mime = "application/json", fg = "#f8f079" },
+  { mime = "text/*", fg = "#e7e7e7" },
+
+  { url = "*.md", fg = "#6638f0" },
+  { url = "*.sh", fg = "#b3e053" },
+  { url = "*.zsh", fg = "#b3e053" },
+
+  { url = "*", fg = "#e7e7e7" },
+]

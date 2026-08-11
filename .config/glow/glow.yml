@@ -1,0 +1,19 @@
+# Voltage — themes/voltage.md.
+#
+# glow's `style` takes either a built-in name or a path to a glamour JSON
+# style. "auto" (the default this replaced) picks glamour's stock dark or light
+# set, which is the one markdown surface that was still off-palette.
+#
+# The path has to be absolute: glow resolves it against the current working
+# directory, not against this config file, so a relative path works only when
+# glow happens to be run from ~/.config/glow.
+style: "/Users/kenny/.config/glow/voltage.json"
+
+# mouse support (TUI-mode only)
+mouse: false
+# use pager to display markdown
+pager: false
+# word-wrap at width
+width: 80
+# show all files, including hidden and ignored.
+all: false
