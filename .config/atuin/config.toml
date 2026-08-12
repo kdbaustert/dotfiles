@@ -169,7 +169,14 @@
 ## whereas tab will put the command in the prompt for editing.
 ## If set to false, both enter and tab will place the command in the prompt for editing.
 ## This applies for new installs. Old installs will keep the old behaviour unless configured otherwise.
-enter_accept = true
+##
+## Set to false: enter and tab BOTH place the selected command on the prompt for
+## editing instead of running it. That matches every other picker in this shell
+## — fzf-tab, the fzf widgets, navi and → (accept_past_line_end below) all
+## insert and wait — and the upstream default of true was the only one that
+## executed on selection, which is a bad asymmetry for a history search where
+## the entry you want is often nearly right rather than exactly right.
+enter_accept = false
 
 ## Defaults to false. If enabled, when triggered after &&, || or |, Atuin will complete commands to chain rather than replace the current line.
 # command_chaining = false
@@ -244,9 +251,10 @@ enter_accept = true
 #
 # Set explicitly rather than left to the default: this is the behaviour we
 # actually want from → (select the highlighted command onto the prompt WITHOUT
-# running it), and enter_accept = true above means Enter does run it. Pinning it
-# here means an upstream change to the default can't silently turn → into
-# "execute", which is the one direction of drift that would actually hurt.
+# running it). With enter_accept = false above, → now agrees with Enter and Tab
+# rather than being the exception. Pinning it here means an upstream change to
+# the default can't silently turn → into "execute", which is the one direction
+# of drift that would actually hurt.
 #
 # Only fires when the cursor is at the END of the typed query — mid-query, →
 # moves the cursor as usual. Tab does the same accept-without-running from any

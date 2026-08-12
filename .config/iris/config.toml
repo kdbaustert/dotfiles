@@ -35,8 +35,13 @@ mode = "last"
 # Debug logging writes every keystroke to iris.log. Bug reports only.
 debug = false
 
-# automatically expand aliases on space
-expand-alias = true
+# OFF. This rewrites a typed alias into its expansion on the space bar, in
+# place, so `ll` visibly becomes `l -h` as you type — which reads as "aliases
+# stopped working" even though nothing is wrong with them. The alias table is
+# untouched by iris either way: 124 aliases resolve inside the wrapper, `ll`
+# among them. Off means what you typed is what stays on the line, and zsh
+# expands it at execution as it always has.
+expand-alias = false
 
 # Never run a suggestion on accept — accepting inserts it and leaves the cursor
 # on the line, which is the same contract fzf-tab and atuin have here.
@@ -132,17 +137,29 @@ toggle-mode = "ctrl+o"
 # four keys below out of the way of the shell the rest of the time.
 toggle-menu = "shift+tab"
 
+# Tab. This MUST NOT be enter, and the reason is worth keeping: binding select
+# to enter overrides iris's built-in Enter, which is the only thing that sends a
+# line to the shell. Enter then accepts a suggestion and nothing else — pressing
+# it twice re-accepts rather than executing, so NOTHING runs. Verified: `git st`
+# + Enter + Enter left `git status` sitting on the line and produced no git
+# output at all. Aliases look broken first, because `ll` + Enter swaps in a
+# suggestion instead of running the alias.
+#
+# So the division is: Tab puts the highlighted suggestion on the line (and with
+# auto-execute = false it stops there, ready to edit), Enter runs the line.
 select = "tab"
 
-# Up/Down are NOT iris's, despite being the obvious keys for a menu. Upstream
-# documents them as "move the selection, or open command history when the prompt
-# is empty" — that second half fires whether or not the menu is open, so with
-# the defaults iris answered the empty-prompt up-arrow itself and atuin's
-# history search never opened. Ctrl-P/Ctrl-N are the reassignment: they are the
-# classic previous/next-item pair, and the only thing they cost is zle's plain
-# up-line-or-history, which is dead weight on a machine where atuin owns Up.
-navigate-up = "ctrl+p"
-navigate-down = "ctrl+n"
+# The arrows, i.e. iris's defaults. These were briefly moved to Ctrl-P/Ctrl-N to
+# keep the empty-prompt up-arrow reaching atuin — that only made sense while
+# iris was a guest in an atuin-owned shell. It autostarts and owns the line
+# editor now, so the arrows are its own: moving them just left the menu
+# unscrollable by the one pair of keys anybody reaches for.
+#
+# Upstream documents them as "move the selection, or open command history when
+# the prompt is empty", and that second half is why atuin no longer answers Up.
+# iris's history mode covers it, reading atuin's database via atuin-history = 2.
+navigate-up = "up"
+navigate-down = "down"
 
 # Left as-is: right-arrow accepts ghost text, and ghost-text is off above, so
 # this never fires.

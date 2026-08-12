@@ -76,33 +76,67 @@ bindkey '^X^E' edit-command-line
 source "$DOTFILES/zsh/extra/cache.zsh"
 
 #------------------------------------------------------------------------------
-# iris — inline completion overlay
+# iris — inline completion overlay, DISABLED (autostart is opt-in)
 #------------------------------------------------------------------------------
-# Unlike every other integration in this file, `iris init zsh` emits TWO blocks
-# and this shell runs exactly one of them:
+# Currently off: a terminal opens into plain zsh. `iris` still works when typed,
+# and `export IRIS_AUTOSTART=1` brings the always-on behaviour back — see the
+# two branches at the bottom of this block.
 #
-#   1. the autostart hook — `exec iris`, replacing this zsh with the iris
-#      binary, which then starts zsh again as a child;
-#   2. the zle hooks — installed instead when $IRIS_PID is already set, i.e. in
-#      that child, which is where the interactive session actually lives.
+# `iris init zsh` emits TWO blocks and this shell runs exactly one of them:
 #
-# So this file is sourced twice per terminal, and everything below this line is
-# only ever run by the child. That is why the call sits here rather than with
-# the other zcache lines further down: on the first pass the shell execs away at
-# this point, so anything above it is paid for twice. Only history, setopts, the
-# keymap and cache.zsh are — starship, zinit, completion and fzf are not.
+#   1. the autostart — `exec iris`, replacing this shell with the iris binary,
+#      which then runs zsh in a pty underneath;
+#   2. the zle hooks — _iris_send_lbuffer plus the precmd/preexec/chpwd trio,
+#      which pipe the current line and cwd to iris over $IRIS_FD. Installed
+#      instead when $IRIS_PID is already set, i.e. in that child shell, which is
+#      where the interactive session actually lives.
 #
-# Config and theme are in .config/iris (symlinked by install.sh); the reasoning
-# for ghost-text/keybindings deferring to zsh-autosuggestions, atuin and fzf-tab
-# is in config.toml.
+# So this file is sourced twice per terminal and everything below this line runs
+# only in the child. That is why the call sits here rather than with the other
+# zcache lines further down: on the first pass the shell execs away at this
+# point, so only history, the setopts, the keymap and cache.zsh are paid for
+# twice — starship, zinit, completion and fzf are not.
 #
-# The guard is not just `command -v iris` — zcache already no-ops when the
-# binary is missing. What it has to stop is `exec iris` firing in a shell that
-# is interactive but not a session: `zsh -ic '…'` sets $ZSH_EXECUTION_STRING and
-# is how install.sh drains zinit's turbo queue, so without this test running the
-# installer would drop into an interactive iris and hang. -t 1 covers the same
-# shape when stdout is a pipe.
-if [[ -z $ZSH_EXECUTION_STRING && -t 1 && $TERM != dumb ]]; then
+# The guard is not `command -v iris`; zcache already no-ops when the binary is
+# missing. What it has to stop is `exec iris` firing in a shell that is
+# interactive but not a session: `zsh -ic '…'` sets $ZSH_EXECUTION_STRING and is
+# how install.sh drains zinit's turbo queue, so without this test the installer
+# drops into an interactive iris and hangs. -t 1 catches the same shape when
+# stdout is a pipe.
+#
+# KNOWN CONFLICTS. iris is not a zle plugin — it wraps the terminal and redraws
+# the command line from OUTSIDE zle, while fzf-tab, fast-syntax-highlighting,
+# zsh-autosuggestions and atuin's widgets all live INSIDE it. They arbitrate the
+# same keystrokes, and iris answers first, unconditionally, whether its menu is
+# open or not. What that has actually cost here:
+#
+#   - the empty-prompt Up arrow never reaches atuin, so its history search is
+#     unavailable on that key (Ctrl-R still is). iris's own history mode covers
+#     it, reading atuin's database via atuin-history = 2 in config.toml;
+#   - iris's accept key must NOT be bound to enter — doing so garbles atuin's
+#     insert into escape sequences, because both answer the same keypress;
+#   - typed aliases get rewritten in place by expand-alias. The alias table is
+#     untouched (124 of them resolve inside the wrapper, `ll` included) — it is
+#     the on-screen rewrite that reads as breakage.
+#
+# Config and Voltage theme are in .config/iris. Do NOT run `iris setup` or
+# `iris uninstall`: both rewrite the RC file in place, and ~/.zshrc is a symlink
+# into this repo. See README.MD.
+# Branch 1 — already inside a shell iris started, whether by hand or by the
+# autostart below. Install the zle hooks and nothing else: $IRIS_RESCUE is a
+# kill switch the generated exec branch checks, so it cannot re-exec. Without
+# this branch a hand-started `iris` has no line feed and suggests nothing.
+#
+# Branch 2 — the autostart, opt-in via $IRIS_AUTOSTART. The rest of that guard
+# stops `exec iris` firing in a shell that is interactive but not a session:
+# `zsh -ic '…'` sets $ZSH_EXECUTION_STRING and is how install.sh drains zinit's
+# turbo queue, so without it the installer drops into an interactive iris and
+# hangs. -t 1 catches the same shape when stdout is a pipe.
+if [[ -n $IRIS_PID && -n $IRIS_FD ]]; then
+  IRIS_RESCUE=1
+  zcache iris iris init zsh
+  unset IRIS_RESCUE
+elif [[ -n $IRIS_AUTOSTART && -z $ZSH_EXECUTION_STRING && -t 1 && $TERM != dumb ]]; then
   zcache iris iris init zsh
 fi
 

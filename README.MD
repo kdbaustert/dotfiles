@@ -72,10 +72,16 @@ themes live at `<vault>/.obsidian/themes/` and the vault path is per-machine;
 copy them in by hand. `.claude/` is neither in the root-dotfiles list nor under
 `.config/`, so nothing links it — it is kept here for reference only.
 
+**`iris` is on demand, not autostarted.** It wraps the shell rather than
+plugging into zle, so leaving it in charge of every prompt fights atuin,
+fzf-tab, zsh-autosuggestions and the alias table — the iris block in `.zshrc`
+records what broke. `.zshrc` installs only its zle hooks, and only inside a
+shell iris itself started, so typing `iris` gives you the full overlay and
+exiting gives you your shell back.
+
 **Don't run `iris setup` or `iris uninstall`.** Both rewrite your shell RC file
 in place, and `~/.zshrc` is a symlink into this repo — they would edit the
-tracked `.zshrc` rather than a copy. The autostart hook is already declared by
-hand (see the iris block in `.zshrc`); to remove iris, delete that block,
+tracked `.zshrc` rather than a copy. To remove iris, delete that block,
 `brew uninstall versenilvis/iris/iris`, and drop `.config/iris`.
 
 **No System Integrity Protection changes are needed.** Earlier versions of this
