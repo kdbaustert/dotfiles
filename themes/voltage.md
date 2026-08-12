@@ -72,6 +72,7 @@ All of these have to agree or the shell looks patched together:
 | yazi                     | `.config/yazi/theme.toml`         |
 | btop                     | `.config/btop/themes/voltage.theme` |
 | glow                     | `.config/glow/voltage.json`       |
+| iris (completion overlay)| `.config/iris/theme.toml`         |
 
 ### What deliberately has no entry
 

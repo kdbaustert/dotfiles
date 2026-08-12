@@ -72,6 +72,12 @@ themes live at `<vault>/.obsidian/themes/` and the vault path is per-machine;
 copy them in by hand. `.claude/` is neither in the root-dotfiles list nor under
 `.config/`, so nothing links it — it is kept here for reference only.
 
+**Don't run `iris setup` or `iris uninstall`.** Both rewrite your shell RC file
+in place, and `~/.zshrc` is a symlink into this repo — they would edit the
+tracked `.zshrc` rather than a copy. The autostart hook is already declared by
+hand (see the iris block in `.zshrc`); to remove iris, delete that block,
+`brew uninstall versenilvis/iris/iris`, and drop `.config/iris`.
+
 **No System Integrity Protection changes are needed.** Earlier versions of this
 README opened with instructions to disable SIP; that was only ever required by
 yabai's scripting addition. yabai and skhd have been removed, so nothing here

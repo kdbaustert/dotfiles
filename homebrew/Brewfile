@@ -88,6 +88,13 @@ brew "clamav"
 brew "fastfetch"
 brew "firebase-cli"
 brew "zig"
+# iris — inline completion overlay (IntelliSense for the prompt). Config and
+# theme live in .config/iris and are symlinked by install.sh; the autostart hook
+# is in .zshrc. The tap is the author's own, and is the only distribution
+# channel that isn't `curl | sh` or a self-updating binary — which is also why
+# [updater] is switched off in config.toml: brew owns this binary, so letting
+# iris rewrite its own Cellar path would desync `brew upgrade`.
+brew "versenilvis/iris/iris"
 # brew "elastic/tap/elasticsearch-full"
 # brew "khanhas/tap/spicetify-cli"
 # brew "switchaudio-osx"

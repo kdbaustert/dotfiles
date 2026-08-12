@@ -76,6 +76,37 @@ bindkey '^X^E' edit-command-line
 source "$DOTFILES/zsh/extra/cache.zsh"
 
 #------------------------------------------------------------------------------
+# iris — inline completion overlay
+#------------------------------------------------------------------------------
+# Unlike every other integration in this file, `iris init zsh` emits TWO blocks
+# and this shell runs exactly one of them:
+#
+#   1. the autostart hook — `exec iris`, replacing this zsh with the iris
+#      binary, which then starts zsh again as a child;
+#   2. the zle hooks — installed instead when $IRIS_PID is already set, i.e. in
+#      that child, which is where the interactive session actually lives.
+#
+# So this file is sourced twice per terminal, and everything below this line is
+# only ever run by the child. That is why the call sits here rather than with
+# the other zcache lines further down: on the first pass the shell execs away at
+# this point, so anything above it is paid for twice. Only history, setopts, the
+# keymap and cache.zsh are — starship, zinit, completion and fzf are not.
+#
+# Config and theme are in .config/iris (symlinked by install.sh); the reasoning
+# for ghost-text/keybindings deferring to zsh-autosuggestions, atuin and fzf-tab
+# is in config.toml.
+#
+# The guard is not just `command -v iris` — zcache already no-ops when the
+# binary is missing. What it has to stop is `exec iris` firing in a shell that
+# is interactive but not a session: `zsh -ic '…'` sets $ZSH_EXECUTION_STRING and
+# is how install.sh drains zinit's turbo queue, so without this test running the
+# installer would drop into an interactive iris and hang. -t 1 covers the same
+# shape when stdout is a pipe.
+if [[ -z $ZSH_EXECUTION_STRING && -t 1 && $TERM != dumb ]]; then
+  zcache iris iris init zsh
+fi
+
+#------------------------------------------------------------------------------
 # Prompt (starship) — first, so the prompt is ready before anything optional
 #------------------------------------------------------------------------------
 # PROMPT and RPROMPT come out of `starship init zsh` single-quoted, so they run

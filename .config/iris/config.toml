@@ -1,0 +1,149 @@
+# ~/.config/iris/config.toml
+#
+# iris is an inline completion overlay: `eval "$(iris init zsh)"` in .zshrc
+# `exec`s the iris binary, which then runs zsh as a child and draws a suggestion
+# menu over the prompt while reading $LBUFFER through a zle hook.
+#
+# That makes it the only tool here that sits *outside* zle rather than inside
+# it, and upstream's README warns it will fight anything that already owns the
+# line editor — zsh-autosuggestions, atuin, completion UIs. This config settles
+# every one of those in favour of the incumbent: iris is additive, and nothing
+# that worked before it was installed changes behaviour. The three places that
+# matters are ghost-text, atuin-history and [keybindings] below.
+
+[core]
+# schema version
+# do not edit this field manually
+version = 1
+
+# Stated rather than auto-detected. Auto-detection reads the parent process,
+# which is correct today but silently picks a different shell if iris is ever
+# launched from one; this file is only ever loaded by the zsh in .zshrc.
+shell = "zsh"
+
+# The child shell is NOT a login shell, deliberately. zsh reads .zprofile then
+# .zshrc, so by the time the autostart hook execs iris the login environment
+# (PATH, XDG dirs, HOMEBREW_*) has already been exported and survives the exec
+# into the child. Setting this true would re-run .zprofile a second time per
+# terminal for no gain.
+shell-login = false
+
+# startup mode: "last", "spec", "history"
+# "last" = remember last mode used
+mode = "last"
+
+# Debug logging writes every keystroke to iris.log. Bug reports only.
+debug = false
+
+# automatically expand aliases on space
+expand-alias = true
+
+# Never run a suggestion on accept — accepting inserts it and leaves the cursor
+# on the line, which is the same contract fzf-tab and atuin have here.
+auto-execute = false
+
+# 2 = atuin's database *and* $HISTFILE. atuin is what actually records history
+# on this machine (it owns Ctrl-R, see .zshrc), so with the default 0 iris's
+# history mode would be reading the thin shell history rather than the real one.
+# Both, not atuin-only: SHARE_HISTORY keeps $HISTFILE populated too and the
+# overlap is deduplicated.
+atuin-history = 2
+
+# Empty = atuin's own default path, which is where our atuin config leaves it.
+atuin-db-path = ""
+
+# Probes unknown binaries with `<cmd> __complete` to synthesise suggestions for
+# Cobra-based CLIs. Left on: it executes the binary you are already typing, with
+# a completion subcommand, which is the same thing carapace and the shell's own
+# completers do.
+cobra-probe-enabled = true
+
+[ui]
+# visual style: "modern" (icons, category pills, shortcut footer) or "classic" (minimalist, centered number, no icons)
+style = "modern"
+
+# The terminal is on a Nerd Font (see the font casks in homebrew/Brewfile and
+# the font-family in .config/ghostty/config), and eza/lsd/yazi all render icons.
+nerd-fonts = true
+
+# Show dotfiles, matching `--hidden` on the fd command backing every fzf picker
+# (zsh/extra/fzf.zsh) and GLOB_DOTS in .zshrc. A config file you can't see in
+# the menu but can see in Ctrl-T is worse than either choice on its own.
+hidden-files = true
+
+# OFF — zsh-autosuggestions keeps the inline ghost text. Both draw faded text
+# after the cursor from different processes; running the two together gives you
+# two suggestions in the same cell, and the zle one wins the redraw. See
+# $ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE in .zshrc for the colour they'd share.
+ghost-text = false
+
+# maximum suggestions to display
+max-suggestions = 100
+
+# Overlay height. fzf runs at --height=45%; 15 rows is the same order on a
+# normal window and leaves the scrollback visible above the prompt.
+max-height = 15
+
+# maximum width of the overlay (0 = responsive to terminal)
+max-width = 0
+
+[git]
+# hide current branch in checkout/switch list
+filter-active-branch = true
+
+# merge remote and local branches with same name
+deduplicate-branches = true
+
+[updater]
+# All of this is off because Homebrew owns the binary (homebrew/Brewfile). A
+# self-update would write a new iris into or over the Cellar path brew installed,
+# leaving `brew upgrade` and `brew doctor` describing a version that isn't there.
+# `brew upgrade iris` is the update path; install.sh runs it with everything else.
+check-on-startup = false
+
+# update channel: "stable", "nightly"
+channel = "stable"
+
+# interval between update checks, e.g. "24h", "6h", "30m"
+check-interval = "24h"
+
+# 0 = off (default, notify only), 1 = auto-install, 2 = always confirm first
+auto-update = 0
+
+[ai]
+# Off, and stated rather than left to the default so it can't drift on with a
+# future `iris config init`. Enabling it ships the line you are typing to Groq
+# (or a local ollama) on a debounce — the same objection that keeps
+# _pay-respects-fallback-100-request-ai out of install.sh.
+enabled = false
+
+[keybindings]
+# Every default here except toggle-menu collided with something already bound,
+# because iris reads keys in raw mode *before* zle sees them — a collision is a
+# silent theft, not an error.
+#
+# Ctrl-O is the one free control key left on this keymap. Taken, for reference:
+# Ctrl-R atuin, Ctrl-T + Alt-C fzf, Ctrl-G navi, Alt-A the fzf alias widget,
+# Ctrl-X Ctrl-E edit-command-line, Ctrl-X Ctrl-X pay-respects, Ctrl-U
+# backward-kill-line, and Ctrl-A/E/W/L which iris handles itself.
+toggle-mode = "ctrl+o"
+
+# The menu is opt-in: it stays closed until Shift-Tab, which is what keeps the
+# four keys below out of the way of the shell the rest of the time.
+toggle-menu = "shift+tab"
+
+select = "tab"
+
+# Up/Down are NOT iris's, despite being the obvious keys for a menu. Upstream
+# documents them as "move the selection, or open command history when the prompt
+# is empty" — that second half fires whether or not the menu is open, so with
+# the defaults iris answered the empty-prompt up-arrow itself and atuin's
+# history search never opened. Ctrl-P/Ctrl-N are the reassignment: they are the
+# classic previous/next-item pair, and the only thing they cost is zle's plain
+# up-line-or-history, which is dead weight on a machine where atuin owns Up.
+navigate-up = "ctrl+p"
+navigate-down = "ctrl+n"
+
+# Left as-is: right-arrow accepts ghost text, and ghost-text is off above, so
+# this never fires.
+navigate-right = "right"
