@@ -72,6 +72,8 @@
 [safe]
 	directory = /opt/homebrew/Library/Taps/homebrew/homebrew-core
 	directory = /opt/homebrew/Library/Taps/homebrew/homebrew-cask
+	directory = /opt/homebrew/Library/Taps/homebrew/homebrew-core
+	directory = /opt/homebrew/Library/Taps/homebrew/homebrew-cask
 
 # Work identity (Kenny Baustert) applied automatically for any repo whose
 # remote URL points at Bitbucket. Matches both SSH and HTTPS remotes.

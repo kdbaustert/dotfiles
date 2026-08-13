@@ -1,0 +1,15 @@
+# Mirrors ~/.local/share/lunarvim/lvim/.stylua.toml so the config in this
+# directory is formatted the way LunarVim formats its own source — mainly
+# `no_call_parentheses`, which is why this file reads `require "voltage"`
+# rather than `require("voltage")`.
+#
+# Without it, stylua falls back to its defaults, and since config.lua wires
+# stylua into format-on-save the first save of any file here would rewrite
+# every one of those calls. stylua walks up from the file being formatted, so
+# this covers the whole directory and stops at the symlink into the repo.
+column_width = 120
+line_endings = "Unix"
+indent_type = "Spaces"
+indent_width = 2
+quote_style = "AutoPreferDouble"
+no_call_parentheses = true

@@ -67,6 +67,10 @@ brew "imagemagick"
 brew "nss"
 brew "shfmt"
 brew "shellcheck"
+# stylua — Lua formatter. Declared here rather than left to Mason because
+# .config/lvim wires it into none-ls, which shells out to PATH: a Mason copy
+# would live under ~/.local/share and vanish with the editor's runtime.
+brew "stylua"
 brew "atuin"
 # starship — the prompt. Previously fetched as a gh-r binary by zinit, which
 # forced zinit to load eagerly (a prompt can't be turbo-deferred) and put ~16ms

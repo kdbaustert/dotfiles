@@ -201,13 +201,16 @@ done
 link "$DOTFILES_DIR/.zprofile" "$HOME/.zprofile"
 link "$DOTFILES_DIR/.zprofile" "$HOME/.profile"
 
+# Claude Code's global instructions. Only CLAUDE.md is deployed: the rest of
+# ~/.claude is state Claude writes itself (settings.local.json, projects/,
+# todos/), so the directory is created and linked into, never linked over.
+mkdir -p "$HOME/.claude"
+link "$DOTFILES_DIR/.claude/CLAUDE.md" "$HOME/.claude/CLAUDE.md"
+
 # ~/.config sub-configs: link every entry in the repo's .config. dotglob so `*`
 # would also match a hidden entry (there are none today — this is defensive, so
 # adding one later doesn't silently go unlinked); nullglob so an empty dir
 # doesn't leave the literal glob pattern behind.
-#
-# Note that repo-root .claude/ is NOT covered here — it is neither in the
-# root-dotfiles list above nor under .config, so nothing deploys it. See README.
 mkdir -p "$HOME/.config"
 if [ -d "$DOTFILES_DIR/.config" ]; then
   shopt -s dotglob nullglob

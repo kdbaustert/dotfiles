@@ -67,10 +67,59 @@ SETUP_SCRIPTS=all ./install.sh          # macos npm composer mas gh-extensions
 
 ## Notes
 
-**`obsidian/` and `.claude/` are not deployed by `install.sh`.** Obsidian
-themes live at `<vault>/.obsidian/themes/` and the vault path is per-machine;
-copy them in by hand. `.claude/` is neither in the root-dotfiles list nor under
-`.config/`, so nothing links it — it is kept here for reference only.
+**There are two Neovim configs, and they are not variants of each other.**
+`.config/nvim` is hand-rolled: lazy.nvim, ~22 plugins, no vendored runtime, and
+a ~15ms start. `.config/lvim` is LunarVim, an IDE layer with its own runtime
+directory. The split is the point — `nvim` is the editor, `lvim` is there when
+the batteries-included version is wanted, and neither can break the other.
+
+They share exactly one thing: `.config/voltage.nvim`, the Voltage colorscheme
+as a standalone plugin-shaped directory that both put on their runtimepath. It
+lives outside both because two transcriptions of the same palette is the drift
+`themes/voltage.md` exists to prevent.
+
+`.config/nvim` splits into `lua/configs` (settings needing no plugin) and
+`lua/plugins` (one file per concern, each returning a lazy spec). Language
+servers come from Mason; formatters and linters deliberately do not — they are
+the ones the Brewfile and `setup/npm.sh` already install, so the shell and the
+editor run the same binaries. `lazy-lock.json` is tracked, so `:Lazy restore`
+reproduces the plugin set exactly.
+
+**LunarVim's runtime is not installed by `install.sh`, only its config.**
+`.config/lvim` is symlinked like every other `.config` entry, but the editor
+itself lives in `~/.local/share/lunarvim` and comes from upstream's installer,
+which is not vendored here:
+
+```sh
+LV_BRANCH=master bash <(curl -s https://raw.githubusercontent.com/LunarVim/LunarVim/master/utils/installer/install.sh)
+```
+
+Run that once on a new box, then `lvim`.
+
+**It is `lvim`, not `nvim`.** LunarVim isolates itself: its shim sets
+`NVIM_APPNAME=lvim` and starts Neovim against its own `init.lua`, so nothing in
+`.config/lvim` is on the path of a bare `nvim`, and nothing in `.config/nvim`
+is on the path of `lvim`. They are two separate editors that happen to share a
+binary — see the next note. `$EDITOR` stays `nvim`.
+
+The config LunarVim writes on first run is replaced by the symlink, and the
+plugin set is pinned by the tracked `.config/lvim/lazy-lock.json` — `:Lazy
+restore` reproduces it exactly. The formatters and linters it wires up are the
+ones already installed by the Brewfile and `setup/npm.sh`, not by Mason.
+Upstream targets Neovim 0.10 while the Brewfile tracks current `neovim`, so
+startup logs one harmless `vim.tbl_flatten is deprecated` warning from
+LunarVim's own code.
+
+**`obsidian/` is not deployed by `install.sh`.** Obsidian themes live at
+`<vault>/.obsidian/themes/` and the vault path is per-machine; copy them in by
+hand.
+
+**Only `CLAUDE.md` is deployed out of `.claude/`.** It is symlinked to
+`~/.claude/CLAUDE.md` — Claude Code's global instructions, applied to every
+project. The rest of `~/.claude` is state Claude writes itself
+(`settings.local.json`, `projects/`, `todos/`), so the directory is created and
+linked *into* rather than linked over. `.claude/themes/` is kept here for
+reference only; nothing links it.
 
 **`iris` is on demand, not autostarted.** It wraps the shell rather than
 plugging into zle, so leaving it in charge of every prompt fights atuin,

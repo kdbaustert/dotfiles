@@ -72,6 +72,7 @@ All of these have to agree or the shell looks patched together:
 | yazi                     | `.config/yazi/theme.toml`         |
 | btop                     | `.config/btop/themes/voltage.theme` |
 | glow                     | `.config/glow/voltage.json`       |
+| Neovim + LunarVim        | `.config/voltage.nvim/`           |
 | iris (completion overlay)| `.config/iris/theme.toml`         |
 
 ### What deliberately has no entry
@@ -85,6 +86,21 @@ without anyone touching git's config.
 Writing explicit hex for them would make things *worse*, not better: it would
 pin them to these values and stop them following the terminal, which is the
 one mechanism here that cannot drift.
+
+Neovim is the opposite case and is why it gets a row rather than an exemption.
+It sets `termguicolors`, so it emits 24-bit hex and resolves nothing through
+the Ghostty palette — the editor is the largest surface on screen and the one
+that would drift hardest if left to a stock theme. `.config/voltage.nvim/`
+therefore spells out every highlight group. The one thing it *does* hand back
+to the palette is `terminal_color_0..15`, so `:terminal` buffers and anything
+drawn inside them resolve through the table at the top of this file.
+
+That directory is a colorscheme in Neovim's own plugin shape — `colors/` plus
+`lua/` — rather than a file inside either editor's config, because there are
+two editors here (`.config/nvim` and `.config/lvim`) and a copy each is exactly
+the drift this document exists to prevent. Both put it on their runtimepath and
+`:colorscheme voltage` resolves out of it. It is also the only thing the two
+configs share.
 
 Two tools also need forcing flags rather than colors. Anything rendering inside
 an fzf preview or a pipe has to be told to keep color — `--color=always` for

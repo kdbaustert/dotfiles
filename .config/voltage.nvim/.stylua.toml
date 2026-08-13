@@ -1,0 +1,8 @@
+# See .config/nvim/.stylua.toml. This directory is loaded by both editors, so
+# it carries its own copy rather than inheriting from either of them.
+column_width = 120
+line_endings = "Unix"
+indent_type = "Spaces"
+indent_width = 2
+quote_style = "AutoPreferDouble"
+no_call_parentheses = true
