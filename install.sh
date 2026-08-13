@@ -201,11 +201,20 @@ done
 link "$DOTFILES_DIR/.zprofile" "$HOME/.zprofile"
 link "$DOTFILES_DIR/.zprofile" "$HOME/.profile"
 
-# Claude Code's global instructions. Only CLAUDE.md is deployed: the rest of
-# ~/.claude is state Claude writes itself (settings.local.json, projects/,
-# todos/), so the directory is created and linked into, never linked over.
+# Claude Code's global instructions. Only the two instruction files are
+# deployed: the rest of ~/.claude is state Claude writes itself
+# (settings.local.json, projects/, todos/), so the directory is created and
+# linked into, never linked over.
+#
+# AGENTS.md is linked for the sake of tools that DO look for it at user scope.
+# Claude Code is not one of them — verified against 2.1.231: neither
+# ~/.claude/AGENTS.md nor <project>/AGENTS.md is discovered, only CLAUDE.md is.
+# What makes it load is the `@AGENTS.md` import at the top of CLAUDE.md, so the
+# two files have to stay together — dropping either one silently loses the
+# tooling rules rather than failing.
 mkdir -p "$HOME/.claude"
 link "$DOTFILES_DIR/.claude/CLAUDE.md" "$HOME/.claude/CLAUDE.md"
+link "$DOTFILES_DIR/.claude/AGENTS.md" "$HOME/.claude/AGENTS.md"
 
 # ~/.config sub-configs: link every entry in the repo's .config. dotglob so `*`
 # would also match a hidden entry (there are none today — this is defensive, so

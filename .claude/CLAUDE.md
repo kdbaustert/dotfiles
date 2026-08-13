@@ -2,6 +2,12 @@
 
 Applies to every project. Project-level `CLAUDE.md` files take precedence over anything here.
 
+Which binary to reach for lives in `AGENTS.md`, next to this file. Claude Code has
+no AGENTS.md discovery path at either scope, so it is pulled in by this import —
+without the line, the file is invisible to Claude and only read by other tools:
+
+@AGENTS.md
+
 ## Environment
 
 - macOS, Apple Silicon. Homebrew at `/opt/homebrew` — always prefer its binaries over `/usr/bin`.

@@ -120,12 +120,24 @@ LunarVim's own code.
 `<vault>/.obsidian/themes/` and the vault path is per-machine; copy them in by
 hand.
 
-**Only `CLAUDE.md` is deployed out of `.claude/`.** It is symlinked to
-`~/.claude/CLAUDE.md` — Claude Code's global instructions, applied to every
-project. The rest of `~/.claude` is state Claude writes itself
+**Only the instruction files are deployed out of `.claude/`.** `CLAUDE.md` and
+`AGENTS.md` are symlinked to `~/.claude/` — Claude Code's global instructions,
+applied to every project. The rest of `~/.claude` is state Claude writes itself
 (`settings.local.json`, `projects/`, `todos/`), so the directory is created and
 linked *into* rather than linked over. `.claude/themes/` is kept here for
 reference only; nothing links it.
+
+**`AGENTS.md` only loads because `CLAUDE.md` imports it.** Claude Code has no
+`AGENTS.md` discovery path — verified against 2.1.231, neither
+`~/.claude/AGENTS.md` nor `<project>/AGENTS.md` is picked up, only `CLAUDE.md`
+is. The `@AGENTS.md` line at the top of each `CLAUDE.md` is what pulls it in, so
+the pairs have to stay together; delete the import and the rules go quietly
+missing rather than erroring. The split is worth keeping because `AGENTS.md` is
+the vendor-neutral name other agent tools read directly.
+
+That pattern appears twice, and the two are unrelated: `.claude/AGENTS.md` is
+global (which binary to reach for — `rg`, `fd`, `jq`, the `g`-prefixed GNU
+tools), while the root `AGENTS.md` + `CLAUDE.md` pair covers editing *this* repo.
 
 **`iris` is on demand, not autostarted.** It wraps the shell rather than
 plugging into zle, so leaving it in charge of every prompt fights atuin,
