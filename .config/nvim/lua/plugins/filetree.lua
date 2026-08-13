@@ -101,14 +101,19 @@ return {
           return
         end
 
-        local is_dir = data.file ~= "" and vim.fn.isdirectory(data.file) == 1
-        if is_dir then
-          -- oil already claimed the directory buffer; just add the sidebar.
-          api.tree.open { focus = false }
-          return
-        end
-
+        -- Open, then put the cursor back where it was. `tree.open{focus=false}`
+        -- does not reliably keep focus off the sidebar, and landing in the
+        -- tree on every start means the first keystroke of the day goes to the
+        -- wrong window. Restoring the window explicitly is unambiguous.
+        --
+        -- This covers the directory case too: `nvim some/dir` leaves oil in
+        -- the main window with the tree beside it, which is the same shape.
+        local origin = vim.api.nvim_get_current_win()
         api.tree.open { focus = false }
+
+        if vim.api.nvim_win_is_valid(origin) then
+          vim.api.nvim_set_current_win(origin)
+        end
       end,
     })
 

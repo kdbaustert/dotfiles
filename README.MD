@@ -68,10 +68,16 @@ SETUP_SCRIPTS=all ./install.sh          # macos npm composer mas gh-extensions
 ## Notes
 
 **There are two Neovim configs, and they are not variants of each other.**
-`.config/nvim` is hand-rolled: lazy.nvim, ~22 plugins, no vendored runtime, and
-a ~15ms start. `.config/lvim` is LunarVim, an IDE layer with its own runtime
-directory. The split is the point — `nvim` is the editor, `lvim` is there when
-the batteries-included version is wanted, and neither can break the other.
+`.config/nvim` is hand-rolled: lazy.nvim, 23 plugins, no vendored runtime, and
+a ~50ms start (~80ms opening a file, once treesitter and the LSP attach).
+`.config/lvim` is LunarVim, an IDE layer with its own runtime directory. The
+split is the point — `nvim` is the editor, `lvim` is there when the
+batteries-included version is wanted, and neither can break the other.
+
+Roughly 35ms of that start is nvim-tree, which is open on every launch and so
+cannot be lazy-loaded. That is the price of the sidebar being always-on, and it
+is the single biggest item in the startup profile — `nvim --startuptime` if it
+ever needs revisiting.
 
 They share exactly one thing: `.config/voltage.nvim`, the Voltage colorscheme
 as a standalone plugin-shaped directory that both put on their runtimepath. It
