@@ -127,17 +127,20 @@ applied to every project. The rest of `~/.claude` is state Claude writes itself
 linked *into* rather than linked over. `.claude/themes/` is kept here for
 reference only; nothing links it.
 
-**`AGENTS.md` only loads because `CLAUDE.md` imports it.** Claude Code has no
-`AGENTS.md` discovery path — verified against 2.1.231, neither
+**`.claude/AGENTS.md` only loads because `.claude/CLAUDE.md` imports it.** Claude
+Code has no `AGENTS.md` discovery path — verified against 2.1.231, neither
 `~/.claude/AGENTS.md` nor `<project>/AGENTS.md` is picked up, only `CLAUDE.md`
-is. The `@AGENTS.md` line at the top of each `CLAUDE.md` is what pulls it in, so
-the pairs have to stay together; delete the import and the rules go quietly
-missing rather than erroring. The split is worth keeping because `AGENTS.md` is
-the vendor-neutral name other agent tools read directly.
+is. The `@AGENTS.md` line at the top of `CLAUDE.md` is what pulls it in, so the
+pair has to stay together; delete the import and the rules go quietly missing
+rather than erroring. The split is worth keeping there because `AGENTS.md` is the
+vendor-neutral name other agent tools read directly, and those global rules —
+which binary to reach for (`rg`, `fd`, `jq`, the `g`-prefixed GNU tools) — are
+the ones worth handing to a non-Claude tool.
 
-That pattern appears twice, and the two are unrelated: `.claude/AGENTS.md` is
-global (which binary to reach for — `rg`, `fd`, `jq`, the `g`-prefixed GNU
-tools), while the root `AGENTS.md` + `CLAUDE.md` pair covers editing *this* repo.
+The root of this repo used to carry the same pair; it doesn't any more. The rules
+for editing *this* repo are inlined directly in the top-level `CLAUDE.md`, since
+Claude Code is the only agent that edits it and one file can't drift from its
+copy.
 
 **`iris` is on demand, not autostarted.** It wraps the shell rather than
 plugging into zle, so leaving it in charge of every prompt fights atuin,
