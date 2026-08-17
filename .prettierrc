@@ -7,7 +7,7 @@
   "semi": false,
   "bracketSpacing": true,
   "bracketSameLine": false,
-  "endOfLine": "crlf",
+  "endOfLine": "lf",
   "plugins": ["@prettier/plugin-php"],
   "overrides": [
     {

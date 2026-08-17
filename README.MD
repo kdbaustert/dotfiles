@@ -120,27 +120,27 @@ LunarVim's own code.
 `<vault>/.obsidian/themes/` and the vault path is per-machine; copy them in by
 hand.
 
-**Only the instruction files are deployed out of `.claude/`.** `CLAUDE.md` and
-`AGENTS.md` are symlinked to `~/.claude/` — Claude Code's global instructions,
-applied to every project. The rest of `~/.claude` is state Claude writes itself
+**Only the instruction file is deployed out of `.claude/`.** `CLAUDE.md` is
+symlinked to `~/.claude/` — Claude Code's global instructions, applied to every
+project. The rest of `~/.claude` is state Claude writes itself
 (`settings.local.json`, `projects/`, `todos/`), so the directory is created and
 linked *into* rather than linked over. `.claude/themes/` is kept here for
 reference only; nothing links it.
 
-**`.claude/AGENTS.md` only loads because `.claude/CLAUDE.md` imports it.** Claude
-Code has no `AGENTS.md` discovery path — verified against 2.1.231, neither
-`~/.claude/AGENTS.md` nor `<project>/AGENTS.md` is picked up, only `CLAUDE.md`
-is. The `@AGENTS.md` line at the top of `CLAUDE.md` is what pulls it in, so the
-pair has to stay together; delete the import and the rules go quietly missing
-rather than erroring. The split is worth keeping there because `AGENTS.md` is the
-vendor-neutral name other agent tools read directly, and those global rules —
-which binary to reach for (`rg`, `fd`, `jq`, the `g`-prefixed GNU tools) — are
-the ones worth handing to a non-Claude tool.
+**There is no `AGENTS.md` at either scope any more.** `.claude/` used to carry
+one alongside `CLAUDE.md` — the vendor-neutral name other agent tools read
+directly, holding the "which binary to reach for" rules (`rg`, `fd`, `jq`, the
+`g`-prefixed GNU tools). Claude Code has no `AGENTS.md` discovery path, though —
+verified against 2.1.231, neither `~/.claude/AGENTS.md` nor `<project>/AGENTS.md`
+is picked up, only `CLAUDE.md` is — so an `@AGENTS.md` import line was the only
+thing loading it, and deleting that line lost the rules quietly rather than
+erroring. Those rules are now inlined in `.claude/CLAUDE.md`. `install.sh`
+removes the retired `~/.claude/AGENTS.md` symlink on its next run.
 
-The root of this repo used to carry the same pair; it doesn't any more. The rules
-for editing *this* repo are inlined directly in the top-level `CLAUDE.md`, since
-Claude Code is the only agent that edits it and one file can't drift from its
-copy.
+The root of this repo carried the same pair and was merged first, for the same
+reasons: the rules for editing *this* repo are inlined directly in the top-level
+`CLAUDE.md`, since Claude Code is the only agent that edits it and one file can't
+drift from its copy.
 
 **`iris` is on demand, not autostarted.** It wraps the shell rather than
 plugging into zle, so leaving it in charge of every prompt fights atuin,

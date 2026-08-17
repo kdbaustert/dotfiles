@@ -201,20 +201,25 @@ done
 link "$DOTFILES_DIR/.zprofile" "$HOME/.zprofile"
 link "$DOTFILES_DIR/.zprofile" "$HOME/.profile"
 
-# Claude Code's global instructions. Only the two instruction files are
-# deployed: the rest of ~/.claude is state Claude writes itself
-# (settings.local.json, projects/, todos/), so the directory is created and
-# linked into, never linked over.
+# Claude Code's global instructions. Only CLAUDE.md is deployed: the rest of
+# ~/.claude is state Claude writes itself (settings.local.json, projects/,
+# todos/), so the directory is created and linked into, never linked over.
 #
-# AGENTS.md is linked for the sake of tools that DO look for it at user scope.
-# Claude Code is not one of them — verified against 2.1.231: neither
-# ~/.claude/AGENTS.md nor <project>/AGENTS.md is discovered, only CLAUDE.md is.
-# What makes it load is the `@AGENTS.md` import at the top of CLAUDE.md, so the
-# two files have to stay together — dropping either one silently loses the
-# tooling rules rather than failing.
+# There used to be a second file here, AGENTS.md, linked for the sake of tools
+# that DO look for it at user scope and pulled into CLAUDE.md by an `@AGENTS.md`
+# import. Claude Code never discovered it on its own — verified against 2.1.231:
+# neither ~/.claude/AGENTS.md nor <project>/AGENTS.md is read, only CLAUDE.md is
+# — so the import was the only thing loading it, and deleting that one line lost
+# the tooling rules silently rather than failing. Its contents now live in
+# CLAUDE.md directly.
 mkdir -p "$HOME/.claude"
 link "$DOTFILES_DIR/.claude/CLAUDE.md" "$HOME/.claude/CLAUDE.md"
-link "$DOTFILES_DIR/.claude/AGENTS.md" "$HOME/.claude/AGENTS.md"
+
+# Retired: the ~/.claude/AGENTS.md link from before that merge. Same guard as the
+# root-level sweep above — only a symlink pointing into this repo is removed.
+if [ -L "$HOME/.claude/AGENTS.md" ] && case "$(readlink "$HOME/.claude/AGENTS.md")" in "$DOTFILES_DIR"/*) true ;; *) false ;; esac; then
+  rm -f "$HOME/.claude/AGENTS.md" && info "Removed retired symlink ~/.claude/AGENTS.md"
+fi
 
 # ~/.config sub-configs: link every entry in the repo's .config. dotglob so `*`
 # would also match a hidden entry (there are none today — this is defensive, so

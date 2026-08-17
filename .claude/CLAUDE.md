@@ -2,22 +2,101 @@
 
 Applies to every project. Project-level `CLAUDE.md` files take precedence over anything here.
 
-Which binary to reach for lives in `AGENTS.md`, next to this file. Claude Code has
-no AGENTS.md discovery path at either scope, so it is pulled in by this import —
-without the line, the file is invisible to Claude and only read by other tools:
-
-@AGENTS.md
+The tooling contract below used to live in a sibling `AGENTS.md` that this file
+pulled in with an `@AGENTS.md` import. That split is gone by choice: Claude Code
+has no AGENTS.md discovery path at either scope — verified against 2.1.231,
+neither `~/.claude/AGENTS.md` nor `<project>/AGENTS.md` is read — so the file only
+ever loaded *because* of the import, and deleting that one line lost the rules
+silently rather than erroring. One file, no import, nothing to keep in sync.
 
 ## Environment
 
 - macOS, Apple Silicon. Homebrew at `/opt/homebrew` — always prefer its binaries over `/usr/bin`.
-- Shell is zsh. `~/.zshrc`, `~/.zprofile`, `~/.zshenv`, `~/.gitconfig`, `~/.editorconfig`, `~/.prettierrc` are all symlinks into `~/dotfiles` — edit the file in `~/dotfiles`, never the symlink target path in `$HOME`.
-- Editor is `nvim`. Version managers: `pyenv` (Python), `nvm` (Node).
+- Shell is zsh. `~/.zshrc`, `~/.zprofile`, `~/.profile`, `~/.zshenv`, `~/.gitconfig`, `~/.editorconfig`, `~/.prettierrc`, `~/.claude/CLAUDE.md` and every `~/.config/<tool>` entry are symlinks into `~/dotfiles` — edit the file in `~/dotfiles`, never the symlink target path in `$HOME`.
+- Editor is `nvim`. Node versions: `nvm` (loaded from `zsh/zinit.zsh`; the default `node` is Homebrew's). There is no Python version manager — `pyenv` was removed because it managed zero versions; `python3` is Homebrew's.
 - Shell history is `atuin`. Prefer `atuin search` over `grep`-ing `.zsh_history`.
+
+GNU `coreutils` and `grep` are installed but `gnubin` is deliberately off `PATH`:
+the defaults are BSD, and the GNU versions are **g-prefixed** — `ggrep`, `gsed`,
+`gfind`, `gdircolors`. If a script needs GNU flags (`sed -i` without an argument,
+`grep -P`), call the `g`-prefixed binary explicitly rather than assuming.
+
+Interactive aliases *do* reach non-interactive tool calls via the shell snapshot.
+That is a hazard, not a convenience: `ls` is `eza`/`lsd` with icons, and `tree` —
+which is not installed as a binary — resolves to the `llt` alias. **When parsing
+output, call the real binary** — `/bin/ls`, or better, `fd`.
+
+## Reach for these first
+
+| Task | Use | Not |
+| ---- | --- | --- |
+| Search file contents | `rg` | `grep -r`, `find -exec grep` |
+| Find files by name | `fd` | `find` |
+| List every file in a tree | `fd . -t f`, `rg --files` | `ls -R`, `tree` |
+| List one directory | `/bin/ls -la` | the aliased `ls` |
+| JSON | `jq` | `sed`/`grep` over JSON |
+| Shell history | `atuin search` | grepping `~/.zsh_history` |
+| GitHub (PRs, issues, API) | `gh` | scraping web URLs |
+| Read a file | the Read tool | `cat`, `bat`, `head` |
+| Processes | `procs` | `ps aux \| grep` |
+
+Also installed and worth knowing: `fzf`, `zoxide`, `delta`, `lazygit`, `gitui`,
+`glow`, `yazi`, `btop`, `httpie`, `sqlite`, `zstd`, `sevenzip`.
+
+The flags worth remembering:
+
+```bash
+# ripgrep — content
+rg -i "pattern"           # case-insensitive
+rg -t py "pattern"        # only Python files (`rg --type-list` for the rest)
+rg -g "*.md" "pattern"    # only Markdown
+rg -l "pattern"           # filenames with matches, no match text
+rg -c "pattern"           # count per file
+rg -n "pattern"           # line numbers
+rg -A3 -B3 "error"        # context lines
+rg "TODO|FIXME|HACK"      # alternation — one pass, not three
+
+# ripgrep — file listing
+rg --files                # every file (respects .gitignore)
+rg --files -t md          # only Markdown
+rg --files | rg "name"    # find by name
+
+# fd
+fd -e js                  # every .js file
+fd . -t d                 # every directory
+fd -x command {}          # run a command per match
+
+# jq
+jq . data.json            # pretty-print
+jq -r .name file.json     # extract a field
+jq '.id = 0' x.json       # modify a field
+```
+
+Search strategy: start broad then narrow (`rg "partial" | rg "specific"`), filter
+by type early, batch alternations into one pattern, and scope to a subdirectory
+when you know where to look.
+
+## The gotcha that actually bites
+
+**`rg` and `fd` both respect `.gitignore` and both skip hidden files.** A search
+that comes back empty may be a search that never looked. When the target could be
+ignored or vendored — `node_modules`, `vendor`, `dist`, build output, lockfiles,
+anything under a dot-directory — pass the flags:
+
+```sh
+rg -n 'pattern'                      # default: tracked, non-hidden
+rg -n --hidden -g '!.git' 'pattern'  # include dotfiles, still skip .git
+rg -nuu 'pattern'                    # ignore .gitignore AND include hidden
+fd -e ts 'name'                      # smart-case, .gitignore-aware
+fd -H -I 'name'                      # hidden + no-ignore
+```
+
+`rg -l` for the file list alone, `rg -c` for counts — cheaper than dumping matches
+when you only need to know where something lives.
 
 ## Where things live
 
-- `~/Development/` — web/PHP work. `cnc-claims`, `cnc-claimsource` are work projects (custom PHP MVC; see `~/Development/cnc-mvc-ruleset.md` and each repo's own `CLAUDE.md`). `kennybdev` is personal.
+- `~/Development/` — web/PHP work. `cnc-claims` is the checked-out work project (custom PHP MVC; see `~/Development/cnc-mvc-ruleset.md` and the repo's own `CLAUDE.md`); `cnc-claimsource` is a sibling work project, currently present only as a zip. `kennybdev` is personal.
 - `~/Developer/` — Swift/macOS and native projects (`Cmd-Tab`, `rio`, `ghostty`).
 - `~/dotfiles/` — shell, git, and editor config.
 
@@ -33,6 +112,15 @@ Curate your context by delegating tasks (researching, exploring, tracing, testin
 
 When planning, do not be afraid to suggest seemingly insane solutions when they reveal a materially better direction. Explore broadly, then recommend and implement only the scope justified by the current problem. We effectively have to rethink and relearn what it means to build and innovate software. We value flexible platforms, memory efficiency, low CPU usage, and developer experience; when those goals conflict, make the trade-offs explicit and follow project priorities.
 
+## Rules
+
+- **Investigate first:** Never speculate about code you have not read. Read files and ripgrep for usages before making claims. If uncertain, say so and propose how to verify
+- **Scope to the request:** Do what is asked; nothing more. When ambiguous, default to research and recommendations — only edit when explicitly asked. Do not refactor adjacent code or create abstractions for a single use
+- **Verify before done:** Re-check each requirement. Run tests and lint. State what changed, what was verified, and what could not be
+- **File discipline:** Edit existing files in place. Do not create new files unless required. Clean up scratch files
+- **Safety:** Ask before destructive actions (deleting files/branches, force pushes, hard resets, `--no-verify`)
+- **Efficiency:** Parallelize independent tool calls; serialize dependent ones
+
 ## Code style
 
 Follow the repo's existing style first. Absent a repo convention:
@@ -42,12 +130,27 @@ Follow the repo's existing style first. Absent a repo convention:
 - PHP: 120 cols, double quotes, no trailing commas, PHP 8.1 target.
 - Swift: standard Swift API design guidelines; no third-party formatter unless the repo ships one.
 
+## Linters and formatters
+
+Installed as real binaries, not editor-managed: `shellcheck`, `shfmt`, `stylua`,
+`php-cs-fixer`, plus Prettier via `~/.prettierrc`. The shell and the editor run
+the same binaries on purpose — Neovim's Mason provides language servers only.
+Prefer a repo's own pinned tooling when it ships one.
+
+Verify shell edits without executing them: `bash -n` / `zsh -n` to parse,
+`shellcheck` to lint.
+
 ## Git
 
 - Commits are SSH-signed via 1Password (`op-ssh-sign`). Do not disable signing or add `-c commit.gpgsign=false` to work around a signing prompt — tell me instead.
-- Personal identity is `kenny@kennyb.dev`; Bitbucket remotes auto-switch to the work identity via `~/.gitconfig-work`. Don't set `user.email` per-repo by hand.
-- Never commit, push, or create a PR unless I ask. If I'm on the default branch, branch first.
+- Personal identity is `kenny@kennyb.dev`; Bitbucket remotes auto-switch to the work identity via `~/.gitconfig-work` (a plain file in `$HOME`, deliberately not in the dotfiles repo). Don't set `user.email` per-repo by hand.
+- Never commit, push, or create a PR unless I ask.
+- **Never create a branch.** Commit on whatever branch I'm already on, including the
+  default branch — this overrides the harness default of branching first when on
+  `main`/`master`. If a commit really shouldn't land on the current branch, say so
+  and let me decide; don't run `git checkout -b`/`git switch -c` on your own.
 - Work repos use Bitbucket Pipelines (`bitbucket-pipelines.yml`), not GitHub Actions — check the right CI config.
+- `delta` is **not** git's pager here — it is invoked explicitly by the fzf-tab previews in `.zshrc`. So `git diff` and `git show` emit plain, parseable output; no `--no-pager` dance is needed. Add `--no-pager` anyway when piping a command whose pager behaviour you have not checked.
 
 ## Working preferences
 

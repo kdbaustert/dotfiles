@@ -9,8 +9,8 @@ with an `@AGENTS.md` import — vendor-neutral name, one copy, read directly by
 tools that look for it. That split is gone by choice: Claude Code is the only
 agent that edits this repo, the import was a silent failure mode (delete the line
 and the rules go missing rather than erroring), and one file beats two that have
-to stay in sync. The *global* pair in `.claude/` still uses the import, and is
-unrelated to this one.
+to stay in sync. The *global* file in `.claude/` was merged the same way, for the
+same reasons — there is no `AGENTS.md` at either scope any more.
 
 Not to be confused with `.claude/CLAUDE.md`, which is the *global* instruction
 file staged here for deployment to `~/.claude/` — it is not about this repo.
@@ -19,7 +19,7 @@ file staged here for deployment to `~/.claude/` — it is not about this repo.
 
 `~/.zshrc`, `~/.zprofile`, `~/.profile` (a second link to `.zprofile`),
 `~/.zshenv`, `~/.gitconfig`, `~/.editorconfig`, `~/.prettierrc`,
-`~/.claude/CLAUDE.md`, `~/.claude/AGENTS.md` and every `~/.config/<tool>` entry
+`~/.claude/CLAUDE.md` and every `~/.config/<tool>` entry
 are symlinks into this repo. **Edit the file in `~/dotfiles`.** Never write to the
 `$HOME` path. `~/.hushlogin` is the one exception — `install.sh` `touch`es it
 rather than linking it, because only its existence is ever read.
@@ -46,7 +46,7 @@ Known offenders:
 | `setup/`              | Opt-in scripts (`SETUP_SCRIPTS="npm composer" ./install.sh`)      |
 | `themes/voltage.md`   | Canonical palette + the list of files that carry it               |
 | `clamav/`, `iterm/`, `obsidian/` | App-specific config                                    |
-| `.claude/CLAUDE.md`   | Global Claude Code instructions, with `.claude/AGENTS.md` alongside |
+| `.claude/CLAUDE.md`   | Global Claude Code instructions (the only file here that deploys) |
 
 The two `.config/git/` files reach git by different routes, which matters when
 one of them appears not to work: `allowed_signers` is named explicitly by
@@ -55,8 +55,9 @@ pointing at it at all — git reads `$XDG_CONFIG_HOME/git/ignore` on its own, so
 the symlink is the whole wiring.
 
 `.claude/` is tracked in full but only partly deployed: `install.sh` links
-`CLAUDE.md` and `AGENTS.md` and nothing else, so `themes/my-theme.json` rides
-along for reference and is applied by hand.
+`CLAUDE.md` and nothing else, so `themes/my-theme.json` rides along for reference
+and is applied by hand. The installer also sweeps the retired
+`~/.claude/AGENTS.md` link on re-run.
 
 Two Neovim configs, deliberately independent: `.config/nvim` (hand-rolled,
 lazy.nvim) and `.config/lvim` (LunarVim). They share only `.config/voltage.nvim`,
