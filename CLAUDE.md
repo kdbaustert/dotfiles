@@ -17,12 +17,21 @@ file staged here for deployment to `~/.claude/` — it is not about this repo.
 
 ## The one rule that breaks everything else
 
-`~/.zshrc`, `~/.zprofile`, `~/.zshenv`, `~/.gitconfig`, `~/.editorconfig`,
-`~/.prettierrc`, `~/.claude/CLAUDE.md` and every `~/.config/<tool>` entry are
-symlinks into this repo. **Edit the file in `~/dotfiles`.** Never write to the
-`$HOME` path, and never run a tool that rewrites a shell RC in place — it will
-silently edit the tracked file. `iris setup` and `iris uninstall` are the known
-offenders; don't run either.
+`~/.zshrc`, `~/.zprofile`, `~/.profile` (a second link to `.zprofile`),
+`~/.zshenv`, `~/.gitconfig`, `~/.editorconfig`, `~/.prettierrc`,
+`~/.claude/CLAUDE.md`, `~/.claude/AGENTS.md` and every `~/.config/<tool>` entry
+are symlinks into this repo. **Edit the file in `~/dotfiles`.** Never write to the
+`$HOME` path. `~/.hushlogin` is the one exception — `install.sh` `touch`es it
+rather than linking it, because only its existence is ever read.
+
+The corollary is the real hazard: **never run a tool that rewrites one of these
+files in place**, because it lands in the tracked file with no indication it did.
+Known offenders:
+
+- `iris setup` / `iris uninstall` — rewrite the shell RC. Don't run either.
+- `abbr add` / `abbr erase` — rewrite `zsh/abbreviations`, which is tracked, and
+  drop every comment in it (its own header says so). Editing that file by hand is
+  the way to keep the section breaks; `abbr` is for throwaway experiments.
 
 ## Layout
 
@@ -30,12 +39,24 @@ offenders; don't run either.
 | --------------------- | --------------------------------------------------------------- |
 | `.zshrc` / `.zprofile` / `.zshenv` | Shell entry points, symlinked to `$HOME`           |
 | `zsh/`                | `aliases.zsh`, `functions.zsh`, `zinit.zsh`, `extra/` snippets    |
+| `zsh/abbreviations`   | zsh-abbr's store, read via `$ABBR_USER_ABBREVIATIONS_FILE`        |
 | `.config/`            | Every entry is symlinked to `~/.config/<name>`                    |
+| `.config/git/`        | `ignore` (global excludes) and `allowed_signers` (SSH signing)     |
 | `homebrew/Brewfile`   | The package set                                                   |
 | `setup/`              | Opt-in scripts (`SETUP_SCRIPTS="npm composer" ./install.sh`)      |
 | `themes/voltage.md`   | Canonical palette + the list of files that carry it               |
 | `clamav/`, `iterm/`, `obsidian/` | App-specific config                                    |
 | `.claude/CLAUDE.md`   | Global Claude Code instructions, with `.claude/AGENTS.md` alongside |
+
+The two `.config/git/` files reach git by different routes, which matters when
+one of them appears not to work: `allowed_signers` is named explicitly by
+`.gitconfig`'s `allowedSignersFile`, while `ignore` has no `core.excludesFile`
+pointing at it at all — git reads `$XDG_CONFIG_HOME/git/ignore` on its own, so
+the symlink is the whole wiring.
+
+`.claude/` is tracked in full but only partly deployed: `install.sh` links
+`CLAUDE.md` and `AGENTS.md` and nothing else, so `themes/my-theme.json` rides
+along for reference and is applied by hand.
 
 Two Neovim configs, deliberately independent: `.config/nvim` (hand-rolled,
 lazy.nvim) and `.config/lvim` (LunarVim). They share only `.config/voltage.nvim`,
@@ -61,12 +82,31 @@ It asks for sudo, edits `/etc/pam.d/sudo_local`, runs `brew bundle`, downloads
 ~120MB of ClamAV signatures, and loads LaunchAgents. Verify narrowly instead:
 
 ```sh
-bash -n install.sh && shellcheck install.sh   # installer + setup/*.sh (bash)
-zsh -n .zshrc                                 # zsh files: parse only
+bash -n install.sh && shellcheck install.sh setup/*.sh   # bash: parse, then lint
+for f in .zshenv .zprofile .zshrc zsh/*.zsh zsh/extra/*.zsh; do
+  zsh -n "$f" || echo "FAIL $f"                          # zsh: parse only
+done
 zsh -ic exit                                  # full interactive load
 time zsh -i -c exit                           # startup cost — it is budgeted
 stylua --check .config/nvim .config/lvim .config/voltage.nvim
 ```
+
+Both file lists are load-bearing, and both used to be shorter than they needed
+to be. `shellcheck` never sees `setup/*.sh` on its own — those are invoked by
+variable name from the `SETUP_SCRIPTS` loop, which it cannot resolve statically,
+so they have to be named on the command line. And `zsh -n` parses exactly *one*
+file: extra arguments become positional parameters and are silently never read
+(`zsh -n .zshenv /nonexistent` exits 0), which is why this is a loop and not a
+list. It has to be, because `.zshrc` `source`s `zsh/extra/cache.zsh`,
+`zinit.zsh`, `functions.zsh`, `aliases.zsh` and four more `extra/` snippets at
+*runtime* — a syntax error in any of them sails past `zsh -n .zshrc` and only
+surfaces in `zsh -ic exit`.
+
+`shellcheck` currently exits 1 on a clean tree: two SC2015 `info`s on the
+deliberate `cmd && success || warning` lines in `install.sh` (both are
+best-effort steps where the "C may run when A is true" caveat is acceptable).
+Read the findings, don't chase the exit status, and don't rewrite those two lines
+into `if`/`else` just to silence it.
 
 Startup latency is a first-class constraint here: plugins are turbo-deferred in
 `zsh/zinit.zsh`, tool `init` output is cached via the `zcache` helper defined
@@ -91,6 +131,12 @@ one. A change with no rationale attached does not match this codebase.
 
 Do not commit: `*.zwc` (byte-compiled zsh, machine-specific),
 `.config/fsh/secondary_theme.zsh`, `.zsh_history`.
+
+`.claude/settings.local.json` is also uncommittable here, but not via `.gitignore`
+— the exclude lives in `.config/git/ignore` as `**/.claude/settings.local.json`,
+which this repo deploys and is therefore subject to. So `git status` is clean with
+that file sitting untracked in the tree; `git check-ignore -v <path>` is what tells
+you which rule caught something.
 
 Do commit, even though a tool generates them: `.config/fsh/current_theme.zsh`
 (built from our `voltage.ini`; it's what themes a fresh machine) and both
