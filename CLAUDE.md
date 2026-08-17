@@ -46,7 +46,8 @@ Known offenders:
 | `setup/`              | Opt-in scripts (`SETUP_SCRIPTS="npm composer" ./install.sh`)      |
 | `themes/voltage.md`   | Canonical palette + the list of files that carry it               |
 | `clamav/`, `iterm/`, `obsidian/` | App-specific config                                    |
-| `.claude/CLAUDE.md`   | Global Claude Code instructions (the only file here that deploys) |
+| `.claude/CLAUDE.md`   | Global Claude Code instructions                                   |
+| `.claude/hooks/`      | `notify.sh`, the Notification hook (terminal-notifier banner)     |
 
 The two `.config/git/` files reach git by different routes, which matters when
 one of them appears not to work: `allowed_signers` is named explicitly by
@@ -55,9 +56,27 @@ pointing at it at all — git reads `$XDG_CONFIG_HOME/git/ignore` on its own, so
 the symlink is the whole wiring.
 
 `.claude/` is tracked in full but only partly deployed: `install.sh` links
-`CLAUDE.md` and nothing else, so `themes/my-theme.json` rides along for reference
-and is applied by hand. The installer also sweeps the retired
+`CLAUDE.md` and `hooks/notify.sh`, so `themes/my-theme.json` rides along for
+reference and is applied by hand. The installer also sweeps the retired
 `~/.claude/AGENTS.md` link on re-run.
+
+`~/.claude/settings.json` is **not** tracked — it is mostly state Claude writes
+itself (model, `enabledPlugins`, the atuin hooks), so a symlink would fight it.
+That makes the one block wiring `notify.sh` up a manual step on a new machine:
+
+```json
+"Notification": [{ "hooks": [{ "type": "command",
+  "command": "$HOME/.claude/hooks/notify.sh" }] }]
+```
+
+`Notification` is the only event hooked, on purpose — it fires when Claude is
+blocked on you (a permission prompt, an idle question). `Stop` would banner
+every turn, which is how you end up leaving Do Not Disturb on.
+
+The same file carries the other untracked-but-load-bearing setting,
+`"attribution": { "commit": "", "pr": "" }`, which is what actually strips the
+`Co-Authored-By` trailer Claude Code would otherwise append to every commit.
+`.claude/CLAUDE.md` states the rule as well, since only one of the two travels.
 
 Two Neovim configs, deliberately independent: `.config/nvim` (hand-rolled,
 lazy.nvim) and `.config/lvim` (LunarVim). They share only `.config/voltage.nvim`,

@@ -145,6 +145,11 @@ Verify shell edits without executing them: `bash -n` / `zsh -n` to parse,
 - Commits are SSH-signed via 1Password (`op-ssh-sign`). Do not disable signing or add `-c commit.gpgsign=false` to work around a signing prompt — tell me instead.
 - Personal identity is `kenny@kennyb.dev`; Bitbucket remotes auto-switch to the work identity via `~/.gitconfig-work` (a plain file in `$HOME`, deliberately not in the dotfiles repo). Don't set `user.email` per-repo by hand.
 - Never commit, push, or create a PR unless I ask.
+- **No co-author trailers.** Commit messages end at the last line of prose — no
+  `Co-Authored-By:`, no "Generated with Claude Code" in a PR body, no attribution
+  footer of any kind. This overrides the harness default, which appends one.
+  `attribution.commit`/`attribution.pr` are set to `""` in `~/.claude/settings.json`
+  to enforce it, but that file is untracked, so the rule lives here too.
 - **Never create a branch.** Commit on whatever branch I'm already on, including the
   default branch — this overrides the harness default of branching first when on
   `main`/`master`. If a commit really shouldn't land on the current branch, say so

@@ -120,12 +120,25 @@ LunarVim's own code.
 `<vault>/.obsidian/themes/` and the vault path is per-machine; copy them in by
 hand.
 
-**Only the instruction file is deployed out of `.claude/`.** `CLAUDE.md` is
-symlinked to `~/.claude/` — Claude Code's global instructions, applied to every
-project. The rest of `~/.claude` is state Claude writes itself
-(`settings.local.json`, `projects/`, `todos/`), so the directory is created and
-linked *into* rather than linked over. `.claude/themes/` is kept here for
-reference only; nothing links it.
+**Two files are deployed out of `.claude/`.** `CLAUDE.md` — Claude Code's global
+instructions, applied to every project — and `hooks/notify.sh` are symlinked
+into `~/.claude/`. The rest of `~/.claude` is state Claude writes itself
+(`settings.json`, `settings.local.json`, `projects/`, `todos/`), so the
+directory is created and linked *into* rather than linked over.
+`.claude/themes/` is kept here for reference only; nothing links it.
+
+**The notification hook needs one manual step.** `hooks/notify.sh` fires a
+`terminal-notifier` banner when Claude is waiting on you, but the settings file
+that invokes it is untracked, so add this to `~/.claude/settings.json` under
+`hooks` on a new machine:
+
+```json
+"Notification": [{ "hooks": [{ "type": "command",
+  "command": "$HOME/.claude/hooks/notify.sh" }] }]
+```
+
+Only the `Notification` event is hooked — permission prompts and idle
+questions. Hooking `Stop` as well would banner every single turn.
 
 **There is no `AGENTS.md` at either scope any more.** `.claude/` used to carry
 one alongside `CLAUDE.md` — the vendor-neutral name other agent tools read

@@ -215,6 +215,12 @@ link "$DOTFILES_DIR/.zprofile" "$HOME/.profile"
 mkdir -p "$HOME/.claude"
 link "$DOTFILES_DIR/.claude/CLAUDE.md" "$HOME/.claude/CLAUDE.md"
 
+# The Notification hook script. ~/.claude/settings.json points at it but is NOT
+# tracked here — it is mostly state Claude writes itself — so the hook block has
+# to be pasted in by hand once per machine. notify.sh's own header carries it.
+mkdir -p "$HOME/.claude/hooks"
+link "$DOTFILES_DIR/.claude/hooks/notify.sh" "$HOME/.claude/hooks/notify.sh"
+
 # Retired: the ~/.claude/AGENTS.md link from before that merge. Same guard as the
 # root-level sweep above — only a symlink pointing into this repo is removed.
 if [ -L "$HOME/.claude/AGENTS.md" ] && case "$(readlink "$HOME/.claude/AGENTS.md")" in "$DOTFILES_DIR"/*) true ;; *) false ;; esac; then
