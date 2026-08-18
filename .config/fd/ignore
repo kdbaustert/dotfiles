@@ -1,0 +1,28 @@
+# Global fd ignore — read automatically from $XDG_CONFIG_HOME/fd/ignore, with no
+# flag or env var wiring it up. gitignore syntax.
+#
+# This exists for signal-to-noise, NOT for speed. fd walks the 19,462-file
+# cnc-claims tree in ~60ms and rg searches it in ~340ms; --hidden costs no
+# measurable time at all (0.342s vs 0.341s). The problem was what the walk
+# *returned*: `$FD` in zsh/extra/fzf.zsh passes --hidden, and in ~/dotfiles that
+# made CTRL-T list 501 files of which 415 — 83% — were .git/ internals. Object
+# files and refs crowding out the 86 files you actually wanted to open.
+#
+# Excluding it here rather than adding --exclude to $FD fixes every fd caller at
+# once: the CTRL-T and ALT-C pickers, _fzf_compgen_path / _fzf_compgen_dir
+# behind `vim **<tab>`, and bare `fd` on the command line. One place, and the
+# $FD string in fzf.zsh stays about color instead of growing exclusions.
+#
+# `fd -I` (--no-ignore) still bypasses this, so the escape hatch documented in
+# .claude/CLAUDE.md keeps working when you genuinely need to search a .git
+# object or a vendored tree.
+.git/
+
+# macOS sprinkles these through every directory it has ever previewed. Never the
+# thing being searched for.
+.DS_Store
+
+# Deliberately NOT listed here: node_modules/, vendor/, dist/. Real repos already
+# gitignore them, so fd skips them without help — and .claude/CLAUDE.md calls
+# them out as trees you sometimes DO need to search. A global exclusion would
+# put them behind -I permanently and fight that workflow to buy nothing.
