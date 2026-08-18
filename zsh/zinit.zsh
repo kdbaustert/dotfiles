@@ -58,8 +58,15 @@ setopt PROMPT_SUBST
 #
 # The previous version of this comment claimed nvm managed no versions and that
 # `node` therefore resolved to Homebrew's. Both halves are now wrong:
-# ~/.nvm/versions/node holds v26.5.0 and ~/.nvm/alias/default is `lts`, so in an
-# interactive shell `node` is the shim *function* and gives v26.5.0 — a function
+# ~/.nvm/versions/node holds v26.5.0, and ~/.nvm/alias/default is `node` — nvm's
+# symbolic alias for "newest installed", not a literal version. This comment said
+# `lts` until the alias files were actually read: ~/.nvm/alias/lts is an empty
+# file, so had default really pointed there it would resolve to nothing. The
+# v26.5.0 conclusion was right regardless, because `node` and the sole installed
+# version coincide — but it held by luck, not by the mechanism described.
+#
+# So in an interactive shell `node` is the shim *function* and gives v26.5.0 — a
+# function
 # outranks any $path lookup, so Homebrew's v26.7.0 does not win despite
 # /opt/homebrew/bin being first in the path array. Homebrew's node is what
 # non-interactive shells and scripts get, since they never load this plugin.

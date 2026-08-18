@@ -48,6 +48,7 @@ Known offenders:
 | `clamav/`, `iterm/`, `obsidian/` | App-specific config                                    |
 | `.claude/CLAUDE.md`   | Global Claude Code instructions                                   |
 | `.claude/hooks/`      | `notify.sh`, the Notification hook (terminal-notifier banner)     |
+| `.claude/skills/`     | Skills, one dir per skill; `plain/` is vendored from upstream      |
 
 The two `.config/git/` files reach git by different routes, which matters when
 one of them appears not to work: `allowed_signers` is named explicitly by
@@ -56,9 +57,21 @@ pointing at it at all — git reads `$XDG_CONFIG_HOME/git/ignore` on its own, so
 the symlink is the whole wiring.
 
 `.claude/` is tracked in full but only partly deployed: `install.sh` links
-`CLAUDE.md` and `hooks/notify.sh`, so `themes/my-theme.json` rides along for
-reference and is applied by hand. The installer also sweeps the retired
-`~/.claude/AGENTS.md` link on re-run.
+`CLAUDE.md`, `hooks/notify.sh` and every directory under `skills/`, so
+`themes/my-theme.json` rides along for reference and is applied by hand. The
+installer also sweeps the retired `~/.claude/AGENTS.md` link on re-run.
+
+`skills/` is a loop over `skills/*`, not one `link` line per skill, for the same
+reason `.config/*` is — a skill added here but not named in the installer would
+silently never deploy, the exact failure mode that killed the `@AGENTS.md`
+import. A skill is discovered by its *directory* containing a `SKILL.md`, so the
+directory is what gets linked. The sweep alongside it removes only links that
+point into this repo, so a skill installed by hand from elsewhere survives.
+
+`skills/plain/` is vendored verbatim from
+`petekp/claude-code-setup` (`skills/plain/SKILL.md`) — it is upstream's file,
+not ours. Re-fetch with `gh api` and diff rather than editing in place; local
+edits would be silently lost the next time it is refreshed.
 
 `~/.claude/settings.json` is **not** tracked — it is mostly state Claude writes
 itself (model, `enabledPlugins`, the atuin hooks), so a symlink would fight it.

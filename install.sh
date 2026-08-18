@@ -221,6 +221,33 @@ link "$DOTFILES_DIR/.claude/CLAUDE.md" "$HOME/.claude/CLAUDE.md"
 mkdir -p "$HOME/.claude/hooks"
 link "$DOTFILES_DIR/.claude/hooks/notify.sh" "$HOME/.claude/hooks/notify.sh"
 
+# Skills: link every skill directory under .claude/skills. A loop rather than one
+# `link` line per skill, for the same reason .config/* is a loop — a skill added
+# to the repo but not named here would silently never deploy, which is exactly
+# the failure mode the old @AGENTS.md import had. Claude Code discovers a skill
+# by its directory holding a SKILL.md, so the directory is what gets linked, not
+# the file inside it.
+if [ -d "$DOTFILES_DIR/.claude/skills" ]; then
+  mkdir -p "$HOME/.claude/skills"
+  shopt -s dotglob nullglob
+  for item in "$DOTFILES_DIR/.claude/skills"/*; do
+    [ -d "$item" ] || continue
+    case "$(basename "$item")" in .DS_Store) continue ;; esac
+    link "$item" "$HOME/.claude/skills/$(basename "$item")"
+  done
+  shopt -u dotglob nullglob
+
+  # Sweep ~/.claude/skills links left dangling by a skill this repo no longer
+  # ships. Same guard as the other sweeps — only a symlink pointing into this
+  # repo is removed, so a hand-installed skill from elsewhere survives.
+  for item in "$HOME/.claude/skills"/*; do
+    if [ -L "$item" ] && [ ! -e "$item" ] \
+      && case "$(readlink "$item")" in "$DOTFILES_DIR"/*) true ;; *) false ;; esac; then
+      rm -f "$item" && info "Removed dangling symlink ~/.claude/skills/$(basename "$item")"
+    fi
+  done
+fi
+
 # Retired: the ~/.claude/AGENTS.md link from before that merge. Same guard as the
 # root-level sweep above — only a symlink pointing into this repo is removed.
 if [ -L "$HOME/.claude/AGENTS.md" ] && case "$(readlink "$HOME/.claude/AGENTS.md")" in "$DOTFILES_DIR"/*) true ;; *) false ;; esac; then
