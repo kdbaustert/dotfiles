@@ -13,7 +13,8 @@ silently rather than erroring. One file, no import, nothing to keep in sync.
 
 - macOS, Apple Silicon. Homebrew at `/opt/homebrew` — always prefer its binaries over `/usr/bin`.
 - Shell is zsh. `~/.zshrc`, `~/.zprofile`, `~/.profile`, `~/.zshenv`, `~/.gitconfig`, `~/.editorconfig`, `~/.prettierrc`, `~/.claude/CLAUDE.md` and every `~/.config/<tool>` entry are symlinks into `~/dotfiles` — edit the file in `~/dotfiles`, never the symlink target path in `$HOME`.
-- Editor is `nvim`. Node versions: `nvm` (a shell function loaded from `zsh/zinit.zsh`, not a binary; the default `node` is Homebrew's). There is no Python version manager — `pyenv` was removed because it managed zero versions; `python3` is Homebrew's.
+- Editor is `nvim`. There is no Python version manager — `pyenv` was removed because it managed zero versions; `python3` is Homebrew's.
+- **`node` is version-skewed by shell type.** `nvm` is lazy-loaded (`NVM_LAZY_LOAD` in `.zprofile`, turbo-deferred in `zsh/zinit.zsh`) and is a shim *function*, not a binary. It manages one version, v26.5.0. Non-interactive shells and scripts — which is what a Bash tool call is — never load the plugin and get Homebrew's `/opt/homebrew/bin/node`, currently v26.7.0 (measured). An interactive shell gets the shim and v26.5.0. So a version you observe through a tool call is not the version I get at a prompt; `whence -w node` in a real interactive shell is the only honest check, not `zsh -i -c`, which exits before turbo fires.
 - Shell history is `atuin`.
 
 GNU `coreutils`, `grep` and `gnu-sed` are installed but `gnubin` is deliberately
