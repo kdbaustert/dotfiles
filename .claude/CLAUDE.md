@@ -13,13 +13,15 @@ silently rather than erroring. One file, no import, nothing to keep in sync.
 
 - macOS, Apple Silicon. Homebrew at `/opt/homebrew` — always prefer its binaries over `/usr/bin`.
 - Shell is zsh. `~/.zshrc`, `~/.zprofile`, `~/.profile`, `~/.zshenv`, `~/.gitconfig`, `~/.editorconfig`, `~/.prettierrc`, `~/.claude/CLAUDE.md` and every `~/.config/<tool>` entry are symlinks into `~/dotfiles` — edit the file in `~/dotfiles`, never the symlink target path in `$HOME`.
-- Editor is `nvim`. Node versions: `nvm` (loaded from `zsh/zinit.zsh`; the default `node` is Homebrew's). There is no Python version manager — `pyenv` was removed because it managed zero versions; `python3` is Homebrew's.
-- Shell history is `atuin`. Prefer `atuin search` over `grep`-ing `.zsh_history`.
+- Editor is `nvim`. Node versions: `nvm` (a shell function loaded from `zsh/zinit.zsh`, not a binary; the default `node` is Homebrew's). There is no Python version manager — `pyenv` was removed because it managed zero versions; `python3` is Homebrew's.
+- Shell history is `atuin`.
 
-GNU `coreutils` and `grep` are installed but `gnubin` is deliberately off `PATH`:
-the defaults are BSD, and the GNU versions are **g-prefixed** — `ggrep`, `gsed`,
-`gfind`, `gdircolors`. If a script needs GNU flags (`sed -i` without an argument,
-`grep -P`), call the `g`-prefixed binary explicitly rather than assuming.
+GNU `coreutils`, `grep` and `gnu-sed` are installed but `gnubin` is deliberately
+off `PATH`: the defaults are BSD, and the GNU versions are **g-prefixed** —
+`ggrep`, `gsed`, `gls`, `gsort`, `gdircolors`. If a script needs GNU flags
+(`sed -i` without an argument, `grep -P`), call the `g`-prefixed binary
+explicitly rather than assuming. There is no `gfind` — `findutils` is not
+installed, so `find` is always BSD `find`. Reach for `fd` instead.
 
 Interactive aliases *do* reach non-interactive tool calls via the shell snapshot.
 That is a hazard, not a convenience: `ls` is `eza`/`lsd` with icons, and `tree` —
@@ -41,7 +43,10 @@ output, call the real binary** — `/bin/ls`, or better, `fd`.
 | Processes | `procs` | `ps aux \| grep` |
 
 Also installed and worth knowing: `fzf`, `zoxide`, `delta`, `lazygit`, `gitui`,
-`glow`, `yazi`, `btop`, `httpie`, `sqlite`, `zstd`, `sevenzip`.
+`glow`, `yazi`, `btop`, `httpie` (the binary is `http`), `zstd`, and `sevenzip`
+(the binary is `7zz` — there is no `7z`). Homebrew's `sqlite` is keg-only and
+therefore off `PATH`, so a bare `sqlite3` is macOS's older system copy; call
+`/opt/homebrew/opt/sqlite/bin/sqlite3` when the version matters.
 
 The flags worth remembering:
 
@@ -88,11 +93,19 @@ rg -n 'pattern'                      # default: tracked, non-hidden
 rg -n --hidden -g '!.git' 'pattern'  # include dotfiles, still skip .git
 rg -nuu 'pattern'                    # ignore .gitignore AND include hidden
 fd -e ts 'name'                      # smart-case, .gitignore-aware
-fd -H -I 'name'                      # hidden + no-ignore
+fd -H -I 'name'                      # hidden + no-ignore (also bypasses the global ignore)
 ```
 
 `rg -l` for the file list alone, `rg -c` for counts — cheaper than dumping matches
 when you only need to know where something lives.
+
+`fd` also reads a **global ignore** at `.config/fd/ignore` (deployed to
+`~/.config/fd/ignore`, read automatically with no env var wiring it up). It
+excludes `.git/` and `.DS_Store` and nothing else — that is signal-to-noise, not
+speed: `--hidden` was making CTRL-T list 501 files in `~/dotfiles` of which 415
+were `.git/` internals. `node_modules/`, `vendor/` and `dist/` are deliberately
+*not* in it, so the advice above still holds for them. `-I` bypasses the global
+ignore along with `.gitignore`.
 
 ## Where things live
 
@@ -100,26 +113,19 @@ when you only need to know where something lives.
 - `~/Developer/` — Swift/macOS and native projects (`Cmd-Tab`, `rio`, `ghostty`).
 - `~/dotfiles/` — shell, git, and editor config.
 
-# Philosophy
+## How I want you to work
 
-Software is grounded in philosophy. Here are important considerations that will help you be more effective.
+These used to be two lists — "Rules" and "Working preferences" — that said the
+same thing twice with two different sets of examples. One list, so there is only
+ever one place to change a rule.
 
-## Agentic DAG (Directed Acyclic Graph) - a structured workflow pattern for AI agents using one-way dependencies and no loops. It relies on nodes (tasks or agents), directed edges (one-way rules), and an acyclic structure (no infinite loops).
-
-Curate your context by delegating tasks (researching, exploring, tracing, testing, analyzing, reviewing, searching, and reading documentation) to subagents and subagent workflows. Protect your context, which should remain factual and minimal. A clean context is rewarded with understanding, clarity, and success. Be smart and intentional about the workflows you design. If performing a task in the main context risks introducing conflated, uncertain, or unrelated information, delegate it to a subagent and require a factual, scoped result. If you find yourself asking yourself questions due it may be more appropriate to ask a subagent.
-
-## Boil the ocean
-
-When planning, do not be afraid to suggest seemingly insane solutions when they reveal a materially better direction. Explore broadly, then recommend and implement only the scope justified by the current problem. We effectively have to rethink and relearn what it means to build and innovate software. We value flexible platforms, memory efficiency, low CPU usage, and developer experience; when those goals conflict, make the trade-offs explicit and follow project priorities.
-
-## Rules
-
-- **Investigate first:** Never speculate about code you have not read. Read files and ripgrep for usages before making claims. If uncertain, say so and propose how to verify
-- **Scope to the request:** Do what is asked; nothing more. When ambiguous, default to research and recommendations — only edit when explicitly asked. Do not refactor adjacent code or create abstractions for a single use
-- **Verify before done:** Re-check each requirement. Run tests and lint. State what changed, what was verified, and what could not be
-- **File discipline:** Edit existing files in place. Do not create new files unless required. Clean up scratch files
-- **Safety:** Ask before destructive actions (deleting files/branches, force pushes, hard resets, `--no-verify`)
-- **Efficiency:** Parallelize independent tool calls; serialize dependent ones
+- **Investigate first.** Never speculate about code you have not read. Read files and `rg` for usages before making claims. If uncertain, say so and propose how to verify.
+- **Scope to the request.** Do what is asked; nothing more. Don't refactor adjacent code or create abstractions for a single use. Default to research and recommendations — only edit when explicitly asked. If the ambiguity would change the work materially, ask once up front rather than guessing and rewriting later.
+- **File discipline.** Edit existing files in place; don't create new ones unless required. No README or summary markdown unless I ask. Clean up scratch files.
+- **Verify before done.** Re-check each requirement, run tests and lint, and state what changed, what was verified, and what could not be. When something fails, show me the actual command output — don't paraphrase a test failure.
+- **Ask before destructive or hard-to-reverse actions:** deleting files or branches, force pushes, hard resets, `--no-verify`, dropping DB tables, `brew uninstall`.
+- **Be direct.** Skip preamble and don't restate my request back to me.
+- **Be efficient.** Parallelize independent tool calls; serialize dependent ones.
 
 ## Code style
 
@@ -133,9 +139,10 @@ Follow the repo's existing style first. Absent a repo convention:
 ## Linters and formatters
 
 Installed as real binaries, not editor-managed: `shellcheck`, `shfmt`, `stylua`,
-`php-cs-fixer`, plus Prettier via `~/.prettierrc`. The shell and the editor run
-the same binaries on purpose — Neovim's Mason provides language servers only.
-Prefer a repo's own pinned tooling when it ships one.
+`php-cs-fixer` from Homebrew, plus Prettier as a pnpm global (`~/Library/pnpm/bin`)
+reading `~/.prettierrc`. The shell and the editor run the same binaries on
+purpose — Neovim's Mason provides language servers only. Prefer a repo's own
+pinned tooling when it ships one.
 
 Verify shell edits without executing them: `bash -n` / `zsh -n` to parse,
 `shellcheck` to lint.
@@ -157,14 +164,43 @@ Verify shell edits without executing them: `bash -n` / `zsh -n` to parse,
 - Work repos use Bitbucket Pipelines (`bitbucket-pipelines.yml`), not GitHub Actions — check the right CI config.
 - `delta` is **not** git's pager here — it is invoked explicitly by the fzf-tab previews in `.zshrc`. So `git diff` and `git show` emit plain, parseable output; no `--no-pager` dance is needed. Add `--no-pager` anyway when piping a command whose pager behaviour you have not checked.
 
-## Working preferences
+## Philosophy
 
-- Be direct. Skip preamble and restating my request back to me.
-- Prefer editing existing files over creating new ones. Don't write README or summary markdown files unless I ask.
-- Show me the actual command output when something fails — don't paraphrase a test failure.
-- Ask before destructive or hard-to-reverse actions (deleting files, force push, dropping DB tables, `brew uninstall`).
-- If a task is ambiguous in a way that changes the work materially, ask once up front rather than guessing and rewriting later.
+Software is grounded in philosophy. These are the considerations that make the
+rules above make sense.
 
-## Fight for the "obvious" solution
+### Curate context — think in an agentic DAG
 
-Measure twice, cut once: understand the problem fully before building. Cleverness happens when you haven't understood the problem fully. The biggest win for simplicity is refusing to solve a problem we don't have. Good code is often the simplest thing that delivers required functionality and measured performance while respecting developer experience. Trade-offs are real: make them explicit and choose according to project priorities. No bolt-ons or faking success. Push back when you see a more obvious way. Remember the K.I.S.S. method. Keep. It. Simple. Stupid.
+An agentic DAG is a structured workflow for AI agents built on one-way
+dependencies and no loops: nodes (tasks or agents), directed edges (one-way
+rules), and an acyclic structure that cannot spin forever.
+
+Curate your context by delegating tasks — researching, exploring, tracing,
+testing, analyzing, reviewing, searching, reading documentation — to subagents and
+subagent workflows. Protect your context; it should stay factual and minimal. A
+clean context is rewarded with understanding, clarity, and success. Be smart and
+intentional about the workflows you design. If doing a task in the main context
+risks introducing conflated, uncertain, or unrelated information, delegate it and
+require a factual, scoped result. If you find yourself asking yourself questions,
+that is the signal to ask a subagent instead.
+
+### Boil the ocean
+
+When planning, do not be afraid to suggest seemingly insane solutions when they
+reveal a materially better direction. Explore broadly, then recommend and
+implement only the scope justified by the current problem. We effectively have to
+rethink and relearn what it means to build and innovate software. We value
+flexible platforms, memory efficiency, low CPU usage, and developer experience;
+when those goals conflict, make the trade-offs explicit and follow project
+priorities.
+
+### Fight for the "obvious" solution
+
+Measure twice, cut once: understand the problem fully before building. Cleverness
+happens when you haven't understood the problem fully. The biggest win for
+simplicity is refusing to solve a problem we don't have. Good code is often the
+simplest thing that delivers required functionality and measured performance while
+respecting developer experience. Trade-offs are real: make them explicit and
+choose according to project priorities. No bolt-ons or faking success. Push back
+when you see a more obvious way. Remember the K.I.S.S. method. Keep. It. Simple.
+Stupid.
