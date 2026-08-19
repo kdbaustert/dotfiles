@@ -138,13 +138,7 @@ These used to be two lists — "Rules" and "Working preferences" — that said t
 same thing twice with two different sets of examples. One list, so there is only
 ever one place to change a rule.
 
-## Investigation & Accuracy
-
-- Never speculate about code you have not read. Read files and ripgrep for usages before making claims
-- If the user references a file, read it before answering
-- If uncertain, say so and propose how to verify. Do not fabricate APIs, paths, or behavior
-
-- **Investigate first.** Never speculate about code you have not read. Read files and `rg` for usages before making claims. If uncertain, say so and propose how to verify.
+- **Investigate first.** Never speculate about code you have not read. Read files and `rg` for usages before making claims, and read any file I reference before answering. If uncertain, say so and propose how to verify — don't fabricate APIs, paths, or behavior.
 - **Scope to the request.** Do what is asked; nothing more. Don't refactor adjacent code or create abstractions for a single use. Default to research and recommendations — only edit when explicitly asked. If the ambiguity would change the work materially, ask once up front rather than guessing and rewriting later.
 - **File discipline.** Edit existing files in place; don't create new ones unless required. No README or summary markdown unless I ask. Clean up scratch files.
 - **Verify before done.** Re-check each requirement, run tests and lint, and state what changed, what was verified, and what could not be. When something fails, show me the actual command output — don't paraphrase a test failure.
@@ -188,6 +182,66 @@ Verify shell edits without executing them: `bash -n` / `zsh -n` to parse,
   and let me decide; don't run `git checkout -b`/`git switch -c` on your own.
 - Work repos use Bitbucket Pipelines (`bitbucket-pipelines.yml`), not GitHub Actions — check the right CI config.
 - `delta` is **not** git's pager here — it is invoked explicitly by the fzf-tab previews in `.zshrc`. So `git diff` and `git show` emit plain, parseable output; no `--no-pager` dance is needed. Add `--no-pager` anyway when piping a command whose pager behaviour you have not checked.
+
+## Memory
+
+Claude Code keeps a persistent memory directory per project — one fact per file,
+indexed by a `MEMORY.md` that is loaded into context at the start of every
+session. It lives beside the session transcripts under
+`~/.claude/projects/<cwd-with-slashes-as-dashes>/memory/`, which is to say
+**outside every repo**: nothing in it is tracked, diffed, deployed by
+`install.sh`, or carried to a second machine, and no project's memory is visible
+from another. Nothing learned in `cnc-claims` reaches `dotfiles`.
+
+**The point of it is to spend fewer sessions.** A session that re-derives what
+the last one already worked out is a session wasted — re-reading the same files,
+re-running the same measurement, re-litigating an approach that was tried and
+rejected. Memory is the only thing that survives a `/clear`, a compaction, or a
+day off, so treat "would the next session have to redo this?" as the test for
+whether a fact is worth a file.
+
+Things that pass that test:
+
+- **A conclusion that cost real work.** A measured number, a traced call path, a
+  root cause, the answer to "does X actually load Y". Save the finding, not the
+  transcript of finding it.
+- **An approach ruled out, and why.** The most expensive thing to rediscover,
+  because nothing in the tree records a road not taken — this repo's own habit of
+  writing rejected alternatives into comments is the same instinct.
+- **A goal in flight.** What we are part-way through and what is left, so the
+  next session opens with the plan instead of rebuilding it. Convert relative
+  dates to absolute; "last week" is meaningless on re-read.
+- **A pointer with no home in the repo** — a ticket, a dashboard, an upstream
+  URL we keep going back to.
+
+Write it the moment it is established, not at the end — a session can end
+abruptly and usually does. Then add the `MEMORY.md` line in the same breath: a
+memory the index does not name is one recall will never surface, so an unindexed
+file is wasted work rather than saved work. Its `description` is what recall
+matches against, so make it the question it answers, not a label.
+
+Two guards, so this stays cheap:
+
+- **A durable rule belongs in this file, not in memory.** If a memory would begin
+  "Kenny prefers…" or "always run…", it is a CLAUDE.md edit — propose it here,
+  where it is version-controlled, reviewable, and survives a rebuild. Memory
+  carries *what we found*; this file carries *how I want you to work*.
+- **Recalled memories are dated, not authoritative.** They record what was true
+  when written. If one names a file, flag, version, or command, re-read it before
+  acting on it, and delete the memory outright when it turns out to be wrong. A
+  stale memory is worse than a missing one: it arrives sounding established, and
+  it costs a session to unpick.
+
+Everything else is bloat, and bloat is paid for at the top of every future
+session: skip what the repo already records (structure, past fixes, git history,
+the rules here), what is scoped to the conversation in progress ("we were about
+to try X"), and anything sensitive — credentials, tokens, client data, the work
+identity in `~/.gitconfig-work`. When I ask you to remember something that fails
+those tests, ask what was non-obvious about it and save that instead.
+
+This is the [context curation](#curate-context--think-in-an-agentic-dag) rule
+applied across sessions rather than within one: keep what persists factual and
+minimal, so the next session starts where this one stopped.
 
 ## Philosophy
 
