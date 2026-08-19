@@ -73,7 +73,11 @@ cursor-style = underline
 cursor-style-blink = true
 # Shell integration's `cursor` feature swaps the cursor to a bar at the prompt,
 # overriding cursor-style. Turn it off so the underline holds everywhere.
-shell-integration-features = no-cursor
+# `title` is off because zsh/extra/tabtitle.zsh writes the title instead, so it
+# can prefix a terminal glyph to it (the tab "icon"). Ghostty's own title hook
+# forcibly reorders itself last in precmd_functions, so leaving it on would
+# overwrite ours rather than lose a race — see that file for the whole story.
+shell-integration-features = no-cursor,no-title
 
 # Colors — Voltage (see themes/voltage.md for the palette and the tools that
 # share it). Derived from the Rio port that used to live here, with two fixes:
@@ -107,6 +111,13 @@ palette = 15=#F8F8F8
 
 mouse-scroll-multiplier = 5
 macos-titlebar-style = tabs
+# Fonts the window title *and* the native tab labels. It is set for the glyph,
+# not the typeface: Ghostty only builds the tab's attributedTitle — the only
+# hook onto an AppKit tab label's font — when this key is present, and macOS
+# font fallback will not reach a Nerd Font for a Private Use Area codepoint on
+# its own (U+E795 resolves to LastResort under .SFNS, measured). Without this,
+# the icon zsh/extra/tabtitle.zsh emits renders as an empty box.
+window-title-font-family = "Hack Nerd Font"
 auto-update = download
 auto-update-channel = stable
 

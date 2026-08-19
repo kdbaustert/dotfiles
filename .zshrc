@@ -360,6 +360,11 @@ source "$DOTFILES/zsh/aliases.zsh"
 # Authoritative, unlike the process-inspection guess iTerm2 and Rio fall back to.
 [ -f "$DOTFILES/zsh/extra/osc7.zsh" ] && source "$DOTFILES/zsh/extra/osc7.zsh"
 
+# Tab icon: prefix Ghostty's tab title with a terminal glyph, the closest thing
+# Ghostty has to iTerm2's per-tab process icons. Pairs with `no-title` in
+# .config/ghostty/config; a no-op under every other terminal.
+[ -f "$DOTFILES/zsh/extra/tabtitle.zsh" ] && source "$DOTFILES/zsh/extra/tabtitle.zsh"
+
 # auto-ls: list the directory on every cd/pushd/z. Sourced after aliases.zsh so
 # $commands[eza] is already populated; the hook itself never fires until the
 # first directory change, so this costs nothing at startup.
