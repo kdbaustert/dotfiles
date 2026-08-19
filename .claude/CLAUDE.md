@@ -9,6 +9,24 @@ neither `~/.claude/AGENTS.md` nor `<project>/AGENTS.md` is read — so the file 
 ever loaded *because* of the import, and deleting that one line lost the rules
 silently rather than erroring. One file, no import, nothing to keep in sync.
 
+## Preferences
+
+- Ask before committing to git
+- Prefer editing existing files over creating new ones
+- Run tests after making changes
+- Keep code simple — no over-engineering
+- No unnecessary comments or docstrings
+
+## Workflow
+
+- When something goes sideways, stop and re-plan — don't keep pushing
+- After finishing a task: run typecheck, tests, and lint before calling it done
+
+## Style
+
+- Prefer small, focused functions
+- Use early returns over nested conditionals
+
 ## Environment
 
 - macOS, Apple Silicon. Homebrew at `/opt/homebrew` — always prefer its binaries over `/usr/bin`.
@@ -119,6 +137,12 @@ ignore along with `.gitignore`.
 These used to be two lists — "Rules" and "Working preferences" — that said the
 same thing twice with two different sets of examples. One list, so there is only
 ever one place to change a rule.
+
+## Investigation & Accuracy
+
+- Never speculate about code you have not read. Read files and ripgrep for usages before making claims
+- If the user references a file, read it before answering
+- If uncertain, say so and propose how to verify. Do not fabricate APIs, paths, or behavior
 
 - **Investigate first.** Never speculate about code you have not read. Read files and `rg` for usages before making claims. If uncertain, say so and propose how to verify.
 - **Scope to the request.** Do what is asked; nothing more. Don't refactor adjacent code or create abstractions for a single use. Default to research and recommendations — only edit when explicitly asked. If the ambiguity would change the work materially, ask once up front rather than guessing and rewriting later.
