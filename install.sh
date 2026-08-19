@@ -221,6 +221,14 @@ link "$DOTFILES_DIR/.claude/CLAUDE.md" "$HOME/.claude/CLAUDE.md"
 mkdir -p "$HOME/.claude/hooks"
 link "$DOTFILES_DIR/.claude/hooks/notify.sh" "$HOME/.claude/hooks/notify.sh"
 
+# The status line command — the plan's 5-hour and 7-day usage windows on screen
+# at all times, rather than only when /usage is asked. Same untracked-settings
+# story as the hook above: the script deploys, the `statusLine` block does not.
+# It lives beside hooks/ rather than inside it because Claude Code does not
+# treat it as a hook — it is named by its own top-level `statusLine` setting
+# rather than by an event, and it re-runs on every render, not on a lifecycle.
+link "$DOTFILES_DIR/.claude/statusline.sh" "$HOME/.claude/statusline.sh"
+
 # Skills: link every skill directory under .claude/skills. A loop rather than one
 # `link` line per skill, for the same reason .config/* is a loop — a skill added
 # to the repo but not named here would silently never deploy, which is exactly

@@ -120,25 +120,50 @@ LunarVim's own code.
 `<vault>/.obsidian/themes/` and the vault path is per-machine; copy them in by
 hand.
 
-**Two files are deployed out of `.claude/`.** `CLAUDE.md` — Claude Code's global
-instructions, applied to every project — and `hooks/notify.sh` are symlinked
-into `~/.claude/`. The rest of `~/.claude` is state Claude writes itself
+**Part of `.claude/` is deployed.** `CLAUDE.md` — Claude Code's global
+instructions, applied to every project — plus `hooks/notify.sh`,
+`statusline.sh` and every directory under `skills/` are symlinked into
+`~/.claude/`. The rest of `~/.claude` is state Claude writes itself
 (`settings.json`, `settings.local.json`, `projects/`, `todos/`), so the
 directory is created and linked *into* rather than linked over.
 `.claude/themes/` is kept here for reference only; nothing links it.
 
-**The notification hook needs one manual step.** `hooks/notify.sh` fires a
-`terminal-notifier` banner when Claude is waiting on you, but the settings file
-that invokes it is untracked, so add this to `~/.claude/settings.json` under
-`hooks` on a new machine:
+**Two settings blocks are manual.** Both deployed scripts are named by
+`~/.claude/settings.json`, which is untracked, so on a new machine add this
+under `hooks`:
 
 ```json
 "Notification": [{ "hooks": [{ "type": "command",
   "command": "$HOME/.claude/hooks/notify.sh" }] }]
 ```
 
-Only the `Notification` event is hooked — permission prompts and idle
+and this at the top level:
+
+```json
+"statusLine": { "type": "command",
+  "command": "$HOME/.claude/statusline.sh", "padding": 0 }
+```
+
+`hooks/notify.sh` fires a `terminal-notifier` banner when Claude is waiting on
+you. Only the `Notification` event is hooked — permission prompts and idle
 questions. Hooking `Stop` as well would banner every single turn.
+
+`statusline.sh` keeps the plan's usage on screen as three bars, one per window,
+each coloured green → yellow → orange → red as it fills:
+
+```
+Current session  ███████░░░░░░░  52%  2h 14m left
+Current week     ███████████░░░  81%  4d 9h left
+Context window   ████░░░░░░░░░░  31%  312K of 1M · Opus 5
+```
+
+`Current session` and `Current week` are Claude Code's own names for the two
+rate-limit windows, so the status line and `/usage` never disagree about which
+bar is which. `/usage` and `/context` answer the same questions on demand; the
+point of the status line is that you see the 5-hour number *before* it becomes
+the reason you went looking — hence a countdown rather than a reset time.
+Windows Claude Code does not report (API-key auth has no rate limits) drop
+their row rather than showing an empty bar.
 
 **There is no `AGENTS.md` at either scope any more.** `.claude/` used to carry
 one alongside `CLAUDE.md` — the vendor-neutral name other agent tools read

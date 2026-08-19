@@ -48,6 +48,7 @@ Known offenders:
 | `clamav/`, `iterm/`, `obsidian/` | App-specific config                                    |
 | `.claude/CLAUDE.md`   | Global Claude Code instructions                                   |
 | `.claude/hooks/`      | `notify.sh`, the Notification hook (terminal-notifier banner)     |
+| `.claude/statusline.sh` | The status line — plan usage, context, model, on every render   |
 | `.claude/skills/`     | Skills, one dir per skill; `plain/` is vendored from upstream      |
 
 The two `.config/git/` files reach git by different routes, which matters when
@@ -75,16 +76,30 @@ edits would be silently lost the next time it is refreshed.
 
 `~/.claude/settings.json` is **not** tracked — it is mostly state Claude writes
 itself (model, `enabledPlugins`, the atuin hooks), so a symlink would fight it.
-That makes the one block wiring `notify.sh` up a manual step on a new machine:
+That makes the two blocks wiring the deployed scripts up a manual step on a new
+machine — one under `hooks`, one at the top level:
 
 ```json
 "Notification": [{ "hooks": [{ "type": "command",
   "command": "$HOME/.claude/hooks/notify.sh" }] }]
 ```
 
+```json
+"statusLine": { "type": "command",
+  "command": "$HOME/.claude/statusline.sh", "padding": 0 }
+```
+
 `Notification` is the only event hooked, on purpose — it fires when Claude is
 blocked on you (a permission prompt, an idle question). `Stop` would banner
 every turn, which is how you end up leaving Do Not Disturb on.
+
+The status line is where the plan's usage windows live, because `/usage` only
+answers when asked and the 5-hour window is usually already the reason you
+asked. Three rows — session, week, context — each a bar plus a countdown, using
+Claude Code's own names for the windows so the two never disagree. It re-runs on
+every render, so it is held to the same latency budget as `.zshrc`: one `jq` and
+nothing else, ~10ms measured. `padding: 0` puts it flush left against the prompt
+box rather than indented by one column.
 
 The same file carries the other untracked-but-load-bearing setting,
 `"attribution": { "commit": "", "pr": "" }`, which is what actually strips the
