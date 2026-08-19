@@ -23,6 +23,19 @@
 #   Current week     ███████████░░░  81%  4d 9h left
 #   Context window   ████░░░░░░░░░░  31%  312K of 1.0M · Opus 5
 #
+# The rows are flush — no blank line between them — and that was tried both
+# ways. Blank separators are also close to impossible here: Claude Code
+# post-processes this script's output as, read off the 2.1.235 binary:
+#
+#   stdout.trim().split("\n").flatMap(u => u.trim() || []).join("\n")
+#
+# Every line is trimmed, and a line that trims to empty is *dropped* rather than
+# rendered blank, so `join("\n\n")` and separators holding a space, an NBSP or
+# a BOM all vanish — every one of them is whitespace to JS `trim()`. The single
+# character that survives is U+200B: category Cf, not whitespace, zero columns.
+# That is the escape hatch if the block ever wants a gap again; the same
+# `.trim()` is also why no row here can be indented.
+#
 # The row order is deliberate and doubles as a fallback. Multi-line status
 # lines render in full here, but if a future version ever clipped to the first
 # line, the one that survives is the 5-hour window — the number that actually

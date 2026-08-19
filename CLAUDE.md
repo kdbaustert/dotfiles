@@ -19,7 +19,8 @@ file staged here for deployment to `~/.claude/` — it is not about this repo.
 
 `~/.zshrc`, `~/.zprofile`, `~/.profile` (a second link to `.zprofile`),
 `~/.zshenv`, `~/.gitconfig`, `~/.editorconfig`, `~/.prettierrc`,
-`~/.claude/CLAUDE.md` and every `~/.config/<tool>` entry
+`~/.claude/CLAUDE.md`, `~/.claude/hooks/notify.sh`, `~/.claude/statusline.sh`,
+every `~/.claude/skills/<skill>` directory and every `~/.config/<tool>` entry
 are symlinks into this repo. **Edit the file in `~/dotfiles`.** Never write to the
 `$HOME` path. `~/.hushlogin` is the one exception — `install.sh` `touch`es it
 rather than linking it, because only its existence is ever read.
@@ -32,6 +33,13 @@ Known offenders:
 - `abbr add` / `abbr erase` — rewrite `zsh/abbreviations`, which is tracked, and
   drop every comment in it (its own header says so). Editing that file by hand is
   the way to keep the section breaks; `abbr` is for throwaway experiments.
+- `brew` — appends a `[safe] directory` pair to `~/.gitconfig` with
+  `git config --global --add` every time it hits dubious-ownership on a tap, so
+  the block regrows a copy at a time and shows up as an unexplained diff. Nothing
+  breaks — extra entries are inert — but collapse it back to one pair per path
+  when you see it; the comment above the block carries the recipe. This is also
+  why `git config --global` is the wrong way to change anything here: it rewrites
+  the tracked file, and it can replace the symlink rather than follow it.
 
 ## Layout
 
@@ -58,9 +66,10 @@ pointing at it at all — git reads `$XDG_CONFIG_HOME/git/ignore` on its own, so
 the symlink is the whole wiring.
 
 `.claude/` is tracked in full but only partly deployed: `install.sh` links
-`CLAUDE.md`, `hooks/notify.sh` and every directory under `skills/`, so
-`themes/my-theme.json` rides along for reference and is applied by hand. The
-installer also sweeps the retired `~/.claude/AGENTS.md` link on re-run.
+`CLAUDE.md`, `hooks/notify.sh`, `statusline.sh` and every directory under
+`skills/`, so `themes/my-theme.json` rides along for reference and is applied by
+hand. The installer also sweeps the retired `~/.claude/AGENTS.md` link on
+re-run.
 
 `skills/` is a loop over `skills/*`, not one `link` line per skill, for the same
 reason `.config/*` is — a skill added here but not named in the installer would
@@ -130,7 +139,9 @@ It asks for sudo, edits `/etc/pam.d/sudo_local`, runs `brew bundle`, downloads
 ~120MB of ClamAV signatures, and loads LaunchAgents. Verify narrowly instead:
 
 ```sh
-bash -n install.sh && shellcheck install.sh setup/*.sh   # bash: parse, then lint
+bash -n install.sh                            # bash: parse
+shellcheck install.sh setup/*.sh \
+  .claude/hooks/notify.sh .claude/statusline.sh   # ...then lint every one
 for f in .zshenv .zprofile .zshrc zsh/*.zsh zsh/extra/*.zsh; do
   zsh -n "$f" || echo "FAIL $f"                          # zsh: parse only
 done
@@ -142,11 +153,13 @@ stylua --check .config/nvim .config/lvim .config/voltage.nvim
 Both file lists are load-bearing, and both used to be shorter than they needed
 to be. `shellcheck` never sees `setup/*.sh` on its own — those are invoked by
 variable name from the `SETUP_SCRIPTS` loop, which it cannot resolve statically,
-so they have to be named on the command line. And `zsh -n` parses exactly *one*
-file: extra arguments become positional parameters and are silently never read
+so they have to be named on the command line. The two scripts under `.claude/`
+have no caller in this repo at all — Claude Code runs them from `$HOME` — so
+they are named for the same reason. And `zsh -n` parses exactly *one* file:
+extra arguments become positional parameters and are silently never read
 (`zsh -n .zshenv /nonexistent` exits 0), which is why this is a loop and not a
 list. It has to be, because `.zshrc` `source`s `zsh/extra/cache.zsh`,
-`zinit.zsh`, `functions.zsh`, `aliases.zsh` and four more `extra/` snippets at
+`zinit.zsh`, `functions.zsh`, `aliases.zsh` and six more `extra/` snippets at
 *runtime* — a syntax error in any of them sails past `zsh -n .zshrc` and only
 surfaces in `zsh -ic exit`.
 

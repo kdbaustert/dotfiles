@@ -1,6 +1,12 @@
 # Global instructions
 
-Applies to every project. Project-level `CLAUDE.md` files take precedence over anything here.
+Applies to every project. Claude Code loads this file *and* the project's
+`CLAUDE.md`, concatenated in that order, rather than choosing between them — so
+where the two disagree, follow the project and ignore the rule here; don't try
+to satisfy both. There is no setting that suppresses this file for a single
+project — verified against 2.1.235 — so the precedence is this sentence and
+nothing else. A project file that overrides a rule should name the rule it
+overrides, so the override still reads as deliberate after this file changes.
 
 The tooling contract below used to live in a sibling `AGENTS.md` that this file
 pulled in with an `@AGENTS.md` import. That split is gone by choice: Claude Code
@@ -9,28 +15,10 @@ neither `~/.claude/AGENTS.md` nor `<project>/AGENTS.md` is read — so the file 
 ever loaded *because* of the import, and deleting that one line lost the rules
 silently rather than erroring. One file, no import, nothing to keep in sync.
 
-## Preferences
-
-- Ask before committing to git
-- Prefer editing existing files over creating new ones
-- Run tests after making changes
-- Keep code simple — no over-engineering
-- No unnecessary comments or docstrings
-
-## Workflow
-
-- When something goes sideways, stop and re-plan — don't keep pushing
-- After finishing a task: run typecheck, tests, and lint before calling it done
-
-## Style
-
-- Prefer small, focused functions
-- Use early returns over nested conditionals
-
 ## Environment
 
 - macOS, Apple Silicon. Homebrew at `/opt/homebrew` — always prefer its binaries over `/usr/bin`.
-- Shell is zsh. `~/.zshrc`, `~/.zprofile`, `~/.profile`, `~/.zshenv`, `~/.gitconfig`, `~/.editorconfig`, `~/.prettierrc`, `~/.claude/CLAUDE.md` and every `~/.config/<tool>` entry are symlinks into `~/dotfiles` — edit the file in `~/dotfiles`, never the symlink target path in `$HOME`.
+- Shell is zsh. `~/.zshrc`, `~/.zprofile`, `~/.profile`, `~/.zshenv`, `~/.gitconfig`, `~/.editorconfig`, `~/.prettierrc`, `~/.claude/CLAUDE.md`, `~/.claude/hooks/notify.sh`, `~/.claude/statusline.sh`, every `~/.claude/skills/<skill>` directory and every `~/.config/<tool>` entry are symlinks into `~/dotfiles` — edit the file in `~/dotfiles`, never the symlink target path in `$HOME`.
 - Editor is `nvim`. There is no Python version manager — `pyenv` was removed because it managed zero versions; `python3` is Homebrew's.
 - **`node` is version-skewed by shell type.** `nvm` is lazy-loaded (`NVM_LAZY_LOAD` in `.zprofile`, turbo-deferred in `zsh/zinit.zsh`) and is a shim *function*, not a binary. It manages one version, v26.5.0. Non-interactive shells and scripts — which is what a Bash tool call is — never load the plugin and get Homebrew's `/opt/homebrew/bin/node`, currently v26.7.0 (measured). An interactive shell gets the shim and v26.5.0. So a version you observe through a tool call is not the version I get at a prompt; `whence -w node` in a real interactive shell is the only honest check, not `zsh -i -c`, which exits before turbo fires.
 - Shell history is `atuin`.
@@ -135,14 +123,18 @@ ignore along with `.gitignore`.
 ## How I want you to work
 
 These used to be two lists — "Rules" and "Working preferences" — that said the
-same thing twice with two different sets of examples. One list, so there is only
-ever one place to change a rule.
+same thing twice with two different sets of examples. A "Preferences" /
+"Workflow" / "Style" trio at the top of the file later said it a third time, in
+shorter words and with no reasoning attached; it is folded into this list and
+into *Code style* below. One list, so there is only ever one place to change a
+rule.
 
 - **Investigate first.** Never speculate about code you have not read. Read files and `rg` for usages before making claims, and read any file I reference before answering. If uncertain, say so and propose how to verify — don't fabricate APIs, paths, or behavior.
 - **Scope to the request.** Do what is asked; nothing more. Don't refactor adjacent code or create abstractions for a single use. Default to research and recommendations — only edit when explicitly asked. If the ambiguity would change the work materially, ask once up front rather than guessing and rewriting later.
 - **File discipline.** Edit existing files in place; don't create new ones unless required. No README or summary markdown unless I ask. Clean up scratch files.
-- **Verify before done.** Re-check each requirement, run tests and lint, and state what changed, what was verified, and what could not be. When something fails, show me the actual command output — don't paraphrase a test failure.
+- **Verify before done.** Re-check each requirement, run typecheck, tests and lint, and state what changed, what was verified, and what could not be. When something fails, show me the actual command output — don't paraphrase a test failure.
 - **Ask before destructive or hard-to-reverse actions:** deleting files or branches, force pushes, hard resets, `--no-verify`, dropping DB tables, `brew uninstall`.
+- **Stop and re-plan when it goes sideways.** Don't keep pushing an approach that isn't working — say what broke, say what you'd try instead, and let me redirect before you spend another five tool calls on it.
 - **Be direct.** Skip preamble and don't restate my request back to me.
 - **Be efficient.** Parallelize independent tool calls; serialize dependent ones.
 
@@ -154,6 +146,12 @@ Follow the repo's existing style first. Absent a repo convention:
 - JS/TS: single quotes, no semicolons, 80 cols, `es5` trailing commas, arrow parens omitted for single args — i.e. run Prettier with `~/.prettierrc`.
 - PHP: 120 cols, double quotes, no trailing commas, PHP 8.1 target.
 - Swift: standard Swift API design guidelines; no third-party formatter unless the repo ships one.
+
+Regardless of language: small, focused functions; early returns rather than
+nested conditionals; and no comment or docstring that only restates the code.
+A repo that documents its *reasoning* in comments — `~/dotfiles` does, and says
+so in its own `CLAUDE.md` — overrides that last one, as repo convention always
+does.
 
 ## Linters and formatters
 
