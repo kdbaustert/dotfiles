@@ -66,9 +66,15 @@
 # Duplicates creep back in: `brew` appends a fresh pair with `git config --add`
 # every time it hits the error, so this block regrows unless it is periodically
 # collapsed. Git only ever needs one entry per path — extra copies are inert,
-# just noise. Re-dedupe with:
-#     git config --global --unset-all safe.directory
-# then restore the two lines below.
+# just noise. Re-dedupe by deleting the extra lines here by hand, in the repo
+# copy, and nowhere else.
+#
+# Not with `git config --global --unset-all safe.directory`, which this comment
+# used to recommend: every `git config --global` write rewrites this tracked
+# file behind your back, and it can replace the symlink with a real file rather
+# than following it — which is how the repo copy and the live ~/.gitconfig came
+# apart the last time (see the header). A hand edit is the whole fix; nothing
+# needs restoring afterwards.
 [safe]
 	directory = /opt/homebrew/Library/Taps/homebrew/homebrew-core
 	directory = /opt/homebrew/Library/Taps/homebrew/homebrew-cask
