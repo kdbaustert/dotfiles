@@ -74,6 +74,16 @@ All of these have to agree or the shell looks patched together:
 | glow                     | `.config/glow/voltage.json`       |
 | Neovim + LunarVim        | `.config/voltage.nvim/`           |
 | iris (completion overlay)| `.config/iris/theme.toml`         |
+| Ghostty tab icons        | `fonts/build-tab-icons.py`        |
+
+The tab-icon row is the odd one: `fonts/build-tab-icons.py` does not carry the
+palette so much as measure against it. Its icon tints are iTerm2's, not ours,
+but they are drawn on Ghostty's titlebar — which inherits `bg` — so the script
+transcribes `bg` as `BACKGROUND` and lifts any tint that falls below 4.5:1
+against it. Change `bg` and that floor is being measured against the wrong
+color, so the font needs rebuilding and `install.sh` re-running; the script
+prints every tint it moves, which is the quickest way to see whether the change
+mattered.
 
 ### What deliberately has no entry
 

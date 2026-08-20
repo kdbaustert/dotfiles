@@ -22,8 +22,12 @@ file staged here for deployment to `~/.claude/` — it is not about this repo.
 `~/.claude/CLAUDE.md`, `~/.claude/hooks/notify.sh`, `~/.claude/statusline.sh`,
 every `~/.claude/skills/<skill>` directory and every `~/.config/<tool>` entry
 are symlinks into this repo. **Edit the file in `~/dotfiles`.** Never write to the
-`$HOME` path. `~/.hushlogin` is the one exception — `install.sh` `touch`es it
-rather than linking it, because only its existence is ever read.
+`$HOME` path. Two exceptions: `~/.hushlogin`, which `install.sh` `touch`es
+rather than links because only its existence is ever read, and
+`~/Library/Fonts/HackNerdFontColor-Regular.ttf`, which is **copied**, because
+CoreText does not register a symlinked font (measured — see the *Tab icon font*
+section of `install.sh`). That one is the only place where editing the repo file
+is not enough on its own: re-run `install.sh` to push the new bytes across.
 
 The corollary is the real hazard: **never run a tool that rewrites one of these
 files in place**, because it lands in the tracked file with no indication it did.
@@ -53,6 +57,7 @@ Known offenders:
 | `homebrew/Brewfile`   | The package set                                                   |
 | `setup/`              | Opt-in scripts (`SETUP_SCRIPTS="npm composer" ./install.sh`)      |
 | `themes/voltage.md`   | Canonical palette + the list of files that carry it               |
+| `fonts/`              | The tab-icon color font and the script that builds it             |
 | `clamav/`, `iterm/`, `obsidian/` | App-specific config                                    |
 | `.claude/CLAUDE.md`   | Global Claude Code instructions                                   |
 | `.claude/hooks/`      | `notify.sh`, the Notification hook (terminal-notifier banner)     |
@@ -200,8 +205,15 @@ that file sitting untracked in the tree; `git check-ignore -v <path>` is what te
 you which rule caught something.
 
 Do commit, even though a tool generates them: `.config/fsh/current_theme.zsh`
-(built from our `voltage.ini`; it's what themes a fresh machine) and both
-`lazy-lock.json` files (they pin the plugin sets for `:Lazy restore`).
+(built from our `voltage.ini`; it's what themes a fresh machine), both
+`lazy-lock.json` files (they pin the plugin sets for `:Lazy restore`), and both
+outputs of `fonts/build-tab-icons.py` — `fonts/HackNerdFontColor-Regular.ttf`
+and `zsh/extra/tabtitle-icons.zsh`. That last pair is committed because a fresh
+machine has neither `fonttools` nor, until the Brewfile's font casks land, a
+source Nerd Font to rebuild from; regenerating needs
+`pip install fonttools && python3 fonts/build-tab-icons.py`, and both files must
+be regenerated together — the codepoints in the `.zsh` only mean anything to the
+`.ttf` built in the same run.
 
 ## Colors
 

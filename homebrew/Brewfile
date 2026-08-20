@@ -214,6 +214,11 @@ cask "font-hack"   # plain Hack; installed here but was undeclared
 # NOT installed yet, because adding v3 faces beside the v2 files would register
 # two fonts claiming the same family name. Remove the v2 files first, then
 # `brew install --cask font-hack-nerd-font`.
+#
+# fonts/build-tab-icons.py reads whichever of the two is present as the source
+# for the colored tab-icon font. It handles both names, but the ethereum icon
+# lives at a v2-only codepoint, so a v3 source makes that one entry fail the
+# build loudly — the script says which and why.
 cask "font-hack-nerd-font"
 # Installed but undeclared until now.
 cask "font-fira-code-nerd-font"

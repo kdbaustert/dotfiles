@@ -416,6 +416,34 @@ if command -v zsh &>/dev/null; then
 fi
 
 #------------------------------------------------------------------------------
+title "Tab icon font"
+#------------------------------------------------------------------------------
+# fonts/HackNerdFontColor-Regular.ttf is Hack Nerd Font with a COLR/CPAL table
+# added, so the tab icons zsh/extra/tabtitle.zsh emits come out in iTerm2's
+# tints. .config/ghostty/config names it as window-title-font-family; it does
+# not replace the terminal font, and the two families coexist.
+#
+# COPIED, not linked, unlike everything else here: CoreText does not register a
+# symlinked font out of ~/Library/Fonts. Measured — a real copy resolved through
+# NSFont within ~3s while the symlink stayed invisible through 24s of polling,
+# even though fc-list listed it the whole time. So a font edit in the repo needs
+# this step re-run; the cmp guard makes that cheap.
+TAB_ICON_FONT="$DOTFILES_DIR/fonts/HackNerdFontColor-Regular.ttf"
+TAB_ICON_DEST="$HOME/Library/Fonts/HackNerdFontColor-Regular.ttf"
+if [ ! -f "$TAB_ICON_FONT" ]; then
+  warning "Skipping tab icon font — not built: $TAB_ICON_FONT"
+elif cmp -s "$TAB_ICON_FONT" "$TAB_ICON_DEST"; then
+  info "Tab icon font already current."
+else
+  mkdir -p "$HOME/Library/Fonts"
+  if cp "$TAB_ICON_FONT" "$TAB_ICON_DEST"; then
+    success "installed $TAB_ICON_DEST"
+  else
+    warning "Could not install the tab icon font; tab icons stay monochrome."
+  fi
+fi
+
+#------------------------------------------------------------------------------
 title "Finishing ClamAV setup"
 #------------------------------------------------------------------------------
 # Collect the background freshclam started above, then do everything that

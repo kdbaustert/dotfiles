@@ -61,6 +61,7 @@ SETUP_SCRIPTS=all ./install.sh          # macos npm composer mas gh-extensions
 | `homebrew/`  | `Brewfile`                                             |
 | `setup/`     | The optional scripts above                             |
 | `themes/`    | Voltage — the shared palette; see `themes/voltage.md`  |
+| `fonts/`     | Ghostty's colored tab-icon font + its build script     |
 | `clamav/`    | ClamAV config + the `freshclam` LaunchAgent            |
 | `iterm/`     | iTerm2 preferences folder                              |
 | `obsidian/`  | "Amethyst Night" theme                                 |

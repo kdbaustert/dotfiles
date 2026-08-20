@@ -11,91 +11,48 @@
 #  icon on.
 #
 #  So the icon has to be a character inside the title, which is what this file
-#  emits: a Nerd Font glyph prefixed to the OSC 2 window title, chosen from the
-#  command about to run using iTerm2's own command list (see the table below).
+#  emits: a glyph prefixed to the OSC 2 window title, chosen from the command
+#  about to run using iTerm2's own command list. The command → codepoint table
+#  is generated into tabtitle-icons.zsh beside this file; everything here is the
+#  part that decides *which* command we are looking at and when to write.
 #
-#  Two things make that render rather than show a Last Resort box:
+#  Three things make that render rather than show a Last Resort box:
 #
-#    1. `window-title-font-family = "Hack Nerd Font"` in .config/ghostty/config.
-#       Ghostty only sets `tab.attributedTitle` — the thing that fonts the
-#       native tab label — when that key is set. Without it the label uses the
-#       system font, and macOS font fallback does *not* reach into installed
-#       Nerd Fonts for a Private Use Area codepoint: CTFontCreateForString
-#       returns LastResort for U+E795 under .SFNS, measured.
+#    1. `window-title-font-family` in .config/ghostty/config. Ghostty only sets
+#       `tab.attributedTitle` — the thing that fonts the native tab label — when
+#       that key is set. Without it the label uses the system font, and macOS
+#       font fallback does *not* reach into installed Nerd Fonts for a Private
+#       Use Area codepoint: CTFontCreateForString returns LastResort for U+E795
+#       under .SFNS, measured.
 #    2. `no-title` in `shell-integration-features`. Ghostty's own zsh
 #       integration writes OSC 2 from a precmd hook that forcibly reorders
 #       itself to the end of precmd_functions, so it would overwrite whatever
 #       we set. We take the title over instead of racing it.
+#    3. The font that key names is our own build — see fonts/build-tab-icons.py.
+#       It carries the icons a second time under plane-16 codepoints with
+#       iTerm2's tints baked into a COLR table, which is what makes them
+#       colored: the tab label is one NSAttributedString with a single
+#       .foregroundColor, so a color font is the only thing that outranks it.
+#       Commands iTerm2 has no tint for keep the plain Nerd Font codepoint and
+#       stay monochrome, exactly as iTerm2 leaves them.
 #
-#  What can't be matched: color. The tab label is one NSAttributedString drawn
-#  in NSColor.labelColor, so every glyph is monochrome — iTerm2's per-command
-#  tints have nowhere to live.
+#  Three deliberate deviations from iTerm2:
 #
-#  Two deliberate deviations from iTerm2:
-#
+#    - Tints too dark to read on Voltage's background are lifted in lightness
+#      until they clear 4.5:1. iTerm2 picked them for a far lighter tab bar;
+#      elixir's #440e60 measures 1.36:1 against #0F0D0E. Hue and saturation are
+#      untouched, so they still read as the same colors — the build script has
+#      the rule and prints every one it moves.
 #    - An unmapped command keeps the terminal glyph rather than dropping the
 #      icon. A tab that sometimes has an icon and sometimes doesn't reads as
 #      broken; iTerm2 gets away with it because its icon sits in its own slot
 #      and ours would shift the label.
-#    - `nvim` shares vim's glyph. Nerd Fonts only added a Neovim glyph at
-#      U+E6AE, which is outside this font's charset (it covers E5FA-E634 and
-#      E700-E7C5 — checked with `fc-list --format='%{charset}'`).
-#
-#  Codepoints are Devicons / Font Awesome / Seti / Font Logos, all of which
-#  kept their assignments between Nerd Fonts v2 and v3. The one exception is
-#  ethereum (U+FCB9), which only exists in v2's Material range — v3 moved that
-#  block to U+F0001+, so it is the one glyph a font upgrade would blank.
+#    - `nvim` shares vim's glyph but takes iTerm2's neovim green. Nerd Fonts
+#      only added a Neovim glyph at U+E6AE, which is outside this font's
+#      charset (it covers E5FA-E634 and E700-E7C5 — checked with
+#      `fc-list --format='%{charset}'`); the color, unlike the picture, is ours
+#      to assign.
 #==============================================================================
-
-# Command → glyph. The command lists are iTerm2's, transcribed from
-# /Applications/iTerm.app/Contents/Resources/graphic_icons.json (its keys are
-# named in the comments so the two can be diffed after an iTerm2 update).
-# Written as a case rather than an associative array so it costs nothing at
-# startup: the patterns compile into the .zwc and are only walked in preexec.
-_tabtitle_glyph_for() {
-  emulate -L zsh
-
-  case $1 in
-    bash|fish|zsh|tcsh)                      _tabtitle_glyph=$'' ;;  # shell
-    git|git-remote-ftp|git-remote-ftps|git-remote-http|git-remote-https)
-                                             _tabtitle_glyph=$'' ;;  # git
-    vim|vi|Vim|nvim)                         _tabtitle_glyph=$'' ;;  # vim, neovim
-    nano|pico)                               _tabtitle_glyph=$'' ;;  # nano, code
-    emacs|Emacs)                             _tabtitle_glyph=$'' ;;  # emacs
-    tail|less|more)                          _tabtitle_glyph=$'' ;;  # read
-    grep|egrep|fgrep|search|find|lookup)     _tabtitle_glyph=$'' ;;  # search
-    top|htop|iftop)                          _tabtitle_glyph=$'' ;;  # monitor
-    ping)                                    _tabtitle_glyph=$'' ;;  # bullhorn
-    curl)                                    _tabtitle_glyph=$'' ;;  # curl
-    wget|http)                               _tabtitle_glyph=$'' ;;  # http
-    docker|docker-compose)                   _tabtitle_glyph=$'' ;;  # docker
-    cc|ccache|clang|gcc|gmake|make|xcodebuild)
-                                             _tabtitle_glyph=$'' ;;  # compile
-    zip|unzip|gzip|gunzip|gzcat|bzip2|bunzip2|tar|gz|winzip|zar)
-                                             _tabtitle_glyph=$'' ;;  # zip
-    node)                                    _tabtitle_glyph=$'' ;;  # nodejs
-    npm|npx)                                 _tabtitle_glyph=$'' ;;  # npm
-    yarn|yarnpkg)                            _tabtitle_glyph=$'' ;;  # yarn
-    php|composer|composer.phar)              _tabtitle_glyph=$'' ;;  # php
-    python|python[0-9.]*|Python|ipython|IPython|apython|pip|easy_install)
-                                             _tabtitle_glyph=$'' ;;  # python
-    ruby|irb|rake|sidekiq)                   _tabtitle_glyph=$'' ;;  # ruby
-    perl)                                    _tabtitle_glyph=$'' ;;  # perl
-    java|javac)                              _tabtitle_glyph=$'' ;;  # java
-    go)                                      _tabtitle_glyph=$'' ;;  # go
-    lein|planck|lumo)                        _tabtitle_glyph=$'' ;;  # clojure
-    elixir|elixirc|iex|mix)                  _tabtitle_glyph=$'' ;;  # elixir
-    beam|beam.smp|dialyzer|epmd|erl|erlc|escript|run_erl|to_erl)
-                                             _tabtitle_glyph=$'' ;;  # erlang
-    ethereum|geth|testrpc)                   _tabtitle_glyph=$'ﲹ' ;;  # ethereum
-    heroku)                                  _tabtitle_glyph=$'' ;;  # heroku
-    postgres|psql)                           _tabtitle_glyph=$'' ;;  # postgres
-    mongo|mongod|mongodb|mysql|sqlite3|postmaster|pgbench|pg_dump|pg_dumpall|pg_restore|pg_upgrade|redis-cli|redis-server|redis-sentinel|redis-benchmark|redis-check-aof|redis-check-rdb)
-                                             _tabtitle_glyph=$'' ;;  # database
-    claude)                                  _tabtitle_glyph=$'' ;;  # claude_code
-    *)                                       _tabtitle_glyph=$'' ;;  # (see above)
-  esac
-}
 
 # The job iTerm2 would be looking at. It reads the foreground process straight
 # off the pty; all we have in preexec is the line as typed, so the equivalent
@@ -132,12 +89,25 @@ _tabtitle_job_from() {
 # Ghostty only. iTerm2 draws its own icon and needs no help, and any other
 # terminal would render this as a missing-glyph box.
 if [[ -o interactive && $TERM_PROGRAM == ghostty ]]; then
+  # The command → codepoint table, generated alongside the font so the two can
+  # never disagree about which private-use codepoint carries which tint. Sourced
+  # inside the guard so every other terminal skips the file read entirely.
+  source "${0:A:h}/tabtitle-icons.zsh"
+
+  # At an idle prompt the foreground job *is* the shell, which is what iTerm2
+  # shows there too. Resolved once rather than per-prompt, and through the table
+  # rather than as a literal, so a regenerated font cannot leave this behind.
+  typeset -g _tabtitle_prompt_glyph
+  _tabtitle_glyph_for zsh
+  _tabtitle_prompt_glyph=$_tabtitle_glyph
+  unset _tabtitle_glyph
+
   # Same title text Ghostty's own integration would have written: the working
   # directory at the prompt, the command line while one runs. Only the glyph in
   # front of it is ours.
   _tabtitle_precmd() {
     emulate -L zsh
-    printf '\033]2;%s %s\a' $'' "${(%):-%(4~|…/%3~|%~)}"
+    printf '\033]2;%s %s\a' "$_tabtitle_prompt_glyph" "${(%):-%(4~|…/%3~|%~)}"
   }
 
   _tabtitle_preexec() {
