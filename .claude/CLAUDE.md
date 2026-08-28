@@ -152,7 +152,8 @@ Follow the repo's existing style first. Absent a repo convention:
 - 2-space indent, LF line endings, UTF-8, final newline, no trailing whitespace. CSS/SCSS use tabs (4).
 - JS/TS: single quotes, no semicolons, 80 cols, `es5` trailing commas, arrow parens omitted for single args — i.e. run Prettier with `~/.prettierrc`.
 - PHP: 120 cols, double quotes, no trailing commas, PHP 8.1 target.
-- Swift: standard Swift API design guidelines; no third-party formatter unless the repo ships one.
+- Swift: 4-space indent — the one language here that does not take the 2-space default above (measured: the Swift projects here are 4 throughout). 100 columns. Standard Swift API design guidelines. `XCTest` unless the repo already imports `Testing`. No third-party formatter unless the repo ships one.
+- Swift packages: `swift-tools-version: 6.0`, `platforms: [.macOS(.v14)]`, and an explicit `swiftLanguageMode` carrying a comment that says why that mode — then leave it alone. One package here is `.v6` because a threading mistake in it stalls the event tap and the system answers by killing the app; another is `.v5` on purpose because its AppKit panels hand state across callbacks that strict concurrency cannot prove safe, and main-thread confinement already covers it. Both reasons sit next to the setting; migrating one because the newer mode is newer discards an argument I already had.
 
 Regardless of language: small, focused functions; early returns rather than
 nested conditionals; and no comment or docstring that only restates the code.
@@ -168,13 +169,33 @@ reading `~/.prettierrc`. The shell and the editor run the same binaries on
 purpose — Neovim's Mason provides language servers only. Prefer a repo's own
 pinned tooling when it ships one.
 
+Swift has none of that installed. `swift format` (6.3.0) ships inside Xcode's
+toolchain, so it is first-party and the *Code style* rule above does not forbid
+it — but its default indent is **2 spaces** and both Swift repos here are 4, so a
+bare `swift format -i` reindents the whole tree. Run it only with a config
+pinning `indentation.spaces: 4`, and prefer not to run it at all: both repos are
+already internally consistent, so the diff would be reindentation burying
+whatever actually changed. `swiftlint` is not installed and not in the Brewfile,
+so a repo that asks for it needs `brew install swiftlint` first; say so rather
+than skipping the lint step.
+
 Verify shell edits without executing them: `bash -n` / `zsh -n` to parse,
 `shellcheck` to lint.
 
+Swift work is not finished at a clean compile — build the app and install it.
+My apps take the same flag: `./build.sh --install` builds the release bundle and
+puts it in `/Applications`, so what I run is what you just changed. Do that once
+the change is complete, not per edit. Expect the running copy to go down with
+it: the installer quits the app, deletes the installed bundle, copies the new
+one in and relaunches it, so the app disappearing for a second is the install
+working rather than a crash. A repo with its own build script still wins — one
+here uses a different build tool entirely.
+
 ## Git
 
-- Commits are SSH-signed via 1Password (`op-ssh-sign`). Do not disable signing or add `-c commit.gpgsign=false` to work around a signing prompt — tell me instead.
-- Personal identity is `kenny@kennyb.dev`; Bitbucket remotes auto-switch to the work identity via `~/.gitconfig-work` (a plain file in `$HOME`, deliberately not in the dotfiles repo). Don't set `user.email` per-repo by hand.
+- Both remotes sign, each as its own identity: GitHub as `kenny@kennyb.dev`, Bitbucket as the work identity via `~/.gitconfig-work` (a plain file in `$HOME`, deliberately not in this repo), pulled in by `.gitconfig`'s `includeIf hasconfig:remote.*.url`. Separate signing keys and separate allowed-signers files — which is why `.config/git/allowed_signers` lists only the personal key while the work one stays untracked at `~/.gitconfig-work-signers`. Both sign through 1Password's `op-ssh-sign`, so a verification failure in a work repo is usually the signers file rather than the signing.
+- Don't disable either half: no `-c commit.gpgsign=false` to get past a signing prompt — tell me instead — and no per-repo `user.email` or `user.signingkey` set by hand.
+- The switch keys off the remote, so a repo with **no remote yet** falls through to the personal identity and signs with the personal key. Measured: a fresh `git init` reports `kenny@kennyb.dev`, and both identity and key flip the moment the Bitbucket remote is added. Add the remote before the first commit in a work repo, or that commit lands under my personal name signed with a key the work account cannot attribute.
 - Never commit, push, or create a PR unless I ask.
 - **No co-author trailers.** Commit messages end at the last line of prose — no
   `Co-Authored-By:`, no "Generated with Claude Code" in a PR body, no attribution
@@ -185,6 +206,15 @@ Verify shell edits without executing them: `bash -n` / `zsh -n` to parse,
   default branch — this overrides the harness default of branching first when on
   `main`/`master`. If a commit really shouldn't land on the current branch, say so
   and let me decide; don't run `git checkout -b`/`git switch -c` on your own.
+- **Never merge `develop` or `staging` into another branch.** They are integration
+  branches carrying everyone's in-flight work, so merging one into a feature branch
+  pulls other people's commits into my history: the diff stops being reviewable, the
+  *audit only my own changes* rule below has to work around it, and unpicking it
+  afterwards costs far more than the merge saved. That holds for every target,
+  including another long-lived branch and including a merge that would only
+  fast-forward. If a branch has fallen behind, say so and let me decide how to catch
+  it up — rebasing onto the branch it was cut from is usually the answer, but that is
+  my call, not yours.
 - Work repos use Bitbucket Pipelines (`bitbucket-pipelines.yml`), not GitHub Actions — check the right CI config.
 - `delta` is **not** git's pager here — it is invoked explicitly by the fzf-tab previews in `.zshrc`. So `git diff` and `git show` emit plain, parseable output; no `--no-pager` dance is needed. Add `--no-pager` anyway when piping a command whose pager behaviour you have not checked.
 

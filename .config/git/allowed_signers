@@ -3,8 +3,10 @@
 # namespaces="git" restricts this key to git signatures, so it cannot be
 # used to satisfy verification for other ssh-signed payloads.
 #
-# Only the personal identity is listed: the work identity (~/.gitconfig-work,
-# applied to bitbucket remotes) sets commit.gpgsign = false and has no
-# signingkey, so those commits are unsigned by design and nothing here would
-# make them verify.
+# Only the personal identity is listed. Work commits are signed as well —
+# bitbucket remotes pull in ~/.gitconfig-work, which carries its own 1Password
+# signingkey — but that key and the address it belongs to stay out of this repo,
+# like the rest of the work identity. That file points gpg.ssh.allowedSignersFile
+# at ~/.gitconfig-work-signers instead, so this file is never the one consulted
+# in a work repo.
 kenny@kennyb.dev namespaces="git" ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOISHjId1mlt/MUYsl1rA/J8ox77BFvqQL7e8dZWWvc5

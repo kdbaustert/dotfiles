@@ -180,6 +180,24 @@ for f in .zshenv .zshrc .gitconfig .editorconfig .prettierrc; do
   link "$DOTFILES_DIR/$f" "$HOME/$f"
 done
 
+# The work identity that .gitconfig's includeIf pulls in for bitbucket remotes,
+# plus the allowed-signers file it points gpg.ssh.allowedSignersFile at. Neither
+# is in this repo and neither should be: nothing about the work account belongs
+# in something pushed to GitHub. They are only ever warned about, never created
+# — the contents are not ours to write.
+#
+# Worth a check because the failure is silent. Git ignores a missing include
+# path rather than erroring (measured: `git config --get user.email` exits 0 and
+# returns the base identity), so on a machine without these files a bitbucket
+# repo does not complain — it just commits as the personal identity, signed with
+# the personal key, which the work account cannot attribute.
+#
+# Silent when they are present, on purpose. See the .vimrc note above: a line
+# that prints on every clean run is a line you stop reading.
+for f in .gitconfig-work .gitconfig-work-signers; do
+  [ -e "$HOME/$f" ] || warning "Missing ~/$f — bitbucket repos will commit as the personal identity until it exists."
+done
+
 # ~/.hushlogin suppresses the "Last login:" banner. Only its existence matters —
 # the contents are never read — so it is created here rather than symlinked.
 if [ -e "$HOME/.hushlogin" ]; then

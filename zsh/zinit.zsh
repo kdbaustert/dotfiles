@@ -283,9 +283,13 @@ FZF_GIT_PREFIX='^X^G'
 #      autosuggestions      completions exist before fzf-tab hooks them
 #      fast-syntax-highlighting — MUST be last of the three
 #   4. carapace           — after 3, so compdef exists by the time it runs
-#   5. behaviour plugins  — order-independent among themselves
+#   5. behaviour plugins  — order-independent among themselves, but the block as
+#                           a whole must stay after 3: zsh-manydots-magic chains
+#                           onto self-insert and has to find the wrappers from
+#                           autosuggestions and F-Sy-H already in place
 #   6. fzf-git.sh
-#   7. zsh-bench          — a program, not a plugin
+#   7. measurement        — zsh-bench and zsh-prompt-benchmark; neither of them
+#                           runs anything at startup
 
 # --- Node ---------------------------------------------------------------------
 # zsh-nvm with lazy loading (NVM_LAZY_LOAD=true, set in .zprofile): the heavy
@@ -361,6 +365,10 @@ zinit wait lucid id-as'carapace-init' has'carapace' \
 #   - OMZP::safe-paste    — bracketed-paste-magic; see the zstyles in section 3,
 #                           which are not optional.
 #   - zsh-autopair        — auto-insert/delete matching brackets, quotes, parens
+#   - zsh-manydots-magic  — a third '.' typed after '..' expands to '../..', a
+#                           fourth to '../../..'. Knows when not to fire, so
+#                           `ruby -e '(1...`, `git log branch...` and
+#                           `git diff ...branch` are all left alone
 #   - zsh-you-should-use  — nags when a full command has an existing alias
 #   - forgit              — fzf-powered git (glo, gss, gcb…); honours delta,
 #                           and is put on $PATH so `git forgit <cmd>` works
@@ -368,6 +376,22 @@ zinit wait lucid id-as'carapace-init' has'carapace' \
 #                           (uses terminal-notifier, installed via Homebrew)
 #   - zsh-abbr            — fish-style abbreviations; store is section 3's
 #                           $ABBR_USER_ABBREVIATIONS_FILE
+#
+# zsh-manydots-magic is the one entry here that is not order-independent, and its
+# constraint points out of this block rather than inside it. It works by chaining
+# onto whatever widget currently answers self-insert — its `.on` reads the live
+# binding, wraps it, and re-binds through it — so every other wrapper has to be
+# installed first: autosuggestions and fast-syntax-highlighting in block 3, and
+# zsh-autopair one line above. Load it any earlier and it captures the bare
+# builtin, the later wrapper replaces it outright, and dots quietly stop
+# expanding with nothing logged.
+#
+# The usual reason to refuse a plugin that touches self-insert does not apply
+# here: it chains rather than clobbers, and upstream handles the url-quote-magic
+# case by name — which is exactly what section 3's bracketed-paste zstyles swap
+# in for the duration of a paste. `pick` is not optional either: the repo ships a
+# single file called `manydots-magic` with no extension, so zinit's
+# `*.plugin.zsh` detection would find nothing to source.
 #
 # forgit's atload is what makes the `git forgit …` sub-command work: forgit
 # ships bin/git-forgit, and git finds a `git-<x>` on $PATH as sub-command <x>.
@@ -383,6 +407,8 @@ zinit wait lucid for \
   OMZP::sudo \
   OMZP::safe-paste \
   hlissner/zsh-autopair \
+  pick'manydots-magic' \
+    knu/zsh-manydots-magic \
   MichaelAquilina/zsh-you-should-use \
   atload'path+=( "$FORGIT_INSTALL_DIR/bin" )' \
     wfxr/forgit \
@@ -400,7 +426,7 @@ zinit wait lucid for \
   has'fzf' pick'fzf-git.sh' atload'_fzf_git_rebind' \
     junegunn/fzf-git.sh
 
-# --- zsh-bench (a program, not a plugin) --------------------------------------
+# --- Measurement: zsh-bench + zsh-prompt-benchmark ----------------------------
 # Measures *perceived* interactive latency — first-prompt-lag, first-command-lag,
 # input-lag, exit-time — by driving a real interactive zsh under a pty. This is
 # the thing the turbo-defer architecture at the top of this file is actually
@@ -413,6 +439,24 @@ zinit wait lucid for \
 #
 #   zsh-bench                 # summary for the current interactive config
 #   zsh-bench --iters 20      # tighter confidence interval
+#
+# zsh-prompt-benchmark covers the other half of the same question. zsh-bench
+# reports first-prompt-lag once per run — the cost of *starting* a shell; this
+# reports milliseconds per prompt averaged over a few hundred samples, i.e. the
+# cost of drawing a prompt on every command, which on this config is starship.
+# That is the number the PROMPT2 fix in .zshrc moved, and it was found by reading
+# `zprof` by hand because nothing here measured it directly.
+#
+# Sourced rather than as"program": unlike zsh-bench this genuinely is a plugin
+# file, and its only top-level statement is one function definition. The precmd
+# hook it needs is added by that function when you invoke it and removed again
+# when the run ends, so it stays off the startup path either way.
+#
+#   zsh-prompt-benchmark      # then press and hold ENTER for ~10s
+#
+# Dormant upstream — last commit 2019-11-21, and taken anyway: ~80 lines doing
+# one thing, by the author of zsh-bench above, written for powerlevel10k.
 zinit wait lucid for \
   as"program" pick"zsh-bench" \
-    romkatv/zsh-bench
+    romkatv/zsh-bench \
+  romkatv/zsh-prompt-benchmark
