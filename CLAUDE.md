@@ -62,7 +62,7 @@ Known offenders:
 | `.claude/CLAUDE.md`   | Global Claude Code instructions                                   |
 | `.claude/hooks/`      | `notify.sh`, the Notification hook (terminal-notifier banner)     |
 | `.claude/statusline.sh` | The status line — plan usage, context, model, on every render   |
-| `.claude/skills/`     | Skills, one dir per skill; `plain/` is vendored from upstream      |
+| `.claude/skills/`     | Skills, one dir per skill; `php-psr12/` is ours, three are vendored |
 
 The two `.config/git/` files reach git by different routes, which matters when
 one of them appears not to work: `allowed_signers` is named explicitly by
@@ -83,10 +83,37 @@ import. A skill is discovered by its *directory* containing a `SKILL.md`, so the
 directory is what gets linked. The sweep alongside it removes only links that
 point into this repo, so a skill installed by hand from elsewhere survives.
 
-`skills/plain/` is vendored verbatim from
-`petekp/claude-code-setup` (`skills/plain/SKILL.md`) — it is upstream's file,
-not ours. Re-fetch with `gh api` and diff rather than editing in place; local
-edits would be silently lost the next time it is refreshed.
+Three of the four skills are **vendored, not ours**. `skills/plain/` comes from
+`petekp/claude-code-setup` (`skills/plain/SKILL.md`); `skills/javascript-pro/`
+and `skills/swift-expert/` come from `Jeffallan/claude-skills` (MIT), each with
+its `references/` directory, because the SKILL.md's "Reference Guide" table is
+five dead links without them. They are upstream's files. Re-fetch with `gh api`
+and diff rather than editing in place; local edits would be silently lost the
+next time one is refreshed:
+
+```sh
+gh api repos/Jeffallan/claude-skills/contents/skills/swift-expert/SKILL.md \
+  -H 'Accept: application/vnd.github.raw'
+```
+
+Vendoring verbatim means two of them contradict the style rules in
+`.claude/CLAUDE.md`. That is deliberate: correcting it in the file would be
+thrown away by the next refresh, so it is recorded here instead. The global
+rules win — these skills are reference material, not authority.
+
+- `javascript-pro` writes every example with double quotes and semicolons, the
+  opposite of the JS rule (single quotes, no semicolons, 80 cols, via
+  `~/.prettierrc`). It states no quote rule anywhere, so this is
+  conflict-by-example only — follow Prettier and ignore the examples'
+  punctuation. Its workflow also mandates `eslint --fix` and Jest at 85%
+  coverage; `eslint` and `prettier` are installed as pnpm globals but **`jest`
+  is not installed at all**, so that step only applies when the repo being
+  worked on ships it.
+- `swift-expert` ends its workflow at `swift build` / `swift test`, which is not
+  how Swift work finishes here — the global rule is `./build.sh --install`, and
+  one of the projects uses a different build tool entirely. It also assumes
+  SwiftUI and Swift 5.9+, while the projects here are AppKit at tools-version
+  6.0. Take its concurrency, actor and protocol guidance; not its build steps.
 
 `~/.claude/settings.json` is **not** tracked — it is mostly state Claude writes
 itself (model, `enabledPlugins`, the atuin hooks), so a symlink would fight it.
