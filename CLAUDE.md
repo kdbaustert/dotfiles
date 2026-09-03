@@ -137,10 +137,12 @@ every turn, which is how you end up leaving Do Not Disturb on.
 The status line is where the plan's usage windows live, because `/usage` only
 answers when asked and the 5-hour window is usually already the reason you
 asked. Three rows — session, week, context — each a bar plus a countdown, using
-Claude Code's own names for the windows so the two never disagree. It re-runs on
-every render, so it is held to the same latency budget as `.zshrc`: one `jq` and
-nothing else, ~10ms measured. `padding: 0` puts it flush left against the prompt
-box rather than indented by one column.
+Claude Code's own names for the windows so the two never disagree; a fourth, the
+Fable weekly window, is written but dormant, because 2.1.258 tracks that window
+and draws it in `/usage` yet drops it from the object it hands the script. It
+re-runs on every render, so it is held to the same latency budget as `.zshrc`:
+one `jq` and nothing else, ~10ms measured. `padding: 0` puts it flush left
+against the prompt box rather than indented by one column.
 
 The same file carries the other untracked-but-load-bearing setting,
 `"attribution": { "commit": "", "pr": "" }`, which is what actually strips the

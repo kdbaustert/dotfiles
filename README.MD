@@ -167,7 +167,11 @@ bar is which. `/usage` and `/context` answer the same questions on demand; the
 point of the status line is that you see the 5-hour number *before* it becomes
 the reason you went looking — hence a countdown rather than a reset time.
 Windows Claude Code does not report (API-key auth has no rate limits) drop
-their row rather than showing an empty bar.
+their row rather than showing an empty bar. A fourth row, the Fable weekly
+window, is written but dormant for exactly that reason: 2.1.258 tracks that
+window and draws it in `/usage`, yet leaves it out of the object it hands the
+script, so the row appears the day the field is forwarded and costs nothing
+until then. The script's header has the detail.
 
 **There is no `AGENTS.md` at either scope any more.** `.claude/` used to carry
 one alongside `CLAUDE.md` — the vendor-neutral name other agent tools read

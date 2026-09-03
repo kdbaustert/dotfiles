@@ -17,7 +17,8 @@
 # reason you asked. The status line is the only always-on surface Claude Code
 # offers, so the usage windows go here and nothing else competes for the space.
 #
-# It prints three rows, one per window:
+# It prints one row per window — three of them in practice, because the fourth
+# (Fable) is dormant; see `.rate_limits.seven_day_overage_included` below:
 #
 #   Current session  ███████░░░░░░░  52%  2h 14m left
 #   Current week     ███████████░░░  81%  4d 9h left
@@ -44,7 +45,10 @@
 # `Current session` and `Current week` are Claude Code's own names for these
 # windows, taken from what `/usage` prints, so the two never disagree about
 # which bar is which. `/usage` also floors its percentages rather than
-# rounding, and so does this, for the same reason.
+# rounding, and so does this, for the same reason. `Fable week` is the one
+# departure: `/usage` draws that bar as `Current week (Fable)`, which is 20
+# columns against a 15-column label field, and widening the field to fit it
+# would push every bar right to buy nothing.
 #
 # Countdowns rather than reset clock times: "resets 14:30" needs a subtraction
 # before it means anything, and the question being asked is always "how long
@@ -63,6 +67,23 @@
 #                           `five_hour`/`seven_day` only when a subscription
 #                           reports them, so every field here must be optional
 #                           and a missing window drops its whole row.
+#   .rate_limits.seven_day_overage_included
+#                           the Fable weekly window, and dormant. 2.1.258 does
+#                           track it — from the `anthropic-ratelimit-unified-
+#                           7d_oi-*` response headers, under exactly this name,
+#                           labelled "Fable limit" internally and drawn by
+#                           `/usage` as `Current week (Fable)` — but the object
+#                           it hands this script is rebuilt from `five_hour`,
+#                           `seven_day` and (gateway-only) `spend_limit` alone,
+#                           so the key is dropped on the way out. The row is
+#                           written anyway because an absent window already
+#                           costs nothing: `select` drops it exactly as it
+#                           drops a missing `five_hour`, so it lights up the
+#                           day the field is forwarded. Nothing else can supply
+#                           it — no file under `~/.claude` caches the
+#                           utilization and the transcripts do not record it,
+#                           leaving a network call per render, which the one-jq
+#                           budget above rules out.
 #   .rate_limits.*.used_percentage    0-100 (utilization × 100), not a fraction.
 #   .rate_limits.*.resets_at          ISO 8601 string, nullable. A *different*
 #                           Claude Code schema carries the same key as epoch
@@ -98,7 +119,7 @@ exec jq -r '
   def padr($s; $n): $s + rep(" "; $n - ($s | length));
   def padl($s; $n): rep(" "; $n - ($s | length)) + $s;
 
-  # One ramp for all three bars, so they read the same way without a legend.
+  # One ramp for every bar, so they read the same way without a legend.
   def heat($p):
     if   $p >= 90 then red
     elif $p >= 75 then orange
@@ -151,6 +172,10 @@ exec jq -r '
       (.rate_limits.seven_day
        | select(. and .used_percentage != null)
        | row("Current week"; .used_percentage; countdown(.resets_at))),
+
+      (.rate_limits.seven_day_overage_included
+       | select(. and .used_percentage != null)
+       | row("Fable week"; .used_percentage; countdown(.resets_at))),
 
       (.context_window
        | select(. and .used_percentage != null)
