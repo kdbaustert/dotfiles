@@ -385,6 +385,13 @@ zcache atuin atuin init zsh
 # navi — interactive cheatsheets (Ctrl-G)
 zcache navi navi widget zsh
 
+# direnv — loads a project's environment on cd; here that is a Nix dev shell
+# through `use flake`, cached by nix-direnv (see .config/direnv/direnvrc). The
+# hook is a precmd that runs `direnv export zsh` before every prompt: one fork,
+# 5.9ms measured over 20 runs in a directory with no .envrc, so the cost is per
+# prompt rather than at startup, and small enough to live outside a guard.
+zcache direnv direnv hook zsh
+
 # pay-respects — corrects the last failed command (replaces thefuck, whose repo
 # is dead and which spawned a Python interpreter on every invocation). Kept on
 # `fuck` for muscle memory; the binary's own default is `f`, which would collide

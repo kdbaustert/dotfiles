@@ -1,0 +1,19 @@
+# direnv's own config, loaded before every .envrc it evaluates.
+#
+# The one thing here is nix-direnv, which replaces the built-in `use nix` and
+# `use flake` with versions that cache the evaluated shell under
+# <project>/.direnv (globally ignored via .config/git/ignore) and keep its
+# store paths alive as GC roots. Without it every cd into a flake re-runs
+# `nix print-dev-env` — seconds each time, against a shell whose startup is
+# budgeted in milliseconds.
+#
+# Fetched by direnv itself rather than vendored or installed: nix-direnv is not
+# a Homebrew formula (measured — `brew install nix-direnv` finds nothing), and
+# putting it in the Nix profile would make the first global Nix install the
+# very tool that exists to keep Nix per-project. `source_url` is upstream's own
+# first-listed install method; it downloads once, checks the hash, and caches
+# the file under ~/.cache/direnv, so this line is pinned and checksummed the
+# way install.sh pins pay-respects. To bump: change the version in the URL and
+# take the new hash from the README's own source_url line — verified for 3.2.0
+# against a fresh download of the tag.
+source_url "https://raw.githubusercontent.com/nix-community/nix-direnv/3.2.0/direnvrc" "sha256-hW6NC1JHue3IjZN3uDM6l6I2PMaauqd2D7hXYJ1Zfr4="

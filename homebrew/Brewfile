@@ -62,6 +62,11 @@ brew "nnn"
 # no node; declare it so that stays reproducible.
 brew "node"
 brew "pnpm"
+# direnv — per-directory environments, which here means a project's Nix dev
+# shell: ghostty, rio and kennybdev each carry an .envrc saying `use flake`.
+# The caching half, nix-direnv, is not a formula; .config/direnv/direnvrc
+# fetches it pinned and checksummed. The zsh hook is the zcache line in .zshrc.
+brew "direnv"
 brew "vivid"
 brew "imagemagick"
 brew "nss"
