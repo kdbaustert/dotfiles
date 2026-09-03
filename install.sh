@@ -78,6 +78,48 @@ brew analytics off
 brew cleanup
 
 #------------------------------------------------------------------------------
+title "Nix"
+#------------------------------------------------------------------------------
+# The Nix package manager, beside Homebrew rather than instead of it. The split:
+# Homebrew owns the machine — the Brewfile, casks, fonts, the global CLI set —
+# and Nix owns per-project environments. `nix-shell` and `nix develop` give a
+# repo a pinned toolchain without touching anything global, which Homebrew has
+# no equivalent for. Don't install through Nix what the Brewfile already has:
+# both ship ripgrep, fd, jq, bat, eza, fzf, zoxide, starship, atuin, git,
+# delta, lazygit, neovim, node and python, and a second copy only drifts.
+#
+# Upstream's installer, not Determinate Systems'. Determinate's writes a
+# receipt for a clean uninstall and re-adds its /etc/zshrc hook after a macOS
+# upgrade, but it puts a third party between us and the interpreter, and this
+# machine was first installed with upstream. The one thing it fixes — the /etc
+# hook — is moot here: `--no-modify-profile` skips that edit entirely and
+# .zprofile sources the hook itself, tracked and upgrade-proof (Apple resets
+# /etc/zshrc on major updates, which is the usual way a Nix install quietly
+# drops off PATH).
+#
+# `--daemon` is the only mode macOS accepts — the installer refuses
+# `--no-daemon` on Darwin — and it creates a separate APFS volume for /nix,
+# since the root volume is read-only. The default nixpkgs-unstable channel is
+# kept: `nix-shell -p` resolves <nixpkgs> through it, and without a channel
+# that form fails until flakes are set up.
+#
+# Guarded on the binary, not on /nix: a half-finished install leaves the
+# directory behind and the installer refuses to run over one, so a stale /nix
+# surfaces here as the warning below with the installer's own message above it.
+NIX_BIN="/nix/var/nix/profiles/default/bin/nix"
+if [ -x "$NIX_BIN" ]; then
+  info "Nix already installed ($("$NIX_BIN" --version))."
+else
+  info "Installing Nix (multi-user daemon — this creates a /nix APFS volume)..."
+  if sh <(curl -fsSL https://nixos.org/nix/install) --daemon --yes --no-modify-profile \
+    && [ -x "$NIX_BIN" ]; then
+    success "Nix installed ($("$NIX_BIN" --version))."
+  else
+    warning "Nix install failed — see the installer output above; nix-shell stays unavailable."
+  fi
+fi
+
+#------------------------------------------------------------------------------
 title "pay-respects"
 #------------------------------------------------------------------------------
 # Command correction (the `fuck` alias in .zshrc). Not installed via Homebrew:

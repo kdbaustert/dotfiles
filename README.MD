@@ -24,6 +24,9 @@ It will ask for your sudo password up front, and it expects Apple silicon
 
 - Installs the Xcode command line tools and Homebrew, then everything in
   `homebrew/Brewfile`
+- Installs Nix (multi-user, daemon mode) beside Homebrew — for per-project
+  shells, not for tools the Brewfile already has; the shell hook is sourced
+  from `.zprofile`, not `/etc/zshrc`
 - Symlinks the root dotfiles and every `.config/*` entry into `$HOME`
 - Installs `pay-respects` (pinned + checksummed) into `~/.local/bin`
 - Clones the trapd00r `LS_COLORS` database as an alternative to the default

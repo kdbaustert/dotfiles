@@ -73,6 +73,26 @@ fpath=("/opt/homebrew/share/zsh/site-functions" $fpath)
 #------------------------------------------------------------------------------
 # PATH (built once, high → low priority: earlier entries win)
 #------------------------------------------------------------------------------
+# Nix's shell hook, sourced from here rather than from the /etc/zshrc edit its
+# installer would make — install.sh passes `--no-modify-profile`, so on a fresh
+# machine this is the only wiring. Two reasons it lives in the repo: Apple
+# resets /etc/zshrc on major macOS updates, which is the usual way a Nix
+# install quietly drops off PATH; and a tracked file is one this repo can see.
+#
+# Sourced BEFORE the path array on purpose. The hook prepends the Nix profile
+# bins, and the array then prepends Homebrew ahead of them, so `brew` still
+# wins for any tool installed both ways — the global rule. The /etc hook did
+# the opposite: it ran after this file and left ~/.nix-profile/bin at position
+# 2 with /opt/homebrew/bin at 9 (measured). The hook exports a guard variable,
+# so a machine that still carries the /etc copy sources it once, here, and the
+# /etc copy returns immediately.
+#
+# Cost: tests and exports only, no fork on the common path — 0.16ms per source
+# (measured over 200 sourcings), invisible in `zsh -lic exit` — so it does not
+# need zcache.
+[ -e /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh ] \
+  && . /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh
+
 # Homebrew first, so brew's binaries outrank the language-manager and vendor
 # shims below it. (The previous version listed Homebrew *last* under a "Homebrew
 # last so it wins" comment — that was backwards for a zsh path array; what
