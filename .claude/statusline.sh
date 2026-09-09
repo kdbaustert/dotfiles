@@ -17,11 +17,11 @@
 # reason you asked. The status line is the only always-on surface Claude Code
 # offers, so the usage windows go here and nothing else competes for the space.
 #
-# It prints one row per window — three of them in practice, because the fourth
-# (Fable) is dormant; see `.rate_limits.seven_day_overage_included` below:
+# It prints one row per window:
 #
 #   Current session  ███████░░░░░░░  52%  2h 14m left
 #   Current week     ███████████░░░  81%  4d 9h left
+#   Fable week       █████░░░░░░░░░  38%  4d 9h left
 #   Context window   ████░░░░░░░░░░  31%  312K of 1.0M · Opus 5
 #
 # The rows are flush — no blank line between them — and that was tried both
@@ -56,34 +56,80 @@
 #
 # Claude Code re-runs this on *every* render — it is on the interactive path in
 # exactly the way `.zshrc` is, and is budgeted the same way. Hence: one jq
-# process, and nothing else. No git, no `date`, no per-field subshell. jq does
-# the arithmetic, the countdown, the bars and the ANSI, and prints the finished
-# block. `exec` so the shell doesn't linger waiting on it.
+# process on the hot path, and nothing else. No git, no `date`, no per-field
+# subshell. jq does the arithmetic, the countdown, the bars and the ANSI, and
+# prints the finished block. The only other thing that ever runs is the
+# refresher below, in the background, at most once per five minutes.
 #
-# The input schema below was read off the 2.1.235 binary rather than the docs,
+# TWO SOURCES, NOT ONE. Claude Code's stdin carries the 5-hour and 7-day windows
+# but not the Fable one, and it carries them only when *this session* has seen
+# them — so the script also reads a small cache of the `/api/oauth/usage`
+# response, the same endpoint `/usage` itself calls. Why both, rather than the
+# cache alone: stdin is live, refreshed from the response headers of every
+# turn, while the cache is up to five minutes old. Stdin wins when it has a
+# window; the cache fills in what stdin lacks.
+#
+# The Fable window has been "tracked but not forwarded" for a while, and each
+# version has moved it without exposing it:
+#
+#   2.1.258  read off the `anthropic-ratelimit-unified-7d_oi-*` headers into
+#            `seven_day_overage_included`, labelled "Fable limit" internally
+#            and drawn by `/usage` as `Current week (Fable)` — but the object
+#            handed to this script is rebuilt from `five_hour`, `seven_day`
+#            and (gateway-only) `spend_limit` alone, so the key is dropped.
+#   2.1.266  same builder, same three keys. A new `rate_limits.model_scoped[]`
+#            array does carry per-model weekly windows with a server-supplied
+#            `display_name` of "Fable", but it lives on the usage snapshot
+#            handed to the SDK and remote clients, not on the status line's
+#            stdin. 2.1.266 also started persisting the `/usage` response as
+#            `cachedUsageUtilization` in ~/.claude.json, but only after
+#            `/usage` is opened and only for an hour, so it is not a source an
+#            always-on row can lean on — and parsing an 85KB file per render
+#            would blow the budget anyway.
+#
+# So the row keeps a reader for `seven_day_overage_included` — free, and it
+# takes over the day the field is forwarded — and gets its numbers from the
+# cache until then.
+#
+# THE CACHE. `$XDG_CACHE_HOME/claude-usage.json` is the endpoint's JSON plus a
+# `fetched_at` epoch stamp, written atomically (tmp + mv) so a render never
+# reads a half-written file. jq reads it with `--slurpfile` in the *same*
+# process that renders the rows, so the hot path is still one jq; a missing
+# file is fed as /dev/null, which slurps to `[]`, so nothing has to exist for
+# the script to work. Two thresholds, both borrowed from Claude Code's own
+# `/usage` code so the two agree about freshness:
+#
+#   5 minutes  the endpoint's client-side TTL (`rxo` in the 2.1.266 binary).
+#              Older than this and jq appends a `REFRESH` marker line, which
+#              the shell strips and answers by spawning the refresher.
+#   1 hour     the persisted-cache lifetime (`nxo`). Older than this and the
+#              cached rows are hidden rather than shown stale — the usual
+#              cause is an expired OAuth token, which Claude Code refreshes on
+#              its own; the row returns once it has.
+#
+# THE REFRESHER is the only part that costs anything, and it never runs on the
+# hot path. It is backgrounded with stdin, stdout and stderr all pointed at
+# /dev/null, and that is load-bearing: Claude Code reads this script's stdout
+# to EOF, and a child holding the pipe open would freeze the status line for
+# the length of the fetch. The token comes from the `Claude Code-credentials`
+# keychain item Claude Code itself writes (via `security`, which is how Claude
+# Code reads it too, so the ACL is already there), and reaches curl through
+# `-K -` on stdin rather than on the command line, so it never sits in `ps`
+# output for the duration of the request. A lock directory (`mkdir` is atomic)
+# stops a slow fetch from being duplicated by every render in the meantime;
+# one older than two minutes is treated as left by a killed refresher and
+# removed. On any failure the refresher still restamps `fetched_at` over the
+# previous data, so a dead endpoint costs one attempt per five minutes rather
+# than one per render — and the stale-hiding rule above keeps old numbers from
+# lingering on screen.
+#
+# The stdin schema below was read off the 2.1.235 binary rather than the docs,
 # because these details are easy to get wrong and every one fails silently:
 #
 #   .rate_limits            absent entirely on API-key auth — it is built from
 #                           `five_hour`/`seven_day` only when a subscription
 #                           reports them, so every field here must be optional
 #                           and a missing window drops its whole row.
-#   .rate_limits.seven_day_overage_included
-#                           the Fable weekly window, and dormant. 2.1.258 does
-#                           track it — from the `anthropic-ratelimit-unified-
-#                           7d_oi-*` response headers, under exactly this name,
-#                           labelled "Fable limit" internally and drawn by
-#                           `/usage` as `Current week (Fable)` — but the object
-#                           it hands this script is rebuilt from `five_hour`,
-#                           `seven_day` and (gateway-only) `spend_limit` alone,
-#                           so the key is dropped on the way out. The row is
-#                           written anyway because an absent window already
-#                           costs nothing: `select` drops it exactly as it
-#                           drops a missing `five_hour`, so it lights up the
-#                           day the field is forwarded. Nothing else can supply
-#                           it — no file under `~/.claude` caches the
-#                           utilization and the transcripts do not record it,
-#                           leaving a network call per render, which the one-jq
-#                           budget above rules out.
 #   .rate_limits.*.used_percentage    0-100 (utilization × 100), not a fraction.
 #   .rate_limits.*.resets_at          ISO 8601 string, nullable. A *different*
 #                           Claude Code schema carries the same key as epoch
@@ -91,6 +137,16 @@
 #                           betting on which one shows up.
 #   .context_window.used_percentage   0-100, already rounded and clamped by the
 #                           caller — and null until the first turn has usage.
+#
+# And the cache, i.e. the `/api/oauth/usage` response (schema from 2.1.266):
+#
+#   .five_hour / .seven_day .utilization is a 0-1 *fraction* here, unlike
+#                           stdin, and .resets_at is an ISO string — hence the
+#                           ×100 in `cached` and the shared `secs`.
+#   .limits[]               the per-model windows. `.percent` is already 0-100,
+#                           `.scope.model.display_name` is the label ("Fable"),
+#                           and entries without a model scope are other kinds
+#                           of limit and are skipped.
 #
 # Colors are voltage (themes/voltage.md) as 24-bit escapes. Not tput/ANSI-16:
 # the palette's greens and oranges are not in the 16-color set, and the whole
@@ -103,7 +159,35 @@
 # a stack trace where the usage numbers should be. No jq, no line.
 command -v jq >/dev/null 2>&1 || exit 0
 
-exec jq -r '
+cache="${XDG_CACHE_HOME:-$HOME/.cache}/claude-usage.json"
+
+refresh() {
+  local lock="$cache.lock" tmp="$cache.tmp" token body
+  mkdir -p "${cache%/*}"
+  [ -d "$lock" ] && find "$lock" -maxdepth 0 -mmin +2 -exec rmdir {} \; 2>/dev/null
+  mkdir "$lock" 2>/dev/null || return
+  token=$(security find-generic-password -s 'Claude Code-credentials' -w 2>/dev/null \
+    | jq -r '.claudeAiOauth.accessToken // empty')
+  body=''
+  if [ -n "$token" ]; then
+    body=$(curl -sf -m 5 -K - <<EOF
+url = "https://api.anthropic.com/api/oauth/usage"
+header = "Authorization: Bearer $token"
+header = "anthropic-beta: oauth-2025-04-20"
+header = "Content-Type: application/json"
+EOF
+    ) || body=''
+  fi
+  # New data if the fetch parsed, else the old data, restamped either way.
+  local old=$cache; [ -r "$cache" ] || old=/dev/null
+  jq -n --arg body "$body" --argjson t "$(date +%s)" --slurpfile old "$old" \
+    '(($body | fromjson?) // $old[0] // {}) + {fetched_at: $t}' \
+    >"$tmp" 2>/dev/null && mv -f "$tmp" "$cache"
+  rmdir "$lock" 2>/dev/null
+}
+
+cache_in=$cache; [ -r "$cache" ] || cache_in=/dev/null
+out=$(jq -r --slurpfile c "$cache_in" '
   def fg($r; $g; $b): "\u001b[38;2;\($r);\($g);\($b)m";
   def off: "\u001b[0m";
 
@@ -163,25 +247,60 @@ exec jq -r '
     | "\(subtle)\(padr($label; 15))\(off) \(bar($v; 14)) \(heat($v))\(padl("\($v)%"; 4))\(off)"
       + (if $tail then "  \(subtle)\($tail)\(off)" else "" end);
 
+  # The cache, or {} when the file is missing (/dev/null slurps to []).
+  ($c[0] // {}) as $cache
+  | ($cache.fetched_at // 0) as $at
+  | ($at > now - 3600) as $fresh
+  | ($at < now - 300) as $stale
+
+  # A cached window reshaped to the stdin one, so `row` needs only one form.
+  # Empty, not null, when absent — `//` then falls through cleanly.
+  | def cached($k):
+      if $fresh then
+        $cache[$k]
+        | select(. and .utilization != null)
+        | {used_percentage: (.utilization * 100), resets_at}
+      else empty end;
+
   .model.display_name as $model
   | [
-      (.rate_limits.five_hour
+      ((.rate_limits.five_hour // cached("five_hour"))
        | select(. and .used_percentage != null)
        | row("Current session"; .used_percentage; countdown(.resets_at))),
 
-      (.rate_limits.seven_day
+      ((.rate_limits.seven_day // cached("seven_day"))
        | select(. and .used_percentage != null)
        | row("Current week"; .used_percentage; countdown(.resets_at))),
 
-      (.rate_limits.seven_day_overage_included
-       | select(. and .used_percentage != null)
-       | row("Fable week"; .used_percentage; countdown(.resets_at))),
+      # Stdin first, should the key ever be forwarded; the cache otherwise.
+      ((.rate_limits.seven_day_overage_included
+        | select(. and .used_percentage != null)
+        | row("Fable week"; .used_percentage; countdown(.resets_at)))
+       // (if $fresh then
+             $cache.limits[]?
+             | select(.scope.model.display_name and .percent != null)
+             | row("\(.scope.model.display_name) week"; .percent; countdown(.resets_at))
+           else empty end)),
 
       (.context_window
        | select(. and .used_percentage != null)
        | row("Context window"; .used_percentage;
              "\(tokens(.total_input_tokens // 0)) of \(tokens(.context_window_size // 0))"
-             + (if $model then " · \($model)" else "" end)))
+             + (if $model then " · \($model)" else "" end))),
+
+      (if $stale then "REFRESH" else empty end)
     ]
   | join("\n")
-'
+')
+
+# The marker rides on the last line so the strip is two parameter expansions,
+# not a process. It is emitted only when the cache is past its five minutes.
+case $out in
+  *$'\n'REFRESH | REFRESH)
+    out=${out%REFRESH}
+    out=${out%$'\n'}
+    refresh </dev/null >/dev/null 2>&1 &
+    ;;
+esac
+
+printf '%s\n' "$out"

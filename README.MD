@@ -152,12 +152,13 @@ and this at the top level:
 you. Only the `Notification` event is hooked — permission prompts and idle
 questions. Hooking `Stop` as well would banner every single turn.
 
-`statusline.sh` keeps the plan's usage on screen as three bars, one per window,
+`statusline.sh` keeps the plan's usage on screen as four bars, one per window,
 each coloured green → yellow → orange → red as it fills:
 
 ```
 Current session  ███████░░░░░░░  52%  2h 14m left
 Current week     ███████████░░░  81%  4d 9h left
+Fable week       █████░░░░░░░░░  38%  4d 9h left
 Context window   ████░░░░░░░░░░  31%  312K of 1M · Opus 5
 ```
 
@@ -167,11 +168,13 @@ bar is which. `/usage` and `/context` answer the same questions on demand; the
 point of the status line is that you see the 5-hour number *before* it becomes
 the reason you went looking — hence a countdown rather than a reset time.
 Windows Claude Code does not report (API-key auth has no rate limits) drop
-their row rather than showing an empty bar. A fourth row, the Fable weekly
-window, is written but dormant for exactly that reason: 2.1.258 tracks that
-window and draws it in `/usage`, yet leaves it out of the object it hands the
-script, so the row appears the day the field is forwarded and costs nothing
-until then. The script's header has the detail.
+their row rather than showing an empty bar. The Fable weekly window is one
+Claude Code tracks and draws in `/usage` yet never hands the script — 2.1.266
+still drops it — so the script fetches it itself: a background refresher pulls
+the same usage endpoint `/usage` calls, at most every five minutes, into
+`~/.cache/claude-usage.json`, and the render reads that file alongside stdin.
+The cache also fills in the session and week rows when the session has not seen
+them yet. The script's header has the detail.
 
 **There is no `AGENTS.md` at either scope any more.** `.claude/` used to carry
 one alongside `CLAUDE.md` — the vendor-neutral name other agent tools read

@@ -8,12 +8,10 @@ project — verified against 2.1.235 — so the precedence is this sentence and
 nothing else. A project file that overrides a rule should name the rule it
 overrides, so the override still reads as deliberate after this file changes.
 
-The tooling contract below used to live in a sibling `AGENTS.md` that this file
-pulled in with an `@AGENTS.md` import. That split is gone by choice: Claude Code
-has no AGENTS.md discovery path at either scope — verified against 2.1.231,
-neither `~/.claude/AGENTS.md` nor `<project>/AGENTS.md` is read — so the file only
-ever loaded *because* of the import, and deleting that one line lost the rules
-silently rather than erroring. One file, no import, nothing to keep in sync.
+Claude Code has no AGENTS.md discovery path at either scope — verified against
+2.1.231, neither `~/.claude/AGENTS.md` nor `<project>/AGENTS.md` is read — so the
+tooling contract below lives in this file rather than in a sibling one pulled in
+by an `@AGENTS.md` import, which went missing silently rather than erroring.
 
 ## Environment
 
@@ -56,39 +54,6 @@ Also installed and worth knowing: `fzf`, `zoxide`, `delta`, `lazygit`, `gitui`,
 therefore off `PATH`, so a bare `sqlite3` is macOS's older system copy; call
 `/opt/homebrew/opt/sqlite/bin/sqlite3` when the version matters.
 
-The flags worth remembering:
-
-```bash
-# ripgrep — content
-rg -i "pattern"           # case-insensitive
-rg -t py "pattern"        # only Python files (`rg --type-list` for the rest)
-rg -g "*.md" "pattern"    # only Markdown
-rg -l "pattern"           # filenames with matches, no match text
-rg -c "pattern"           # count per file
-rg -n "pattern"           # line numbers
-rg -A3 -B3 "error"        # context lines
-rg "TODO|FIXME|HACK"      # alternation — one pass, not three
-
-# ripgrep — file listing
-rg --files                # every file (respects .gitignore)
-rg --files -t md          # only Markdown
-rg --files | rg "name"    # find by name
-
-# fd
-fd -e js                  # every .js file
-fd . -t d                 # every directory
-fd -x command {}          # run a command per match
-
-# jq
-jq . data.json            # pretty-print
-jq -r .name file.json     # extract a field
-jq '.id = 0' x.json       # modify a field
-```
-
-Search strategy: start broad then narrow (`rg "partial" | rg "specific"`), filter
-by type early, batch alternations into one pattern, and scope to a subdirectory
-when you know where to look.
-
 ## The gotcha that actually bites
 
 **`rg` and `fd` both respect `.gitignore` and both skip hidden files.** A search
@@ -122,18 +87,6 @@ ignore along with `.gitignore`.
 - `~/dotfiles/` — shell, git, and editor config.
 
 ## How I want you to work
-
-These used to be two lists — "Rules" and "Working preferences" — that said the
-same thing twice with two different sets of examples. A "Preferences" /
-"Workflow" / "Style" trio at the top of the file later said it a third time, in
-shorter words and with no reasoning attached; it is folded into this list and
-into *Code style* below. It happened a second time — a `Think Before Coding` /
-`Simplicity First` / `Surgical Changes` trio at the *foot* of the file, same
-shape, same short imperatives, no reasoning — and was folded the same way: of
-its 26 lines, 23 already appeared above, and the one idea that did not is now
-the *clean up your own orphans* bullet. One list, so there is only ever one
-place to change a rule; a rule that turns up twice is a rule about to disagree
-with itself.
 
 - **Investigate first.** Never speculate about code you have not read. Read files and `rg` for usages before making claims, and read any file I reference before answering. If uncertain, say so and propose how to verify — don't fabricate APIs, paths, or behavior.
 - **Read `CLAUDE-REFERENCE.md` before planning or editing, when the repo has one.** Claude Code auto-loads `CLAUDE.md` and nothing else, so a repo that splits its mandatory rules from its architecture reference — `cnc-claims` does, and the reference is where the framework's real behaviour is written down — hands you only half of what it wrote for you, and withholds exactly the half that stops you guessing at code you have not read. Look for it at the repo root at the start of a task and read it in full before you plan or touch anything; treat it as loaded context, not as a file to skim if a search happens to surface it. This is *investigate first* aimed at documentation the harness will not hand you.
@@ -222,8 +175,8 @@ here uses a different build tool entirely.
 
 ## Audits and Jira comments
 
-These four were bullets in *How I want you to work* until they outgrew it — the general list runs to a line or two per rule, and
-these need a paragraph each. They read in the order you execute them: pick the diff, write it up, format it, sign it.
+These four read in the order you execute them: pick the diff, write it up,
+format it, sign it.
 
 - **Audit only my own changes.** When you audit the code changes on a branch, the subject is what *I* wrote on it — not everything the branch's diff against the base happens to contain. A branch picks up other people's commits by merge or rebase from the base branch and, on a shared branch, by their own work, and a `git diff base...HEAD` shows all of it without distinguishing. So take the merge-base, list the commits authored by me (`git log --author="$(git config user.email)" $(git merge-base origin/HEAD HEAD)..HEAD`), and diff those — reviewing a colleague's code back to them under my name is worse than a thin audit. If that leaves nothing, say the branch has no commits of mine rather than widening the net to fill the report.
 - **Audits are written for non-programmers.** Whoever reads an audit — and especially whoever reads it as a Jira comment — is a claims handler, a tester or a manager, not a developer. So describe every change as observable behaviour: what the system did before, what it does now, and what they should look at to confirm it. Cover *all* of them, not the interesting ones — a change you skip because it is mechanical is a change nobody knows to retest. File paths, class and method names, and framework vocabulary go in a trailing parenthetical at most, never in the sentence carrying the meaning: "renamed `getClaimant()` to `getPolicyholder()` in `ClaimController`" tells that reader nothing, while "the claimant is now called the policyholder everywhere it appears on screen" tells them what to check. Reach for the voice of the `plain` skill in `.claude/skills/plain/`, not the voice of a commit message.
@@ -232,63 +185,30 @@ these need a paragraph each. They read in the order you execute them: pick the d
 
 ## Memory
 
-Claude Code keeps a persistent memory directory per project — one fact per file,
-indexed by a `MEMORY.md` that is loaded into context at the start of every
-session. It lives beside the session transcripts under
-`~/.claude/projects/<cwd-with-slashes-as-dashes>/memory/`, which is to say
-**outside every repo**: nothing in it is tracked, diffed, deployed by
-`install.sh`, or carried to a second machine, and no project's memory is visible
-from another. Nothing learned in `cnc-claims` reaches `dotfiles`.
-
-**The point of it is to spend fewer sessions.** A session that re-derives what
-the last one already worked out is a session wasted — re-reading the same files,
-re-running the same measurement, re-litigating an approach that was tried and
-rejected. Memory is the only thing that survives a `/clear`, a compaction, or a
-day off, so treat "would the next session have to redo this?" as the test for
-whether a fact is worth a file.
-
-Things that pass that test:
-
-- **A conclusion that cost real work.** A measured number, a traced call path, a
-  root cause, the answer to "does X actually load Y". Save the finding, not the
-  transcript of finding it.
-- **An approach ruled out, and why.** The most expensive thing to rediscover,
-  because nothing in the tree records a road not taken — this repo's own habit of
-  writing rejected alternatives into comments is the same instinct.
-- **A goal in flight.** What we are part-way through and what is left, so the
-  next session opens with the plan instead of rebuilding it. Convert relative
-  dates to absolute; "last week" is meaningless on re-read.
-- **A pointer with no home in the repo** — a ticket, a dashboard, an upstream
-  URL we keep going back to.
-
-Write it the moment it is established, not at the end — a session can end
-abruptly and usually does. Then add the `MEMORY.md` line in the same breath: a
-memory the index does not name is one recall will never surface, so an unindexed
-file is wasted work rather than saved work. Its `description` is what recall
-matches against, so make it the question it answers, not a label.
+The harness already gives you the format and the path. What it does not give you
+is the point: a session that re-derives what the last one worked out is a session
+wasted, and memory is the only thing that survives a `/clear`, a compaction, or a
+day off. So the test for writing a file is "would the next session have to redo
+this?" — a measured number, a traced call path, a root cause, an approach ruled
+out *and why* (the most expensive thing to rediscover, because nothing in the
+tree records a road not taken), a goal in flight with what is left of it, or a
+pointer with no home in the repo. Write it the moment it is established, not at
+the end; a session can end abruptly and usually does.
 
 Two guards, so this stays cheap:
 
 - **A durable rule belongs in this file, not in memory.** If a memory would begin
   "Kenny prefers…" or "always run…", it is a CLAUDE.md edit — propose it here,
-  where it is version-controlled, reviewable, and survives a rebuild. Memory
-  carries *what we found*; this file carries *how I want you to work*.
-- **Recalled memories are dated, not authoritative.** They record what was true
-  when written. If one names a file, flag, version, or command, re-read it before
-  acting on it, and delete the memory outright when it turns out to be wrong. A
-  stale memory is worse than a missing one: it arrives sounding established, and
-  it costs a session to unpick.
+  where it is version-controlled and survives a rebuild. Memory carries *what we
+  found*; this file carries *how I want you to work*.
+- **Recalled memories are dated, not authoritative.** Re-read any file, flag,
+  version or command one names before acting on it, and delete the memory when it
+  turns out wrong. A stale one is worse than a missing one: it arrives sounding
+  established and costs a session to unpick.
 
-Everything else is bloat, and bloat is paid for at the top of every future
-session: skip what the repo already records (structure, past fixes, git history,
-the rules here), what is scoped to the conversation in progress ("we were about
-to try X"), and anything sensitive — credentials, tokens, client data, the work
-identity in `~/.gitconfig-work`. When I ask you to remember something that fails
-those tests, ask what was non-obvious about it and save that instead.
-
-This is the [context curation](#curate-context--think-in-an-agentic-dag) rule
-applied across sessions rather than within one: keep what persists factual and
-minimal, so the next session starts where this one stopped.
+Never write anything sensitive — credentials, tokens, client data, or the work
+identity in `~/.gitconfig-work`. This is the context curation rule applied across
+sessions rather than within one.
 
 ## Philosophy
 

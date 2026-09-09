@@ -4,13 +4,9 @@ Personal macOS dotfiles (Apple silicon). Everything here is deployed into `$HOME
 as **symlinks** by `install.sh`. `README.MD` documents the repo for a human
 installing it; this file is the working contract for an agent editing it.
 
-The rules below used to live in a sibling `AGENTS.md` that this file pulled in
-with an `@AGENTS.md` import — vendor-neutral name, one copy, read directly by
-tools that look for it. That split is gone by choice: Claude Code is the only
-agent that edits this repo, the import was a silent failure mode (delete the line
-and the rules go missing rather than erroring), and one file beats two that have
-to stay in sync. The *global* file in `.claude/` was merged the same way, for the
-same reasons — there is no `AGENTS.md` at either scope any more.
+Claude Code is the only agent that edits this repo and reads no `AGENTS.md` at
+either scope, so the rules below live in this file rather than in a sibling one
+pulled in by an `@AGENTS.md` import — a line whose deletion lost them silently.
 
 Not to be confused with `.claude/CLAUDE.md`, which is the *global* instruction
 file staged here for deployment to `~/.claude/` — it is not about this repo.
@@ -136,13 +132,17 @@ every turn, which is how you end up leaving Do Not Disturb on.
 
 The status line is where the plan's usage windows live, because `/usage` only
 answers when asked and the 5-hour window is usually already the reason you
-asked. Three rows — session, week, context — each a bar plus a countdown, using
-Claude Code's own names for the windows so the two never disagree; a fourth, the
-Fable weekly window, is written but dormant, because 2.1.258 tracks that window
-and draws it in `/usage` yet drops it from the object it hands the script. It
-re-runs on every render, so it is held to the same latency budget as `.zshrc`:
-one `jq` and nothing else, ~10ms measured. `padding: 0` puts it flush left
-against the prompt box rather than indented by one column.
+asked. Four rows — session, week, Fable week, context — each a bar plus a
+countdown, using Claude Code's own names for the windows so the two never
+disagree. The Fable row is the odd one: Claude Code tracks that window and draws
+it in `/usage` yet drops it from the object it hands the script (verified on
+2.1.258 and again on 2.1.266), so the script keeps its own five-minute cache of
+the usage endpoint at `~/.cache/claude-usage.json`, filled by a background
+refresher and read by the same `jq` that renders. The script re-runs on every
+render, so it is held to the same latency budget as `.zshrc`: one `jq` on the
+hot path and nothing else, ~20ms measured with the cache read; the refresher
+never runs in the foreground. `padding: 0` puts it flush left against the
+prompt box rather than indented by one column.
 
 The same file carries the other untracked-but-load-bearing setting,
 `"attribution": { "commit": "", "pr": "" }`, which is what actually strips the
