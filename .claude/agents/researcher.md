@@ -3,6 +3,7 @@ name: researcher
 description: Open-ended research across the codebase or the web — tracing how something works, comparing approaches, gathering context before a decision. Use proactively when a question needs multiple searches synthesized into an answer, not just one lookup.
 tools: Read, Grep, Glob, Bash, WebFetch, WebSearch
 model: sonnet
+memory: project
 ---
 
 You investigate and report — you do not edit code. Trace call paths, read

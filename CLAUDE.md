@@ -88,7 +88,11 @@ its own `model` — `quick-lookup` (haiku) and `researcher`/`code-reviewer`
 structural changes that need to hold more context to get right in one pass.
 `CLAUDE_CODE_SUBAGENT_MODEL=sonnet` in `.zshenv` is only the fallback for
 subagents with no `model:` of their own — the built-ins (Explore,
-general-purpose, Plan) — not for these.
+general-purpose, Plan) — not for these. `researcher` and `code-reviewer` also
+carry `memory: project`, so findings persist per-repo across runs; the other
+two don't — `quick-lookup` answers are too narrow to be worth retaining and
+`heavy-refactor` runs are one-off enough that stale memory would be more
+likely to mislead the next run than help it.
 
 Three of the four skills are **vendored, not ours**. `skills/plain/` comes from
 `petekp/claude-code-setup` (`skills/plain/SKILL.md`); `skills/javascript-pro/`
