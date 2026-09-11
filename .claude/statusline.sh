@@ -138,11 +138,17 @@
 #   .context_window.used_percentage   0-100, already rounded and clamped by the
 #                           caller — and null until the first turn has usage.
 #
-# And the cache, i.e. the `/api/oauth/usage` response (schema from 2.1.266):
+# And the cache, i.e. the `/api/oauth/usage` response (schema from 2.1.269):
 #
-#   .five_hour / .seven_day .utilization is a 0-1 *fraction* here, unlike
-#                           stdin, and .resets_at is an ISO string — hence the
-#                           ×100 in `cached` and the shared `secs`.
+#   .five_hour / .seven_day .utilization is 0-100 here too, and .resets_at is
+#                           an ISO string. It was a 0-1 *fraction* on 2.1.266
+#                           and this script scaled it ×100; 2.1.269 returns
+#                           5.0 and 28.0 for 5% and 28%, and its own `/usage`
+#                           floors the value as-is (`Math.floor(a.utilization)`
+#                           in the binary) while the header-derived path now
+#                           multiplies *its* fraction by 100 to match. So no
+#                           scaling: the ×100 is what drew 500% and a bar
+#                           five times the width of the terminal.
 #   .limits[]               the per-model windows. `.percent` is already 0-100,
 #                           `.scope.model.display_name` is the label ("Fable"),
 #                           and entries without a model scope are other kinds
@@ -218,10 +224,16 @@ out=$(jq -r --slurpfile c "$cache_in" '
     (if $p <= 0 then 0 else ([$p / 100 * $w | floor, 1] | max) end) as $n
     | "\(heat($p))\(rep("█"; $n))\(track)\(rep("░"; $w - $n))\(off)";
 
-  # Both accepted forms of resets_at, normalised to epoch seconds.
+  # Both accepted forms of resets_at, normalised to epoch seconds. The two
+  # subs are for the cache: the endpoint writes `23:09:59.873787+00:00`, and
+  # jq 1.8 fromdateiso8601 takes only whole seconds ending in `Z`, so without
+  # them every cached row silently lost its countdown (try/catch ate the
+  # parse error). Stdin already sends `Z`, and the subs are no-ops on it.
   def secs($v):
     if $v == null then null
-    else try (if ($v | type) == "number" then $v else ($v | fromdateiso8601) end)
+    else try (if ($v | type) == "number" then $v
+              else ($v | sub("\\.[0-9]+"; "") | sub("\\+00:00$"; "Z")
+                       | fromdateiso8601) end)
          catch null
     end;
 
@@ -259,7 +271,7 @@ out=$(jq -r --slurpfile c "$cache_in" '
       if $fresh then
         $cache[$k]
         | select(. and .utilization != null)
-        | {used_percentage: (.utilization * 100), resets_at}
+        | {used_percentage: .utilization, resets_at}
       else empty end;
 
   .model.display_name as $model
