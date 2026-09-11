@@ -33,6 +33,13 @@ export EDITOR='nvim'
 export VISUAL=$EDITOR
 export PAGER='less'
 
+# Claude Code subagents (Task tool) default to the session's own model
+# otherwise, which is Opus more often than not — pin them to Sonnet, cheaper
+# and plenty for the research/search/lint-style work subagents actually do.
+# Belongs in .zshenv, not .zprofile: Claude Code spawns subagent processes
+# non-interactively, and those only source .zshenv.
+export CLAUDE_CODE_SUBAGENT_MODEL='sonnet'
+
 # Line-editor word boundaries (base value; .zshrc strips '/' on top of this so
 # ^W treats path segments as separate words).
 export WORDCHARS='~!#$%^&*(){}[]<>?.+;'
