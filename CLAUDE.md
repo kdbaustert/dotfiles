@@ -59,6 +59,7 @@ Known offenders:
 | `.claude/hooks/`      | `notify.sh`, the Notification hook (terminal-notifier banner)     |
 | `.claude/statusline.sh` | The status line — plan usage, context, model, on every render   |
 | `.claude/skills/`     | Skills, one dir per skill; `php-psr12/` is ours, three are vendored |
+| `.claude/agents/`     | Custom subagents, one `.md` file per agent, ours                  |
 
 The two `.config/git/` files reach git by different routes, which matters when
 one of them appears not to work: `allowed_signers` is named explicitly by
@@ -67,10 +68,10 @@ pointing at it at all — git reads `$XDG_CONFIG_HOME/git/ignore` on its own, so
 the symlink is the whole wiring.
 
 `.claude/` is tracked in full but only partly deployed: `install.sh` links
-`CLAUDE.md`, `hooks/notify.sh`, `statusline.sh` and every directory under
-`skills/`, so `themes/my-theme.json` rides along for reference and is applied by
-hand. The installer also sweeps the retired `~/.claude/AGENTS.md` link on
-re-run.
+`CLAUDE.md`, `hooks/notify.sh`, `statusline.sh` and every file under `agents/`
+and every directory under `skills/`, so `themes/my-theme.json` rides along for
+reference and is applied by hand. The installer also sweeps the retired
+`~/.claude/AGENTS.md` link on re-run.
 
 `skills/` is a loop over `skills/*`, not one `link` line per skill, for the same
 reason `.config/*` is — a skill added here but not named in the installer would
@@ -78,6 +79,16 @@ silently never deploy, the exact failure mode that killed the `@AGENTS.md`
 import. A skill is discovered by its *directory* containing a `SKILL.md`, so the
 directory is what gets linked. The sweep alongside it removes only links that
 point into this repo, so a skill installed by hand from elsewhere survives.
+
+`agents/` is the same loop-not-list pattern, one level shallower: a subagent is
+discovered by a `.md` file directly under `~/.claude/agents`, so the file itself
+is what gets linked, not a containing directory. Each file's frontmatter sets
+its own `model` — `quick-lookup` (haiku) and `researcher`/`code-reviewer`
+(sonnet) for search and review work, `heavy-refactor` (opus) for multi-file
+structural changes that need to hold more context to get right in one pass.
+`CLAUDE_CODE_SUBAGENT_MODEL=sonnet` in `.zshenv` is only the fallback for
+subagents with no `model:` of their own — the built-ins (Explore,
+general-purpose, Plan) — not for these.
 
 Three of the four skills are **vendored, not ours**. `skills/plain/` comes from
 `petekp/claude-code-setup` (`skills/plain/SKILL.md`); `skills/javascript-pro/`

@@ -33,9 +33,10 @@ export EDITOR='nvim'
 export VISUAL=$EDITOR
 export PAGER='less'
 
-# Claude Code subagents (Task tool) default to the session's own model
-# otherwise, which is Opus more often than not — pin them to Sonnet, cheaper
-# and plenty for the research/search/lint-style work subagents actually do.
+# Fallback model for Claude Code subagents (Task tool) that don't pin their
+# own — the built-ins (Explore, general-purpose, Plan) and anything without a
+# `model:` in its frontmatter. Custom agents in .claude/agents/ (dotfiles repo)
+# set their own tier per task; this just keeps the rest off Opus by default.
 # Belongs in .zshenv, not .zprofile: Claude Code spawns subagent processes
 # non-interactively, and those only source .zshenv.
 export CLAUDE_CODE_SUBAGENT_MODEL='sonnet'

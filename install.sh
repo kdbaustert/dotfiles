@@ -316,6 +316,32 @@ if [ -d "$DOTFILES_DIR/.claude/skills" ]; then
   done
 fi
 
+# Subagents: link every subagent file under .claude/agents, same loop-not-list
+# reasoning as skills above — a file added here but not named in the installer
+# would silently never deploy. Claude Code discovers a subagent by a .md file
+# directly under ~/.claude/agents, so the file itself is what gets linked, not
+# a containing directory.
+if [ -d "$DOTFILES_DIR/.claude/agents" ]; then
+  mkdir -p "$HOME/.claude/agents"
+  shopt -s dotglob nullglob
+  for item in "$DOTFILES_DIR/.claude/agents"/*.md; do
+    [ -f "$item" ] || continue
+    link "$item" "$HOME/.claude/agents/$(basename "$item")"
+  done
+  shopt -u dotglob nullglob
+
+  # Sweep ~/.claude/agents links left dangling by a subagent this repo no
+  # longer ships. Same guard as the skills sweep — only a symlink pointing
+  # into this repo is removed, so a hand-installed agent from elsewhere
+  # survives.
+  for item in "$HOME/.claude/agents"/*; do
+    if [ -L "$item" ] && [ ! -e "$item" ] \
+      && case "$(readlink "$item")" in "$DOTFILES_DIR"/*) true ;; *) false ;; esac; then
+      rm -f "$item" && info "Removed dangling symlink ~/.claude/agents/$(basename "$item")"
+    fi
+  done
+fi
+
 # Retired: the ~/.claude/AGENTS.md link from before that merge. Same guard as the
 # root-level sweep above — only a symlink pointing into this repo is removed.
 if [ -L "$HOME/.claude/AGENTS.md" ] && case "$(readlink "$HOME/.claude/AGENTS.md")" in "$DOTFILES_DIR"/*) true ;; *) false ;; esac; then
