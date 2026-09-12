@@ -104,43 +104,6 @@ fi
 alias pkey="pbcopy < ~/.ssh/github_1p.pub"
 alias pubkey="pbcopy < ~/.ssh/github_1p.pub && echo '=> Public key copied to pasteboard.'"
 
-# ClamAV
-# Signatures auto-update every 2h via ~/Library/LaunchAgents/com.clamav.freshclam.plist
-# (StartInterval=7200, RunAtLoad). That symlink had gone missing, so nothing was
-# updating them at all — re-linked and re-bootstrapped 2026-08-05.
-#
-# clamd is NOT running (`brew services list` reports clamav "none"), so the three
-# clamdscan aliases below — clamq, clamdl, clamreload — currently fail with
-# "Can't connect to clamd through .../clamd.sock". The clamscan-based ones work
-# regardless, since they load signatures per invocation. Start the daemon with
-# `brew services start clamav` if you want the fast path; note clamd holds the
-# whole signature set resident (~1GB+).
-
-# Scanning
-alias clamf=clamfull                              # full-disk scan (function, see functions.zsh)
-alias clamq='clamdscan --fdpass -m -i'            # quick scan via daemon — `clamq ~/Downloads`
-alias clamdl='clamdscan --fdpass -m -i "$HOME/Downloads"'
-# --fdpass is not optional: clamd runs as $USER, so without the passed file
-# descriptor it can't open much of anything outside your own files.
-
-# Signatures
-alias clamdb='freshclam'                          # update signatures now
-alias clamdbauto='launchctl kickstart gui/501/com.clamav.freshclam'  # trigger the scheduled update
-alias clamdbinfo='sigtool --info /opt/homebrew/var/lib/clamav/daily.cvd | head -5'
-
-# Daemon
-alias clamon='brew services start clamav'
-alias clamoff='brew services stop clamav'
-alias clamrestart='brew services restart clamav'
-alias clamstatus='brew services info clamav'
-alias clamreload='clamdscan --reload'             # re-read signatures without a restart
-
-# Logs
-alias clamlog='tail -f "$HOME/clamav-full-scan.log"'
-alias clamdblog='tail -20 /opt/homebrew/var/log/clamav/freshclam.log'
-alias clamdlog='tail -20 /opt/homebrew/var/log/clamav/clamd.log'
-alias clamcfg='command clamconf | head -40'       # dump effective config
-
 # MacOS commands
 alias testspeed="networkQuality"
 

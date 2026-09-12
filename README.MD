@@ -33,7 +33,6 @@ It will ask for your sudo password up front, and it expects Apple silicon
   vivid/Voltage one — see `themes/voltage.md`
 - Bootstraps zinit and pre-installs/compiles the zsh plugins
 - Builds the Voltage theme caches for `bat` and fast-syntax-highlighting
-- Configures ClamAV (signatures, scheduled `freshclam`, `clamd`)
 - Enables Touch ID for `sudo` via `/etc/pam.d/sudo_local`
 - Points iTerm2 at `iterm/` for its preferences
 
@@ -65,7 +64,6 @@ SETUP_SCRIPTS=all ./install.sh          # macos npm composer mas gh-extensions
 | `setup/`     | The optional scripts above                             |
 | `themes/`    | Voltage — the shared palette; see `themes/voltage.md`  |
 | `fonts/`     | Ghostty's colored tab-icon font + its build script     |
-| `clamav/`    | ClamAV config + the `freshclam` LaunchAgent            |
 | `iterm/`     | iTerm2 preferences folder                              |
 | `obsidian/`  | "Amethyst Night" theme                                 |
 

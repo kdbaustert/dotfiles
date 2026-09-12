@@ -372,55 +372,6 @@ if [ -d "$DOTFILES_DIR/.config" ]; then
 fi
 
 #------------------------------------------------------------------------------
-title "ClamAV"
-#------------------------------------------------------------------------------
-# clamav comes from the Brewfile; this wires up config + the signature updater.
-# Configs are symlinked (not copied) so edits in the repo take effect directly.
-if command -v clamscan &>/dev/null; then
-  CLAM_PREFIX="$(brew --prefix)"
-
-  # freshclam refuses to run if these don't exist, and the formula ships none.
-  mkdir -p "$CLAM_PREFIX/var/lib/clamav" \
-           "$CLAM_PREFIX/var/log/clamav" \
-           "$CLAM_PREFIX/var/run/clamav"
-
-  link "$DOTFILES_DIR/clamav/clamd.conf"     "$CLAM_PREFIX/etc/clamav/clamd.conf"
-  link "$DOTFILES_DIR/clamav/freshclam.conf" "$CLAM_PREFIX/etc/clamav/freshclam.conf"
-
-  # The configs hard-code /opt/homebrew and the current user; rewrite both if
-  # this machine differs (Intel prefix, or a different account name).
-  if [ "$CLAM_PREFIX" != "/opt/homebrew" ] || [ "$USER" != "kenny" ]; then
-    warning "ClamAV configs are pinned to /opt/homebrew and user 'kenny' — edit clamav/*.conf for this machine."
-  fi
-
-  mkdir -p "$HOME/Library/LaunchAgents"
-  link "$DOTFILES_DIR/clamav/com.clamav.freshclam.plist" \
-       "$HOME/Library/LaunchAgents/com.clamav.freshclam.plist"
-
-  # Signatures aren't in the repo (~120MB, and they'd be stale anyway).
-  # This also pulls the third-party DBs declared as DatabaseCustomURL in
-  # freshclam.conf (urlhaus, malwarehash, rogue) — see clamav/README.md for
-  # why those three and not the others.
-  #
-  # Started in the BACKGROUND: this is the longest single step in the script and
-  # it is pure network I/O, while the zinit section below is a git clone plus
-  # some CPU. Running them concurrently overlaps the two instead of paying for
-  # both in series. Output goes to a log so it can't interleave with ours; the
-  # wait, the exit status and the DB checks are all handled after zinit, under
-  # "Finishing ClamAV setup".
-  FRESHCLAM_LOG="$(mktemp -t freshclam)"
-  if [ ! -f "$CLAM_PREFIX/var/lib/clamav/daily.cvd" ]; then
-    info "Downloading ClamAV signatures in the background (~120MB)..."
-  else
-    info "Refreshing ClamAV signatures in the background..."
-  fi
-  freshclam >"$FRESHCLAM_LOG" 2>&1 &
-  FRESHCLAM_PID=$!
-else
-  warning "Skipping ClamAV setup — clamscan not found (Brewfile install may have failed)."
-fi
-
-#------------------------------------------------------------------------------
 title "Bootstrapping zinit + plugins"
 #------------------------------------------------------------------------------
 # zinit.zsh self-installs on first interactive shell, but cloning it here keeps
@@ -527,43 +478,6 @@ else
   else
     warning "Could not install the tab icon font; tab icons stay monochrome."
   fi
-fi
-
-#------------------------------------------------------------------------------
-title "Finishing ClamAV setup"
-#------------------------------------------------------------------------------
-# Collect the background freshclam started above, then do everything that
-# genuinely depends on the signatures being on disk.
-if [ -n "${FRESHCLAM_PID:-}" ]; then
-  info "Waiting for the signature download to finish..."
-  if wait "$FRESHCLAM_PID"; then
-    success "ClamAV signatures up to date."
-  else
-    warning "freshclam failed — run it manually later. Output:"
-    sed 's/^/    /' "$FRESHCLAM_LOG" >&2
-  fi
-  rm -f "$FRESHCLAM_LOG"
-
-  # A third-party mirror can 404 or move without freshclam failing overall,
-  # which would silently leave you with core signatures only. Check explicitly.
-  for db in urlhaus.ndb malwarehash.hsb rogue.hdb; do
-    if [ ! -s "$CLAM_PREFIX/var/lib/clamav/$db" ]; then
-      warning "Third-party signature DB missing: $db — check DatabaseCustomURL in clamav/freshclam.conf"
-    fi
-  done
-
-  # bootout first so a re-run picks up plist changes; ignore "not loaded".
-  launchctl bootout "gui/$(id -u)/com.clamav.freshclam" &>/dev/null
-  if launchctl bootstrap "gui/$(id -u)" "$HOME/Library/LaunchAgents/com.clamav.freshclam.plist" 2>/dev/null; then
-    success "freshclam updater scheduled (every 2h)."
-  else
-    warning "Could not load the freshclam LaunchAgent."
-  fi
-
-  # Non-sudo: clamd runs as $USER and starts at login, not at boot.
-  brew services restart clamav &>/dev/null \
-    && success "clamd running." \
-    || warning "clamd failed to start — check $CLAM_PREFIX/var/log/clamav/clamd.log"
 fi
 
 #------------------------------------------------------------------------------

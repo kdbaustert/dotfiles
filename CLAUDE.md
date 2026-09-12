@@ -54,7 +54,7 @@ Known offenders:
 | `setup/`              | Opt-in scripts (`SETUP_SCRIPTS="npm composer" ./install.sh`)      |
 | `themes/voltage.md`   | Canonical palette + the list of files that carry it               |
 | `fonts/`              | The tab-icon color font and the script that builds it             |
-| `clamav/`, `iterm/`, `obsidian/` | App-specific config                                    |
+| `iterm/`, `obsidian/` | App-specific config                                            |
 | `.claude/CLAUDE.md`   | Global Claude Code instructions                                   |
 | `.claude/hooks/`      | `notify.sh`, the Notification hook (terminal-notifier banner)     |
 | `.claude/statusline.sh` | The status line — plan usage, context, model, on every render   |
@@ -184,8 +184,8 @@ other or copy the palette into either.
 
 ## Do not run `install.sh` to test a change
 
-It asks for sudo, edits `/etc/pam.d/sudo_local`, runs `brew bundle`, downloads
-~120MB of ClamAV signatures, and loads LaunchAgents. Verify narrowly instead:
+It asks for sudo, edits `/etc/pam.d/sudo_local`, runs `brew bundle`, and loads
+LaunchAgents. Verify narrowly instead:
 
 ```sh
 bash -n install.sh                            # bash: parse
@@ -233,9 +233,9 @@ declare a **bash** shebang and use bash arrays — they are run directly, never 
 
 **Comments here explain *why*, and are expected to be long.** This repo documents
 rejected alternatives inline — why `pay-respects` isn't a Homebrew formula, why
-`LS_COLORS` isn't a zinit plugin, why the ClamAV download runs in the background.
-When you change one of those decisions, update the comment that justified the old
-one. A change with no rationale attached does not match this codebase.
+`LS_COLORS` isn't a zinit plugin. When you change one of those decisions, update
+the comment that justified the old one. A change with no rationale attached does
+not match this codebase.
 
 ## Generated vs. tracked
 
