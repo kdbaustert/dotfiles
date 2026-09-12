@@ -57,6 +57,20 @@ atuin-history = 2
 # Empty = atuin's own default path, which is where our atuin config leaves it.
 atuin-db-path = ""
 
+# What the arrows do when the menu is CLOSED — "history" browses iris's own
+# history, "shell" leaves the key to zle. "shell", so the empty-prompt Up arrow
+# reaches atuin again: `atuin init zsh` binds Up as well as Ctrl-R (.zshrc), and
+# iris reads keys in raw mode before zle sees them, so the default "history" was
+# a silent theft of that key rather than an error.
+#
+# New in 0.7.0, and the reason this file changed. Before it the only way to hand
+# Up back was to move navigate-up/down off the arrows entirely, which cost the
+# menu its scroll keys — see [keybindings] below. This costs nothing: menu open,
+# the arrows still scroll it; menu closed, they fall through. iris's own history
+# mode is still there on toggle-mode, and atuin-history = 2 above means it reads
+# the same database atuin does either way.
+navigate-closed = "shell"
+
 # Probes unknown binaries with `<cmd> __complete` to synthesise suggestions for
 # Cobra-based CLIs. Left on: it executes the binary you are already typing, with
 # a completion subcommand, which is the same thing carapace and the shell's own
@@ -150,14 +164,12 @@ toggle-menu = "shift+tab"
 select = "tab"
 
 # The arrows, i.e. iris's defaults. These were briefly moved to Ctrl-P/Ctrl-N to
-# keep the empty-prompt up-arrow reaching atuin — that only made sense while
-# iris was a guest in an atuin-owned shell. It autostarts and owns the line
-# editor now, so the arrows are its own: moving them just left the menu
-# unscrollable by the one pair of keys anybody reaches for.
-#
-# Upstream documents them as "move the selection, or open command history when
-# the prompt is empty", and that second half is why atuin no longer answers Up.
-# iris's history mode covers it, reading atuin's database via atuin-history = 2.
+# keep the empty-prompt up-arrow reaching atuin, which left the menu unscrollable
+# by the one pair of keys anybody reaches for. core.navigate-closed = "shell"
+# above replaces that workaround and is strictly better: it splits the two cases
+# rather than trading one for the other. Menu open, the arrows scroll it; menu
+# closed, they fall through to zle and atuin answers Up as it did before iris was
+# installed. So these stay on the arrows.
 navigate-up = "up"
 navigate-down = "down"
 

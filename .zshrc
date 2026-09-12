@@ -76,11 +76,19 @@ bindkey '^X^E' edit-command-line
 source "$DOTFILES/zsh/extra/cache.zsh"
 
 #------------------------------------------------------------------------------
-# iris — inline completion overlay, DISABLED (autostart is opt-in)
+# iris — inline completion overlay, ON (autostart defaults on)
 #------------------------------------------------------------------------------
-# Currently off: a terminal opens into plain zsh. `iris` still works when typed,
-# and `export IRIS_AUTOSTART=1` brings the always-on behaviour back — see the
-# two branches at the bottom of this block.
+# Every terminal opens into iris, which then runs zsh underneath it. To get a
+# plain shell for one invocation, set the switch to 0 rather than unsetting it:
+# `IRIS_AUTOSTART=0 zsh`. That hatch is worth keeping precisely because iris
+# wraps the whole terminal — "edit a tracked file to get my shell back" is the
+# wrong order of operations when the line editor is the thing misbehaving.
+#
+# This was off between 12 Aug and 12 Sep 2026, and the reason it could be turned
+# back on is the first bullet under KNOWN CONFLICTS below: iris used to swallow
+# the empty-prompt Up arrow before atuin saw it, and 0.7.0's navigate-closed
+# setting hands that key back. The two conflicts that remain are settled in
+# config.toml rather than endured.
 #
 # `iris init zsh` emits TWO blocks and this shell runs exactly one of them:
 #
@@ -110,9 +118,10 @@ source "$DOTFILES/zsh/extra/cache.zsh"
 # same keystrokes, and iris answers first, unconditionally, whether its menu is
 # open or not. What that has actually cost here:
 #
-#   - the empty-prompt Up arrow never reaches atuin, so its history search is
-#     unavailable on that key (Ctrl-R still is). iris's own history mode covers
-#     it, reading atuin's database via atuin-history = 2 in config.toml;
+#   - the empty-prompt Up arrow used to be swallowed before atuin saw it. Fixed
+#     in iris 0.7.0 by core.navigate-closed = "shell" in config.toml, which hands
+#     the key back to zle whenever the menu is closed; atuin-history = 2 stays,
+#     so iris's own history mode still reads atuin's database;
 #   - iris's accept key must NOT be bound to enter — doing so garbles atuin's
 #     insert into escape sequences, because both answer the same keypress;
 #   - typed aliases get rewritten in place by expand-alias. The alias table is
@@ -127,16 +136,23 @@ source "$DOTFILES/zsh/extra/cache.zsh"
 # kill switch the generated exec branch checks, so it cannot re-exec. Without
 # this branch a hand-started `iris` has no line feed and suggests nothing.
 #
-# Branch 2 — the autostart, opt-in via $IRIS_AUTOSTART. The rest of that guard
+# Branch 2 — the autostart, and the branch a fresh terminal takes. It tests
+# != 0 rather than -n so that turning iris off is a value you set for one shell
+# rather than a variable you have to remember to unset. The rest of that guard
 # stops `exec iris` firing in a shell that is interactive but not a session:
 # `zsh -ic '…'` sets $ZSH_EXECUTION_STRING and is how install.sh drains zinit's
 # turbo queue, so without it the installer drops into an interactive iris and
 # hangs. -t 1 catches the same shape when stdout is a pipe.
+#
+# Not exported: the child shell reaches Branch 1 on $IRIS_PID regardless, and
+# leaving it shell-local keeps it out of the environment of everything iris runs.
+: ${IRIS_AUTOSTART:=1}
+
 if [[ -n $IRIS_PID && -n $IRIS_FD ]]; then
   IRIS_RESCUE=1
   zcache iris iris init zsh
   unset IRIS_RESCUE
-elif [[ -n $IRIS_AUTOSTART && -z $ZSH_EXECUTION_STRING && -t 1 && $TERM != dumb ]]; then
+elif [[ $IRIS_AUTOSTART != 0 && -z $ZSH_EXECUTION_STRING && -t 1 && $TERM != dumb ]]; then
   zcache iris iris init zsh
 fi
 

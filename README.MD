@@ -189,12 +189,14 @@ reasons: the rules for editing *this* repo are inlined directly in the top-level
 `CLAUDE.md`, since Claude Code is the only agent that edits it and one file can't
 drift from its copy.
 
-**`iris` is on demand, not autostarted.** It wraps the shell rather than
-plugging into zle, so leaving it in charge of every prompt fights atuin,
-fzf-tab, zsh-autosuggestions and the alias table — the iris block in `.zshrc`
-records what broke. `.zshrc` installs only its zle hooks, and only inside a
-shell iris itself started, so typing `iris` gives you the full overlay and
-exiting gives you your shell back.
+**`iris` autostarts, and `IRIS_AUTOSTART=0` opts one shell out.** It wraps the
+shell rather than plugging into zle, so it arbitrates keys against atuin,
+fzf-tab and zsh-autosuggestions before they see them — the iris block in
+`.zshrc` records each collision and where it is settled. It ran on demand only
+for a month because it swallowed the empty-prompt Up arrow; iris 0.7.0's
+`core.navigate-closed = "shell"` gives that key back to atuin, which is what
+made always-on reasonable again. `IRIS_AUTOSTART=0 zsh` gets you a plain shell
+without editing anything.
 
 **Don't run `iris setup` or `iris uninstall`.** Both rewrite your shell RC file
 in place, and `~/.zshrc` is a symlink into this repo — they would edit the

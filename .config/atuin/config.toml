@@ -75,7 +75,27 @@
 
 ## the maximum number of lines the interface should take up
 ## set it to 0 to always go full screen
-# inline_height = 0
+##
+## Pinned to 0, and the default is NOT the 0 written on the line above: atuin's
+## code default is 40 (`.set_default("inline_height", 40)` in atuin-client's
+## settings.rs), so leaving this commented gives you 40, not full screen.
+##
+## 40 is a trap while iris is on. atuin only falls back to full screen when
+## inline_height >= the terminal's row count, so a window taller than 40 rows
+## takes ratatui's Inline viewport, which asks crossterm for the cursor position
+## — a DSR `ESC[6n`. iris owns the real terminal in raw mode and runs zsh on a
+## pty underneath; the query reaches the terminal, but iris eats the reply as a
+## keystroke instead of forwarding it into the pty, so crossterm times out and
+## Ctrl-R / Up / Down print "Error: The cursor position could not be read within
+## a normal duration" rather than opening the search. Measured in a pty harness
+## that answers ESC[6n like the terminal does: 40 rows under iris fine, 60 rows
+## under iris broken, 60 rows with iris off fine, 60 rows under iris with this
+## set to 0 fine.
+##
+## So 0 costs nothing — it is what every window of 40 rows or fewer already did.
+## The alternative is iris forwarding the cursor-position reply, which 0.7.0 has
+## no setting for; keep this pinned until it does.
+inline_height = 0
 
 ## the maximum number of lines the interface should take up
 ## when atuin is invoked from a shell up-key binding
