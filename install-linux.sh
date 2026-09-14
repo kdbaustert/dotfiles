@@ -139,14 +139,15 @@ else
     # and any one of them can fail on its own, and a batch would take the rest
     # down with it. Slower, but a missing iris should not cost firebase-tools.
     #
-    # Build output is silenced below, and an AUR build can run for minutes with
-    # nothing else on screen — print which package and position we're on before
-    # each one starts, so a slow build reads as "still going" rather than "stuck".
+    # Build output is silenced, and an AUR build can run for minutes with
+    # nothing else on screen — spinner_run keeps a live spinner + elapsed time
+    # on screen for each package, so a slow build reads as "still going"
+    # rather than "stuck".
     aur_n=0
     for pkg in "${aur[@]}"; do
       aur_n=$((aur_n + 1))
-      info "[$aur_n/${#aur[@]}] Building $pkg..."
-      if "$AUR_HELPER" -S --needed --noconfirm "${AUR_HELPER_FLAGS[@]}" -- "$pkg" </dev/null &>/dev/null; then
+      if spinner_run "[$aur_n/${#aur[@]}] Building $pkg..." \
+        "$AUR_HELPER" -S --needed --noconfirm "${AUR_HELPER_FLAGS[@]}" -- "$pkg"; then
         success "AUR: $pkg"
       else
         warning "AUR: $pkg failed — see arch/aurlist for which of these are expected to be missing."

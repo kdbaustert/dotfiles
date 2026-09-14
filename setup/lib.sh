@@ -37,6 +37,40 @@ warning() { echo -e "${COLOR_YELLOW}Warning: ${COLOR_NONE}$1"; ISSUES+=("$1"); }
 info()    { echo -e "${COLOR_BLUE}Info: ${COLOR_NONE}$1"; }
 success() { echo -e "${COLOR_GREEN}$1${COLOR_NONE}"; }
 
+# spinner_run <label> <command...>
+# Runs a command with its output discarded (an AUR build, a silent download)
+# while a spinner + elapsed seconds updates in place on the same line, so a
+# step that would otherwise sit blank for minutes reads as "still going"
+# rather than "stuck". Falls back to a single static line when stdout isn't a
+# terminal (piped/logged runs), where a \r spinner would just print garbage.
+# Returns the command's own exit status.
+spinner_run() {
+  local label="$1"; shift
+  local logfile
+  logfile="$(mktemp)"
+
+  if [ ! -t 1 ]; then
+    info "$label"
+    "$@" </dev/null >"$logfile" 2>&1
+    local status=$?
+    rm -f "$logfile"
+    return $status
+  fi
+
+  "$@" </dev/null >"$logfile" 2>&1 &
+  local pid=$! frames='⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏' i=0 start=$SECONDS
+  while kill -0 "$pid" 2>/dev/null; do
+    printf '\r%s %s (%ss)\033[K' "${frames:i%${#frames}:1}" "$label" "$((SECONDS - start))"
+    i=$((i + 1))
+    sleep 0.1
+  done
+  wait "$pid"
+  local status=$?
+  printf '\r\033[K'
+  rm -f "$logfile"
+  return $status
+}
+
 # Every warning collected during the run, so a step's failure does not scroll
 # off screen by the time the installer finishes. `error` is deliberately not
 # collected here — its four call sites are all preconditions the rest of the
