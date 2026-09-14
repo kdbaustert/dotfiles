@@ -38,11 +38,15 @@ info()    { echo -e "${COLOR_BLUE}Info: ${COLOR_NONE}$1"; }
 success() { echo -e "${COLOR_GREEN}$1${COLOR_NONE}"; }
 
 # spinner_run <label> <command...>
-# Runs a command with its output discarded (an AUR build, a silent download)
-# while a spinner + elapsed seconds updates in place on the same line, so a
-# step that would otherwise sit blank for minutes reads as "still going"
-# rather than "stuck". Falls back to a single static line when stdout isn't a
-# terminal (piped/logged runs), where a \r spinner would just print garbage.
+# Runs a command while a header line (spinner + elapsed seconds) plus a
+# scrolling window of the command's own latest output lines redraws in place,
+# so a step that would otherwise sit blank for minutes (an AUR build, a silent
+# download) reads as "still going, and here's what it's doing" rather than
+# "stuck". Falls back to passing output straight through when stdout isn't a
+# terminal (piped/logged runs), where cursor-movement escapes would just print
+# garbage.
+# On failure the full log is left in place and its path printed, since a
+# build failure with no output is unactionable; on success it's removed.
 # Returns the command's own exit status.
 spinner_run() {
   local label="$1"; shift
@@ -51,23 +55,43 @@ spinner_run() {
 
   if [ ! -t 1 ]; then
     info "$label"
-    "$@" </dev/null >"$logfile" 2>&1
-    local status=$?
-    rm -f "$logfile"
-    return $status
+    "$@" </dev/null 2>&1 | tee "$logfile"
+    local st=${PIPESTATUS[0]}
+    [ "$st" -eq 0 ] && rm -f "$logfile"
+    return "$st"
   fi
 
   "$@" </dev/null >"$logfile" 2>&1 &
   local pid=$! frames='⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏' i=0 start=$SECONDS
+  local cols window=5 drawn=0
+  cols=$(tput cols 2>/dev/null || echo 80)
   while kill -0 "$pid" 2>/dev/null; do
-    printf '\r%s %s (%ss)\033[K' "${frames:i%${#frames}:1}" "$label" "$((SECONDS - start))"
+    # Move up over whatever this loop drew last iteration, then redraw the
+    # header + tail so the block updates in place instead of scrolling.
+    [ "$drawn" -gt 0 ] && printf '\033[%dA' "$drawn"
+    printf '\r%s %s (%ss)\033[K\n' \
+      "${frames:i%${#frames}:1}" "$label" "$((SECONDS - start))"
+    local lines=() n=0
+    while IFS= read -r line; do
+      lines+=("$line")
+    done < <(tail -n "$window" "$logfile" 2>/dev/null | tr -d '\r')
+    for line in "${lines[@]}"; do
+      printf '  %.*s\033[K\n' "$((cols > 2 ? cols - 2 : 0))" "$line"
+      n=$((n + 1))
+    done
+    drawn=$((n + 1))
     i=$((i + 1))
     sleep 0.1
   done
   wait "$pid"
   local status=$?
-  printf '\r\033[K'
-  rm -f "$logfile"
+  [ "$drawn" -gt 0 ] && printf '\033[%dA' "$drawn"
+  printf '\033[J'
+  if [ "$status" -eq 0 ]; then
+    rm -f "$logfile"
+  else
+    warning "$label failed — full output in $logfile"
+  fi
   return $status
 }
 
