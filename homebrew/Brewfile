@@ -12,7 +12,10 @@ brew "tmux"
 brew "gnupg"
 brew "openssl"
 brew "wget"
-brew "fzf"
+# fzf — now fetched by zinit as a gh-r binary (zsh/zinit.zsh section 5), not
+# installed here. Left declared, commented, so the package isn't lost from
+# this list.
+# brew "fzf"
 brew "git-lfs"
 brew "httpie"
 brew "jq"
@@ -39,22 +42,25 @@ brew "lolcat"
 brew "ccat"
 brew "navi"
 brew "ffmpeg"
-brew "bat"
+# bat, lsd, fd, zoxide, git-delta, ripgrep — now fetched by zinit as gh-r
+# binaries (zsh/zinit.zsh section 5), not installed here. Left declared,
+# commented, so the packages aren't lost from this list.
+# brew "bat"
 brew "ox"
 brew "mdcat"
 brew "xplr"
 brew "glow"
-brew "lsd"
-brew "fd"
+# brew "lsd"
+# brew "fd"
 brew "sqlite"
 brew "zlib"
-brew "zoxide"
-brew "git-delta"
+# brew "zoxide"
+# brew "git-delta"
 brew "lazygit"
 brew "eza"
 brew "assh"
 brew "procs"
-brew "ripgrep"
+# brew "ripgrep"
 brew "nnn"
 # node — the default Node here. nvm is loaded (see zsh/zinit.zsh) but manages no
 # versions, so this is what actually resolves. It was installed by hand and left
@@ -67,7 +73,10 @@ brew "pnpm"
 # The caching half, nix-direnv, is not a formula; .config/direnv/direnvrc
 # fetches it pinned and checksummed. The zsh hook is the zcache line in .zshrc.
 brew "direnv"
-brew "vivid"
+# vivid — now fetched by zinit as a gh-r binary (zsh/zinit.zsh section 5), not
+# installed here. Left declared, commented, so the package isn't lost from
+# this list.
+# brew "vivid"
 brew "imagemagick"
 brew "nss"
 brew "shfmt"
@@ -76,7 +85,10 @@ brew "shellcheck"
 # .config/lvim wires it into none-ls, which shells out to PATH: a Mason copy
 # would live under ~/.local/share and vanish with the editor's runtime.
 brew "stylua"
-brew "atuin"
+# atuin — now fetched by zinit as a gh-r binary (zsh/zinit.zsh section 5), not
+# installed here. Left declared, commented, so the package isn't lost from
+# this list.
+# brew "atuin"
 # starship — the prompt. Previously fetched as a gh-r binary by zinit, which
 # forced zinit to load eagerly (a prompt can't be turbo-deferred) and put ~16ms
 # of plugin machinery on the critical path. Declared here so it's installed like
