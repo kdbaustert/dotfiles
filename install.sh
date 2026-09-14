@@ -247,4 +247,9 @@ title "Optional setup scripts"
 #     SETUP_SCRIPTS=all ./install.sh
 run_setup_scripts "macos npm composer mas gh-extensions"
 
+#------------------------------------------------------------------------------
+title "Summary"
+#------------------------------------------------------------------------------
+print_summary
+
 success "\nDone. Open a new terminal (or run: exec zsh) to load the new shell."

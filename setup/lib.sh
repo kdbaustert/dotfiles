@@ -33,9 +33,29 @@ COLOR_NONE="\033[0m"
 
 title()   { echo -e "\n${COLOR_PURPLE}$1${COLOR_NONE}"; echo -e "${COLOR_GRAY}==============================${COLOR_NONE}\n"; }
 error()   { echo -e "${COLOR_RED}Error: ${COLOR_NONE}$1"; exit 1; }
-warning() { echo -e "${COLOR_YELLOW}Warning: ${COLOR_NONE}$1"; }
+warning() { echo -e "${COLOR_YELLOW}Warning: ${COLOR_NONE}$1"; ISSUES+=("$1"); }
 info()    { echo -e "${COLOR_BLUE}Info: ${COLOR_NONE}$1"; }
 success() { echo -e "${COLOR_GREEN}$1${COLOR_NONE}"; }
+
+# Every warning collected during the run, so a step's failure does not scroll
+# off screen by the time the installer finishes. `error` is deliberately not
+# collected here — its four call sites are all preconditions the rest of the
+# script cannot run without, so it still exits immediately rather than joining
+# a summary nobody gets to read.
+ISSUES=()
+
+# print_summary — call once, at the very end of install.sh / install-linux.sh.
+print_summary() {
+  if [ ${#ISSUES[@]} -eq 0 ]; then
+    success "\nNo warnings — every step completed cleanly."
+    return 0
+  fi
+  echo -e "\n${COLOR_YELLOW}${#ISSUES[@]} step(s) had warnings:${COLOR_NONE}"
+  local i
+  for i in "${ISSUES[@]}"; do
+    echo -e "  ${COLOR_YELLOW}-${COLOR_NONE} $i"
+  done
+}
 
 # Symlink helper: $1 = source in repo, $2 = destination in $HOME.
 # Skips missing sources, backs up existing real files, replaces symlinks.

@@ -66,8 +66,16 @@ PKGLIST="$DOTFILES_DIR/arch/pkglist"
 if [ ! -f "$PKGLIST" ]; then
   warning "No $PKGLIST — skipping the pacman step."
 else
+  # </dev/null on every pacman/AUR-helper call below: --noconfirm answers the
+  # ordinary proceed/replace prompts, but pacman's "Do you want to skip the
+  # above package for this upgrade?" prompt (shown when a locally installed
+  # version is newer than the repo's, e.g. after building something from AUR)
+  # is a separate --ask bit that --noconfirm does not reliably cover. With
+  # stdin still attached to the terminal, pacman just sits waiting on a
+  # keypress the script never sends — closing stdin makes it take the
+  # non-interactive default instead of hanging.
   info "Refreshing the package databases..."
-  sudo pacman -Sy --noconfirm &>/dev/null || warning "pacman -Sy failed; continuing with the cached database."
+  sudo pacman -Sy --noconfirm </dev/null &>/dev/null || warning "pacman -Sy failed; continuing with the cached database."
 
   known=()
   unknown=()
@@ -89,7 +97,7 @@ else
     info "Installing ${#known[@]} packages (--needed, so already-installed ones are skipped)..."
     # --needed is what makes this idempotent: it turns a reinstall into a no-op
     # rather than redownloading the whole list on every run.
-    sudo pacman -S --needed --noconfirm -- "${known[@]}" \
+    sudo pacman -S --needed --noconfirm -- "${known[@]}" </dev/null \
       && success "Repo packages installed." \
       || warning "Some packages failed (see above)."
   fi
@@ -131,7 +139,7 @@ else
     # and any one of them can fail on its own, and a batch would take the rest
     # down with it. Slower, but a missing iris should not cost firebase-tools.
     for pkg in "${aur[@]}"; do
-      if "$AUR_HELPER" -S --needed --noconfirm "${AUR_HELPER_FLAGS[@]}" -- "$pkg" &>/dev/null; then
+      if "$AUR_HELPER" -S --needed --noconfirm "${AUR_HELPER_FLAGS[@]}" -- "$pkg" </dev/null &>/dev/null; then
         success "AUR: $pkg"
       else
         warning "AUR: $pkg failed — see arch/aurlist for which of these are expected to be missing."
@@ -324,5 +332,10 @@ info "Verify the 1Password signing helper path in .gitconfig-linux:"
 echo "         ls -l /opt/1Password/op-ssh-sign"
 info "Wire the Claude Code hook and status line into ~/.claude/settings.json"
 info "     (untracked on purpose — see .claude/hooks/notify.sh's header)."
+
+#------------------------------------------------------------------------------
+title "Summary"
+#------------------------------------------------------------------------------
+print_summary
 
 success "\nDone. Open a new terminal (or run: exec zsh) to load the new shell."
