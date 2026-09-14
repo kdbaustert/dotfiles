@@ -45,17 +45,25 @@ title "Homebrew"
 #------------------------------------------------------------------------------
 if ! command -v brew &>/dev/null; then
   info "Installing Homebrew..."
-  /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-  eval "$(/opt/homebrew/bin/brew shellenv)"
+  if /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)" \
+    && [ -x /opt/homebrew/bin/brew ]; then
+    eval "$(/opt/homebrew/bin/brew shellenv)"
+  else
+    warning "Homebrew install failed — everything below that needs brew will be skipped."
+  fi
 else
   info "Homebrew already installed — updating & upgrading."
-  brew update && brew upgrade
+  brew update && brew upgrade || warning "brew update/upgrade failed (see above) — continuing with what's already installed."
 fi
 
-info "Installing dependencies from Brewfile..."
-brew bundle install --file="$DOTFILES_DIR/homebrew/Brewfile" || warning "Some Brewfile entries failed (see above)."
-brew analytics off
-brew cleanup
+if command -v brew &>/dev/null; then
+  info "Installing dependencies from Brewfile..."
+  brew bundle install --file="$DOTFILES_DIR/homebrew/Brewfile" || warning "Some Brewfile entries failed (see above)."
+  brew analytics off
+  brew cleanup
+else
+  warning "brew is not on PATH — skipped the Brewfile, analytics opt-out, and cleanup."
+fi
 
 #------------------------------------------------------------------------------
 title "Nix"
@@ -204,16 +212,24 @@ else
   else
     printf '%s\n' "$PAM_TID" | sudo tee /etc/pam.d/sudo_local >/dev/null
   fi
-  success "Touch ID for sudo enabled (/etc/pam.d/sudo_local)."
+  if grep -q '^[^#]*pam_tid\.so' /etc/pam.d/sudo_local 2>/dev/null; then
+    success "Touch ID for sudo enabled (/etc/pam.d/sudo_local)."
+  else
+    warning "Could not write /etc/pam.d/sudo_local — Touch ID for sudo stays disabled."
+  fi
 fi
 
 # Legacy cleanup only: older setups edited /etc/pam.d/sudo directly. With
 # sudo_local in place that line is redundant, but only touch the file if it is
 # actually there — a no-op sed on a system PAM file every run is a needless risk.
 if grep -q '^[^#]*pam_tid\.so' /etc/pam.d/sudo 2>/dev/null; then
-  sudo cp /etc/pam.d/sudo "/etc/pam.d/sudo.backup-$(date +%Y%m%d-%H%M%S)"
-  sudo sed -i '' '/pam_tid.so/d' /etc/pam.d/sudo \
-    && info "Removed the legacy pam_tid line from /etc/pam.d/sudo (backed up)."
+  if sudo cp /etc/pam.d/sudo "/etc/pam.d/sudo.backup-$(date +%Y%m%d-%H%M%S)"; then
+    sudo sed -i '' '/pam_tid.so/d' /etc/pam.d/sudo \
+      && info "Removed the legacy pam_tid line from /etc/pam.d/sudo (backed up)." \
+      || warning "Could not remove the legacy pam_tid line from /etc/pam.d/sudo — harmless (sudo_local already covers it) but worth a look."
+  else
+    warning "Could not back up /etc/pam.d/sudo — skipped the legacy pam_tid cleanup rather than sed without a backup."
+  fi
 fi
 
 #------------------------------------------------------------------------------
