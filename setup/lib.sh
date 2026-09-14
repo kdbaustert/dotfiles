@@ -65,21 +65,27 @@ spinner_run() {
   local pid=$! frames='⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏' i=0 start=$SECONDS
   local cols window=5 drawn=0
   cols=$(tput cols 2>/dev/null || echo 80)
+  # Rows a printed line actually occupies once the terminal wraps it — the
+  # header/tail lines are shown in full (no truncation), so a long one can
+  # span more than one row and the cursor-up math below has to account for it.
+  _spinner_rows() { local len=$1; ((len == 0)) && { echo 1; return; }; echo $(((len + cols - 1) / cols)); }
   while kill -0 "$pid" 2>/dev/null; do
     # Move up over whatever this loop drew last iteration, then redraw the
     # header + tail so the block updates in place instead of scrolling.
     [ "$drawn" -gt 0 ] && printf '\033[%dA' "$drawn"
-    printf '\r%s %s (%ss)\033[K\n' \
-      "${frames:i%${#frames}:1}" "$label" "$((SECONDS - start))"
-    local lines=() n=0
+    local header rows=0
+    header="$(printf '%s %s (%ss)' "${frames:i%${#frames}:1}" "$label" "$((SECONDS - start))")"
+    printf '\r%s\033[K\n' "$header"
+    rows=$(_spinner_rows "${#header}")
+    local lines=()
     while IFS= read -r line; do
       lines+=("$line")
     done < <(tail -n "$window" "$logfile" 2>/dev/null | tr -d '\r')
     for line in "${lines[@]}"; do
-      printf '  %.*s\033[K\n' "$((cols > 2 ? cols - 2 : 0))" "$line"
-      n=$((n + 1))
+      printf '  %s\033[K\n' "$line"
+      rows=$((rows + $(_spinner_rows $((${#line} + 2)))))
     done
-    drawn=$((n + 1))
+    drawn=$rows
     i=$((i + 1))
     sleep 0.1
   done
