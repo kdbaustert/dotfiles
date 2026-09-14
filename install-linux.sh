@@ -107,6 +107,17 @@ for h in paru yay; do
   command -v "$h" &>/dev/null && AUR_HELPER="$h" && break
 done
 
+# --noconfirm only answers pacman/makepkg prompts. Both helpers also have their
+# own PKGBUILD diff/edit menus that --noconfirm does not silence, so without
+# these the helper can sit waiting on a keypress the &>/dev/null below hides —
+# looking exactly like a hang rather than a paused prompt. The flag names differ
+# per helper: yay uses --answer*, paru uses --skipreview/--noupgrademenu.
+case "$AUR_HELPER" in
+paru) AUR_HELPER_FLAGS=(--skipreview --noupgrademenu) ;;
+yay) AUR_HELPER_FLAGS=(--answerdiff None --answeredit None --answerclean None --answerupgrade None) ;;
+*) AUR_HELPER_FLAGS=() ;;
+esac
+
 AURLIST="$DOTFILES_DIR/arch/aurlist"
 if [ -z "$AUR_HELPER" ]; then
   warning "No AUR helper (paru/yay) found — skipping arch/aurlist. Install one, then re-run."
@@ -120,7 +131,7 @@ else
     # and any one of them can fail on its own, and a batch would take the rest
     # down with it. Slower, but a missing iris should not cost firebase-tools.
     for pkg in "${aur[@]}"; do
-      if "$AUR_HELPER" -S --needed --noconfirm -- "$pkg" &>/dev/null; then
+      if "$AUR_HELPER" -S --needed --noconfirm "${AUR_HELPER_FLAGS[@]}" -- "$pkg" &>/dev/null; then
         success "AUR: $pkg"
       else
         warning "AUR: $pkg failed — see arch/aurlist for which of these are expected to be missing."

@@ -13,6 +13,11 @@
 mist-cli
 firebase-tools
 
+# mycli and carapace-bin have no official-repo package; both build from
+# upstream release binaries via AUR PKGBUILDs.
+mycli
+carapace-bin
+
 # iris — the inline completion overlay. .config/iris is symlinked by the
 # installer and .zshrc autostarts it, so this is load-bearing rather than
 # optional on a machine that wants the same prompt.

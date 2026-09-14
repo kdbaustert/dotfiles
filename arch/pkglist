@@ -77,8 +77,6 @@ fortune-mod
 lolcat
 colordiff
 httpie
-mycli
-carapace-bin
 taskwarrior-tui
 fzy
 
@@ -116,7 +114,10 @@ php
 composer
 nginx
 mariadb
-redis
+# Arch moved redis to the AUR (unmaintained) in April 2025 after the Redis
+# license change; valkey is the BSD-licensed fork that replaced it in [extra]
+# and is redis-compatible (same binaries, same wire protocol).
+valkey
 python
 python-pip
 
