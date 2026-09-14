@@ -172,8 +172,19 @@ refresh() {
   mkdir -p "${cache%/*}"
   [ -d "$lock" ] && find "$lock" -maxdepth 0 -mmin +2 -exec rmdir {} \; 2>/dev/null
   mkdir "$lock" 2>/dev/null || return
-  token=$(security find-generic-password -s 'Claude Code-credentials' -w 2>/dev/null \
-    | jq -r '.claudeAiOauth.accessToken // empty')
+  # Where Claude Code keeps the OAuth token differs by platform, and so does the
+  # command to read it: the macOS Keychain via `security` (which is how Claude
+  # Code itself reads it, so the ACL is already in place), and a plain file at
+  # ~/.claude/.credentials.json on Linux, where there is no system keychain it
+  # can rely on. The JSON shape inside is identical, which is why only the
+  # producer branches and the jq filter below is shared.
+  if [ "${OSTYPE:-}" != "${OSTYPE#darwin}" ]; then
+    token=$(security find-generic-password -s 'Claude Code-credentials' -w 2>/dev/null \
+      | jq -r '.claudeAiOauth.accessToken // empty')
+  else
+    token=$(jq -r '.claudeAiOauth.accessToken // empty' \
+      "$HOME/.claude/.credentials.json" 2>/dev/null)
+  fi
   body=''
   if [ -n "$token" ]; then
     body=$(curl -sf -m 5 -K - <<EOF

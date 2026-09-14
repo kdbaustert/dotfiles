@@ -47,16 +47,20 @@ Known offenders:
 | --------------------- | --------------------------------------------------------------- |
 | `.zshrc` / `.zprofile` / `.zshenv` | Shell entry points, symlinked to `$HOME`           |
 | `zsh/`                | `aliases.zsh`, `functions.zsh`, `zinit.zsh`, `extra/` snippets    |
+| `zsh/os/`             | Per-OS shell config: `{macos,linux}-{env,interactive}.zsh`         |
 | `zsh/abbreviations`   | zsh-abbr's store, read via `$ABBR_USER_ABBREVIATIONS_FILE`        |
 | `.config/`            | Every entry is symlinked to `~/.config/<name>`                    |
 | `.config/git/`        | `ignore` (global excludes) and `allowed_signers` (SSH signing)     |
-| `homebrew/Brewfile`   | The package set                                                   |
+| `homebrew/Brewfile`   | The package set (macOS)                                           |
+| `arch/`               | `pkglist` + `aurlist`, the package set (Arch/Manjaro)              |
+| `setup/lib.sh`        | Installer sections shared by `install.sh` and `install-linux.sh`  |
 | `setup/`              | Opt-in scripts (`SETUP_SCRIPTS="npm composer" ./install.sh`)      |
+| `.gitconfig-{macos,linux}` | Deployed to `~/.gitconfig-os`; git has no OS conditional     |
 | `themes/voltage.md`   | Canonical palette + the list of files that carry it               |
 | `fonts/`              | The tab-icon color font and the script that builds it             |
 | `iterm/`, `obsidian/` | App-specific config                                            |
 | `.claude/CLAUDE.md`   | Global Claude Code instructions                                   |
-| `.claude/hooks/`      | `notify.sh`, the Notification hook (terminal-notifier banner)     |
+| `.claude/hooks/`      | `notify.sh`, the Notification hook (terminal-notifier / notify-send) |
 | `.claude/statusline.sh` | The status line — plan usage, context, model, on every render   |
 | `.claude/skills/`     | Skills, one dir per skill; `php-psr12/` is ours, three are vendored |
 | `.claude/agents/`     | Custom subagents, one `.md` file per agent, ours                  |
@@ -169,18 +173,79 @@ lazy.nvim) and `.config/lvim` (LunarVim). They share only `.config/voltage.nvim`
 the colorscheme, which both put on their runtimepath. Never fold one into the
 other or copy the palette into either.
 
+## macOS and Linux
+
+The repo deploys to an Apple-silicon Mac and to Arch/Manjaro. One tracked file
+per setting, never two — the split happens at three different layers depending
+on *why* the setting differs, and picking the wrong layer is how this stops
+working:
+
+1. **Make it portable first.** A setting that can be expressed the same way on
+   both is not a platform problem. `.gitconfig`'s `editor = nvim` (was an
+   absolute `/opt/homebrew/bin/nvim`) and `extract()`'s `${commands[7zz]:-7z}`
+   are the examples — no branch at all, and neither file knows what OS it is on.
+2. **Same knob, different value → inline `if [[ $DOTFILES_OS == macos ]]`**, in
+   the shared file, with both values visible to each other. `PNPM_HOME` in
+   `.zprofile` is the model. Splitting a *pair* across two files is the palette
+   drift this repo warns about everywhere else: one side gets updated, the other
+   silently doesn't.
+3. **Exists on one platform only → `zsh/os/<os>-{env,interactive}.zsh`.** The
+   Homebrew environment, FlyEnv, the LaunchServices aliases, the `pbcopy`/`open`
+   shims. There is no pair to keep visible, and wrapping forty lines in an `if`
+   to no-op them just makes the other platform's reader scroll. The branch then
+   exists once, at the `source` line, instead of a dozen times.
+
+`$DOTFILES_OS` is set in `.zshenv` (`macos` / `linux` / `unknown`) because that
+is the only file every zsh sources. There are exactly two dispatch points:
+`.zprofile` sources `<os>-env.zsh` **last** — `macos-env.zsh` prepends FlyEnv to
+`$path` and has to stay ahead of the array and the overrides block — and
+`.zshrc` sources `<os>-interactive.zsh` after `aliases.zsh` and at the end of the
+tool-integration block, so its `command_not_found_handler` is the last one
+defined. Both placements are load-bearing; the comments at each say so.
+
+A file format with no conditional of its own is the fourth case, and it has to
+be resolved at deploy time instead: `.gitconfig` carries `[include] path =
+~/.gitconfig-os`, and each installer symlinks that at `.gitconfig-macos` or
+`.gitconfig-linux`. Only put a setting there if it genuinely cannot be portable
+— today that is one line, the 1Password `op-ssh-sign` path.
+
+`install.sh` (macOS) and `install-linux.sh` (Arch) are siblings, not forks.
+Everything they do identically lives in `setup/lib.sh` and is called from both;
+the symlink section alone is ~120 lines and grows every time a skill, an agent
+or a `.config` entry is added, so two copies would drift within a week. If a
+function in `lib.sh` ever needs an `if macos` inside it, that is the signal it
+belongs to the callers instead.
+
+Two terminal configs were deliberately left macOS-shaped: `.config/ghostty/config`
+(`macos-titlebar-style`, `window-colorspace`, `font-thicken` are no-ops in the
+GTK build) and `.config/rio/config.toml` (`navigation.mode = "NativeTab"` and
+`renderer.backend = "Metal"` need changing by hand on Linux). Neither app has an
+OS-conditional include, and inventing values that could not be verified against a
+running Linux copy would have been worse than saying so here.
+
 ## Adding or changing config
 
-- A new tool config goes in `.config/<tool>/` — `install.sh` links every
+Every symlink now lives in `link_dotfiles()` in `setup/lib.sh`, not in either
+installer — that is the one place to change, and changing it deploys to both
+machines at once.
+
+- A new tool config goes in `.config/<tool>/` — `link_dotfiles()` links every
   `.config/*` entry automatically, so no installer change is needed.
-- A new **root-level** dotfile must be added to the `for f in ...` list in the
-  "Symlinking dotfiles" section of `install.sh`, or it never gets deployed.
-- Anything that leaves a file outside this repo (a cache build, a `launchctl`
-  bootstrap, a `defaults write`) needs a step in `install.sh` — and that step must
-  be **idempotent**, guarded, and print via `info`/`success`/`warning`/`error`.
-- Removing a config: `install.sh` already sweeps dangling `~/.config` symlinks
-  that point into this repo. Root-level retirements go in the "Retired links"
-  list instead.
+- A new **root-level** dotfile must be added to the `for f in ...` list in
+  `link_dotfiles()` (`setup/lib.sh`), or it never gets deployed.
+- Anything that leaves a file outside this repo needs a step in an installer —
+  **and picking which one is the decision**: shared behaviour goes in
+  `setup/lib.sh`, a `defaults write` or a `launchctl` bootstrap in `install.sh`,
+  a `systemctl` or `fc-cache` call in `install-linux.sh`. Every step must be
+  **idempotent**, guarded, and print via `info`/`success`/`warning`/`error`.
+- A new package goes in `homebrew/Brewfile` *and* `arch/pkglist` (or
+  `arch/aurlist`). The Arch lists were transcribed from the Brewfile and have
+  never been checked against a live mirror; `install-linux.sh` validates every
+  name against the sync database and reports the unknown ones rather than
+  failing the transaction, so the first real run is what settles them.
+- Removing a config: `link_dotfiles()` already sweeps dangling `~/.config`,
+  `~/.claude/skills` and `~/.claude/agents` symlinks that point into this repo.
+  Root-level retirements go in the "Retired links" list instead.
 
 ## Do not run `install.sh` to test a change
 
@@ -188,10 +253,10 @@ It asks for sudo, edits `/etc/pam.d/sudo_local`, runs `brew bundle`, and loads
 LaunchAgents. Verify narrowly instead:
 
 ```sh
-bash -n install.sh                            # bash: parse
-shellcheck install.sh setup/*.sh \
+bash -n install.sh && bash -n install-linux.sh    # bash: parse both
+shellcheck install.sh install-linux.sh setup/*.sh \
   .claude/hooks/notify.sh .claude/statusline.sh   # ...then lint every one
-for f in .zshenv .zprofile .zshrc zsh/*.zsh zsh/extra/*.zsh; do
+for f in .zshenv .zprofile .zshrc zsh/*.zsh zsh/extra/*.zsh zsh/os/*.zsh; do
   zsh -n "$f" || echo "FAIL $f"                          # zsh: parse only
 done
 zsh -ic exit                                  # full interactive load
@@ -212,11 +277,13 @@ list. It has to be, because `.zshrc` `source`s `zsh/extra/cache.zsh`,
 *runtime* — a syntax error in any of them sails past `zsh -n .zshrc` and only
 surfaces in `zsh -ic exit`.
 
-`shellcheck` currently exits 1 on a clean tree: two SC2015 `info`s on the
-deliberate `cmd && success || warning` lines in `install.sh` (both are
-best-effort steps where the "C may run when A is true" caveat is acceptable).
-Read the findings, don't chase the exit status, and don't rewrite those two lines
-into `if`/`else` just to silence it.
+`shellcheck` currently exits 1 on a clean tree: six SC2015 `info`s on the
+deliberate `cmd && success || warning` lines — five in `install-linux.sh`, one
+in `setup/lib.sh` (all are best-effort steps where the "C may run when A is
+true" caveat is acceptable). Read the findings, don't chase the exit status, and
+don't rewrite those lines into `if`/`else` just to silence it. `install.sh`
+itself is now clean; the two it used to report moved into `setup/lib.sh` with
+the code.
 
 Startup latency is a first-class constraint here: plugins are turbo-deferred in
 `zsh/zinit.zsh`, tool `init` output is cached via the `zcache` helper defined

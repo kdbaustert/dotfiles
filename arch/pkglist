@@ -1,0 +1,135 @@
+# Arch/Manjaro repo packages — the pacman half of homebrew/Brewfile.
+#
+# One name per line; # starts a comment. Read by install-linux.sh, which feeds
+# the whole list to `pacman -S --needed` in one transaction.
+#
+# NOT VERIFIED AGAINST A LIVE MIRROR. This list was transcribed from the
+# Brewfile on a Mac, so the names are Arch's as best known rather than as
+# confirmed by `pacman -Si`. install-linux.sh checks every name before it
+# installs anything and prints the ones pacman does not recognise instead of
+# failing the run, so the first execution on a real machine is what turns this
+# comment into a settled list. Move anything it rejects to arch/aurlist or fix
+# the spelling here.
+#
+# Deliberately NOT a translation of the cask list. Those are 90 macOS apps;
+# picking Linux desktop equivalents is a per-app decision, not a mapping, and
+# guessing at it here would install a lot of software nobody asked for.
+
+# --- Shell and core ---------------------------------------------------------
+zsh
+bash
+coreutils
+grep
+gnu-netcat
+perl
+openssh
+git
+git-lfs
+subversion
+tmux
+gnupg
+openssl
+wget
+curl
+rsync
+man-db
+man-pages
+util-linux
+
+# --- The tools .zshrc and CLAUDE.md actually name ---------------------------
+ripgrep
+fd
+fzf
+jq
+bat
+eza
+lsd
+zoxide
+atuin
+starship
+git-delta
+lazygit
+gitui
+procs
+navi
+vivid
+direnv
+neovim
+helix
+yazi
+btop
+htop
+glow
+xplr
+nnn
+ranger
+fastfetch
+tree
+zstd
+7zip
+imagemagick
+ffmpeg
+poppler
+sqlite
+nss
+figlet
+fortune-mod
+lolcat
+colordiff
+httpie
+mycli
+carapace-bin
+taskwarrior-tui
+fzy
+
+# --- command-not-found ------------------------------------------------------
+# Arch's equivalent of Homebrew's handler; zsh/os/linux-interactive.zsh sources
+# the script this ships. The files database needs `pkgfile -u` once, which
+# install-linux.sh runs.
+pkgfile
+
+# --- Notifications ----------------------------------------------------------
+# libnotify provides notify-send, which is what zsh-auto-notify (zsh/zinit.zsh)
+# and .claude/hooks/notify.sh both use on this platform. Without it the plugin
+# prints a warning on every shell start.
+libnotify
+
+# --- Clipboard --------------------------------------------------------------
+# Both, because zsh/os/linux-interactive.zsh picks per session: wl-clipboard
+# under Wayland, xclip under X11. Installing only one makes `pbcopy` fail in
+# whichever session type you did not plan for.
+wl-clipboard
+xclip
+xdg-utils
+
+# --- Linters and formatters -------------------------------------------------
+shellcheck
+shfmt
+stylua
+
+# --- Languages and services -------------------------------------------------
+go
+zig
+nodejs
+pnpm
+php
+composer
+nginx
+mariadb
+redis
+python
+python-pip
+
+# --- Fonts ------------------------------------------------------------------
+# The families .config/ghostty/config and .config/rio/config.toml name. Arch
+# ships Nerd Fonts v3, which is what those configs want — note the v2/v3 caveat
+# in the Brewfile applies to the tab-icon font build, not to these.
+ttf-hack-nerd
+ttf-jetbrains-mono-nerd
+ttf-firacode-nerd
+ttf-sourcecodepro-nerd
+ttf-roboto-mono-nerd
+ttf-nerd-fonts-symbols
+ttf-fira-code
+noto-fonts
+noto-fonts-emoji

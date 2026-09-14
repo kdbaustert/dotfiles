@@ -422,17 +422,19 @@ zcache direnv direnv hook zsh
 # ever change, run `zcache_clear` — mtime invalidation only catches a new binary.
 zcache pay-respects pay-respects zsh --alias fuck --nocnf
 
-# Homebrew command-not-found — when an unknown command is typed, suggest the
-# formula that provides it (`brew which-formula` under the hood). Shipped in
-# Homebrew core now (the old homebrew/command-not-found tap was deprecated).
-# Source the handler directly rather than `eval "$(brew command-not-found-init)"`
-# so we don't spawn brew on every startup; $HOMEBREW_REPOSITORY is exported by
-# .zprofile. With --nocnf above, this is the only handler defined — but keep it
-# last anyway so it wins if that flag is ever dropped.
-() {
-  local h="${HOMEBREW_REPOSITORY:-/opt/homebrew}/Library/Homebrew/command-not-found/handler.sh"
-  [[ -r $h ]] && source "$h"
-}
+# command-not-found — when an unknown command is typed, suggest the package
+# that provides it. Both platforms have one and neither is configurable into
+# the other's shape (Homebrew ships a handler script to source; Arch's pkgfile
+# ships a different one), so this is a one-sided block on each side rather than
+# a paired value, and it lives in zsh/os/$DOTFILES_OS-interactive.zsh.
+#
+# Sourced here, at the END of the tool-integration section, because the handler
+# it defines has to win: with --nocnf above, pay-respects installs none of its
+# own, but if that flag is ever dropped the last definition is the one that
+# takes effect. That ordering is the reason for the placement — do not move
+# this line up next to the aliases.
+[ -r "$DOTFILES/zsh/os/$DOTFILES_OS-interactive.zsh" ] \
+  && source "$DOTFILES/zsh/os/$DOTFILES_OS-interactive.zsh"
 
 #------------------------------------------------------------------------------
 # Colors — everything on Voltage
@@ -463,6 +465,10 @@ export BAT_THEME="Voltage"
 #
 # No MANROFFOPT here: it is the documented companion on groff systems, but
 # macOS ships mandoc, which ignores it — verified identical output either way.
+# Arch does ship groff, where it is NOT optional (without it the overstrike
+# sequences reach bat as literal text and the page renders garbled), so it is
+# set in zsh/os/linux-interactive.zsh. MANPAGER itself is identical on both and
+# stays here; `col` comes from util-linux on Arch and is present by default.
 export MANPAGER="sh -c 'col -bx | bat -l man -p'"
 
 # -R lets ANSI color survive the pager instead of being escaped into visible
@@ -519,7 +525,8 @@ export ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE="fg=#6b6b6b"
     $DOTFILES/zsh/zinit.zsh \
     $DOTFILES/zsh/functions.zsh \
     $DOTFILES/zsh/aliases.zsh \
-    $DOTFILES/zsh/extra/*.zsh(N)
+    $DOTFILES/zsh/extra/*.zsh(N) \
+    $DOTFILES/zsh/os/*.zsh(N)
   do
     # -nt follows symlinks, so the $HOME/.zshrc → dotfiles/.zshrc links compare
     # against the real file's mtime and recompile when the repo copy is edited.

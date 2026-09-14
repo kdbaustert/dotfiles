@@ -12,6 +12,19 @@
 #    RIO_NOTIFY_THRESHOLD   seconds a command must run to notify   (default 15)
 #    RIO_NOTIFY_IGNORE      space-separated commands to never notify for
 #    RIO_NOTIFY_DISABLE     set to any value to disable entirely
+#
+#  macOS-only, and left that way on purpose rather than moved to zsh/os/: the
+#  two guards below (TERM is rio, terminal-notifier exists) already make it a
+#  silent no-op on Linux, so it needs no branch — and it should not GROW one.
+#  zsh-auto-notify, loaded from zsh/zinit.zsh, covers the same ground on Linux
+#  natively via notify-send (see its platform switch, not the stale "uses
+#  terminal-notifier" note this repo carried). Porting this file as well would
+#  mean two notifiers racing the same long command on one machine.
+#
+#  The genuinely unportable half is the frontmost-app test: lsappinfo is
+#  LaunchServices, and Wayland deliberately offers no equivalent — a client
+#  cannot ask which window has focus. So "only ping when you have tabbed away"
+#  has no faithful Linux implementation to pair this with.
 #==============================================================================
 
 # Only meaningful in an interactive Rio session with terminal-notifier present.

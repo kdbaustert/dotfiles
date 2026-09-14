@@ -1,0 +1,28 @@
+# AUR packages — the half that is not in Arch's own repos.
+#
+# Same format and the same "not verified against a live mirror" caveat as
+# arch/pkglist; see that file's header. install-linux.sh installs these with the
+# AUR helper (paru by default) and skips the section entirely if none is found,
+# so a machine without an AUR helper still gets everything in pkglist.
+#
+# Kept separate from pkglist rather than merged and handed wholesale to paru:
+# an AUR package builds from source and can prompt, so it is worth seeing which
+# of the two lists a failure came from.
+
+# The GitHub CLI's own package is in the repos (gh); these are not.
+mist-cli
+firebase-tools
+
+# iris — the inline completion overlay. .config/iris is symlinked by the
+# installer and .zshrc autostarts it, so this is load-bearing rather than
+# optional on a machine that wants the same prompt.
+#
+# UNVERIFIED, and the most likely thing in this port to be missing: iris is
+# distributed on macOS through the author's own Homebrew tap, and whether a
+# Linux build exists at all was not checkable from the Mac this was written on.
+# If it is not packaged, .zshrc degrades cleanly — the `zcache iris` call is a
+# no-op when the binary is absent, so the shell comes up without it rather than
+# erroring. Drop this line and the iris section of .zshrc keeps working as a
+# no-op; do not paper over it with a `curl | sh` installer, which is what the
+# Brewfile comment rejected for the same tool.
+iris

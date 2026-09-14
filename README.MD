@@ -1,6 +1,7 @@
 # Kenny's dotfiles
 
-My personal dotfiles, for macOS. Take anything you want, but at your own risk.
+My personal dotfiles, for macOS and Arch/Manjaro. Take anything you want, but
+at your own risk.
 
 You should first review the code and remove things you don't want or need.
 Don't blindly use my settings unless you know what that entails.
@@ -10,15 +11,37 @@ Don't blindly use my settings unless you know what that entails.
 ```sh
 git clone https://github.com/kdbaustert/dotfiles.git ~/dotfiles
 cd ~/dotfiles
-./install.sh
+./install.sh          # macOS (Apple silicon)
+./install-linux.sh    # Arch / Manjaro
 ```
 
-`install.sh` is idempotent — safe to re-run, and re-running is how you update.
-Existing real files are backed up (`.backup-<timestamp>`) before being replaced
-by symlinks; existing symlinks are simply re-pointed.
+Both are idempotent — safe to re-run, and re-running is how you update. Existing
+real files are backed up (`.backup-<timestamp>`) before being replaced by
+symlinks; existing symlinks are simply re-pointed. Both ask for your sudo
+password up front, and each refuses to run on the other's platform.
 
-It will ask for your sudo password up front, and it expects Apple silicon
-(the `pay-respects` step is pinned to arm64 and skips itself elsewhere).
+They are siblings rather than forks: everything that is the same on both — the
+symlinks, zinit, the theme caches, LS_COLORS, the setup-script runner — lives in
+`setup/lib.sh` and is called from each. What is left in the two scripts is only
+what Homebrew, PAM and CoreText do differently from pacman, systemd and
+fontconfig.
+
+`install.sh` expects Apple silicon (the `pay-respects` step is pinned to arm64
+and skips itself elsewhere). `install-linux.sh` expects `pacman`, and its
+`pay-respects` step is **disabled until you fill in the checksum** — the Linux
+release asset could not be hashed from the Mac this was ported on, so the step
+warns and skips rather than installing something unverified. See the comment
+above that block.
+
+Two things on Linux are worth knowing before the first run:
+
+- **The package lists in `arch/` were transcribed, not verified.** The installer
+  checks every name against the sync database and reports the ones pacman does
+  not recognise instead of aborting, so the first run tells you what to fix.
+- **`.config/ghostty/config` and `.config/rio/config.toml` are still
+  macOS-shaped.** Ghostty ignores its `macos-*` keys in the GTK build, which is
+  harmless; Rio needs `navigation.mode` off `NativeTab` and
+  `renderer.backend` off `Metal` by hand.
 
 ### What it does
 

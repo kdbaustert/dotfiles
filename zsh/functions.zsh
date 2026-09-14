@@ -13,7 +13,13 @@ extract() {
     *.tgz) tar xzf $1 ;;
     *.zip) unzip $1 ;;
     *.Z) uncompress $1 ;;
-    *.7z) 7zz x $1 ;;
+    # 7-Zip's binary is named differently per platform and neither name exists
+    # on the other: Homebrew's sevenzip formula installs `7zz` only, Arch's
+    # 7zip package installs `7z` only. Resolved through zsh's $commands hash at
+    # call time rather than branched on $DOTFILES_OS — the question here is
+    # genuinely "which binary is installed", not "which OS is this", and the
+    # hash answers it in-process with no fork.
+    *.7z) "${commands[7zz]:-7z}" x $1 ;;
     *) echo "'$1' cannot be extracted via extract()" ;;
     esac
   else

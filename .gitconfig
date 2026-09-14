@@ -20,15 +20,39 @@
 [gpg]
 	format = ssh
 [gpg "ssh"]
-	program = /Applications/1Password.app/Contents/MacOS/op-ssh-sign
+	# NB: gpg.ssh.program is NOT set here — it is an absolute path to the
+	# 1Password app bundle and differs per platform, so it comes from the
+	# ~/.gitconfig-os include below. See the comment there.
+	#
 	# Verification needs a trust store; ssh has no implicit keyring the way GPG
 	# does, so without this `git log --show-signature` reports "No signature"
 	# on your own commits even though they are signed. The signers file lives at
 	# .config/git/allowed_signers in this repo.
 	allowedSignersFile = ~/.config/git/allowed_signers
 
+# Platform-specific settings, currently just the 1Password signer binary.
+#
+# git has no OS conditional — includeIf understands gitdir, onbranch and
+# hasconfig:remote, and nothing else — so the split has to happen at deploy
+# time: each installer symlinks ~/.gitconfig-os at .gitconfig-macos or
+# .gitconfig-linux in this repo. Same shape as the ~/.gitconfig-work include at
+# the bottom of this file, deliberately, so there is one pattern to recognise
+# rather than two.
+#
+# Placed here, after [gpg "ssh"] and before the work include, so it overrides
+# the base identity and is in turn overridden by the work one. A missing file
+# is ignored by git rather than an error, which is the same silent-degrade
+# behaviour documented for ~/.gitconfig-work in install.sh — on a machine where
+# this was never linked, signing fails with 1Password not found rather than
+# git refusing to start.
+[include]
+	path = ~/.gitconfig-os
+
 [core]
-	editor = /opt/homebrew/bin/nvim
+	# Not an absolute path. This used to be /opt/homebrew/bin/nvim, which made a
+	# portable setting look like a platform-specific one — the bare name
+	# resolves through $PATH on both machines and needs no OS include.
+	editor = nvim
 
 # delta is not git's pager here — it is invoked by the git-diff/git-show fzf-tab
 # previews in .zshrc (`git diff --color=always … | delta`). delta still reads

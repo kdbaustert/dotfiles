@@ -372,8 +372,16 @@ zinit wait lucid id-as'carapace-init' has'carapace' \
 #   - zsh-you-should-use  — nags when a full command has an existing alias
 #   - forgit              — fzf-powered git (glo, gss, gcb…); honours delta,
 #                           and is put on $PATH so `git forgit <cmd>` works
-#   - zsh-auto-notify     — desktop notification when a long command finishes
-#                           (uses terminal-notifier, installed via Homebrew)
+#   - zsh-auto-notify     — desktop notification when a long command finishes.
+#                           Platform-switched upstream: osascript on Darwin,
+#                           notify-send on Linux (libnotify — install it or the
+#                           plugin prints a warning on load). This comment used
+#                           to say terminal-notifier, which the plugin never
+#                           calls on either platform; the Homebrew formula of
+#                           that name is used by zsh/extra/notify.zsh instead.
+#                           It is also why that file stays macOS-only — this
+#                           plugin already covers Linux, and two notifiers on
+#                           one machine would double-ping every slow command.
 #   - zsh-abbr            — fish-style abbreviations; store is section 3's
 #                           $ABBR_USER_ABBREVIATIONS_FILE
 #

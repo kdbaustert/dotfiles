@@ -1,0 +1,28 @@
+# direnv's own settings, alongside direnvrc (which is the stdlib extension —
+# nix-direnv — not configuration).
+#
+# Both settings exist to make a cd into a flake project print nothing when it
+# works and still print something when it does not. Before them, every cd
+# into kennybdev showed five lines — the direnvrc fetching nix-direnv, the
+# .envrc load, `using flake`, nix-direnv's cache hit, and a full screen of
+# `export +AR +AS +CC ... ~PATH` listing the seventy-odd stdenv variables —
+# and it all read like an error report for something that had succeeded.
+#
+# `log_filter` is a *keep* filter despite the man page saying "filter out":
+# a log line is shown only if it matches the regex (measured on 2.37.1 —
+# `"^(loading|using|nix-direnv)"` kept exactly those lines and nothing else).
+# `"error"` drops every status line, from Go and from the bash stdlib alike,
+# while everything that signals a problem still comes through, because none of
+# it goes via the status path: `direnv: error … is blocked` (Go), `log_error`
+# from an .envrc or from nix-direnv (stdlib, unfiltered), nix's own evaluation
+# errors, and any stdout/stderr the .envrc itself produces. Verified each of
+# those four against a scratch .envrc before this landed. The alternative,
+# `log_format = "-"` / `DIRENV_LOG_FORMAT=""`, silences the error path too,
+# so a flake that stops evaluating would fail without a word.
+#
+# `hide_env_diff` is redundant with the filter on the hot path but stays: it
+# is the setting that names the intent for the export line specifically, and
+# it keeps that line hidden if the filter is ever loosened to debug a load.
+[global]
+hide_env_diff = true
+log_filter = "error"

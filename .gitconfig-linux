@@ -1,0 +1,18 @@
+#==============================================================================
+#  .gitconfig-linux — symlinked to ~/.gitconfig-os by install-linux.sh
+#------------------------------------------------------------------------------
+#  The Arch/Manjaro twin of .gitconfig-macos; see that file's header for why the
+#  split exists at all.
+#==============================================================================
+
+[gpg "ssh"]
+	# 1Password for Linux installs to /opt/1Password and ships the same signing
+	# helper as the Mac app bundle does.
+	#
+	# VERIFY THIS PATH on the first machine that uses it — it was written from
+	# 1Password's documented Linux layout, not read off an installed copy, and
+	# it is the one value in this port that could not be checked against a real
+	# filesystem. A wrong path fails loudly (`error: cannot run ...: No such
+	# file or directory` on the first commit), not silently, so the cost of
+	# being wrong is one confusing commit rather than an unsigned history.
+	program = /opt/1Password/op-ssh-sign

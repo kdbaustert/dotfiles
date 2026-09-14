@@ -1,0 +1,15 @@
+#==============================================================================
+#  .gitconfig-macos — symlinked to ~/.gitconfig-os by install.sh
+#------------------------------------------------------------------------------
+#  Pulled in by the [include] in .gitconfig. Only settings whose VALUE is an
+#  absolute path into a macOS-specific location belong here — git has no OS
+#  conditional, so this file and its Linux twin are the split.
+#
+#  Keep it minimal. Anything that can be expressed portably (a bare binary name
+#  resolved through $PATH, for instance) belongs in .gitconfig itself, where
+#  both machines can see it.
+#==============================================================================
+
+[gpg "ssh"]
+	# 1Password's ssh signing helper, inside the app bundle.
+	program = /Applications/1Password.app/Contents/MacOS/op-ssh-sign

@@ -25,7 +25,19 @@
 # transcript. A notification is best-effort decoration, so every branch here
 # falls back to a default and exits 0.
 
-command -v terminal-notifier >/dev/null 2>&1 || exit 0
+# One notifier per platform, and neither exists on the other: terminal-notifier
+# is a Homebrew formula wrapping NSUserNotification, notify-send is libnotify
+# talking to whatever the desktop runs. Probed by binary rather than by $OSTYPE
+# because the useful question is "can this machine raise a banner at all" — on
+# a headless Linux box neither is installed and the hook should stay silent
+# rather than error.
+if command -v terminal-notifier >/dev/null 2>&1; then
+  notifier=terminal-notifier
+elif command -v notify-send >/dev/null 2>&1; then
+  notifier=notify-send
+else
+  exit 0
+fi
 
 payload=$(cat)
 
@@ -52,14 +64,36 @@ project=$(basename "$cwd")
 activate=()
 [ -n "${__CFBundleIdentifier:-}" ] && activate=(-activate "$__CFBundleIdentifier")
 
-# -group replaces the previous banner for the same project instead of stacking
-# a new one on every prompt — Notification can fire several times in a turn.
-terminal-notifier \
-  -title "Claude Code" \
-  -subtitle "$project" \
-  -message "$message" \
-  -group "claude-code-$project" \
-  "${activate[@]}" \
-  -sound default >/dev/null 2>&1
+if [ "$notifier" = terminal-notifier ]; then
+  # -group replaces the previous banner for the same project instead of stacking
+  # a new one on every prompt — Notification can fire several times in a turn.
+  terminal-notifier \
+    -title "Claude Code" \
+    -subtitle "$project" \
+    -message "$message" \
+    -group "claude-code-$project" \
+    "${activate[@]}" \
+    -sound default >/dev/null 2>&1
+else
+  # notify-send's closest thing to -group is the synchronous hint: a server that
+  # honours it replaces the previous notification carrying the same string
+  # instead of stacking. It is a hint, not a guarantee — GNOME and KDE both
+  # respect it, others may not, and an unrecognised hint is ignored rather than
+  # rejected, so this is safe to send unconditionally.
+  #
+  # No -activate equivalent: click-to-focus needs a window id the hook has no
+  # way to learn, since nothing on Linux sets the __CFBundleIdentifier-style
+  # marker macOS puts on the whole process tree. The banner is informational
+  # here rather than clickable — worth stating so it does not read as an
+  # oversight to whoever compares the two branches.
+  #
+  # Project goes in the body rather than a subtitle, which notify-send has no
+  # concept of; -a sets the application name the desktop shows above it.
+  notify-send \
+    -a "Claude Code" \
+    -h "string:x-canonical-private-synchronous:claude-code-$project" \
+    "Claude Code — $project" \
+    "$message" >/dev/null 2>&1
+fi
 
 exit 0

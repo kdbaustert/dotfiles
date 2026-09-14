@@ -12,12 +12,17 @@ alias x+="chmod +x"
 # variant that used to sit here was shadowed by it anyway, and `pkey`/`pubkey`
 # already cover copying the public key.
 alias reload="source ~/.zshrc"
-alias reloaddns="dscacheutil -flushcache && sudo killall -HUP mDNSResponder"
+# `pbcopy` is macOS's, and on Linux it is a function defined in
+# zsh/os/linux-interactive.zsh that forwards to wl-copy or xclip. Keeping the
+# macOS name as the portable one — rather than inventing a `clipcopy` both
+# platforms have to learn — is what lets these two lines, and pkey/pubkey
+# below, stay here unbranched.
 alias shrug="echo '¯\_(ツ)_/¯' | pbcopy"
 alias genpass='LC_ALL=C tr -dc "[:alnum:]" < /dev/urandom | head -c 20 | pbcopy'
-alias purgemem='sudo purge'
-alias clearDNSCache='sudo dscacheutil -flushcache && sudo killall -HUP mDNSResponder'
-alias cleandotfiles="find . -type f -name '*.DS_Store' -ls -delete"
+# Exact -name, not '*.DS_Store': the glob also matches any real file whose name
+# merely ends in .DS_Store (a `notes.DS_Store` in a test tree was deleted by it),
+# and this one runs as root, so an over-match is unrecoverable.
+alias cleandotfiles="sudo find . -type f -name '.DS_Store' -ls -delete"
 alias claude-clean='for d in backups cache file-history projects session-env; do rm -rf "$HOME/.claude/$d"/*(N) "$HOME/.claude/$d"/.[!.]*(N) 2>/dev/null; done; echo "Cleared ~/.claude/{backups,cache,file-history,projects,session-env}"'
 alias ngroka='ngrok config add-authtoken'
 alias ngrok='ngrok http --url=engaged-obviously-ferret.ngrok-free.app 80'
@@ -30,13 +35,14 @@ alias dev="cd $HOME/Development"
 alias sites="cd $HOME/Sites"
 alias dl="cd $HOME/Downloads"
 alias dotfiles="cd $HOME/dotfiles"
-alias phpdir="cd /opt/homebrew/etc/php"
-# These four were missing the `cd` that every other entry in this block has, so
-# they expanded to a bare path and the shell tried to *execute* the directory.
-# The inner single quotes matter for the two paths containing a space: $HOME is
-# expanded now, at definition time, and the quotes survive into the alias body.
-alias vscode="cd '$HOME/Library/Application Support/Code'"
-alias icloud="cd '$HOME/Library/Mobile Documents'"
+# `phpdir`, `vscode` and `icloud` name platform-specific directories and moved
+# to zsh/os/$DOTFILES_OS-interactive.zsh; the two below are the same path on
+# both machines and stay here.
+#
+# These were missing the `cd` that every other entry in this block has, so they
+# expanded to a bare path and the shell tried to *execute* the directory. The
+# inner single quotes matter for a path containing a space: $HOME is expanded
+# now, at definition time, and the quotes survive into the alias body.
 alias cnc-claims="cd '$HOME/Development/cnc-claims'"
 alias claimsource="cd '$HOME/Development/cnc-claimsource'"
 
@@ -104,28 +110,10 @@ fi
 alias pkey="pbcopy < ~/.ssh/github_1p.pub"
 alias pubkey="pbcopy < ~/.ssh/github_1p.pub && echo '=> Public key copied to pasteboard.'"
 
-# MacOS commands
-alias testspeed="networkQuality"
-
-# Delete all screenshots from the Desktop
-alias rmshots="find ~/Desktop -maxdepth 1 -type f \( -name 'Screenshot *.png' -o -name 'Screen Shot *.png' \) -print -delete"
-
-# Fix LSD pegging the CPU
-# https://discussions.apple.com/message/30186026#message30186026
-alias fixlsd="/System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister -kill -r -domain local -domain system -domain user ; killall Dock"
-alias resetlsd=fixlsd
-
-# computer power options
-alias reboot='sudo /sbin/reboot'
-alias shutdown='sudo /sbin/shutdown'
-# CGSession is gone: Apple removed the "Menu Extras" bundle that carried it, so
-# the old path fails outright on macOS 26. pmset needs no Accessibility grant
-# (the osascript Ctrl-Cmd-Q route fails silently without one) and locks straight
-# away here, since `sysadminctl -screenLock status` reports an immediate delay.
-alias lock='pmset displaysleepnow'
-# macOS ships no /sbin/poweroff (that's a Linux/systemd name) — only halt,
-# shutdown and reboot. `shutdown -h now` is the faithful equivalent.
-alias poweroff='sudo /sbin/shutdown -h now'
+# Power, session and OS-maintenance commands (lock, reboot, poweroff, the DNS
+# cache flush, the LaunchServices rebuild, the volume mute) are all the same
+# idea reached through completely different tools on each platform, so they live
+# in zsh/os/$DOTFILES_OS-interactive.zsh rather than as if/else pairs here.
 
 # Removes all node_modules folders older than 4 months:
 alias cnodeold='find . -name "node_modules" -type d -mtime +120 | xargs rm -rf'
@@ -143,27 +131,22 @@ alias chmodssh='sudo chmod 700 ~/.ssh && chmod 600 ~/.ssh/*'
 
 alias permission='chmod +x'
 
-# Get macOS Software Updates, and update installed Ruby gems, Homebrew, npm, and their installed packages
-alias update='brew update; brew upgrade; brew cleanup; npm install npm -g; npm update -g; composer global update; zinit update'
+# `update` is the system package manager plus the language ones, so its first
+# three commands differ entirely per platform — see the OS interactive files.
 
-# Recursively remove .DS_Store files
+# Recursively remove .DS_Store files. Kept portable rather than filed under
+# macOS: a shared drive or a repo touched by a Mac carries these onto Linux too,
+# and `find -delete` is the same on both.
 alias dsnuke="find . -name '*.DS_Store' -type f -ls -delete"
 
-# Kill all the tabs in Chrome to free up memory
-# [C] explained: http://www.commandlinefu.com/commands/view/402/exclude-grep-from-your-grepped-output-of-ps-alias-included-in-description
-alias chromekill="ps ux | grep '[C]hrome Helper --type=renderer' | grep -v extension-process | tr -s ' ' | cut -d ' ' -f2 | xargs kill"
-
-# Clean up LaunchServices to remove duplicates in the “Open With” menu
-alias lscleanup="/System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister -kill -r -domain local -domain system -domain user && killall Finder"
+# `chromekill` matches on the macOS helper-process name and moved to the OS
+# files; the Linux renderer processes are named differently.
 
 # IP addresses
 alias ip="dig +short myip.opendns.com @resolver1.opendns.com"
 
-# 🔇
-alias stfu="osascript -e 'set volume output muted true'"
-
-# Brew — subcommands moved to abbreviations (zsh/abbreviations)
-alias brewf='$(brew --prefix)'
+# Brew — subcommands moved to abbreviations (zsh/abbreviations); `brewf`/`ibrew`
+# moved to zsh/os/macos-interactive.zsh.
 # NB: `brew` used to be aliased to strip pyenv's shims out of PATH first (they
 # shadowed Homebrew's python and broke some formulae). pyenv is gone, so the
 # alias is both unnecessary and actively broken — `$(pyenv root)` is evaluated
@@ -197,8 +180,6 @@ alias gitlt='git lfs track'
 
 # Composer — subcommands moved to abbreviations (zsh/abbreviations)
 alias c='composer'
-
-alias ibrew='arch -x86_64 /usr/local/bin/brew'
 
 # Print each PATH entry on a separate line
 alias path='echo -e ${PATH//:/\\n}'

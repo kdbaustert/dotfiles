@@ -11,6 +11,28 @@
 # must be here — it replaces the old ": ${DOTFILES:=...}" fallback in .zshrc.
 export DOTFILES="$HOME/dotfiles"
 
+# Which machine this is. Set here rather than in .zprofile because .zshrc,
+# aliases.zsh and functions.zsh all branch on it and none of them is guaranteed
+# to have seen a login shell — .zshenv is the only file every zsh sources.
+#
+# A named variable rather than repeating `[[ $OSTYPE == darwin* ]]` at each of
+# the dozen-odd branch points: the test is the same every time, and one name
+# means a third platform is one line here rather than a grep across the repo.
+# $OSTYPE is zsh's own (darwin26.0 / linux-gnu), so this costs no subprocess —
+# which is the one rule this file has.
+#
+# Deliberately NOT a "is this macOS" boolean. The branches read
+# `[[ $DOTFILES_OS == macos ]]`, and a value that names the platform makes the
+# else-branch obvious to whoever adds the third one. Exported because bash
+# scripts under .claude/ read it too, and bash sets $OSTYPE differently enough
+# (no version suffix on Linux, but `linux-gnu` either way) that re-deriving it
+# there would be a second definition to keep in step.
+case $OSTYPE in
+  darwin*) export DOTFILES_OS=macos ;;
+  linux*)  export DOTFILES_OS=linux ;;
+  *)       export DOTFILES_OS=unknown ;;
+esac
+
 # XDG base directories — referenced (with fallbacks) by zinit and the zsh
 # completion cache. Set them explicitly so every context resolves the same dirs.
 export XDG_CONFIG_HOME="$HOME/.config"

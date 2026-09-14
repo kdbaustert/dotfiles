@@ -21,54 +21,32 @@ export COLORTERM="truecolor"
 # no controlling terminal recorded (non-interactive), where $TTY is unset.
 export GPG_TTY="${TTY:-$(tty)}"
 
-# eza / ls colors
+# eza / ls colors. LSCOLORS — BSD ls's own variable, which only macOS's /bin/ls
+# reads — moved to zsh/os/macos-env.zsh; GNU ls on Arch reads LS_COLORS, which
+# vivid generates in .zshrc for eza and the completion menu alike.
 export EZA_ICON_SPACING=1
 export EZA_GRID_ROWS=5
 export EZA_COLUMNS=80
-export LSCOLORS=ExFxBxDxCxegedabagacad
 
 #------------------------------------------------------------------------------
 # Tooling
 #------------------------------------------------------------------------------
-export HOMEBREW_BREWFILE="${DOTFILES:-$HOME/dotfiles}/homebrew/Brewfile"
+# HOMEBREW_BREWFILE moved to zsh/os/macos-env.zsh with the rest of the Homebrew
+# environment — it names this repo's Brewfile for a bare `brew bundle`.
 export NTL_RUNNER=pnpm
 export NVM_COLORS='cmgRY'
 export NVM_LAZY_LOAD=true          # zsh-nvm: defer nvm.sh until first node/npm/nvm use
 [ -d "$HOME/.nvm" ] && export NVM_DIR="$HOME/.nvm"
-export PNPM_HOME="$HOME/Library/pnpm"
 
-#------------------------------------------------------------------------------
-# Homebrew environment
-#------------------------------------------------------------------------------
-# This is what `eval "$(brew shellenv)"` used to do, written out literally.
-#
-# `brew shellenv` costs ~10ms — by far the most expensive thing in shell
-# startup — and almost all of that is the `/usr/libexec/path_helper` subprocess
-# it evals. That call was pure redundancy here: macOS's /etc/zprofile ALREADY
-# runs path_helper before this file is sourced, so every /etc/paths.d entry
-# (homebrew, cryptex, rvictl, Little Snitch, VMware Fusion) is in $path by the
-# time we get here. Brew's second call only *reordered* what was already there,
-# hoisting /opt/homebrew/{bin,sbin} to the front — which the explicit path
-# array below now does directly, and visibly.
-#
-# The values are stable for a given prefix; `brew --prefix` is /opt/homebrew on
-# Apple Silicon and does not move. Nothing here needs to run brew to find out.
-export HOMEBREW_PREFIX="/opt/homebrew"
-export HOMEBREW_CELLAR="/opt/homebrew/Cellar"
-export HOMEBREW_REPOSITORY="/opt/homebrew"
-export INFOPATH="/opt/homebrew/share/info:${INFOPATH:-}"
-
-# Completions shipped by Homebrew formulae. compinit (run from zinit's turbo
-# block in .zshrc) picks these up from fpath.
-fpath=("/opt/homebrew/share/zsh/site-functions" $fpath)
-
-# NB: brew shellenv also exported MANPATH. That is deliberately dropped — it is
-# actively worse than leaving it unset. path_helper builds MANPATH from
-# /etc/manpaths only, which does NOT include /opt/homebrew/share/man; with
-# MANPATH unset, `man` falls back to its own manpath(1) logic, which derives man
-# directories from $PATH and so *does* find Homebrew's (plus ~/.local/share/man
-# and Xcode's). Verified: `man -w eza` resolves either way, but `manpath` returns
-# a strictly larger, more correct list with MANPATH unset.
+# pnpm's global bin dir, which pnpm itself creates and writes into. The default
+# differs by platform and pnpm does not derive it from XDG on macOS: it uses
+# ~/Library/pnpm there and $XDG_DATA_HOME/pnpm on Linux. Stated explicitly on
+# both rather than left to pnpm, because the path array below has to name it.
+if [[ $DOTFILES_OS == macos ]]; then
+  export PNPM_HOME="$HOME/Library/pnpm"
+else
+  export PNPM_HOME="${XDG_DATA_HOME:-$HOME/.local/share}/pnpm"
+fi
 
 #------------------------------------------------------------------------------
 # PATH (built once, high → low priority: earlier entries win)
@@ -98,6 +76,14 @@ fpath=("/opt/homebrew/share/zsh/site-functions" $fpath)
 # last so it wins" comment — that was backwards for a zsh path array; what
 # actually hoisted it was the path_helper call inside `brew shellenv`. Now the
 # intended precedence is stated directly by the order of this list.)
+#
+# The two /opt/homebrew entries are left in this shared array rather than moved
+# into zsh/os/macos-env.zsh, even though they mean nothing on Linux: zsh drops a
+# PATH entry whose directory does not exist, so they cost a stat apiece there
+# and nothing else. Moving them would mean re-prepending from the OS file, which
+# would have to land between this array and the ~/.local/overrides block below
+# to preserve the precedence both comments describe — a real ordering constraint
+# bought for two inert lines.
 path=(
   "/opt/homebrew/bin"
   "/opt/homebrew/sbin"
@@ -122,13 +108,22 @@ typeset -U path PATH
 [ -d "$HOME/.local/overrides" ] && path=("$HOME/.local/overrides" $path) \
   && typeset -U path PATH
 
-# FlyEnv (PHP dev-environment manager) — prepended last so its PHP wins over
-# Homebrew's, preserving the previous behavior when this lived at the end of
-# .zshrc. Guarded so it's a no-op when FlyEnv isn't installed; a not-yet-created
-# subdir in the list is harmless (zsh just skips missing PATH entries).
-[ -d "$HOME/Library/FlyEnv" ] && path=(
-  "$HOME/Library/FlyEnv/alias"
-  "$HOME/Library/FlyEnv/env/php/bin"
-  "$HOME/Library/FlyEnv/env/php"
-  $path
-) && typeset -U path PATH
+#------------------------------------------------------------------------------
+# Per-OS login environment
+#------------------------------------------------------------------------------
+# Everything that exists on ONE platform only: the Homebrew environment and
+# FlyEnv's PHP paths on macOS, and (currently) nothing at all on Linux, where
+# pacman installs into /usr and both PATH and fpath already cover it.
+#
+# Paired settings — the same knob with a different value on each platform, like
+# PNPM_HOME above — deliberately do NOT live in these files. They stay inline as
+# an if/else so the two values sit next to each other and neither can be updated
+# without the other being visible. Splitting a pair across two files is how the
+# palette drift this repo documents elsewhere starts.
+#
+# Sourced LAST in this file, which is a real constraint rather than tidiness:
+# zsh/os/macos-env.zsh prepends FlyEnv to $path and that has to stay ahead of
+# everything the array and the overrides block above install. A file that only
+# exported variables could go anywhere; one that touches $path cannot.
+[ -r "$DOTFILES/zsh/os/$DOTFILES_OS-env.zsh" ] \
+  && source "$DOTFILES/zsh/os/$DOTFILES_OS-env.zsh"
