@@ -18,16 +18,11 @@ firebase-tools
 mycli
 carapace-bin
 
-# iris — the inline completion overlay. .config/iris is symlinked by the
-# installer and .zshrc autostarts it, so this is load-bearing rather than
-# optional on a machine that wants the same prompt.
-#
-# UNVERIFIED, and the most likely thing in this port to be missing: iris is
-# distributed on macOS through the author's own Homebrew tap, and whether a
-# Linux build exists at all was not checkable from the Mac this was written on.
-# If it is not packaged, .zshrc degrades cleanly — the `zcache iris` call is a
-# no-op when the binary is absent, so the shell comes up without it rather than
-# erroring. Drop this line and the iris section of .zshrc keeps working as a
-# no-op; do not paper over it with a `curl | sh` installer, which is what the
-# Brewfile comment rejected for the same tool.
-iris
+# iris — deliberately NOT built on Linux. It was in this list as an unverified
+# AUR PKGBUILD; the build hung/failed in practice, so it's dropped rather than
+# left to stall install-linux.sh's AUR step. .zshrc degrades cleanly without
+# it — the `zcache iris` call is a no-op when the binary is absent, so the
+# shell comes up without the overlay rather than erroring. Do not re-add it
+# without a working Linux build verified first; do not paper over it with a
+# `curl | sh` installer, which is what the Brewfile comment rejected for the
+# same tool on macOS.
