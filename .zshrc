@@ -126,7 +126,23 @@ source "$DOTFILES/zsh/extra/cache.zsh"
 #     insert into escape sequences, because both answer the same keypress;
 #   - typed aliases get rewritten in place by expand-alias. The alias table is
 #     untouched (124 of them resolve inside the wrapper, `ll` included) — it is
-#     the on-screen rewrite that reads as breakage.
+#     the on-screen rewrite that reads as breakage;
+#   - OFF as of 2026-09-14, and the reason this bullet list keeps growing
+#     instead of shrinking. iris's zle hook sends its own wire protocol
+#     ("IRIS_LINE:<len>:<buffer>") over a side-channel pipe ($IRIS_FD) on
+#     every zle line-pre-redraw — which fires on every Up/Down history press
+#     because a 2-line starship prompt has to fully redraw each time. That
+#     string was observed leaking onto the actual command line instead of
+#     staying on the pipe, and once it leaks once it's part of $BUFFER, so the
+#     next redraw resends "IRIS_LINE:<len>:IRIS_LINE:<len>:...", compounding.
+#     Reproduced with plain Up/Down, no menu open. iris 0.7.0's changelog
+#     already claims two fixes in exactly this area ("overlay drawing
+#     conflicts with full-screen TUI tools like Atuin", "overlay jitter
+#     navigating history with Up/Down") — this is that same seam
+#     (navigate-closed = "shell" handing Up to atuin's full-screen TUI while
+#     iris still owns the outer pty) still not fully solid on the current
+#     release. Re-enable (flip the default below to 1) once upstream ships a
+#     fix; until then this is a known-bad interaction, not a misconfiguration.
 #
 # Config and Voltage theme are in .config/iris. Do NOT run `iris setup` or
 # `iris uninstall`: both rewrite the RC file in place, and ~/.zshrc is a symlink
@@ -146,7 +162,11 @@ source "$DOTFILES/zsh/extra/cache.zsh"
 #
 # Not exported: the child shell reaches Branch 1 on $IRIS_PID regardless, and
 # leaving it shell-local keeps it out of the environment of everything iris runs.
-: ${IRIS_AUTOSTART:=1}
+#
+# Default is 0 (was 1) — see the IRIS_LINE leak bullet in KNOWN CONFLICTS
+# above. `IRIS_AUTOSTART=1 zsh` re-enables it for one shell to retest once
+# upstream ships a fix.
+: ${IRIS_AUTOSTART:=0}
 
 if [[ -n $IRIS_PID && -n $IRIS_FD ]]; then
   IRIS_RESCUE=1
