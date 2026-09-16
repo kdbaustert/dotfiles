@@ -100,6 +100,13 @@ wl-clipboard
 xclip
 xdg-utils
 
+# --- GitHub CLI -------------------------------------------------------------
+# Homebrew's `gh` is Arch's `github-cli` (extra); there is no package named gh.
+# Verified against archlinux.org's package API on 2026-09-16 — the one entry
+# in this file that has been, because the aurlist header used to claim "gh"
+# was in the repos under that name and it never was.
+github-cli
+
 # --- Linters and formatters -------------------------------------------------
 shellcheck
 shfmt

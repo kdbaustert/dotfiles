@@ -216,31 +216,41 @@ title "pay-respects"
 # Same pinned-release install as macOS (see install_pay_respects in
 # setup/lib.sh); only the asset and its checksum differ.
 #
-# THE CHECKSUM BELOW IS A PLACEHOLDER. It could not be read from the release
-# without fetching the Linux asset, and inventing one would be worse than
-# admitting it: the library verifies before installing, so a wrong value makes
-# the step fail safely with "download, checksum, or extract" rather than
-# installing something unverified. Fill it in on the first Linux machine:
+# One checksum per architecture, because the asset differs per architecture
+# and a single PR_SHA256 could only ever have been right for one of them.
+# Both were computed on 2026-09-16 by fetching the v0.8.8 assets from the
+# release and running `shasum -a 256` — the same thing the library does before
+# it installs, so a mismatch here fails safely with "download, checksum, or
+# extract" rather than installing something unverified. Re-derive both when
+# bumping PR_VERSION:
 #
-#   curl -sSfL -O https://github.com/iffse/pay-respects/releases/download/\
-#v0.8.8/pay-respects-0.8.8-x86_64-unknown-linux-musl.tar.zst
-#   sha256sum pay-respects-0.8.8-x86_64-unknown-linux-musl.tar.zst
+#   for a in x86_64 aarch64; do
+#     f=pay-respects-<ver>-$a-unknown-linux-musl.tar.zst
+#     curl -sSfL -O https://github.com/iffse/pay-respects/releases/download/v<ver>/$f
+#     sha256sum $f
+#   done
 #
 # musl rather than gnu: the static build has no glibc version floor, which
 # matters on a rolling distro only in that it removes a variable.
 PR_VERSION="0.8.8"
-PR_SHA256="0000000000000000000000000000000000000000000000000000000000000000"
 
 case "$(uname -m)" in
-  x86_64)  PR_ARCH="x86_64-unknown-linux-musl" ;;
-  aarch64) PR_ARCH="aarch64-unknown-linux-musl" ;;
-  *)       PR_ARCH="" ;;
+  x86_64)
+    PR_ARCH="x86_64-unknown-linux-musl"
+    PR_SHA256="20bb89e9fa114b20ce78b57ece77134e79e314fd0d5086e9695c0de7f98ccaaf"
+    ;;
+  aarch64)
+    PR_ARCH="aarch64-unknown-linux-musl"
+    PR_SHA256="c63ce37f25f4b8f7fc8ffd46955a22cb05314991560822f7de77e8190d3d9ca4"
+    ;;
+  *)
+    PR_ARCH=""
+    PR_SHA256=""
+    ;;
 esac
 
 if [ -z "$PR_ARCH" ]; then
   warning "Skipping pay-respects — no release asset pinned for $(uname -m)."
-elif [ "$PR_SHA256" = "0000000000000000000000000000000000000000000000000000000000000000" ]; then
-  warning "Skipping pay-respects — PR_SHA256 is still the placeholder. See the comment above this block."
 else
   install_pay_respects "$PR_VERSION" "$PR_SHA256" \
     "pay-respects-${PR_VERSION}-${PR_ARCH}.tar.zst"

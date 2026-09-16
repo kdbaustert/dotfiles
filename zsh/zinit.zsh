@@ -1,14 +1,17 @@
 #==============================================================================
 #  zinit — plugin manager bootstrap + plugins
 #------------------------------------------------------------------------------
-#  Philosophy: zinit manages zsh *plugins*, and now also most CLI *binaries* —
-#  fetched as prebuilt gh-r releases rather than left to Homebrew. Two tools
+#  Philosophy: zinit manages zsh *plugins*, and on macOS also most CLI
+#  *binaries* — fetched as prebuilt gh-r releases rather than left to Homebrew
+#  (on Linux those same tools come from arch/pkglist, and section 5 is skipped
+#  entirely — see its header). Two tools
 #  are the exception and stay on Homebrew on purpose: eza and navi ship no
 #  macOS release asset at all (checked against their latest GitHub releases on
 #  2026-09-14 — every asset is Linux/Windows only), so there is no binary for
-#  zinit to fetch. starship stays on Homebrew for a different reason, kept
-#  below. Everything else Homebrew still installs (openssl, zlib, nss, …) is a
-#  library or system dependency, not a CLI binary, and is out of scope here.
+#  zinit to fetch. starship is neither zinit- nor Homebrew-managed; it comes
+#  from its own official install script, kept below. Everything else Homebrew
+#  still installs (openssl, zlib, nss, …) is a library or system dependency,
+#  not a CLI binary, and is out of scope here.
 #
 #  This reintroduces the exact risk this file used to avoid entirely — the
 #  arm64/x86_64 gh-r asset-naming mismatches that previously broke mcfly — so
@@ -64,17 +67,46 @@ ZINIT[ZCOMPDUMP_PATH]="${ZSH_CACHE_DIR:-$HOME/.cache/zsh}/zcompdump"
 
 setopt PROMPT_SUBST
 
-# Prompt: starship now comes from Homebrew (declared in homebrew/Brewfile) and
-# is initialised from .zshrc via the cached `starship init zsh` output.
+# Prompt: starship comes from its own official installer
+# (https://starship.rs/install.sh), not Homebrew and not zinit's gh-r fetcher,
+# installed to ~/.local/bin — the directory .zprofile already puts on $PATH for
+# hand-installed binaries. It is initialised from .zshrc via the cached
+# `starship init zsh` output.
 #
 # It used to be fetched here as a gh-r binary, which made it the ONE plugin
 # loaded eagerly — a prompt cannot be turbo-deferred, since it has to exist
 # before the first prompt is drawn. That put zinit's full plugin-load machinery
 # (~16ms, the single largest entry in `zprof`) on the critical path just to put
-# one binary on $PATH and eval its init. Homebrew already provides every other
-# CLI binary this config uses (eza, bat, fd, fzf, zoxide, atuin, navi, delta,
-# vivid), so this is now consistent with the rest — and `brew upgrade` handles
-# updates instead of `zinit update`.
+# one binary on $PATH and eval its init. It then moved to Homebrew for the same
+# reason every other CLI binary here was — until now, when it moved again to
+# the upstream installer script; `starship --version` output already showed
+# the two builds diverging, and this way there is exactly one updater
+# (`~/.local/bin/starship` re-running its own installer) instead of brew and
+# starship both claiming to own the binary.
+#
+# The check below costs one `command -v` per shell startup (a single stat,
+# same budget class as the zinit bootstrap check above) and only shells out to
+# curl the one time the binary is actually missing — a fresh machine, or this
+# one after `~/.local/bin/starship` gets removed by hand.
+#
+# `command touch` after install matters: zcache (zsh/extra/cache.zsh)
+# invalidates its `starship init zsh` cache by comparing the binary's mtime to
+# the cache's, on the assumption an install always leaves a fresher binary —
+# true for a brew pour, but the official installer's tarball preserves the
+# upstream release's original build timestamp instead of setting it to install
+# time. A binary dated earlier than an existing cache silently keeps that
+# stale cache forever (hit once already: an old cache with Homebrew's
+# `/opt/homebrew/bin/starship` baked into `$PROMPT` outlived the switch to
+# this installer). Touching the binary after every install restores the
+# "newer install invalidates the cache" invariant zcache relies on.
+if ! command -v starship >/dev/null 2>&1; then
+  print -P "%F{33}▓▒░ %F{160}Installing starship (https://starship.rs)…%f"
+  command mkdir -p "$HOME/.local/bin"
+  curl -sS https://starship.rs/install.sh | sh -s -- -y -b "$HOME/.local/bin" \
+    && command touch "$HOME/.local/bin/starship" \
+    && print -P "%F{34}▓▒░ Installation successful.%f" \
+    || print -P "%F{160}▓▒░ Install failed.%f"
+fi
 
 #------------------------------------------------------------------------------
 # 2. Helper functions
@@ -487,9 +519,23 @@ zinit wait lucid for \
   romkatv/zsh-prompt-benchmark
 
 #------------------------------------------------------------------------------
-# 5. CLI binaries (gh-r)
+# 5. CLI binaries (gh-r) — macOS only
 #------------------------------------------------------------------------------
 # Prebuilt release binaries fetched straight from GitHub instead of Homebrew.
+#
+# macOS only, and the guard is a `return` rather than an `if` around forty
+# lines: this file is sourced, so `return` ends it here, and nothing follows
+# this section — which is the constraint to keep. Anything appended below
+# would silently never run, so a new section goes ABOVE this one. Every
+# `bpick` below names a darwin asset, and on Linux the same nine tools come
+# from arch/pkglist via pacman, so without this guard a Linux shell would try
+# to match `*-apple-darwin.tar.gz` against a release that has no such asset
+# on every start, for binaries already on $PATH. The block can't move to
+# zsh/os/macos-interactive.zsh (the usual home for platform-only code): that
+# file is sourced late in .zshrc, after the `zcache fzf/zoxide/atuin/vivid`
+# lines that need these four binaries on $PATH already.
+[[ $DOTFILES_OS == macos ]] || return 0
+
 # `bpick` is pinned to the exact asset filename for aarch64 (Apple Silicon) —
 # verified 2026-09-14 with:
 #   gh api repos/<org>/<repo>/releases/latest --jq '.assets[].name'

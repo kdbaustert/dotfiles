@@ -9,7 +9,8 @@
 # an AUR package builds from source and can prompt, so it is worth seeing which
 # of the two lists a failure came from.
 
-# The GitHub CLI's own package is in the repos (gh); these are not.
+# The GitHub CLI's own package is in the repos (as github-cli, in pkglist);
+# these are not.
 mist-cli
 firebase-tools
 
@@ -17,6 +18,25 @@ firebase-tools
 # upstream release binaries via AUR PKGBUILDs.
 mycli
 carapace-bin
+
+# Homebrew leaves that had no Linux counterpart in either list until
+# 2026-09-16, when the two were diffed. Names checked against the AUR RPC that
+# day, which is more than the rest of this file can say — see the header.
+#   mdcat        — not in extra despite what its age suggests; AUR only.
+#   ccat         — the Homebrew `ccat` (colorized cat).
+#   ox-bin       — the Homebrew `ox` editor. `ox` (source build) also exists
+#                  and lags several minor versions behind; -bin tracks upstream.
+#   assh-bin     — the Homebrew `assh`. Same story: `assh` in the AUR is stuck
+#                  on 2.3 while -bin is on the current 2.17 line.
+#   php-cs-fixer — flagged out-of-date on the AUR as of that check (3.88 vs.
+#                  Homebrew's 3.95). Installs, just behind; `composer global
+#                  require friendsofphp/php-cs-fixer` is the fallback if the
+#                  PKGBUILD stops building.
+mdcat
+ccat
+ox-bin
+assh-bin
+php-cs-fixer
 
 # iris — deliberately NOT built on Linux. It was in this list as an unverified
 # AUR PKGBUILD; the build hung/failed in practice, so it's dropped rather than
