@@ -1,90 +1,90 @@
 cask_args appdir: '/Applications'
 
-brew "bash"
-brew "coreutils"
-brew "svn"
-brew "zsh"
-brew "perl"
-brew "grep"
-brew "openssh"
-brew "git"
-brew "tmux"
-brew "gnupg"
-brew "openssl"
-brew "wget"
+# brew "bash"  # nix: setup/nixos-packages.nix (NixOS equivalent)
+# brew "coreutils"  # nix: setup/nixos-packages.nix (NixOS equivalent)
+# brew "svn"  # nix: setup/nixos-packages.nix (NixOS equivalent)
+# brew "zsh"  # nix: setup/nixos-packages.nix (NixOS equivalent)
+# brew "perl"  # nix: setup/nixos-packages.nix (NixOS equivalent)
+# brew "grep"  # nix: setup/nixos-packages.nix (NixOS equivalent)
+# brew "openssh"  # nix: setup/nixos-packages.nix (NixOS equivalent)
+# brew "git"  # nix: setup/nixos-packages.nix (NixOS equivalent)
+# brew "tmux"  # nix: setup/nixos-packages.nix (NixOS equivalent)
+# brew "gnupg"  # nix: setup/nixos-packages.nix (NixOS equivalent)
+# brew "openssl"  # nix: setup/nixos-packages.nix (NixOS equivalent)
+# brew "wget"  # nix: setup/nixos-packages.nix (NixOS equivalent)
 # fzf — now fetched by zinit as a gh-r binary (zsh/zinit.zsh section 5), not
 # installed here. Left declared, commented, so the package isn't lost from
 # this list.
 # brew "fzf"
-brew "git-lfs"
-brew "httpie"
-brew "jq"
-brew "m-cli"
-brew "mas"
-brew "ssh-copy-id"
-brew "terminal-notifier"
-brew "task"
-brew "fzy"
-brew "tree"
-brew "mycli"
-brew "gh"
-brew "carapace"
-brew "colordiff"
-brew "ranger"
-brew "htop"
-brew "go"
-brew "neovim"
-brew "gitui"
-brew "pinentry-mac"
-brew "fortune"
-brew "figlet"
-brew "lolcat"
-brew "ccat"
-brew "navi"
-brew "ffmpeg"
+# brew "git-lfs"  # nix: setup/nixos-packages.nix (NixOS equivalent)
+# brew "httpie"  # nix: setup/nixos-packages.nix (NixOS equivalent)
+# brew "jq"  # nix: setup/nixos-packages.nix (NixOS equivalent)
+# brew "m-cli"  # nix: setup/nixos-packages.nix (NixOS equivalent)
+# brew "mas"  # nix: setup/nixos-packages.nix (NixOS equivalent)
+# brew "ssh-copy-id"  # nix: setup/nixos-packages.nix (NixOS equivalent)
+# brew "terminal-notifier"  # nix: setup/nixos-packages.nix (NixOS equivalent)
+# brew "task"  # nix: setup/nixos-packages.nix (NixOS equivalent)
+# brew "fzy"  # nix: setup/nixos-packages.nix (NixOS equivalent)
+# brew "tree"  # nix: setup/nixos-packages.nix (NixOS equivalent)
+# brew "mycli"  # nix: setup/nixos-packages.nix (NixOS equivalent)
+# brew "gh"  # nix: setup/nixos-packages.nix (NixOS equivalent)
+# brew "carapace"  # nix: setup/nixos-packages.nix (NixOS equivalent)
+# brew "colordiff"  # nix: setup/nixos-packages.nix (NixOS equivalent)
+# brew "ranger"  # nix: setup/nixos-packages.nix (NixOS equivalent)
+# brew "htop"  # nix: setup/nixos-packages.nix (NixOS equivalent)
+# brew "go"  # nix: setup/nixos-packages.nix (NixOS equivalent)
+# brew "neovim"  # nix: setup/nixos-packages.nix (NixOS equivalent)
+# brew "gitui"  # nix: setup/nixos-packages.nix (NixOS equivalent)
+# brew "pinentry-mac"  # nix: setup/nixos-packages.nix (NixOS equivalent)
+# brew "fortune"  # nix: setup/nixos-packages.nix (NixOS equivalent)
+# brew "figlet"  # nix: setup/nixos-packages.nix (NixOS equivalent)
+# brew "lolcat"  # nix: setup/nixos-packages.nix (NixOS equivalent)
+# brew "ccat"  # nix: setup/nixos-packages.nix (NixOS equivalent)
+# brew "navi"  # nix: setup/nixos-packages.nix (NixOS equivalent)
+# brew "ffmpeg"  # nix: setup/nixos-packages.nix (NixOS equivalent)
 # bat, lsd, fd, zoxide, git-delta, ripgrep — now fetched by zinit as gh-r
 # binaries (zsh/zinit.zsh section 5), not installed here. Left declared,
 # commented, so the packages aren't lost from this list.
 # brew "bat"
-brew "ox"
-brew "mdcat"
-brew "xplr"
-brew "glow"
+# brew "ox"  # nix: setup/nixos-packages.nix (NixOS equivalent)
+# brew "mdcat"  # nix: setup/nixos-packages.nix (NixOS equivalent)
+# brew "xplr"  # nix: setup/nixos-packages.nix (NixOS equivalent)
+# brew "glow"  # nix: setup/nixos-packages.nix (NixOS equivalent)
 # brew "lsd"
 # brew "fd"
-brew "sqlite"
+# brew "sqlite"  # nix: setup/nixos-packages.nix (NixOS equivalent)
 brew "zlib"
 # brew "zoxide"
 # brew "git-delta"
-brew "lazygit"
-brew "eza"
+# brew "lazygit"  # nix: setup/nixos-packages.nix (NixOS equivalent)
+# brew "eza"  # nix: setup/nixos-packages.nix (NixOS equivalent)
 brew "assh"
-brew "procs"
+# brew "procs"  # nix: setup/nixos-packages.nix (NixOS equivalent)
 # brew "ripgrep"
-brew "nnn"
+# brew "nnn"  # nix: setup/nixos-packages.nix (NixOS equivalent)
 # node — the default Node here. nvm is loaded (see zsh/zinit.zsh) but manages no
 # versions, so this is what actually resolves. It was installed by hand and left
 # undeclared, meaning `brew bundle` on a fresh box produced a shell with pnpm but
 # no node; declare it so that stays reproducible.
-brew "node"
-brew "pnpm"
+# brew "node"  # nix: setup/nixos-packages.nix (NixOS equivalent)
+# brew "pnpm"  # nix: setup/nixos-packages.nix (NixOS equivalent)
 # direnv — per-directory environments, which here means a project's Nix dev
 # shell: ghostty, rio and kennybdev each carry an .envrc saying `use flake`.
 # The caching half, nix-direnv, is not a formula; .config/direnv/direnvrc
 # fetches it pinned and checksummed. The zsh hook is the zcache line in .zshrc.
-brew "direnv"
+# brew "direnv"  # nix: setup/nixos-packages.nix (NixOS equivalent)
 # vivid — now fetched by zinit as a gh-r binary (zsh/zinit.zsh section 5), not
 # installed here. Left declared, commented, so the package isn't lost from
 # this list.
 # brew "vivid"
-brew "imagemagick"
-brew "nss"
-brew "shfmt"
-brew "shellcheck"
+# brew "imagemagick"  # nix: setup/nixos-packages.nix (NixOS equivalent)
+# brew "nss"  # nix: setup/nixos-packages.nix (NixOS equivalent)
+# brew "shfmt"  # nix: setup/nixos-packages.nix (NixOS equivalent)
+# brew "shellcheck"  # nix: setup/nixos-packages.nix (NixOS equivalent)
 # stylua — Lua formatter. Declared here rather than left to Mason because
 # .config/lvim wires it into none-ls, which shells out to PATH: a Mason copy
 # would live under ~/.local/share and vanish with the editor's runtime.
-brew "stylua"
+# brew "stylua"  # nix: setup/nixos-packages.nix (NixOS equivalent)
 # atuin — now fetched by zinit as a gh-r binary (zsh/zinit.zsh section 5), not
 # installed here. Left declared, commented, so the package isn't lost from
 # this list.
@@ -93,19 +93,19 @@ brew "stylua"
 # forced zinit to load eagerly (a prompt can't be turbo-deferred) and put ~16ms
 # of plugin machinery on the critical path. Declared here so it's installed like
 # every other CLI binary; zsh/zinit.zsh no longer mentions it.
-brew "starship"
-brew "poppler"
-brew "sevenzip"
+# brew "starship"  # nix: setup/nixos-packages.nix (NixOS equivalent)
+# brew "poppler"  # nix: setup/nixos-packages.nix (NixOS equivalent)
+# brew "sevenzip"  # nix: setup/nixos-packages.nix (NixOS equivalent)
 # zstd — provides unzstd, which install.sh needs to unpack the pay-respects
 # release (it ships .tar.zst only). Previously present merely as a transitive
 # dep of curl/imagemagick/etc; declare it now that a script depends on it.
-brew "zstd"
-brew "helix"
-brew "yazi"
-brew "btop"
-brew "fastfetch"
+# brew "zstd"  # nix: setup/nixos-packages.nix (NixOS equivalent)
+# brew "helix"  # nix: setup/nixos-packages.nix (NixOS equivalent)
+# brew "yazi"  # nix: setup/nixos-packages.nix (NixOS equivalent)
+# brew "btop"  # nix: setup/nixos-packages.nix (NixOS equivalent)
+# brew "fastfetch"  # nix: setup/nixos-packages.nix (NixOS equivalent)
 brew "firebase-cli"
-brew "zig"
+# brew "zig"  # nix: setup/nixos-packages.nix (NixOS equivalent)
 # iris — inline completion overlay (IntelliSense for the prompt). Config and
 # theme live in .config/iris and are symlinked by install.sh; the autostart hook
 # is in .zshrc. The tap is the author's own, and is the only distribution
@@ -120,13 +120,13 @@ brew "versenilvis/iris/iris"
 # brew "mkcert"
 
 # Development
-brew "php"
+# brew "php"  # nix: setup/nixos-packages.nix (NixOS equivalent)
 # brew "php@8.5"
-brew "nginx"
-brew "php-cs-fixer"
-brew "mariadb"
-brew "redis"
-brew "composer"
+# brew "nginx"  # nix: setup/nixos-packages.nix (NixOS equivalent)
+# brew "php-cs-fixer"  # nix: setup/nixos-packages.nix (NixOS equivalent)
+# brew "mariadb"  # nix: setup/nixos-packages.nix (NixOS equivalent)
+# brew "redis"  # nix: setup/nixos-packages.nix (NixOS equivalent)
+# brew "composer"  # nix: setup/nixos-packages.nix (NixOS equivalent)
 # brew "wp-cli"
 # brew "shopify-cli"
 # brew "theme-check"
@@ -214,10 +214,10 @@ cask "visual-studio-code@insiders"
 # cask "hammerspoon"
 
 ## Fonts
-cask "font-fira-code"
+# cask "font-fira-code"  # nix: setup/nixos-packages.nix (NixOS equivalent)
 cask "font-monaspace"
-cask "font-symbols-only-nerd-font"
-cask "font-jetbrains-mono-nerd-font"  # v3 Nerd Font — Rio + NvChad devicons need v3 glyphs
+# cask "font-symbols-only-nerd-font"  # nix: setup/nixos-packages.nix (NixOS equivalent)
+# cask "font-jetbrains-mono-nerd-font"  # v3 Nerd Font — Rio + NvChad devicons need v3 glyphs — nix: setup/nixos-packages.nix (NixOS equivalent)
 cask "font-hack"   # plain Hack; installed here but was undeclared
 # "Hack Nerd Font Mono" is the family .config/ghostty/config and
 # .config/rio/config.toml actually name, and font-hack above does NOT provide it
@@ -233,11 +233,11 @@ cask "font-hack"   # plain Hack; installed here but was undeclared
 # for the colored tab-icon font. It handles both names, but the ethereum icon
 # lives at a v2-only codepoint, so a v3 source makes that one entry fail the
 # build loudly — the script says which and why.
-cask "font-hack-nerd-font"
+# cask "font-hack-nerd-font"  # nix: setup/nixos-packages.nix (NixOS equivalent)
 # Installed but undeclared until now.
-cask "font-fira-code-nerd-font"
+# cask "font-fira-code-nerd-font"  # nix: setup/nixos-packages.nix (NixOS equivalent)
 cask "font-fira-mono-nerd-font"
-cask "font-roboto-mono-nerd-font"
-cask "font-sauce-code-pro-nerd-font"
+# cask "font-roboto-mono-nerd-font"  # nix: setup/nixos-packages.nix (NixOS equivalent)
+# cask "font-sauce-code-pro-nerd-font"  # nix: setup/nixos-packages.nix (NixOS equivalent)
 
 
