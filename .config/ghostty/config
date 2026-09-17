@@ -1,7 +1,7 @@
 # See the full configuration reference: https://ghostty.org/docs/config
 # Ported from .config/rio/config.toml — matched to what Rio actually renders.
 
-macos-icon = blueprint
+#macos-icon = blueprint
 #macos-custom-icon = ~/.config/ghostty/ghostty-mac.icns
 
 # Fonts

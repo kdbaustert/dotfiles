@@ -62,7 +62,7 @@ Known offenders:
 | `.claude/CLAUDE.md`   | Global Claude Code instructions                                   |
 | `.claude/hooks/`      | `notify.sh`, the Notification hook (terminal-notifier / notify-send) |
 | `.claude/statusline.sh` | The status line — plan usage, context, model, on every render   |
-| `.claude/skills/`     | Skills, one dir per skill; `php-psr12/` is ours, three are vendored |
+| `.claude/skills/`     | Skills, one dir per skill; `php-psr12/` is ours, five are vendored |
 | `.claude/agents/`     | Custom subagents, one `.md` file per agent, ours                  |
 
 The two `.config/git/` files reach git by different routes, which matters when
@@ -80,9 +80,22 @@ reference and is applied by hand. The installer also sweeps the retired
 `skills/` is a loop over `skills/*`, not one `link` line per skill, for the same
 reason `.config/*` is — a skill added here but not named in the installer would
 silently never deploy, the exact failure mode that killed the `@AGENTS.md`
-import. A skill is discovered by its *directory* containing a `SKILL.md`, so the
-directory is what gets linked. The sweep alongside it removes only links that
-point into this repo, so a skill installed by hand from elsewhere survives.
+import. The loop links every directory unconditionally, since a plain skill is
+discovered by its *directory* containing a `SKILL.md`, while a directory that
+also carries a `.claude-plugin/plugin.json` is discovered a second way — as a
+full Claude Code plugin, auto-loading as `<name>@skills-dir` — and doesn't need
+a `SKILL.md` of its own at all if its manifest points at `commands/` instead
+(`code-review/` is exactly this: plugin.json + commands/code-review.md, no
+SKILL.md). The sweep alongside the loop removes only links that point into this
+repo, so a skill installed by hand from elsewhere survives.
+
+Running `claude plugin list` from inside this repo will warn that
+`frontend-design@skills-dir`/`code-review@skills-dir` are "shadowed" by a
+same-named project-scope copy — that's `~/dotfiles/.claude/skills/<name>`
+itself being visible twice (once as the deployed user-scope symlink target,
+once as this repo's own `./.claude/skills/<name>` from the cwd). Harmless: the
+user-scope one still loads, and it's only cosmetic double-counting that shows
+up when your cwd happens to be this repo.
 
 `agents/` is the same loop-not-list pattern, one level shallower: a subagent is
 discovered by a `.md` file directly under `~/.claude/agents`, so the file itself
@@ -98,18 +111,40 @@ two don't — `quick-lookup` answers are too narrow to be worth retaining and
 `heavy-refactor` runs are one-off enough that stale memory would be more
 likely to mislead the next run than help it.
 
-Three of the four skills are **vendored, not ours**. `skills/plain/` comes from
-`petekp/claude-code-setup` (`skills/plain/SKILL.md`); `skills/javascript-pro/`
-and `skills/swift-expert/` come from `Jeffallan/claude-skills` (MIT), each with
-its `references/` directory, because the SKILL.md's "Reference Guide" table is
-five dead links without them. They are upstream's files. Re-fetch with `gh api`
-and diff rather than editing in place; local edits would be silently lost the
-next time one is refreshed:
+Only `php-psr12/` is ours; the other five skill directories are **vendored, not
+ours**. `skills/plain/` comes from `petekp/claude-code-setup`
+(`skills/plain/SKILL.md`); `skills/javascript-pro/` and `skills/swift-expert/`
+come from `Jeffallan/claude-skills` (MIT), each with its `references/`
+directory, because the SKILL.md's "Reference Guide" table is five dead links
+without them. They are upstream's files. Re-fetch with `gh api` and diff rather
+than editing in place; local edits would be silently lost the next time one is
+refreshed:
 
 ```sh
 gh api repos/Jeffallan/claude-skills/contents/skills/swift-expert/SKILL.md \
   -H 'Accept: application/vnd.github.raw'
 ```
+
+`frontend-design/` and `code-review/` are also vendored, from
+`anthropics/claude-code`'s own `plugins/frontend-design` and `plugins/code-review`
+— copied whole (`.claude-plugin/plugin.json`, `README.md`, and either
+`skills/frontend-design/SKILL.md` or `commands/code-review.md`), which is also
+why they're full plugins and not just skills; see the note above
+`claude plugin list`'s shadowing warning. Licensed under Anthropic's own
+Commercial Terms of Service (`LICENSE.md` at that repo's root), not MIT like
+the other two vendored skills. Re-fetch the same way:
+
+```sh
+gh api repos/anthropics/claude-code/contents/plugins/code-review \
+  -H 'Accept: application/vnd.github.raw'
+```
+
+They were vendored from a local zip download rather than the marketplace
+install this repo briefly used, because the `claude-plugins-official`
+marketplace's mirror of both had drifted behind `main` — noticeably so for
+`code-review`, which upstream had grown a `--comment`/inline-comment posting
+step and named authors that the marketplace copy's `plugin.json` had genericized
+to `"Anthropic"`.
 
 Vendoring verbatim means two of them contradict the style rules in
 `.claude/CLAUDE.md`. That is deliberate: correcting it in the file would be
@@ -339,3 +374,14 @@ themes into caches and need the corresponding `install.sh` steps re-run.
 
 Commits are SSH-signed through 1Password. Don't disable signing, don't set a
 per-repo `user.email`, and don't commit or push unless asked.
+
+
+# Coding Rules
+
+Please follow all of the following coding rules.
+
+- Make changed code explain its behavior through names and structure.
+- Use comments only to explain reasons that code cannot express.
+- Use vertical whitespace (blank lines) between logical steps, declaration groups, and completed control-flow blocks.
+- Do not write minified code. Code should always be formatted to be read and maintained.
+- Add correctly formatted PHPDoc, JSDoc, or respective comment-based type-hinting to every function you add or change.
