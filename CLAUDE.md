@@ -385,3 +385,7 @@ Please follow all of the following coding rules.
 - Use vertical whitespace (blank lines) between logical steps, declaration groups, and completed control-flow blocks.
 - Do not write minified code. Code should always be formatted to be read and maintained.
 - Add correctly formatted PHPDoc, JSDoc, or respective comment-based type-hinting to every function you add or change.
+
+# Compact instructions
+
+When you are using compact, please focus on test output and code changes

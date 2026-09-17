@@ -470,6 +470,51 @@ install_pay_respects() {
 }
 
 #------------------------------------------------------------------------------
+# install_claude_plugins <plugin...>
+#------------------------------------------------------------------------------
+# Claude Code plugins from the official marketplace (claude-plugins-official),
+# installed by name at user scope. Unlike everything else link_dotfiles puts
+# under ~/.claude, a plugin isn't a file this repo owns — `claude plugin
+# install` writes into ~/.claude/plugins/installed_plugins.json, which is
+# runtime state the CLI manages itself and was never a candidate for a
+# symlink (see the note above link_dotfiles's ~/.claude section). So the only
+# way an install survives a fresh machine is running the command again here.
+#
+# Both `claude plugin marketplace add` and `claude plugin install` are
+# idempotent on their own — re-adding a marketplace already on disk, or
+# reinstalling a plugin already at the requested version, exits 0 with an
+# "already" message rather than erroring — so this is a plain loop with no
+# separate already-installed check. `-y` accepts a marketplace-declared
+# command with no prompt; none of the LSP plugins declare one, but the flag
+# costs nothing and keeps a future catalog change from hanging a
+# non-interactive run.
+#
+# Guarded on the `claude` binary, not on SETUP_SCRIPTS: the CLI isn't
+# installed by this repo (it's Claude Code's own installer, not the Brewfile's
+# `cask "claude"`, which is the unrelated desktop app), so a fresh machine
+# that hasn't run it yet skips cleanly rather than erroring the rest of the
+# installer.
+install_claude_plugins() {
+  local plugin
+
+  if ! command -v claude &>/dev/null; then
+    warning "claude CLI not found — skipped Claude Code plugins ($*)."
+    return 0
+  fi
+
+  claude plugin marketplace add anthropics/claude-plugins-official &>/dev/null \
+    || warning "Could not add/verify the claude-plugins-official marketplace."
+
+  for plugin in "$@"; do
+    if claude plugin install "${plugin}@claude-plugins-official" -y &>/dev/null; then
+      success "Claude Code plugin ${plugin}@claude-plugins-official installed."
+    else
+      warning "Failed to install Claude Code plugin ${plugin}@claude-plugins-official."
+    fi
+  done
+}
+
+#------------------------------------------------------------------------------
 # run_setup_scripts <default-list>
 #------------------------------------------------------------------------------
 # Opt-in, and off by default: these pull down a lot of global packages, and on
