@@ -62,7 +62,7 @@ Known offenders:
 | `.claude/CLAUDE.md`   | Global Claude Code instructions                                   |
 | `.claude/hooks/`      | `notify.sh`, the Notification hook (terminal-notifier / notify-send) |
 | `.claude/statusline.sh` | The status line — plan usage, context, model, on every render   |
-| `.claude/skills/`     | Skills, one dir per skill; `php-psr12/` is ours, five are vendored |
+| `.claude/skills/`     | Skills, one dir per skill; `php-psr12/` is ours, three are vendored |
 | `.claude/agents/`     | Custom subagents, one `.md` file per agent, ours                  |
 
 The two `.config/git/` files reach git by different routes, which matters when
@@ -84,18 +84,9 @@ import. The loop links every directory unconditionally, since a plain skill is
 discovered by its *directory* containing a `SKILL.md`, while a directory that
 also carries a `.claude-plugin/plugin.json` is discovered a second way — as a
 full Claude Code plugin, auto-loading as `<name>@skills-dir` — and doesn't need
-a `SKILL.md` of its own at all if its manifest points at `commands/` instead
-(`code-review/` is exactly this: plugin.json + commands/code-review.md, no
-SKILL.md). The sweep alongside the loop removes only links that point into this
-repo, so a skill installed by hand from elsewhere survives.
-
-Running `claude plugin list` from inside this repo will warn that
-`frontend-design@skills-dir`/`code-review@skills-dir` are "shadowed" by a
-same-named project-scope copy — that's `~/dotfiles/.claude/skills/<name>`
-itself being visible twice (once as the deployed user-scope symlink target,
-once as this repo's own `./.claude/skills/<name>` from the cwd). Harmless: the
-user-scope one still loads, and it's only cosmetic double-counting that shows
-up when your cwd happens to be this repo.
+a `SKILL.md` of its own at all if its manifest points at `commands/` instead.
+The sweep alongside the loop removes only links that point into this repo, so
+a skill installed by hand from elsewhere survives.
 
 `agents/` is the same loop-not-list pattern, one level shallower: a subagent is
 discovered by a `.md` file directly under `~/.claude/agents`, so the file itself
@@ -111,7 +102,7 @@ two don't — `quick-lookup` answers are too narrow to be worth retaining and
 `heavy-refactor` runs are one-off enough that stale memory would be more
 likely to mislead the next run than help it.
 
-Only `php-psr12/` is ours; the other five skill directories are **vendored, not
+Only `php-psr12/` is ours; the other three skill directories are **vendored, not
 ours**. `skills/plain/` comes from `petekp/claude-code-setup`
 (`skills/plain/SKILL.md`); `skills/javascript-pro/` and `skills/swift-expert/`
 come from `Jeffallan/claude-skills` (MIT), each with its `references/`
@@ -125,26 +116,8 @@ gh api repos/Jeffallan/claude-skills/contents/skills/swift-expert/SKILL.md \
   -H 'Accept: application/vnd.github.raw'
 ```
 
-`frontend-design/` and `code-review/` are also vendored, from
-`anthropics/claude-code`'s own `plugins/frontend-design` and `plugins/code-review`
-— copied whole (`.claude-plugin/plugin.json`, `README.md`, and either
-`skills/frontend-design/SKILL.md` or `commands/code-review.md`), which is also
-why they're full plugins and not just skills; see the note above
-`claude plugin list`'s shadowing warning. Licensed under Anthropic's own
-Commercial Terms of Service (`LICENSE.md` at that repo's root), not MIT like
-the other two vendored skills. Re-fetch the same way:
-
-```sh
-gh api repos/anthropics/claude-code/contents/plugins/code-review \
-  -H 'Accept: application/vnd.github.raw'
-```
-
-They were vendored from a local zip download rather than the marketplace
-install this repo briefly used, because the `claude-plugins-official`
-marketplace's mirror of both had drifted behind `main` — noticeably so for
-`code-review`, which upstream had grown a `--comment`/inline-comment posting
-step and named authors that the marketplace copy's `plugin.json` had genericized
-to `"Anthropic"`.
+`frontend-design/` and `code-review/` — Anthropic's own vendored plugins that
+used to sit alongside these — were removed outright, not replaced.
 
 Vendoring verbatim means two of them contradict the style rules in
 `.claude/CLAUDE.md`. That is deliberate: correcting it in the file would be

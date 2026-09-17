@@ -155,12 +155,13 @@ link_dotfiles macos
 #------------------------------------------------------------------------------
 title "Claude Code plugins"
 #------------------------------------------------------------------------------
-# LSP plugins from the official marketplace: php-lsp (intelephense, for
-# cnc-claims' PHP), swift-lsp (SourceKit-LSP, for the Developer/ Swift
-# projects), typescript-lsp (typescript-language-server, for web work).
+# From the official marketplace: php-lsp (intelephense, for cnc-claims' PHP),
+# swift-lsp (SourceKit-LSP, for the Developer/ Swift projects), typescript-lsp
+# (typescript-language-server, for web work), and miro (board access via MCP —
+# auth happens on first use, not here; install only wires the plugin up).
 # See install_claude_plugins in setup/lib.sh for why this has to be a command
 # run again on every machine rather than a symlink like the rest of .claude.
-install_claude_plugins php-lsp swift-lsp typescript-lsp
+install_claude_plugins php-lsp swift-lsp typescript-lsp miro
 
 #------------------------------------------------------------------------------
 title "Bootstrapping zinit + plugins"
