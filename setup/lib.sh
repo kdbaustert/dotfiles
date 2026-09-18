@@ -282,11 +282,31 @@ link_dotfiles() {
     shopt -s dotglob nullglob
     for item in "$DOTFILES_DIR/.config"/*; do
       [ -e "$item" ] || continue
-      case "$(basename "$item")" in .DS_Store) continue ;; esac
+      case "$(basename "$item")" in
+        .DS_Store) continue ;;
+        # ghostty is the one .config entry that is not deployed everywhere.
+        # The terminal is macOS-only in this setup, and the config is written
+        # for it — macos-titlebar-style, window-colorspace, font-thicken, and a
+        # window-title-font-family naming the COLR/CPAL tab-icon font that
+        # install-linux.sh deliberately does not install. Linking it on Arch
+        # put a file there for a terminal that is not installed, describing a
+        # font that is not present. The exclusion lives here rather than in a
+        # per-OS file because the rest of the loop is genuinely shared; see the
+        # macOS/Linux section of CLAUDE.md for which layer takes which case.
+        ghostty) [ "$os" = macos ] || continue ;;
+      esac
       link "$item" "$HOME/.config/$(basename "$item")"
     done
     shopt -u dotglob nullglob
     sweep_dangling "$HOME/.config"
+  fi
+
+  # Retire a ghostty link left by a run from before that exclusion. Same guard
+  # as every other sweep here: a symlink pointing into this repo and nothing
+  # else, so a real directory or one someone linked from elsewhere survives.
+  if [ "$os" != macos ] && [ -L "$HOME/.config/ghostty" ] \
+    && case "$(readlink "$HOME/.config/ghostty")" in "$DOTFILES_DIR"/*) true ;; *) false ;; esac; then
+    rm -f "$HOME/.config/ghostty" && info "Removed ~/.config/ghostty — that config is macOS-only."
   fi
 }
 

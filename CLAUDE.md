@@ -263,10 +263,22 @@ or a `.config` entry is added, so two copies would drift within a week. If a
 function in `lib.sh` ever needs an `if macos` inside it, that is the signal it
 belongs to the callers instead.
 
-Two terminal configs were deliberately left macOS-shaped: `.config/ghostty/config`
-(`macos-titlebar-style`, `window-colorspace`, `font-thicken` are no-ops in the
-GTK build) and `.config/rio/config.toml` (`navigation.mode = "NativeTab"` and
-`renderer.backend = "Metal"` need changing by hand on Linux). Neither app has an
+Two terminal configs are macOS-shaped, and they are handled differently from
+each other on purpose.
+
+`.config/ghostty/config` is **not deployed on Linux at all** — it is the single
+exception in `link_dotfiles()`'s `.config/*` loop. Ghostty is a macOS-only
+terminal in this setup, and the file is written for it: `macos-titlebar-style`,
+`window-colorspace`, `font-thicken`, and a `window-title-font-family` naming the
+COLR/CPAL tab-icon font that `install-linux.sh` deliberately never installs.
+Linking it on Arch left a config for an absent terminal describing an absent
+font. A re-run also removes a link left by an earlier one. If ghostty is ever
+used on Linux, the fix is an OS-conditional config, not restoring the blanket
+link.
+
+`.config/rio/config.toml` still deploys everywhere and still needs
+`navigation.mode = "NativeTab"` and `renderer.backend = "Metal"` changed by hand
+on Linux — rio *is* used on both, so the file has to exist there; it has no
 OS-conditional include, and inventing values that could not be verified against a
 running Linux copy would have been worse than saying so here.
 
