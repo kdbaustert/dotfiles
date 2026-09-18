@@ -271,9 +271,9 @@ title "Optional setup scripts"
 # selection works. macos.sh and mas.sh appear in this `all` list and not in the
 # Linux one: one rewrites system defaults, the other drives the Mac App Store.
 #
-#     SETUP_SCRIPTS="npm composer" ./install.sh
+#     SETUP_SCRIPTS="pnpm composer" ./install.sh
 #     SETUP_SCRIPTS=all ./install.sh
-run_setup_scripts "macos npm composer mas gh-extensions"
+run_setup_scripts "macos pnpm composer mas gh-extensions"
 
 #------------------------------------------------------------------------------
 title "Summary"

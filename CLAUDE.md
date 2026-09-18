@@ -57,7 +57,7 @@ Known offenders:
 | `homebrew/Brewfile`   | The package set (macOS)                                           |
 | `arch/`               | `pkglist` + `aurlist`, the package set (Arch/Manjaro)              |
 | `setup/lib.sh`        | Installer sections shared by `install.sh` and `install-linux.sh`  |
-| `setup/`              | Opt-in scripts (`SETUP_SCRIPTS="npm composer" ./install.sh`)      |
+| `setup/`              | Opt-in scripts (`SETUP_SCRIPTS="pnpm composer" ./install.sh`)      |
 | `.gitconfig-{macos,linux}` | Deployed to `~/.gitconfig-os`; git has no OS conditional     |
 | `themes/voltage.md`   | Canonical palette + the list of files that carry it               |
 | `iterm/`, `obsidian/` | App-specific config                                            |

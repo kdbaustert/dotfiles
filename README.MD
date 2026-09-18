@@ -66,14 +66,14 @@ The scripts in `setup/` are opt-in, because they change system defaults or
 install a lot of global packages. Select them by name:
 
 ```sh
-SETUP_SCRIPTS="npm composer" ./install.sh
-SETUP_SCRIPTS=all ./install.sh          # macos npm composer mas gh-extensions
+SETUP_SCRIPTS="pnpm composer" ./install.sh
+SETUP_SCRIPTS=all ./install.sh          # macos pnpm composer mas gh-extensions
 ```
 
 | Script             | Installs                                          |
 | ------------------ | ------------------------------------------------- |
 | `macos.sh`         | System defaults — **review this one before running** |
-| `npm.sh`           | Global npm packages                               |
+| `pnpm.sh`          | Global JS packages (pnpm, not npm — see the file) |
 | `composer.sh`      | Global Composer packages                          |
 | `mas.sh`           | Mac App Store apps (sign in to the App Store first) |
 | `gh-extensions.sh` | GitHub CLI extensions                             |
@@ -112,7 +112,7 @@ lives outside both because two transcriptions of the same palette is the drift
 `.config/nvim` splits into `lua/configs` (settings needing no plugin) and
 `lua/plugins` (one file per concern, each returning a lazy spec). Language
 servers come from Mason; formatters and linters deliberately do not — they are
-the ones the Brewfile and `setup/npm.sh` already install, so the shell and the
+the ones the Brewfile and `setup/pnpm.sh` already install, so the shell and the
 editor run the same binaries. `lazy-lock.json` is tracked, so `:Lazy restore`
 reproduces the plugin set exactly.
 
@@ -136,7 +136,7 @@ binary — see the next note. `$EDITOR` stays `nvim`.
 The config LunarVim writes on first run is replaced by the symlink, and the
 plugin set is pinned by the tracked `.config/lvim/lazy-lock.json` — `:Lazy
 restore` reproduces it exactly. The formatters and linters it wires up are the
-ones already installed by the Brewfile and `setup/npm.sh`, not by Mason.
+ones already installed by the Brewfile and `setup/pnpm.sh`, not by Mason.
 Upstream targets Neovim 0.10 while the Brewfile tracks current `neovim`, so
 startup logs one harmless `vim.tbl_flatten is deprecated` warning from
 LunarVim's own code.

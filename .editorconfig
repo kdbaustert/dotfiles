@@ -8,7 +8,7 @@ indent_size = 2
 # config read by zsh, bash, git and launchd. A CRLF default here is not cosmetic
 # — an editor honouring it appends \r to every line, which turns a shebang into
 # a "bad interpreter" error, hides `then`/`fi` from the parser, and silently
-# appends \r to array elements (`npm install -g '@vue/cli<CR>'`). setup/npm.sh,
+# appends \r to array elements (`npm install -g '@vue/cli<CR>'`). setup/pnpm.sh,
 # setup/composer.sh and setup/mas.sh were all broken this way.
 end_of_line = lf
 charset = utf-8

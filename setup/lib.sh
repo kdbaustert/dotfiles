@@ -568,7 +568,7 @@ install_claude_plugins() {
 # one — so it printed a heading and did nothing on every run. Select them by
 # name instead:
 #
-#     SETUP_SCRIPTS="npm composer" ./install.sh
+#     SETUP_SCRIPTS="pnpm composer" ./install.sh
 #     SETUP_SCRIPTS=all ./install.sh
 #
 # <default-list> is what `all` expands to, and it differs per platform: macos.sh
@@ -583,7 +583,7 @@ run_setup_scripts() {
   [ "$requested" = "all" ] && requested="$all_list"
 
   if [ -z "$requested" ]; then
-    info "None requested — re-run with SETUP_SCRIPTS=\"npm composer\" (or =all) to include them."
+    info "None requested — re-run with SETUP_SCRIPTS=\"pnpm composer\" (or =all) to include them."
     return 0
   fi
 

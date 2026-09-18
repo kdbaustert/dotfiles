@@ -5,7 +5,7 @@
 -- failing is a formatter failing, not a mystery LSP error.
 --
 -- Every tool named here is one this repo already installs, and neither plugin
--- will fetch anything — prettier/eslint/stylelint come from setup/npm.sh, and
+-- will fetch anything — prettier/eslint/stylelint come from setup/pnpm.sh, and
 -- stylua/shfmt/shellcheck/php-cs-fixer from the Brewfile. Deliberately not
 -- mason: these are sharp little binaries the shell wants anyway, and a copy
 -- under ~/.local/share/nvim would vanish with the plugin dir. Language servers

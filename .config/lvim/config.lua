@@ -129,7 +129,7 @@ lvim.lsp.installer.setup.ensure_installed = {
 
 -- Every tool named below is one this repo already installs, and none-ls only
 -- shells out to PATH — it never fetches anything. So Mason is deliberately not
--- in the loop here: prettier/eslint/stylelint come from setup/npm.sh, and
+-- in the loop here: prettier/eslint/stylelint come from setup/pnpm.sh, and
 -- stylua/shfmt/shellcheck/php-cs-fixer from the Brewfile. A Mason-installed
 -- copy would sit under ~/.local/share/lunarvim and disappear the moment that
 -- runtime is reinstalled, which is exactly the drift the Brewfile exists to

@@ -551,3 +551,4 @@ export ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE="fg=#6b6b6b"
 }
 
 
+export PATH="$(dirname $(xcrun --find sourcekit-lsp)):$PATH"

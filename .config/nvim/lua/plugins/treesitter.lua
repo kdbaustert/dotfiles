@@ -15,7 +15,7 @@ return {
   main = "nvim-treesitter.configs",
   opts = {
     -- The stack this machine actually edits — the web tooling implied by
-    -- setup/npm.sh and the Brewfile's php, plus the languages this repo is
+    -- setup/pnpm.sh and the Brewfile's php, plus the languages this repo is
     -- itself written in.
     ensure_installed = {
       "bash",
