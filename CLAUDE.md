@@ -62,7 +62,7 @@ Known offenders:
 | `.claude/CLAUDE.md`   | Global Claude Code instructions                                   |
 | `.claude/hooks/`      | `notify.sh`, the Notification hook (terminal-notifier / notify-send) |
 | `.claude/statusline.sh` | The status line — plan usage, context, model, on every render   |
-| `.claude/skills/`     | Skills, one dir per skill; `php-psr12/` is ours, three are vendored |
+| `.claude/skills/`     | Skills, one dir per skill — all six vendored, none ours            |
 | `.claude/agents/`     | Custom subagents, one `.md` file per agent, ours                  |
 
 The two `.config/git/` files reach git by different routes, which matters when
@@ -102,14 +102,18 @@ two don't — `quick-lookup` answers are too narrow to be worth retaining and
 `heavy-refactor` runs are one-off enough that stale memory would be more
 likely to mislead the next run than help it.
 
-Only `php-psr12/` is ours; the other three skill directories are **vendored, not
-ours**. `skills/plain/` comes from `petekp/claude-code-setup`
-(`skills/plain/SKILL.md`); `skills/javascript-pro/` and `skills/swift-expert/`
-come from `Jeffallan/claude-skills` (MIT), each with its `references/`
-directory, because the SKILL.md's "Reference Guide" table is five dead links
-without them. They are upstream's files. Re-fetch with `gh api` and diff rather
-than editing in place; local edits would be silently lost the next time one is
-refreshed:
+All six skill directories are **vendored, not ours** — there is no longer a
+repo-owned skill here; `php-psr12/` filled that slot until it was removed.
+`skills/plain/` comes from `petekp/claude-code-setup`
+(`skills/plain/SKILL.md`); `skills/javascript-pro/`, `skills/swift-expert/`,
+`skills/php-pro/`, `skills/vue-expert-js/` and `skills/vue-expert/` come from
+`Jeffallan/claude-skills` (MIT), each with its `references/` directory,
+because the SKILL.md's "Reference Guide" table is five dead links without
+them — `vue-expert-js` additionally defers to three files under
+`../vue-expert/references/` for concepts it shares with the TypeScript
+version, so the two are vendored together or not at all. They are upstream's
+files. Re-fetch with `gh api` and diff rather than editing in place; local
+edits would be silently lost the next time one is refreshed:
 
 ```sh
 gh api repos/Jeffallan/claude-skills/contents/skills/swift-expert/SKILL.md \
@@ -119,7 +123,7 @@ gh api repos/Jeffallan/claude-skills/contents/skills/swift-expert/SKILL.md \
 `frontend-design/` and `code-review/` — Anthropic's own vendored plugins that
 used to sit alongside these — were removed outright, not replaced.
 
-Vendoring verbatim means two of them contradict the style rules in
+Vendoring verbatim means three of them contradict the style rules in
 `.claude/CLAUDE.md`. That is deliberate: correcting it in the file would be
 thrown away by the next refresh, so it is recorded here instead. The global
 rules win — these skills are reference material, not authority.
@@ -137,6 +141,14 @@ rules win — these skills are reference material, not authority.
   one of the projects uses a different build tool entirely. It also assumes
   SwiftUI and Swift 5.9+, while the projects here are AppKit at tools-version
   6.0. Take its concurrency, actor and protocol guidance; not its build steps.
+- `php-pro` writes every example with single-quoted strings and a trailing
+  comma after the last constructor-promoted property, the opposite of the PHP
+  rule (double quotes, no trailing commas, PHP 8.1 target) — it targets PHP
+  8.3+. Follow the repo's PHP rule and ignore the examples' punctuation and
+  version. Its verify step also mandates `phpstan analyse --level=9` and
+  `pest`/80%+ coverage; only `php-cs-fixer` is installed here, so PHPStan and
+  Pest apply only when the repo being worked on already has them in
+  `composer.json`.
 
 `~/.claude/settings.json` is **not** tracked — it is mostly state Claude writes
 itself (model, `enabledPlugins`, the atuin hooks), so a symlink would fight it.
