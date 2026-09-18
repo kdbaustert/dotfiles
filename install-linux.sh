@@ -74,8 +74,20 @@ else
   # stdin still attached to the terminal, pacman just sits waiting on a
   # keypress the script never sends — closing stdin makes it take the
   # non-interactive default instead of hanging.
+  # Refresh the sudo timestamp here, on its own line with nothing redirected,
+  # so the password is asked for and typed in the clear. The commands below
+  # redirect, and a redirected sudo is where this used to go wrong twice over:
+  # sudo writes its prompt to STDERR, so `&>/dev/null` asked for a password
+  # invisibly and then sat there waiting for one; and `</dev/null` — which
+  # pacman needs, per the note above — also empties sudo's stdin, which is
+  # where sudo reads the password from when it cannot open /dev/tty, so it hit
+  # EOF and failed with "no password was provided" before anything could be
+  # typed. Authenticating first means the calls below inherit a live timestamp
+  # and never have to ask at all.
+  sudo -v || warning "Could not refresh sudo credentials — the pacman steps below may fail."
+
   info "Refreshing the package databases..."
-  sudo pacman -Sy --noconfirm </dev/null &>/dev/null || warning "pacman -Sy failed; continuing with the cached database."
+  sudo pacman -Sy --noconfirm </dev/null >/dev/null || warning "pacman -Sy failed; continuing with the cached database."
 
   known=()
   unknown=()
@@ -165,11 +177,16 @@ title "command-not-found database"
 # afterwards, which is why this is a one-time step rather than something the
 # shell does.
 if command -v pkgfile &>/dev/null; then
+  # Same rule as the pacman block: authenticate unredirected, then redirect only
+  # stdout on the calls themselves. `&>/dev/null` here used to swallow sudo's
+  # password prompt along with pkgfile's output.
+  sudo -v || warning "Could not refresh sudo credentials — the pkgfile steps below may fail."
+
   info "Building the pkgfile database (first run downloads a few MB)..."
-  sudo pkgfile -u &>/dev/null \
+  sudo pkgfile -u >/dev/null \
     && success "pkgfile database built." \
     || warning "pkgfile -u failed — command-not-found will suggest nothing until it succeeds."
-  sudo systemctl enable --now pkgfile-update.timer &>/dev/null \
+  sudo systemctl enable --now pkgfile-update.timer >/dev/null \
     && success "pkgfile-update.timer enabled." \
     || info "Could not enable pkgfile-update.timer; refresh by hand with: sudo pkgfile -u"
 else
