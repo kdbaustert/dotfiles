@@ -10,24 +10,28 @@
   baked into this file as a literal `/Users/kenny/...` — this plist is
   symlinked out of the repo unmodified, like everything else install.sh
   deploys, so it can't carry a machine-specific path.
+
+  Indented with spaces, not the tabs plutil and Xcode emit by default:
+  .editorconfig's [*] section governs every file here except CSS/SCSS, and
+  there is no .plist exemption.
 -->
 <plist version="1.0">
 <dict>
-	<key>Label</key>
-	<string>dev.kennyb.claude-usage-refresh</string>
-	<key>ProgramArguments</key>
-	<array>
-		<string>/bin/zsh</string>
-		<string>-c</string>
-		<string>exec "$HOME/.claude/statusline.sh" --refresh</string>
-	</array>
-	<key>StartInterval</key>
-	<integer>300</integer>
-	<key>RunAtLoad</key>
-	<true/>
-	<key>StandardOutPath</key>
-	<string>/dev/null</string>
-	<key>StandardErrorPath</key>
-	<string>/dev/null</string>
+  <key>Label</key>
+  <string>dev.kennyb.claude-usage-refresh</string>
+  <key>ProgramArguments</key>
+  <array>
+    <string>/bin/zsh</string>
+    <string>-c</string>
+    <string>exec "$HOME/.claude/statusline.sh" --refresh</string>
+  </array>
+  <key>StartInterval</key>
+  <integer>300</integer>
+  <key>RunAtLoad</key>
+  <true/>
+  <key>StandardOutPath</key>
+  <string>/dev/null</string>
+  <key>StandardErrorPath</key>
+  <string>/dev/null</string>
 </dict>
 </plist>

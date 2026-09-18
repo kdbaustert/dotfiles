@@ -216,7 +216,15 @@ link "$DOTFILES_DIR/launchd/$LAUNCH_AGENT_LABEL.plist" "$LAUNCH_AGENT_PLIST"
 # makes a re-run pick up an edited plist (StartInterval, etc.), and booting out
 # an agent that was never loaded just fails quietly.
 launchctl bootout "gui/$(id -u)/$LAUNCH_AGENT_LABEL" &>/dev/null
-if launchctl bootstrap "gui/$(id -u)" "$LAUNCH_AGENT_PLIST" &>/dev/null; then
+launchctl bootstrap "gui/$(id -u)" "$LAUNCH_AGENT_PLIST" &>/dev/null
+
+# The verdict comes from `print`, not from what bootstrap returned. bootout can
+# return before launchd has finished tearing the job down, and the bootstrap
+# behind it then fails *because the job is still there* — an error that means
+# the agent is loaded, which is the opposite of what reporting that exit status
+# would say. Asking what state launchd ended up in answers the only question
+# this section actually cares about.
+if launchctl print "gui/$(id -u)/$LAUNCH_AGENT_LABEL" &>/dev/null; then
   success "Loaded $LAUNCH_AGENT_LABEL — refreshes the usage cache every 5 minutes."
 else
   warning "Could not load $LAUNCH_AGENT_LABEL — the usage cache will only refresh during an active Claude Code session."

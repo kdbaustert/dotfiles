@@ -218,9 +218,17 @@ EOF
 # The LaunchAgent's entry point — see the refresher comment above. Exits before
 # touching stdin, since a launchd-triggered run has none of Claude Code's JSON
 # to read.
+#
+# Always exit 0. `refresh` returns whatever its last command did, and both of
+# its ordinary non-fatal outcomes — another refresh already holding the lock,
+# or a cache directory it cannot write — come back non-zero, which launchd
+# records as a failed job and shows as `last exit code = 1` forever after. This
+# is a best-effort cache warmer; a missed run is not a failure worth flagging.
+# The honest health check is the cache's own `fetched_at`, which answers the
+# question an exit code only gestures at: is the data actually being refreshed.
 if [ "${1:-}" = "--refresh" ]; then
   refresh
-  exit
+  exit 0
 fi
 
 cache_in=$cache; [ -r "$cache" ] || cache_in=/dev/null
@@ -324,10 +332,26 @@ out=$(jq -r --slurpfile c "$cache_in" '
   # it lands where a tie-break can land: equal to the stdin reading, or one
   # below it. Anything further apart is a stale cache rather than a rounding
   # disagreement, and stdin — which is live — wins.
+  #
+  # The `// null` on the binding below is load-bearing: cached() yields `empty`
+  # when the cache is missing or stale, and `empty as $x | BODY` iterates zero
+  # times, so BODY never runs and the whole row silently disappears — stdin
+  # data and all. The old `//` chain this replaced absorbed that for free;
+  # a plain binding does not. Measured: without it, a fresh machine or a cache
+  # older than an hour renders an empty status line rather than the live rows.
+  # Both null-guards below run before any arithmetic, because a window can
+  # arrive present but empty: Claude Code builds these from whatever a
+  # subscription reports, and its own /usage skips a window on
+  # `l.utilization === null` rather than assuming a number. Reaching `floor`
+  # with a null in hand aborts the whole jq program, not just the one row, so
+  # the status line goes blank rather than losing a line. A live window with no
+  # percentage is a window stdin does not really have, so it falls through to
+  # the cache — which is the documented split, the cache filling in what stdin
+  # lacks — and if that has nothing either, the null drops the row downstream.
   def resolved($k):
       (.rate_limits[$k]) as $live
-      | cached($k) as $cached_val
-      | if $live == null then $cached_val
+      | (cached($k) // null) as $cached_val
+      | if $live == null or $live.used_percentage == null then $cached_val
         elif $cached_val == null or $cached_val.used_percentage == null then $live
         elif ($live.used_percentage | . != (. | floor)) then $live
         elif (($live.used_percentage - $cached_val.used_percentage) | . >= 0 and . <= 1)
