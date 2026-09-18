@@ -62,7 +62,7 @@ Known offenders:
 | `.claude/CLAUDE.md`   | Global Claude Code instructions                                   |
 | `.claude/hooks/`      | `notify.sh`, the Notification hook (terminal-notifier / notify-send) |
 | `.claude/statusline.sh` | The status line — plan usage, context, model, on every render   |
-| `.claude/skills/`     | Skills, one dir per skill — all six vendored, none ours            |
+| `.claude/skills/`     | Skills, one dir per skill — all ten vendored, none ours            |
 | `.claude/agents/`     | Custom subagents, one `.md` file per agent, ours                  |
 
 The two `.config/git/` files reach git by different routes, which matters when
@@ -102,11 +102,13 @@ two don't — `quick-lookup` answers are too narrow to be worth retaining and
 `heavy-refactor` runs are one-off enough that stale memory would be more
 likely to mislead the next run than help it.
 
-All six skill directories are **vendored, not ours** — there is no longer a
+All ten skill directories are **vendored, not ours** — there is no longer a
 repo-owned skill here; `php-psr12/` filled that slot until it was removed.
 `skills/plain/` comes from `petekp/claude-code-setup`
 (`skills/plain/SKILL.md`); `skills/javascript-pro/`, `skills/swift-expert/`,
-`skills/php-pro/`, `skills/vue-expert-js/` and `skills/vue-expert/` come from
+`skills/php-pro/`, `skills/vue-expert-js/`, `skills/vue-expert/`,
+`skills/database-optimizer/`, `skills/nextjs-developer/`,
+`skills/react-expert/` and `skills/react-native-expert/` come from
 `Jeffallan/claude-skills` (MIT), each with its `references/` directory,
 because the SKILL.md's "Reference Guide" table is five dead links without
 them — `vue-expert-js` additionally defers to three files under
@@ -123,7 +125,7 @@ gh api repos/Jeffallan/claude-skills/contents/skills/swift-expert/SKILL.md \
 `frontend-design/` and `code-review/` — Anthropic's own vendored plugins that
 used to sit alongside these — were removed outright, not replaced.
 
-Vendoring verbatim means three of them contradict the style rules in
+Vendoring verbatim means four of them contradict the style rules in
 `.claude/CLAUDE.md`. That is deliberate: correcting it in the file would be
 thrown away by the next refresh, so it is recorded here instead. The global
 rules win — these skills are reference material, not authority.
@@ -149,6 +151,11 @@ rules win — these skills are reference material, not authority.
   `pest`/80%+ coverage; only `php-cs-fixer` is installed here, so PHPStan and
   Pest apply only when the repo being worked on already has them in
   `composer.json`.
+- `react-expert` writes every example with semicolons, the opposite of the JS/TS
+  rule (no semicolons, via `~/.prettierrc`) — its quote style (single) does
+  match. Follow Prettier and ignore the examples' semicolons.
+  `react-native-expert` and `nextjs-developer` don't have this problem; their
+  examples are already semicolon-free.
 
 `~/.claude/settings.json` is **not** tracked — it is mostly state Claude writes
 itself (model, `enabledPlugins`, the atuin hooks), so a symlink would fight it.
