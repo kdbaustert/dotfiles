@@ -95,14 +95,17 @@ a skill installed by hand from elsewhere survives.
 `agents/` is the same loop-not-list pattern, one level shallower: a subagent is
 discovered by a `.md` file directly under `~/.claude/agents`, so the file itself
 is what gets linked, not a containing directory. Each file's frontmatter sets
-its own `model` — `quick-lookup` (haiku) and `researcher`/`code-reviewer`
-(sonnet) for search and review work, `heavy-refactor` (opus) for multi-file
-structural changes that need to hold more context to get right in one pass.
+its own `model` — `quick-lookup` (haiku) and `researcher`/`code-reviewer`/
+`feature-scout` (sonnet) for search, review, and survey work, `heavy-refactor`
+and `bug-hunter` (opus) for work that needs to hold more context to get right
+in one pass — multi-file structural changes for the former, tracing a defect
+or a missing error path across callers and callees for the latter.
 `CLAUDE_CODE_SUBAGENT_MODEL=sonnet` in `.zshenv` is only the fallback for
 subagents with no `model:` of their own — the built-ins (Explore,
-general-purpose, Plan) — not for these. `researcher` and `code-reviewer` also
-carry `memory: project`, so findings persist per-repo across runs; the other
-two don't — `quick-lookup` answers are too narrow to be worth retaining and
+general-purpose, Plan) — not for these. `researcher`, `code-reviewer`,
+`feature-scout`, and `bug-hunter` also carry `memory: project`, so findings
+persist per-repo across runs; `heavy-refactor` and `quick-lookup` don't —
+`quick-lookup` answers are too narrow to be worth retaining and
 `heavy-refactor` runs are one-off enough that stale memory would be more
 likely to mislead the next run than help it.
 
