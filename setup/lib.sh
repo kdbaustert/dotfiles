@@ -470,13 +470,37 @@ install_pay_respects() {
 }
 
 #------------------------------------------------------------------------------
+# CLAUDE_PLUGINS
+#------------------------------------------------------------------------------
+# The plugin set install_claude_plugins (below) installs, declared once and
+# shared by install.sh and install-linux.sh — both call
+# `install_claude_plugins "${CLAUDE_PLUGINS[@]}"` rather than each carrying its
+# own copy of the list. Same reasoning as link_dotfiles living here instead of
+# in both installers: a list that grows over time and exists twice drifts
+# silently the first time only one copy gets edited. Add a plugin by appending
+# a line; each one installs as `<name>@claude-plugins-official`.
+#
+# shellcheck disable=SC2034 # read by install.sh and install-linux.sh after they source this file
+CLAUDE_PLUGINS=(
+  php-lsp          # intelephense, for cnc-claims' PHP
+  swift-lsp        # SourceKit-LSP, for the Developer/ Swift projects
+  typescript-lsp   # typescript-language-server, for web work
+  miro             # board access via MCP; auth happens on first use, not here
+  frontend-design  # design-quality guidance for new/reshaped UI work
+  code-simplifier  # reuse/simplification pass over recently changed code
+  atlassian        # Jira + Confluence; backs .claude/CLAUDE.md's Jira-comment workflow
+  asana            # Asana task/project MCP; needs /asana-setup once, after install
+  code-review      # multi-agent PR review with confidence-scored findings
+)
+
+#------------------------------------------------------------------------------
 # install_claude_plugins <plugin...>
 #------------------------------------------------------------------------------
-# Claude Code plugins from the official marketplace (claude-plugins-official),
-# installed by name at user scope. Unlike everything else link_dotfiles puts
-# under ~/.claude, a plugin isn't a file this repo owns — `claude plugin
-# install` writes into ~/.claude/plugins/installed_plugins.json, which is
-# runtime state the CLI manages itself and was never a candidate for a
+# Installs each named plugin from the official marketplace
+# (claude-plugins-official) by name, at user scope. Unlike everything else
+# link_dotfiles puts under ~/.claude, a plugin isn't a file this repo owns —
+# `claude plugin install` writes into ~/.claude/plugins/installed_plugins.json,
+# which is runtime state the CLI manages itself and was never a candidate for a
 # symlink (see the note above link_dotfiles's ~/.claude section). So the only
 # way an install survives a fresh machine is running the command again here.
 #
@@ -493,7 +517,10 @@ install_pay_respects() {
 # installed by this repo (it's Claude Code's own installer, not the Brewfile's
 # `cask "claude"`, which is the unrelated desktop app), so a fresh machine
 # that hasn't run it yet skips cleanly rather than erroring the rest of the
-# installer.
+# installer. Takes its plugin names as arguments rather than reading
+# CLAUDE_PLUGINS directly, so it stays a plain, testable "install these"
+# primitive — CLAUDE_PLUGINS is the one caller that matters today, not a
+# hidden dependency of the function itself.
 install_claude_plugins() {
   local plugin
 

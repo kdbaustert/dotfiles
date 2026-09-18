@@ -276,12 +276,12 @@ link_dotfiles linux
 #------------------------------------------------------------------------------
 title "Claude Code plugins"
 #------------------------------------------------------------------------------
-# Identical to install.sh's step — see install_claude_plugins in setup/lib.sh.
-# swift-lsp only matters on the macOS side (no SourceKit-LSP on Arch), but
-# installing the same four here keeps the plugin set itself the same on every
-# machine, the same reason link_dotfiles deploys every skill unconditionally
-# rather than picking per OS.
-install_claude_plugins php-lsp swift-lsp typescript-lsp miro
+# Identical to install.sh's step — see CLAUDE_PLUGINS and install_claude_plugins
+# in setup/lib.sh. swift-lsp only matters on the macOS side (no SourceKit-LSP
+# on Arch), but installing the same set here keeps the plugin list itself the
+# same on every machine, the same reason link_dotfiles deploys every skill
+# unconditionally rather than picking per OS.
+install_claude_plugins "${CLAUDE_PLUGINS[@]}"
 
 #------------------------------------------------------------------------------
 title "Bootstrapping zinit + plugins"
