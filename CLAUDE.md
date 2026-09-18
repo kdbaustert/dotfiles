@@ -360,7 +360,6 @@ themes into caches and need the corresponding `install.sh` steps re-run.
 Commits are SSH-signed through 1Password. Don't disable signing, don't set a
 per-repo `user.email`, and don't commit or push unless asked.
 
-
 # Coding Rules
 
 Please follow all of the following coding rules.
