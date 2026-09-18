@@ -64,6 +64,7 @@ Known offenders:
 | `.claude/statusline.sh` | The status line — plan usage, context, model, on every render   |
 | `.claude/skills/`     | Skills, one dir per skill — all ten vendored, none ours            |
 | `.claude/agents/`     | Custom subagents, one `.md` file per agent, ours                  |
+| `launchd/`            | macOS LaunchAgent plists, loaded by `install.sh` (not symlink-only) |
 
 The two `.config/git/` files reach git by different routes, which matters when
 one of them appears not to work: `allowed_signers` is named explicitly by
@@ -190,6 +191,14 @@ hot path and nothing else, ~20ms measured with the cache read; the refresher
 never runs in the foreground. `padding: 0` puts it flush left against the
 prompt box rather than indented by one column.
 
+That refresher only ever fires from inside a render, so a machine with no
+Claude Code session open just lets the cache age past its one-hour cutoff —
+the next session's first render then shows nothing for that row until its own
+background fetch lands. `launchd/dev.kennyb.claude-usage-refresh.plist`, loaded
+by `install.sh`, closes that gap by calling `statusline.sh --refresh` every 5
+minutes regardless of whether a session is open — see the "THE REFRESHER"
+comment in the script for the full split between the two paths.
+
 The same file carries the other untracked-but-load-bearing setting,
 `"attribution": { "commit": "", "pr": "" }`, which is what actually strips the
 `Co-Authored-By` trailer Claude Code would otherwise append to every commit.
@@ -289,6 +298,7 @@ done
 zsh -ic exit                                  # full interactive load
 time zsh -i -c exit                           # startup cost — it is budgeted
 stylua --check .config/nvim .config/lvim .config/voltage.nvim
+plutil -lint launchd/*.plist                  # plist syntax, no launchctl load
 ```
 
 Both file lists are load-bearing, and both used to be shorter than they needed
@@ -304,13 +314,20 @@ list. It has to be, because `.zshrc` `source`s `zsh/extra/cache.zsh`,
 *runtime* — a syntax error in any of them sails past `zsh -n .zshrc` and only
 surfaces in `zsh -ic exit`.
 
-`shellcheck` currently exits 1 on a clean tree: six SC2015 `info`s on the
-deliberate `cmd && success || warning` lines — five in `install-linux.sh`, one
-in `setup/lib.sh` (all are best-effort steps where the "C may run when A is
-true" caveat is acceptable). Read the findings, don't chase the exit status, and
-don't rewrite those lines into `if`/`else` just to silence it. `install.sh`
-itself is now clean; the two it used to report moved into `setup/lib.sh` with
-the code.
+`shellcheck` currently exits 1 on a clean tree: eight SC2015 `info`s on the
+deliberate `cmd && success || warning` lines — five in `install-linux.sh` (101,
+170, 173, 315, 344), two in `install.sh` (56, the `brew update && brew upgrade`
+line, and 260, the legacy `pam_tid` cleanup), and one in `setup/lib.sh` (352).
+All are best-effort steps where the "C may run when A is true" caveat is
+acceptable. Read the findings, don't chase the exit status, and don't rewrite
+those lines into `if`/`else` just to silence it.
+
+This paragraph used to claim six, and that `install.sh` was clean because its
+two had "moved into `setup/lib.sh` with the code". Only one did; the brew and
+`pam_tid` lines stayed put, so the count and the all-clear were both wrong.
+Re-count from the command above rather than trusting the number here — a stale
+count is worse than none, because it reads as a checksum and invites you to
+treat a genuine new finding as one of the known ones.
 
 Startup latency is a first-class constraint here: plugins are turbo-deferred in
 `zsh/zinit.zsh`, tool `init` output is cached via the `zcache` helper defined

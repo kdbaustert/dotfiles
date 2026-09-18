@@ -200,6 +200,29 @@ else
 fi
 
 #------------------------------------------------------------------------------
+title "Claude usage cache refresh (LaunchAgent)"
+#------------------------------------------------------------------------------
+# Keeps ~/.cache/claude-usage.json warm between Claude Code sessions — see the
+# "THE REFRESHER" comment in .claude/statusline.sh for why a session-less gap
+# otherwise leaves the cache up to an hour stale. macOS-only, so it lives here
+# rather than in link_dotfiles() (setup/lib.sh), which install-linux.sh shares
+# and which has no LaunchAgent equivalent to reach for.
+LAUNCH_AGENT_LABEL="dev.kennyb.claude-usage-refresh"
+LAUNCH_AGENT_PLIST="$HOME/Library/LaunchAgents/$LAUNCH_AGENT_LABEL.plist"
+mkdir -p "$HOME/Library/LaunchAgents"
+link "$DOTFILES_DIR/launchd/$LAUNCH_AGENT_LABEL.plist" "$LAUNCH_AGENT_PLIST"
+
+# bootout-then-bootstrap rather than a load/already-loaded check: it is what
+# makes a re-run pick up an edited plist (StartInterval, etc.), and booting out
+# an agent that was never loaded just fails quietly.
+launchctl bootout "gui/$(id -u)/$LAUNCH_AGENT_LABEL" &>/dev/null
+if launchctl bootstrap "gui/$(id -u)" "$LAUNCH_AGENT_PLIST" &>/dev/null; then
+  success "Loaded $LAUNCH_AGENT_LABEL — refreshes the usage cache every 5 minutes."
+else
+  warning "Could not load $LAUNCH_AGENT_LABEL — the usage cache will only refresh during an active Claude Code session."
+fi
+
+#------------------------------------------------------------------------------
 title "Touch ID for sudo"
 #------------------------------------------------------------------------------
 # /etc/pam.d/sudo_local is Apple's supported override file (macOS 14+); it is

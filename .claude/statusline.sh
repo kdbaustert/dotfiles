@@ -123,6 +123,18 @@
 # than one per render — and the stale-hiding rule above keeps old numbers from
 # lingering on screen.
 #
+# The render path above only ever calls the refresher opportunistically — from
+# inside a render, when the cache is already stale. With no Claude Code session
+# running, nothing renders, so the cache just sits there aging past the 1-hour
+# `$fresh` cutoff and the next session's first render shows nothing for a beat
+# until its own background refresh lands. `launchd/dev.kennyb.claude-usage-refresh.plist`
+# covers that gap from outside any session: it invokes this script with
+# `--refresh` every 5 minutes (the same TTL the render path already uses) so
+# the cache is warm before a render ever asks. `--refresh` runs the fetch in
+# the foreground rather than backgrounding it — the launchd job already *is*
+# the background process — and skips the render entirely, since there is no
+# Claude Code stdin to read outside of one.
+#
 # The stdin schema below was read off the 2.1.235 binary rather than the docs,
 # because these details are easy to get wrong and every one fails silently:
 #
@@ -202,6 +214,14 @@ EOF
     >"$tmp" 2>/dev/null && mv -f "$tmp" "$cache"
   rmdir "$lock" 2>/dev/null
 }
+
+# The LaunchAgent's entry point — see the refresher comment above. Exits before
+# touching stdin, since a launchd-triggered run has none of Claude Code's JSON
+# to read.
+if [ "${1:-}" = "--refresh" ]; then
+  refresh
+  exit
+fi
 
 cache_in=$cache; [ -r "$cache" ] || cache_in=/dev/null
 out=$(jq -r --slurpfile c "$cache_in" '
@@ -285,13 +305,43 @@ out=$(jq -r --slurpfile c "$cache_in" '
         | {used_percentage: .utilization, resets_at}
       else empty end;
 
+  # Claude Code rounds the live stdin percentage to the nearest 0.1 before this
+  # script ever sees it (read off the 2.1.276 binary: the statusLine object
+  # builds used_percentage as Math.round(utilization * 1000) / 10), while
+  # /usage floors a separately-fetched, unrounded percentage. Flooring an
+  # already-rounded value only disagrees with that at a whole-number reading:
+  # a stdin value of exactly 41.0 could come from a true percentage anywhere
+  # in [40.95, 41.05), and nothing about 41.0 alone says which side of 41 it
+  # started on — so the floor in row can show one point higher than /usage does.
+  # That happens only in that one ambiguous case, so only there does this
+  # prefer the cache percentage (fetched from the same endpoint /usage reads,
+  # at whatever precision it returns) over the rounded stdin value; every
+  # other reading, nine tenths of the value range, stays live.
+  #
+  # The cache only ever breaks that tie, never overrides the live number. It
+  # can be up to five minutes behind stdin (the LaunchAgent interval), which
+  # during a busy session is worth several points, so it is trusted only when
+  # it lands where a tie-break can land: equal to the stdin reading, or one
+  # below it. Anything further apart is a stale cache rather than a rounding
+  # disagreement, and stdin — which is live — wins.
+  def resolved($k):
+      (.rate_limits[$k]) as $live
+      | cached($k) as $cached_val
+      | if $live == null then $cached_val
+        elif $cached_val == null or $cached_val.used_percentage == null then $live
+        elif ($live.used_percentage | . != (. | floor)) then $live
+        elif (($live.used_percentage - $cached_val.used_percentage) | . >= 0 and . <= 1)
+          then $cached_val
+        else $live
+        end;
+
   .model.display_name as $model
   | [
-      ((.rate_limits.five_hour // cached("five_hour"))
+      (resolved("five_hour")
        | select(. and .used_percentage != null)
        | row("Current session"; .used_percentage; countdown(.resets_at))),
 
-      ((.rate_limits.seven_day // cached("seven_day"))
+      (resolved("seven_day")
        | select(. and .used_percentage != null)
        | row("Current week"; .used_percentage; countdown(.resets_at))),
 

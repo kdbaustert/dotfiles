@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--
+  Keeps ~/.cache/claude-usage.json warm even when no Claude Code session is
+  open to trigger the opportunistic refresh in .claude/statusline.sh — see the
+  "THE REFRESHER" comment there for the render-path half of this.
+
+  ProgramArguments runs through `zsh -c` rather than naming the script
+  directly so `$HOME` is expanded by the shell at launch time instead of
+  baked into this file as a literal `/Users/kenny/...` — this plist is
+  symlinked out of the repo unmodified, like everything else install.sh
+  deploys, so it can't carry a machine-specific path.
+-->
+<plist version="1.0">
+<dict>
+	<key>Label</key>
+	<string>dev.kennyb.claude-usage-refresh</string>
+	<key>ProgramArguments</key>
+	<array>
+		<string>/bin/zsh</string>
+		<string>-c</string>
+		<string>exec "$HOME/.claude/statusline.sh" --refresh</string>
+	</array>
+	<key>StartInterval</key>
+	<integer>300</integer>
+	<key>RunAtLoad</key>
+	<true/>
+	<key>StandardOutPath</key>
+	<string>/dev/null</string>
+	<key>StandardErrorPath</key>
+	<string>/dev/null</string>
+</dict>
+</plist>
