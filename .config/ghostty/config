@@ -4,6 +4,31 @@
 #macos-icon = blueprint
 #macos-custom-icon = ~/.config/ghostty/ghostty-mac.icns
 
+# Announce ourselves as xterm-256color rather than Ghostty's own xterm-ghostty.
+#
+# TERM travels over ssh; the terminfo entry describing it does not. Ghostty
+# ships xterm-ghostty and installs it locally, so every box that has never had
+# Ghostty on it — which is every server, container and the Arch machine here —
+# cannot resolve the name, and anything built on curses fails there: `tput`,
+# `clear`, less, htop, and zsh itself complaining before the prompt appears.
+# xterm-256color is the name that is present essentially everywhere.
+#
+# The cost, so it is not a surprise later: xterm-256color has no `Smulx`, the
+# capability advertising styled underlines, and xterm-ghostty does. Neovim
+# reads that capability to decide whether to emit undercurl, so the ten
+# `undercurl = true` highlights in .config/voltage.nvim — the four spell groups
+# and the four diagnostic underlines — degrade to straight underlines. If that
+# is ever worth reclaiming, the fix belongs in the editor rather than here:
+# setting `t_Cs`/`t_Ce` makes Neovim emit the sequences regardless of what
+# terminfo claims.
+#
+# The alternative was keeping xterm-ghostty and pushing the terminfo entry to
+# each remote box (`infocmp -x xterm-ghostty | ssh host -- tic -x -`). Rejected:
+# it is per-host, has to be redone for every new machine and every container,
+# and fails exactly when least convenient — on a box you have just reached and
+# cannot yet read the screen of.
+term = xterm-256color
+
 # Fonts
 font-family = "Hack Nerd Font Mono"
 font-size = 15.5
