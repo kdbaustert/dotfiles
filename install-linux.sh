@@ -348,16 +348,9 @@ title "Fonts"
 # there is nothing to copy — this only refreshes fontconfig's cache so a
 # just-installed family is visible without a logout.
 #
-# Note what is deliberately NOT here: fonts/HackNerdFontColor-Regular.ttf, the
-# COLR/CPAL build that colours Ghostty's tab icons. That whole mechanism
-# (zsh/extra/tabtitle.zsh and the font it needs) works around the macOS native
-# tab bar being an AppKit NSTabBar that cannot hold an image, which is not a
-# problem Ghostty's GTK build has. Installing the font here would put a second
-# family claiming "Hack Nerd Font Color" on the system to no purpose.
-#
-# Unlike macOS, a symlinked font WOULD work here — fontconfig follows them,
-# where CoreText does not — so if the tab-icon font is ever wanted on Linux it
-# belongs in link_dotfiles, not in a copy step.
+# There is no font-copy step to mirror install.sh's any more: the one font this
+# repo built rather than installed, a COLR/CPAL Hack that tinted Ghostty's tab
+# icons, is gone along with the rest of that mechanism.
 if command -v fc-cache &>/dev/null; then
   fc-cache -f &>/dev/null \
     && success "Font cache refreshed." \

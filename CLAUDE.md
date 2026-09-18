@@ -18,12 +18,15 @@ file staged here for deployment to `~/.claude/` — it is not about this repo.
 `~/.claude/CLAUDE.md`, `~/.claude/hooks/notify.sh`, `~/.claude/statusline.sh`,
 every `~/.claude/skills/<skill>` directory and every `~/.config/<tool>` entry
 are symlinks into this repo. **Edit the file in `~/dotfiles`.** Never write to the
-`$HOME` path. Two exceptions: `~/.hushlogin`, which `install.sh` `touch`es
-rather than links because only its existence is ever read, and
-`~/Library/Fonts/HackNerdFontColor-Regular.ttf`, which is **copied**, because
-CoreText does not register a symlinked font (measured — see the *Tab icon font*
-section of `install.sh`). That one is the only place where editing the repo file
-is not enough on its own: re-run `install.sh` to push the new bytes across.
+`$HOME` path. One exception: `~/.hushlogin`, which `install.sh` `touch`es
+rather than links because only its existence is ever read.
+
+There used to be a second — `~/Library/Fonts/HackNerdFontColor-Regular.ttf`, a
+COLR/CPAL build of Hack copied rather than linked because CoreText does not
+register a symlinked font. It existed to tint the tab-icon glyphs
+`zsh/extra/tabtitle.zsh` wrote into Ghostty's tab titles, and went when that
+mechanism did. A stale copy may still sit in `~/Library/Fonts` on a machine
+that installed it; nothing reads it now, and removing it is by hand.
 
 The corollary is the real hazard: **never run a tool that rewrites one of these
 files in place**, because it lands in the tracked file with no indication it did.
@@ -57,7 +60,6 @@ Known offenders:
 | `setup/`              | Opt-in scripts (`SETUP_SCRIPTS="npm composer" ./install.sh`)      |
 | `.gitconfig-{macos,linux}` | Deployed to `~/.gitconfig-os`; git has no OS conditional     |
 | `themes/voltage.md`   | Canonical palette + the list of files that carry it               |
-| `fonts/`              | The tab-icon color font and the script that builds it             |
 | `iterm/`, `obsidian/` | App-specific config                                            |
 | `.claude/CLAUDE.md`   | Global Claude Code instructions                                   |
 | `.claude/hooks/`      | `notify.sh`, the Notification hook (terminal-notifier / notify-send) |
@@ -269,12 +271,10 @@ each other on purpose.
 `.config/ghostty/config` is **not deployed on Linux at all** — it is the single
 exception in `link_dotfiles()`'s `.config/*` loop. Ghostty is a macOS-only
 terminal in this setup, and the file is written for it: `macos-titlebar-style`,
-`window-colorspace`, `font-thicken`, and a `window-title-font-family` naming the
-COLR/CPAL tab-icon font that `install-linux.sh` deliberately never installs.
-Linking it on Arch left a config for an absent terminal describing an absent
-font. A re-run also removes a link left by an earlier one. If ghostty is ever
-used on Linux, the fix is an OS-conditional config, not restoring the blanket
-link.
+`window-colorspace` and `font-thicken` are all no-ops in the GTK build. Linking
+it on Arch left a config for a terminal that is not installed there. A re-run
+also removes a link an earlier one left behind. If ghostty is ever used on
+Linux, the fix is an OS-conditional config, not restoring the blanket link.
 
 `.config/rio/config.toml` still deploys everywhere and still needs
 `navigation.mode = "NativeTab"` and `renderer.backend = "Metal"` changed by hand
@@ -386,15 +386,12 @@ that file sitting untracked in the tree; `git check-ignore -v <path>` is what te
 you which rule caught something.
 
 Do commit, even though a tool generates them: `.config/fsh/current_theme.zsh`
-(built from our `voltage.ini`; it's what themes a fresh machine), both
-`lazy-lock.json` files (they pin the plugin sets for `:Lazy restore`), and both
-outputs of `fonts/build-tab-icons.py` — `fonts/HackNerdFontColor-Regular.ttf`
-and `zsh/extra/tabtitle-icons.zsh`. That last pair is committed because a fresh
-machine has neither `fonttools` nor, until the Brewfile's font casks land, a
-source Nerd Font to rebuild from; regenerating needs
-`pip install fonttools && python3 fonts/build-tab-icons.py`, and both files must
-be regenerated together — the codepoints in the `.zsh` only mean anything to the
-`.ttf` built in the same run.
+(built from our `voltage.ini`; it's what themes a fresh machine) and both
+`lazy-lock.json` files (they pin the plugin sets for `:Lazy restore`).
+
+`fonts/build-tab-icons.py` and its two committed outputs used to be the third
+case here. The whole tab-icon mechanism is gone, so the exception it needed
+went with it.
 
 ## Colors
 

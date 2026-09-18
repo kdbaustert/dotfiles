@@ -73,11 +73,12 @@ cursor-style = underline
 cursor-style-blink = true
 # Shell integration's `cursor` feature swaps the cursor to a bar at the prompt,
 # overriding cursor-style. Turn it off so the underline holds everywhere.
-# `title` is off because zsh/extra/tabtitle.zsh writes the title instead, so it
-# can prefix a terminal glyph to it (the tab "icon"). Ghostty's own title hook
-# forcibly reorders itself last in precmd_functions, so leaving it on would
-# overwrite ours rather than lose a race — see that file for the whole story.
-shell-integration-features = no-cursor,no-title
+#
+# `title` used to be off too, because zsh/extra/tabtitle.zsh wrote the title
+# itself so it could prefix a colored glyph to it — a tab "icon" imitating
+# iTerm2. That mechanism is gone, so Ghostty writes its own titles again;
+# leaving no-title behind would have meant nothing wrote them at all.
+shell-integration-features = no-cursor
 
 # Colors — Voltage (see themes/voltage.md for the palette and the tools that
 # share it). Derived from the Rio port that used to live here, with two fixes:
@@ -111,20 +112,12 @@ palette = 15=#F8F8F8
 
 mouse-scroll-multiplier = 5
 macos-titlebar-style = tabs
-# Fonts the window title *and* the native tab labels. It is set for the glyph,
-# not the typeface: Ghostty only builds the tab's attributedTitle — the only
-# hook onto an AppKit tab label's font — when this key is present, and macOS
-# font fallback will not reach a Nerd Font for a Private Use Area codepoint on
-# its own (U+E795 resolves to LastResort under .SFNS, measured). Without this,
-# the icon zsh/extra/tabtitle.zsh emits renders as an empty box.
-#
-# Not plain "Hack Nerd Font": this is our own build of it, carrying a COLR/CPAL
-# table so the icon glyphs come out in iTerm2's tints. Ghostty gives the whole
-# tab label one .foregroundColor, and a color font is the only thing that
-# outranks it. Built by fonts/build-tab-icons.py — which has the whole story —
-# and copied into ~/Library/Fonts by install.sh. Fall back to "Hack Nerd Font"
-# and the icons go monochrome; nothing else changes.
-window-title-font-family = "Hack Nerd Font Color"
+# window-title-font-family was here, naming "Hack Nerd Font Color" — a local
+# COLR/CPAL build of Hack that existed only to tint the tab-icon glyphs
+# zsh/extra/tabtitle.zsh emitted. Both the font and that script are gone, and
+# the key only ever earned its place by carrying them: pointing it at a family
+# no longer installed would have left the title font resolving to whatever
+# fallback macOS picked. Titles now use the default.
 auto-update = download
 auto-update-channel = stable
 

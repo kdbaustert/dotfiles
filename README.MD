@@ -38,10 +38,11 @@ Two things on Linux are worth knowing before the first run:
 - **The package lists in `arch/` were transcribed, not verified.** The installer
   checks every name against the sync database and reports the ones pacman does
   not recognise instead of aborting, so the first run tells you what to fix.
-- **`.config/ghostty/config` and `.config/rio/config.toml` are still
-  macOS-shaped.** Ghostty ignores its `macos-*` keys in the GTK build, which is
-  harmless; Rio needs `navigation.mode` off `NativeTab` and
-  `renderer.backend` off `Metal` by hand.
+- **`.config/ghostty/config` is not deployed here at all.** Ghostty is macOS-only
+  in this setup, so it is the one `.config` entry the symlink step skips on
+  Linux; a re-run also removes a link an earlier one left. `.config/rio/config.toml`
+  *is* deployed and is still macOS-shaped — Rio needs `navigation.mode` off
+  `NativeTab` and `renderer.backend` off `Metal` by hand.
 
 ### What it does
 
@@ -86,7 +87,6 @@ SETUP_SCRIPTS=all ./install.sh          # macos npm composer mas gh-extensions
 | `homebrew/`  | `Brewfile`                                             |
 | `setup/`     | The optional scripts above                             |
 | `themes/`    | Voltage — the shared palette; see `themes/voltage.md`  |
-| `fonts/`     | Ghostty's colored tab-icon font + its build script     |
 | `iterm/`     | iTerm2 preferences folder                              |
 | `obsidian/`  | "Amethyst Night" theme                                 |
 

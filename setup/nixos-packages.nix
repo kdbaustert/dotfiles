@@ -133,7 +133,7 @@ with pkgs;
   # --- Fonts -----------------------------------------------------------------
   # Nerd Fonts v3, matching what .config/ghostty/config and
   # .config/rio/config.toml name — see arch/pkglist's font section for the
-  # same v2/v3 note (applies to the tab-icon font build, not these).
+  # same v2/v3 note.
   nerd-fonts.hack
   nerd-fonts.jetbrains-mono
   nerd-fonts.fira-code

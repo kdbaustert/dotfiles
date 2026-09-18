@@ -130,8 +130,7 @@ python-pip
 
 # --- Fonts ------------------------------------------------------------------
 # The families .config/ghostty/config and .config/rio/config.toml name. Arch
-# ships Nerd Fonts v3, which is what those configs want — note the v2/v3 caveat
-# in the Brewfile applies to the tab-icon font build, not to these.
+# ships Nerd Fonts v3, which is what those configs want.
 ttf-hack-nerd
 ttf-jetbrains-mono-nerd
 ttf-firacode-nerd

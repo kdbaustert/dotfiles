@@ -15,8 +15,8 @@
 #
 #  What stays OUT of this file: anything a package manager, an OS service or a
 #  system path makes specific to one platform. Homebrew, Nix's Darwin notes,
-#  Touch ID, the iTerm2 prefs and the tab-icon font live in install.sh; pacman,
-#  the AUR helper and fontconfig live in install-linux.sh. If a function here
+#  Touch ID and the iTerm2 prefs live in install.sh; pacman, the AUR helper and
+#  fontconfig live in install-linux.sh. If a function here
 #  ever needs an `if macos` inside it, that is the signal it belongs to the
 #  callers instead.
 #
@@ -285,14 +285,12 @@ link_dotfiles() {
       case "$(basename "$item")" in
         .DS_Store) continue ;;
         # ghostty is the one .config entry that is not deployed everywhere.
-        # The terminal is macOS-only in this setup, and the config is written
-        # for it — macos-titlebar-style, window-colorspace, font-thicken, and a
-        # window-title-font-family naming the COLR/CPAL tab-icon font that
-        # install-linux.sh deliberately does not install. Linking it on Arch
-        # put a file there for a terminal that is not installed, describing a
-        # font that is not present. The exclusion lives here rather than in a
-        # per-OS file because the rest of the loop is genuinely shared; see the
-        # macOS/Linux section of CLAUDE.md for which layer takes which case.
+        # The terminal is macOS-only in this setup and the config is written for
+        # it — macos-titlebar-style, window-colorspace and font-thicken are all
+        # no-ops in the GTK build — so linking it on Arch put a file there for a
+        # terminal that is not installed. The exclusion lives here rather than
+        # in a per-OS file because the rest of the loop is genuinely shared; see
+        # the macOS/Linux section of CLAUDE.md for which layer takes which case.
         ghostty) [ "$os" = macos ] || continue ;;
       esac
       link "$item" "$HOME/.config/$(basename "$item")"
