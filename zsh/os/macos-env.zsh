@@ -58,6 +58,36 @@ fpath=("/opt/homebrew/share/zsh/site-functions" $fpath)
 export LSCOLORS=ExFxBxDxCxegedabagacad
 
 #------------------------------------------------------------------------------
+# Xcode toolchain (sourcekit-lsp)
+#------------------------------------------------------------------------------
+# Puts sourcekit-lsp — the Swift language server — on PATH. It ships inside
+# Xcode's toolchain and nowhere else, which is what makes this a macos-env.zsh
+# entry rather than something portable.
+#
+# Written out literally rather than `export PATH="$(dirname $(xcrun --find
+# sourcekit-lsp)):$PATH"`, which is how this arrived, for exactly the reason
+# the Homebrew block above is written out: that is two subprocesses on the
+# login path, measured at ~11ms together, to print a directory that only moves
+# when Xcode does. The `xcrun` fallback below covers the cases the literal
+# cannot — Xcode installed somewhere other than /Applications, or only the
+# Command Line Tools — and costs nothing when the literal path is there.
+#
+# Prepended BEFORE the FlyEnv block rather than after, deliberately. This
+# directory holds the whole toolchain — swift, swiftc, clang, lldb — not just
+# the language server, so where it lands decides which compiler wins. Going in
+# first leaves FlyEnv's prepend last, which is the guarantee the section below
+# documents and depends on.
+_xcode_toolchain_bin="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin"
+if [ ! -d "$_xcode_toolchain_bin" ] && (( $+commands[xcrun] )); then
+  _xcode_toolchain_bin=${${:-$(xcrun --find sourcekit-lsp 2>/dev/null)}:h}
+fi
+[ -d "$_xcode_toolchain_bin" ] && path=(
+  "$_xcode_toolchain_bin"
+  $path
+) && typeset -U path PATH
+unset _xcode_toolchain_bin
+
+#------------------------------------------------------------------------------
 # FlyEnv
 #------------------------------------------------------------------------------
 # FlyEnv (PHP dev-environment manager) — prepended last so its PHP wins over
