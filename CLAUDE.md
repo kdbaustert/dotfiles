@@ -65,6 +65,7 @@ Known offenders:
 | `.claude/skills/`     | Skills, one dir per skill — all ten vendored, none ours            |
 | `.claude/agents/`     | Custom subagents, one `.md` file per agent, ours                  |
 | `launchd/`            | macOS LaunchAgent plists, loaded by `install.sh` (not symlink-only) |
+| `systemd/`            | The Linux counterpart, enabled by `install-linux.sh`              |
 
 The two `.config/git/` files reach git by different routes, which matters when
 one of them appears not to work: `allowed_signers` is named explicitly by
@@ -199,6 +200,16 @@ by `install.sh`, closes that gap by calling `statusline.sh --refresh` every 5
 minutes regardless of whether a session is open — see the "THE REFRESHER"
 comment in the script for the full split between the two paths.
 
+`systemd/claude-usage-refresh.{service,timer}` is the same thing on Arch,
+enabled by `install-linux.sh`. It is a genuine pair rather than a macOS-only
+feature because the status line itself is cross-platform — `refresh()` already
+branches to `~/.claude/.credentials.json` where there is no Keychain — so
+leaving the timer off would have made Linux the only machine where the cache
+goes stale overnight. Both units are deployed to `~/.config/systemd/user`, not
+linked by `link_dotfiles()`: the destination is outside the `.config/*` sweep
+and enabling them needs `systemctl`, which is exactly the "anything that leaves
+a file outside this repo" case below.
+
 The same file carries the other untracked-but-load-bearing setting,
 `"attribution": { "commit": "", "pr": "" }`, which is what actually strips the
 `Co-Authored-By` trailer Claude Code would otherwise append to every commit.
@@ -299,6 +310,7 @@ zsh -ic exit                                  # full interactive load
 time zsh -i -c exit                           # startup cost — it is budgeted
 stylua --check .config/nvim .config/lvim .config/voltage.nvim
 plutil -lint launchd/*.plist                  # plist syntax, no launchctl load
+systemd-analyze verify systemd/*.timer        # Linux only; no-op elsewhere
 ```
 
 Both file lists are load-bearing, and both used to be shorter than they needed
@@ -315,19 +327,21 @@ list. It has to be, because `.zshrc` `source`s `zsh/extra/cache.zsh`,
 surfaces in `zsh -ic exit`.
 
 `shellcheck` currently exits 1 on a clean tree: eight SC2015 `info`s on the
-deliberate `cmd && success || warning` lines — five in `install-linux.sh` (101,
-170, 173, 315, 344), two in `install.sh` (56, the `brew update && brew upgrade`
-line, and 260, the legacy `pam_tid` cleanup), and one in `setup/lib.sh` (352).
-All are best-effort steps where the "C may run when A is true" caveat is
-acceptable. Read the findings, don't chase the exit status, and don't rewrite
-those lines into `if`/`else` just to silence it.
+deliberate `cmd && success || warning` lines — five in `install-linux.sh`, two
+in `install.sh` (the `brew update && brew upgrade` line and the legacy
+`pam_tid` cleanup), one in `setup/lib.sh`. All are best-effort steps where the
+"C may run when A is true" caveat is acceptable. Read the findings, don't chase
+the exit status, and don't rewrite those lines into `if`/`else` just to silence
+it.
 
-This paragraph used to claim six, and that `install.sh` was clean because its
-two had "moved into `setup/lib.sh` with the code". Only one did; the brew and
-`pam_tid` lines stayed put, so the count and the all-clear were both wrong.
-Re-count from the command above rather than trusting the number here — a stale
-count is worse than none, because it reads as a checksum and invites you to
-treat a genuine new finding as one of the known ones.
+No line numbers here on purpose. This paragraph has been wrong twice: it long
+claimed six and that `install.sh` was clean because its two had "moved into
+`setup/lib.sh` with the code" — only one did — and the numbers that replaced
+them went stale the same day, when adding a section to each installer shifted
+every line below it. Counts and filenames survive an edit; line numbers do not.
+Re-derive the list from the command above rather than trusting anything here,
+because a stale tally reads as a checksum and invites you to wave through a
+genuine new finding as one of the known ones.
 
 Startup latency is a first-class constraint here: plugins are turbo-deferred in
 `zsh/zinit.zsh`, tool `init` output is cached via the `zcache` helper defined

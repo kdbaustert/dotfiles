@@ -1,0 +1,18 @@
+# The Linux half of launchd/dev.kennyb.claude-usage-refresh.plist — keeps
+# ~/.cache/claude-usage.json warm when no Claude Code session is open to
+# trigger the opportunistic refresh in .claude/statusline.sh. The "THE
+# REFRESHER" comment there covers the render-path half.
+#
+# %h rather than a literal /home/kenny: this unit is symlinked out of the repo
+# unmodified, exactly as the plist is, so it cannot carry a machine-specific
+# path. systemd expands %h to the user's home directory, which is why this
+# needs no `sh -c` wrapper — the plist does only because launchd has no
+# equivalent specifier.
+
+[Unit]
+Description=Refresh the Claude Code usage cache read by the status line
+Documentation=file:%h/.claude/statusline.sh
+
+[Service]
+Type=oneshot
+ExecStart=%h/.claude/statusline.sh --refresh

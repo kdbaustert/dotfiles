@@ -1,0 +1,20 @@
+# Fires claude-usage-refresh.service every five minutes — the same interval as
+# the macOS LaunchAgent, and the same interval the render path already treats
+# as the cache's TTL.
+#
+# OnCalendar rather than a monotonic OnUnitActiveSec, because only a calendar
+# timer honours Persistent=: with it, a run missed while the machine was asleep
+# or powered off is caught up at the next start, which is the behaviour that
+# matters here — waking up to an hour-stale cache is the exact gap this exists
+# to close. Persistent= is silently inert on a monotonic timer, so the two
+# settings have to be chosen together.
+
+[Unit]
+Description=Refresh the Claude Code usage cache every five minutes
+
+[Timer]
+OnCalendar=*:0/5
+Persistent=true
+
+[Install]
+WantedBy=timers.target

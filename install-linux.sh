@@ -284,6 +284,37 @@ title "Claude Code plugins"
 install_claude_plugins "${CLAUDE_PLUGINS[@]}"
 
 #------------------------------------------------------------------------------
+title "Claude usage cache refresh (systemd timer)"
+#------------------------------------------------------------------------------
+# The Linux half of install.sh's LaunchAgent step, and the reason it is not in
+# link_dotfiles(): the units deploy to ~/.config/systemd/user rather than
+# alongside the rest of .config, and enabling them is a systemctl call that has
+# no macOS counterpart. See systemd/claude-usage-refresh.timer for why the
+# interval is a calendar timer rather than a monotonic one.
+#
+# A --user timer, never --system: it runs .claude/statusline.sh as the logged-in
+# user, reading that user's token out of ~/.claude/.credentials.json.
+SYSTEMD_USER_DIR="$HOME/.config/systemd/user"
+mkdir -p "$SYSTEMD_USER_DIR"
+for f in claude-usage-refresh.service claude-usage-refresh.timer; do
+  link "$DOTFILES_DIR/systemd/$f" "$SYSTEMD_USER_DIR/$f"
+done
+
+if ! command -v systemctl &>/dev/null; then
+  warning "systemctl not found — the usage cache will only refresh during an active Claude Code session."
+else
+  systemctl --user daemon-reload &>/dev/null
+  systemctl --user enable --now claude-usage-refresh.timer &>/dev/null
+  # Same reasoning as the macOS side: ask what state the manager ended up in
+  # rather than trusting the exit status of the command that tried to set it.
+  if systemctl --user is-enabled claude-usage-refresh.timer &>/dev/null; then
+    success "Enabled claude-usage-refresh.timer — refreshes the usage cache every 5 minutes."
+  else
+    warning "Could not enable claude-usage-refresh.timer — the usage cache will only refresh during an active Claude Code session."
+  fi
+fi
+
+#------------------------------------------------------------------------------
 title "Bootstrapping zinit + plugins"
 #------------------------------------------------------------------------------
 bootstrap_zinit

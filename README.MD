@@ -197,6 +197,14 @@ the same usage endpoint `/usage` calls, at most every five minutes, into
 The cache also fills in the session and week rows when the session has not seen
 them yet. The script's header has the detail.
 
+That refresher only runs while something is rendering, so a scheduled job keeps
+the cache warm when nothing is — a LaunchAgent on macOS
+(`launchd/dev.kennyb.claude-usage-refresh.plist`), a user timer on Arch
+(`systemd/claude-usage-refresh.timer`), both calling `statusline.sh --refresh`
+every five minutes. The installers deploy and enable them. Without it the cache
+ages past its one-hour cutoff overnight and the first render of the morning has
+nothing to draw those rows from.
+
 **There is no `AGENTS.md` at either scope any more.** `.claude/` used to carry
 one alongside `CLAUDE.md` — the vendor-neutral name other agent tools read
 directly, holding the "which binary to reach for" rules (`rg`, `fd`, `jq`, the
