@@ -266,6 +266,23 @@ link_dotfiles() {
     sweep_dangling "$HOME/.claude/agents"
   fi
 
+  # Slash commands: link every command file under .claude/commands, same
+  # loop-not-list reasoning as skills and agents above — a file added here but
+  # not named in the installer would silently never deploy. Claude Code
+  # discovers a command the same way it discovers a subagent: by a .md file
+  # directly under ~/.claude/commands, so the file itself is what gets linked,
+  # not a containing directory.
+  if [ -d "$DOTFILES_DIR/.claude/commands" ]; then
+    mkdir -p "$HOME/.claude/commands"
+    shopt -s dotglob nullglob
+    for item in "$DOTFILES_DIR/.claude/commands"/*.md; do
+      [ -f "$item" ] || continue
+      link "$item" "$HOME/.claude/commands/$(basename "$item")"
+    done
+    shopt -u dotglob nullglob
+    sweep_dangling "$HOME/.claude/commands"
+  fi
+
   # Retired: the ~/.claude/AGENTS.md link from before that merge. Same guard as
   # the root-level sweep above — only a symlink pointing into this repo is
   # removed.

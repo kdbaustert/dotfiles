@@ -66,6 +66,7 @@ Known offenders:
 | `.claude/statusline.sh` | The status line — plan usage, context, model, on every render   |
 | `.claude/skills/`     | Skills, one dir per skill — all ten vendored, none ours            |
 | `.claude/agents/`     | Custom subagents, one `.md` file per agent, ours                  |
+| `.claude/commands/`   | Custom slash commands, one `.md` file per command, ours           |
 | `launchd/`            | macOS LaunchAgent plists, loaded by `install.sh` (not symlink-only) |
 | `systemd/`            | The Linux counterpart, enabled by `install-linux.sh`              |
 
@@ -76,10 +77,10 @@ pointing at it at all — git reads `$XDG_CONFIG_HOME/git/ignore` on its own, so
 the symlink is the whole wiring.
 
 `.claude/` is tracked in full but only partly deployed: `install.sh` links
-`CLAUDE.md`, `hooks/notify.sh`, `statusline.sh` and every file under `agents/`
-and every directory under `skills/`, so `themes/my-theme.json` rides along for
-reference and is applied by hand. The installer also sweeps the retired
-`~/.claude/AGENTS.md` link on re-run.
+`CLAUDE.md`, `hooks/notify.sh`, `statusline.sh`, every file under `agents/`,
+every file under `commands/` and every directory under `skills/`, so
+`themes/my-theme.json` rides along for reference and is applied by hand. The
+installer also sweeps the retired `~/.claude/AGENTS.md` link on re-run.
 
 `skills/` is a loop over `skills/*`, not one `link` line per skill, for the same
 reason `.config/*` is — a skill added here but not named in the installer would
@@ -108,6 +109,21 @@ persist per-repo across runs; `heavy-refactor` and `quick-lookup` don't —
 `quick-lookup` answers are too narrow to be worth retaining and
 `heavy-refactor` runs are one-off enough that stale memory would be more
 likely to mislead the next run than help it.
+
+`commands/` follows the identical loop-not-list pattern one level shallower
+still: a slash command is discovered the same way a subagent is, by a `.md`
+file directly under `~/.claude/commands`. `hunt-bugs.md` and
+`scout-features.md` are manual shortcuts for `bug-hunter` and `feature-scout`
+— each sets `disable-model-invocation: true`, so Claude doesn't also
+auto-fire the command on top of the agent's own proactive `description`, and
+its body just tells Claude to invoke the Agent tool with that `subagent_type`
+directly. The frontmatter mechanism Claude Code's own docs describe for this
+— `context: fork` plus `agent: <name>` — reads as the more direct way to
+write it, but is a confirmed live bug for any agent outside the three
+built-ins (`Explore`, `Plan`, `general-purpose`): the command's body runs
+inline in the main context instead of forking into the named subagent
+(anthropics/claude-code issues #21725, #20604). Don't switch these two files
+to that frontmatter until that's fixed upstream.
 
 All ten skill directories are **vendored, not ours** — there is no longer a
 repo-owned skill here; `php-psr12/` filled that slot until it was removed.

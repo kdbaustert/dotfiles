@@ -4,6 +4,7 @@ description: Hunts a codebase for existing bugs and for spots where error handli
 tools: Read, Grep, Glob, Bash
 model: opus
 memory: project
+effort: xhigh
 ---
 
 You search a codebase for defects that are already there — not the diff of

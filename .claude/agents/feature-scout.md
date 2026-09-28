@@ -4,6 +4,7 @@ description: Surveys a project for gaps and opportunities, then proposes new fea
 tools: Read, Grep, Glob, Bash, WebFetch, WebSearch
 model: sonnet
 memory: project
+effort: high
 ---
 
 You survey a project and propose features it doesn't have yet — you do not
