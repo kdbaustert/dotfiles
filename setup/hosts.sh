@@ -14,12 +14,30 @@
 # script is tracked: everything outside the markers, FlyEnv's block and Apple's
 # localhost lines included, is carried through untouched.
 #
-# No scheduled refresh. /etc/hosts is root-owned, so keeping it current would
-# take a root LaunchDaemon holding a curl-to-root-file pipeline, which is a
-# worse trade than a list that is a few weeks old. Run this by hand instead.
+# Refreshed weekly by a root LaunchDaemon, local.<user>.hosts-refresh, that
+# install.sh generates and installs, then runs this once. This was first rejected:
+# a root job pulling a file off the internet into /etc/hosts is a worse trade
+# than a list a few weeks old. Two guards are what make it acceptable now:
+#
+#   - The daemon runs a root-owned copy of this script in /usr/local/libexec,
+#     never the file in ~/dotfiles. The repo is writable by anything running as
+#     me, so pointing a root job at it would hand root to any process that can
+#     edit a file in $HOME.
+#   - Only "0.0.0.0 host" lines survive the filter below, so the worst a broken
+#     or compromised upstream can do is block a site, never redirect one to an
+#     address it controls. keep_reachable() then un-blocks the hosts that must
+#     never go dark, the updater's own download host among them.
+#
+# Re-run install.sh after editing this — that is what re-copies it to the root
+# location; until then the daemon keeps running the old copy.
 #
 # To undo it, delete the lines from #BLOCKLIST-BEGIN# to #BLOCKLIST-END#
-# inclusive; nothing else in the file depends on them.
+# inclusive; nothing else in the file depends on them. To stop the schedule,
+# as the user who ran install.sh:
+#
+#     label="local.$(id -un).hosts-refresh"
+#     sudo launchctl bootout "system/$label"
+#     sudo rm "/Library/LaunchDaemons/$label.plist" "/usr/local/libexec/$label"
 set -uo pipefail
 
 LIST_URL="https://raw.githubusercontent.com/StevenBlack/hosts/master/alternates/porn/hosts"
@@ -33,10 +51,32 @@ END_MARKER="#BLOCKLIST-END#"
 # way down.
 MIN_ENTRIES=50000
 
+# The daemon passes --scheduled so its log lines carry a date: launchd's log
+# has no timestamps of its own, and that line is what shows whether the weekly
+# job ran at all.
+scheduled=false
+[ "${1:-}" = "--scheduled" ] && scheduled=true
+
+# keep_reachable
+#   stdin:  "0.0.0.0 host" lines, one per line
+#   stdout: the same lines, minus any host that must never be blocked
+#
+# Unattended, a list that one week started blocking raw.githubusercontent.com
+# would also stop every later download, and nothing would say so.
+keep_reachable() {
+  # TODO: drop the lines for hosts you can't afford to lose.
+  cat
+}
+
+$scheduled && echo "$(date '+%Y-%m-%d %H:%M') scheduled refresh"
+
 tmp_dir="$(mktemp -d)"
 trap 'rm -rf "$tmp_dir"' EXIT
 
-if ! curl -fsSL -o "$tmp_dir/upstream" "$LIST_URL"; then
+# Retries because the scheduled run fires the moment the Mac wakes, usually
+# before Wi-Fi has rejoined; without them that week's refresh is simply lost.
+if ! curl -fsSL --retry 5 --retry-delay 30 --retry-all-errors \
+  -o "$tmp_dir/upstream" "$LIST_URL"; then
   echo "Could not download $LIST_URL — /etc/hosts left unchanged." >&2
   exit 1
 fi
@@ -47,7 +87,8 @@ fi
 # stripped so every line is a bare "0.0.0.0 host".
 grep '^0\.0\.0\.0 ' "$tmp_dir/upstream" \
   | grep -v '^0\.0\.0\.0 0\.0\.0\.0$' \
-  | sed 's/[[:space:]]*#.*$//' >"$tmp_dir/entries"
+  | sed 's/[[:space:]]*#.*$//' \
+  | keep_reachable >"$tmp_dir/entries"
 
 entry_count="$(wc -l <"$tmp_dir/entries" | tr -d ' ')"
 if [ "$entry_count" -lt "$MIN_ENTRIES" ]; then

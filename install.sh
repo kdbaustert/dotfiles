@@ -203,6 +203,92 @@ else
 fi
 
 #------------------------------------------------------------------------------
+title "Hosts blocklist (LaunchDaemon)"
+#------------------------------------------------------------------------------
+# Splices the blocklist into /etc/hosts now and installs the root job that
+# re-splices it every Monday — see the header of setup/hosts.sh for why a root
+# job is acceptable here. Unlike the agent above, both files are root owned and
+# never linked: the daemon must not run anything I can edit, and launchd
+# refuses a daemon plist not owned by root. That makes this section what
+# carries an edit to setup/hosts.sh or the plist over to the running job.
+#
+# install(1) rather than cp, because it sets owner and mode in the same step,
+# leaving no moment where the copy root will run is writable by me. Every step
+# rides the sudo session opened at the top of this script.
+#
+# The label is built from the account running the installer, not written into
+# the repo, so the same checkout installs cleanly under any user name. For the
+# same reason the plist is generated here rather than tracked in launchd/: the
+# label and both paths inside it all carry that name. `id -un` rather than
+# $USER, which is unset in some non-login contexts.
+HOSTS_DAEMON_LABEL="local.$(id -un).hosts-refresh"
+HOSTS_DAEMON_PLIST="/Library/LaunchDaemons/$HOSTS_DAEMON_LABEL.plist"
+HOSTS_DAEMON_SCRIPT="/usr/local/libexec/$HOSTS_DAEMON_LABEL"
+HOSTS_DAEMON_LOG="/var/log/$HOSTS_DAEMON_LABEL.log"
+hosts_plist_tmp="$(mktemp)"
+
+# StartCalendarInterval rather than StartInterval: a calendar job that came
+# due while the Mac slept runs once on wake instead of being skipped. One
+# missed while the Mac was shut down is not made up; the next Monday catches it.
+# --scheduled only adds a dated line to the log — launchd's has no timestamps.
+cat >"$hosts_plist_tmp" <<EOF
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>Label</key>
+  <string>$HOSTS_DAEMON_LABEL</string>
+  <key>ProgramArguments</key>
+  <array>
+    <string>/bin/bash</string>
+    <string>$HOSTS_DAEMON_SCRIPT</string>
+    <string>--scheduled</string>
+  </array>
+  <key>StartCalendarInterval</key>
+  <dict>
+    <key>Weekday</key>
+    <integer>1</integer>
+    <key>Hour</key>
+    <integer>10</integer>
+    <key>Minute</key>
+    <integer>0</integer>
+  </dict>
+  <key>StandardOutPath</key>
+  <string>$HOSTS_DAEMON_LOG</string>
+  <key>StandardErrorPath</key>
+  <string>$HOSTS_DAEMON_LOG</string>
+</dict>
+</plist>
+EOF
+
+# Linted before it goes anywhere near /Library: with no tracked copy, the
+# `plutil -lint launchd/*.plist` check in CLAUDE.md never sees this file.
+if plutil -lint -s "$hosts_plist_tmp" \
+  && sudo install -d -o root -g wheel -m 755 "$(dirname "$HOSTS_DAEMON_SCRIPT")" \
+  && sudo install -o root -g wheel -m 755 "$DOTFILES_DIR/setup/hosts.sh" "$HOSTS_DAEMON_SCRIPT" \
+  && sudo install -o root -g wheel -m 644 "$hosts_plist_tmp" "$HOSTS_DAEMON_PLIST"; then
+  # Same bootout-then-bootstrap and same verdict-from-print as the agent above,
+  # for the same race.
+  sudo launchctl bootout "system/$HOSTS_DAEMON_LABEL" &>/dev/null
+  sudo launchctl bootstrap system "$HOSTS_DAEMON_PLIST" &>/dev/null
+
+  if launchctl print "system/$HOSTS_DAEMON_LABEL" &>/dev/null; then
+    success "Loaded $HOSTS_DAEMON_LABEL — refreshes /etc/hosts every Monday at 10:00."
+  else
+    warning "Could not load $HOSTS_DAEMON_LABEL — the blocklist will only update when setup/hosts.sh is run by hand."
+  fi
+else
+  warning "Could not copy the hosts refresh job into place — the blocklist will only update when setup/hosts.sh is run by hand."
+fi
+rm -f "$hosts_plist_tmp"
+
+if "$DOTFILES_DIR/setup/hosts.sh"; then
+  success "Hosts blocklist current."
+else
+  warning "setup/hosts.sh exited non-zero — /etc/hosts left as it was; see the output above."
+fi
+
+#------------------------------------------------------------------------------
 title "Touch ID for sudo"
 #------------------------------------------------------------------------------
 # /etc/pam.d/sudo_local is Apple's supported override file (macOS 14+); it is
@@ -273,7 +359,7 @@ title "Optional setup scripts"
 #
 #     SETUP_SCRIPTS="pnpm composer" ./install.sh
 #     SETUP_SCRIPTS=all ./install.sh
-run_setup_scripts "macos pnpm composer mas gh-extensions hosts"
+run_setup_scripts "macos pnpm composer mas gh-extensions"
 
 #------------------------------------------------------------------------------
 title "Summary"

@@ -57,6 +57,8 @@ Two things on Linux are worth knowing before the first run:
   vivid/Voltage one — see `themes/voltage.md`
 - Bootstraps zinit and pre-installs/compiles the zsh plugins
 - Builds the Voltage theme caches for `bat` and fast-syntax-highlighting
+- Splices an ad, tracker and porn blocklist into `/etc/hosts` (`setup/hosts.sh`)
+  and installs a root LaunchDaemon that refreshes it every Monday
 - Enables Touch ID for `sudo` via `/etc/pam.d/sudo_local`
 - Points iTerm2 at `iterm/` for its preferences
 
@@ -67,7 +69,7 @@ install a lot of global packages. Select them by name:
 
 ```sh
 SETUP_SCRIPTS="pnpm composer" ./install.sh
-SETUP_SCRIPTS=all ./install.sh          # macos pnpm composer mas gh-extensions hosts
+SETUP_SCRIPTS=all ./install.sh          # macos pnpm composer mas gh-extensions
 ```
 
 | Script             | Installs                                          |
@@ -77,7 +79,6 @@ SETUP_SCRIPTS=all ./install.sh          # macos pnpm composer mas gh-extensions 
 | `composer.sh`      | Global Composer packages                          |
 | `mas.sh`           | Mac App Store apps (sign in to the App Store first) |
 | `gh-extensions.sh` | GitHub CLI extensions                             |
-| `hosts.sh`         | Ad, tracker and porn blocklist spliced into `/etc/hosts` (sudo) |
 
 ## Layout
 
