@@ -273,7 +273,7 @@ title "Optional setup scripts"
 #
 #     SETUP_SCRIPTS="pnpm composer" ./install.sh
 #     SETUP_SCRIPTS=all ./install.sh
-run_setup_scripts "macos pnpm composer mas gh-extensions"
+run_setup_scripts "macos pnpm composer mas gh-extensions hosts"
 
 #------------------------------------------------------------------------------
 title "Summary"

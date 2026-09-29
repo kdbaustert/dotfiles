@@ -67,7 +67,7 @@ install a lot of global packages. Select them by name:
 
 ```sh
 SETUP_SCRIPTS="pnpm composer" ./install.sh
-SETUP_SCRIPTS=all ./install.sh          # macos pnpm composer mas gh-extensions
+SETUP_SCRIPTS=all ./install.sh          # macos pnpm composer mas gh-extensions hosts
 ```
 
 | Script             | Installs                                          |
@@ -77,6 +77,7 @@ SETUP_SCRIPTS=all ./install.sh          # macos pnpm composer mas gh-extensions
 | `composer.sh`      | Global Composer packages                          |
 | `mas.sh`           | Mac App Store apps (sign in to the App Store first) |
 | `gh-extensions.sh` | GitHub CLI extensions                             |
+| `hosts.sh`         | Ad, tracker and porn blocklist spliced into `/etc/hosts` (sudo) |
 
 ## Layout
 
