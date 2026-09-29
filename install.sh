@@ -377,7 +377,7 @@ section_touchid() {
 }
 
 #------------------------------------------------------------------------------
-section_prefs() {
+section_iterm() {
   title "iTerm preferences"
   # iTerm2 reads its prefs from a folder rather than a symlinked plist: point it at
   # iterm/ and it picks up com.googlecode.iterm2.plist from there. This was set by
@@ -448,7 +448,7 @@ SECTIONS=(
   "zsh|pay-respects, LS_COLORS, zinit plugins, Voltage themes (bat, syntax highlighting)"
   "hosts|Hosts blocklist and its weekly LaunchDaemon"
   "touchid|Touch ID for sudo"
-  "prefs|App preferences (iTerm2)"
+  "iterm|(iTerm2) Preferences"
   "setup-scripts|Optional setup/ scripts, selected by \$SETUP_SCRIPTS"
   "macos|macOS system defaults from setup/macos.sh — review it first"
 )
