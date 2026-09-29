@@ -20,14 +20,32 @@ real files are backed up (`.backup-<timestamp>`) before being replaced by
 symlinks; existing symlinks are simply re-pointed. Both ask for your sudo
 password up front, and each refuses to run on the other's platform.
 
+`install.sh` is interactive. Run bare, it asks a yes/no for every section
+(drawn with [gum](https://github.com/charmbracelet/gum), fetched pinned into
+`~/.local/bin` on first run), all up front, before anything runs — Enter means
+yes. Sections always run in their usual order, and sudo is only requested when
+one you kept needs it.
+
+```sh
+./install.sh                   # a yes/no for every section
+./install.sh brew              # just the Homebrew + Brewfile step, no questions
+./install.sh symlinks zsh      # relink, then redo the zsh setup and theme caches
+./install.sh --skip nix,hosts  # the questions, without these two
+./install.sh -y                # everything, no questions
+./install.sh --help            # list the section names
+```
+
+Without a terminal (piped, over ssh without `-t`) it behaves as `-y`.
+
 They are siblings rather than forks: everything that is the same on both — the
 symlinks, zinit, the theme caches, LS_COLORS, the setup-script runner — lives in
 `setup/lib.sh` and is called from each. What is left in the two scripts is only
 what Homebrew, PAM and CoreText do differently from pacman, systemd and
 fontconfig.
 
-`install.sh` expects Apple silicon (the `pay-respects` step is pinned to arm64
-and skips itself elsewhere). `install-linux.sh` expects `pacman`, and its
+`install.sh` expects Apple silicon (the `pay-respects` install in the `zsh`
+step is pinned to arm64 and skips itself elsewhere).
+`install-linux.sh` expects `pacman`, and its
 `pay-respects` step is **disabled until you fill in the checksum** — the Linux
 release asset could not be hashed from the Mac this was ported on, so the step
 warns and skips rather than installing something unverified. See the comment
@@ -64,21 +82,24 @@ Two things on Linux are worth knowing before the first run:
 
 ### Optional setup scripts
 
-The scripts in `setup/` are opt-in, because they change system defaults or
-install a lot of global packages. Select them by name:
+The scripts in `setup/` are opt-in, because they install a lot of global
+packages. Select them by name:
 
 ```sh
 SETUP_SCRIPTS="pnpm composer" ./install.sh
-SETUP_SCRIPTS=all ./install.sh          # macos pnpm composer mas gh-extensions
+SETUP_SCRIPTS=all ./install.sh          # pnpm composer mas gh-extensions
 ```
 
 | Script             | Installs                                          |
 | ------------------ | ------------------------------------------------- |
-| `macos.sh`         | System defaults — **review this one before running** |
 | `pnpm.sh`          | Global JS packages (pnpm, not npm — see the file) |
 | `composer.sh`      | Global Composer packages                          |
 | `mas.sh`           | Mac App Store apps (sign in to the App Store first) |
 | `gh-extensions.sh` | GitHub CLI extensions                             |
+
+The macOS system defaults in `setup/macos.sh` are not one of these — they are
+the `macos` section of `install.sh` (`./install.sh macos`), last in the run.
+**Review that script before saying yes to it.**
 
 ## Layout
 

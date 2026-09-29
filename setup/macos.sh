@@ -4,10 +4,10 @@
 # Mac, rather than an aspirational list. bash, not sh, to match the rest of
 # setup/ and because `&>` below is not POSIX.
 #
-# Changes system settings; review before running. Enable it through the
+# Changes system settings; review before running. Run it through the
 # installer rather than calling it directly:
 #
-#   SETUP_SCRIPTS=macos ./install.sh
+#   ./install.sh macos
 #
 # Inspired by https://mths.be/macos
 

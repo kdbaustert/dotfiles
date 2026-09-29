@@ -579,8 +579,9 @@ install_claude_plugins() {
 #------------------------------------------------------------------------------
 # run_setup_scripts <default-list>
 #------------------------------------------------------------------------------
-# Opt-in, and off by default: these pull down a lot of global packages, and on
-# macOS one of them rewrites system defaults. Previously this was five
+# Opt-in, and off by default: these pull down a lot of global packages.
+# (macos.sh, which rewrites system defaults, used to be one of them and is now
+# install.sh's own `macos` section.) Previously this was five
 # commented-out lines in install.sh, which meant editing the installer to enable
 # one — so it printed a heading and did nothing on every run. Select them by
 # name instead:
@@ -588,8 +589,8 @@ install_claude_plugins() {
 #     SETUP_SCRIPTS="pnpm composer" ./install.sh
 #     SETUP_SCRIPTS=all ./install.sh
 #
-# <default-list> is what `all` expands to, and it differs per platform: macos.sh
-# and mas.sh have no meaning on Arch.
+# <default-list> is what `all` expands to, and it differs per platform: mas.sh
+# has no meaning on Arch.
 #
 # Executed directly rather than through `sh`: every script in setup/ declares a
 # bash shebang and uses bash arrays, which `sh` survives only by accident on
