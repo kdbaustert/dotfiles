@@ -513,7 +513,16 @@ install_pay_respects() {
 # own copy of the list. Same reasoning as link_dotfiles living here instead of
 # in both installers: a list that grows over time and exists twice drifts
 # silently the first time only one copy gets edited. Add a plugin by appending
-# a line; each one installs as `<name>@claude-plugins-official`.
+# a line; a bare name installs as `<name>@claude-plugins-official`.
+#
+# A plugin from anywhere else is written `<name>@<owner>/<repo>`: the GitHub
+# repo is its marketplace, added first, and the plugin installs as
+# `<name>@<repo>`. That leans on the marketplace's own `name` (in its
+# .claude-plugin/marketplace.json) matching the repo's — true of every
+# marketplace here, the official one included — because `claude plugin
+# marketplace add` reports nothing machine-readable to learn the name from
+# (no --json, checked on 2.1.285). A marketplace that breaks the convention
+# fails loudly as a "Failed to install" warning, not silently.
 #
 # shellcheck disable=SC2034 # read by install.sh and install-linux.sh after they source this file
 CLAUDE_PLUGINS=(
@@ -526,14 +535,21 @@ CLAUDE_PLUGINS=(
   atlassian        # Jira + Confluence; backs .claude/CLAUDE.md's Jira-comment workflow
   asana            # Asana task/project MCP; needs /asana-setup once, after install
   code-review      # multi-agent PR review with confidence-scored findings
+
+  # Third-party; opt-in twice over — /i-have-adhd per session, or every session
+  # once ~/.claude/.i-have-adhd-always exists (its SessionStart hook checks).
+  i-have-adhd@ayghri/i-have-adhd  # action-first, ADHD-shaped output style
 )
 
 #------------------------------------------------------------------------------
 # install_claude_plugins <plugin...>
 #------------------------------------------------------------------------------
-# Installs each named plugin from the official marketplace
-# (claude-plugins-official) by name, at user scope. Unlike everything else
-# link_dotfiles puts under ~/.claude, a plugin isn't a file this repo owns —
+# Installs each named plugin at user scope — a bare name from the official
+# marketplace (claude-plugins-official), a `<name>@<owner>/<repo>` from that
+# GitHub repo's own marketplace (see CLAUDE_PLUGINS above).
+#
+# Unlike everything else link_dotfiles puts under ~/.claude, a plugin isn't a
+# file this repo owns —
 # `claude plugin install` writes into ~/.claude/plugins/installed_plugins.json,
 # which is runtime state the CLI manages itself and was never a candidate for a
 # symlink (see the note above link_dotfiles's ~/.claude section). So the only
@@ -546,7 +562,8 @@ CLAUDE_PLUGINS=(
 # separate already-installed check. `-y` accepts a marketplace-declared
 # command with no prompt; none of the LSP plugins declare one, but the flag
 # costs nothing and keeps a future catalog change from hanging a
-# non-interactive run.
+# non-interactive run. For a third-party entry that is no wider trust than
+# listing it at all: installing any plugin already runs its hooks as you.
 #
 # Guarded on the `claude` binary, not on SETUP_SCRIPTS: the CLI isn't
 # installed by this repo (it's Claude Code's own installer, not the Brewfile's
@@ -557,7 +574,7 @@ CLAUDE_PLUGINS=(
 # primitive — CLAUDE_PLUGINS is the one caller that matters today, not a
 # hidden dependency of the function itself.
 install_claude_plugins() {
-  local plugin
+  local entry plugin repo marketplace
 
   if ! command -v claude &>/dev/null; then
     warning "claude CLI not found — skipped Claude Code plugins ($*)."
@@ -567,11 +584,21 @@ install_claude_plugins() {
   claude plugin marketplace add anthropics/claude-plugins-official &>/dev/null \
     || warning "Could not add/verify the claude-plugins-official marketplace."
 
-  for plugin in "$@"; do
-    if claude plugin install "${plugin}@claude-plugins-official" -y &>/dev/null; then
-      success "Claude Code plugin ${plugin}@claude-plugins-official installed."
+  for entry in "$@"; do
+    plugin=${entry%%@*}
+    marketplace=claude-plugins-official
+
+    if [[ $entry == *@*/* ]]; then
+      repo=${entry#*@}
+      marketplace=${repo##*/}
+      claude plugin marketplace add "$repo" &>/dev/null \
+        || warning "Could not add/verify the ${marketplace} marketplace (${repo})."
+    fi
+
+    if claude plugin install "${plugin}@${marketplace}" -y &>/dev/null; then
+      success "Claude Code plugin ${plugin}@${marketplace} installed."
     else
-      warning "Failed to install Claude Code plugin ${plugin}@claude-plugins-official."
+      warning "Failed to install Claude Code plugin ${plugin}@${marketplace}."
     fi
   done
 }

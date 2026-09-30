@@ -57,7 +57,7 @@ window-padding-color = background
 # background-opacity = 0 only mitigates it. This blur is focus-independent.
 # Matches the old .config/rio/config.toml (opacity = 0.45, blur = true).
 background-opacity = 0.75
-background-blur = 95
+background-blur = 70
 #background-blur = macos-glass-regular
 
 # Don't dim inactive splits — keep every surface the same background.
