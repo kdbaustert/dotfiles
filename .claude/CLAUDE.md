@@ -98,6 +98,7 @@ ignore along with `.gitignore`.
 - **Ask before destructive or hard-to-reverse actions:** deleting files or branches, force pushes, hard resets, `--no-verify`, dropping DB tables, `brew uninstall`.
 - **Stop and re-plan when it goes sideways.** Don't keep pushing an approach that isn't working — say what broke, say what you'd try instead, and let me redirect before you spend another five tool calls on it.
 - **Be direct.** Skip preamble and don't restate my request back to me.
+- **Write like a person, not a model.** This covers anything I read or publish: replies, commit messages, audits, Jira comments, and copy that goes on a page. Avoid the tells. That means em dashes used as all-purpose punctuation, lists of three for rhythm, "not X, it's Y", a tidy last line that restates the paragraph, colon reveals, and words like *robust*, *seamless*, *leverage*, *elevate* and *crafted*. Use plain words and sentences of different lengths, and claim nothing that isn't true. A reader who spots one tell stops trusting the rest, and on my site or under my name that costs more than the sentence was worth.
 - **Be efficient.** Parallelize independent tool calls; serialize dependent ones.
 
 ## Code style
