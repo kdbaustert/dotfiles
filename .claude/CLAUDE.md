@@ -117,6 +117,55 @@ A repo that documents its *reasoning* in comments — `~/dotfiles` does, and say
 so in its own `CLAUDE.md` — overrides that last one, as repo convention always
 does.
 
+## Tests
+
+Write tests the way a developer on the team would. Read the tests already in the
+repo before adding one, and match their framework, file layout, naming, fixtures
+and helpers, so the new test looks like it came from whoever wrote the one beside
+it. Model-written tests have tells just as model-written prose does, and a
+reviewer who spots them stops trusting that the suite checks anything. This
+holds for every framework I use: PHPUnit, Laravel Dusk, Jest, Vitest and
+Cypress, browser tests as much as unit tests. Absent a repo convention:
+
+- **Name the behaviour plainly.** `rejects a claim with no policy number`, or
+  `test_rounds_partial_hours_down`. Not `should successfully and correctly
+  handle the case where...`. The name already describes the test, so don't put
+  a comment above it that says the same thing again.
+- **No scaffolding comments.** Leave out `// Arrange` / `// Act` / `// Assert`
+  banners and the comment over an assertion that restates it. A comment belongs
+  in a test when it explains why an odd input or value was chosen.
+- **Test what the code does, not how it does it.** Assert on what a caller could
+  see: return values, output, saved state. Mocking the unit under test, or
+  asserting only that a mock received the arguments you just handed it, proves
+  nothing. Mock at the boundary (network, clock, filesystem, a third-party API)
+  and leave the rest real.
+- **Write the tests the change needs, not as many as possible.** One test per
+  behaviour that could break, plus the edge cases the code actually has. No
+  tests for trivial getters, no five near-copies where a data provider or table
+  would do, and no `toBeDefined()` warm-up before the assertion that matters.
+  Coverage is a side effect, not the target.
+- **Assert exact values.** `toBe(42)`, `assertSame(42, $total)` and the full
+  expected string, not `toBeTruthy()`, `assertNotEmpty()` or "returns an
+  array". A loose assertion passes when the code is wrong.
+- **In browser tests, wait for something and select by a test hook.** A fixed
+  sleep (`cy.wait(5000)`, `$browser->pause(2000)`) is either longer than it
+  needs to be, which slows the suite, or shorter, which makes it flaky. Wait on
+  what the user would see instead: `waitFor('@save')` or `waitForText()` in
+  Dusk, and in Cypress let `cy.get()` retry or `cy.wait('@alias')` on an
+  intercepted request. Find elements by an attribute that exists for the tests
+  (`dusk="save"`, read as `@save`, or `data-cy="save"`), not a CSS path copied
+  out of devtools like `.row > .col-md-6:nth-child(2) button`, which breaks the
+  next time someone moves the layout. If the element has no hook, add one to the
+  markup rather than writing a longer selector.
+- **Keep setup in the test.** Pull it into a helper or factory once several
+  tests share it. A builder class for a single test is the single-use
+  abstraction *scope to the request* already rules out.
+- **Never bend a test until it passes.** When one fails, either the code or the
+  expectation is wrong, and finding out which is the job. Don't loosen the
+  assertion, wrap it in a `try`, skip it, or change the expected value to
+  whatever the code returns now without telling me. That is the *no faking
+  success* rule from *Fight for the "obvious" solution*, applied to a suite.
+
 ## Linters and formatters
 
 Installed as real binaries, not editor-managed: `shellcheck`, `shfmt`, `stylua`,
