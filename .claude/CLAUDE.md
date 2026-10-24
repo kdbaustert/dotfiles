@@ -1,38 +1,31 @@
 # Global instructions
 
-Applies to every project. Claude Code loads this file *and* the project's
-`CLAUDE.md`, concatenated in that order, rather than choosing between them — so
-where the two disagree, follow the project and ignore the rule here; don't try
-to satisfy both. There is no setting that suppresses this file for a single
-project — verified against 2.1.235 — so the precedence is this sentence and
-nothing else. A project file that overrides a rule should name the rule it
-overrides, so the override still reads as deliberate after this file changes.
+Applies to every project. Claude Code loads this file and the project's
+`CLAUDE.md` together, this one first. Where they disagree, follow the project and
+ignore the rule here; don't try to satisfy both. A project file that overrides a
+rule should name the rule it overrides.
 
-Claude Code has no AGENTS.md discovery path at either scope — verified against
-2.1.231, neither `~/.claude/AGENTS.md` nor `<project>/AGENTS.md` is read — so the
-tooling contract below lives in this file rather than in a sibling one pulled in
-by an `@AGENTS.md` import, which went missing silently rather than erroring.
+`~/.claude/REFERENCE.md` holds the measurements, history and reasons behind these
+rules, under the same headings. It is not loaded automatically. Read the matching
+section before changing or arguing with a rule here, and when a task touches Nix,
+node versions, git signing identities, or Swift formatting and language modes.
 
 ## Environment
 
-- macOS, Apple Silicon. Homebrew at `/opt/homebrew` — always prefer its binaries over `/usr/bin`.
-- **Nix is installed beside Homebrew, and each owns a different job.** Nix (upstream, multi-user daemon, put there by `install.sh`) is for per-project environments — `nix-shell`, `nix develop` — and nothing global. Homebrew owns the machine: casks, fonts, and every global CLI tool. Never `nix profile install` or `nix-env -i` a tool the Brewfile already has — ripgrep, fd, jq, bat, eza, fzf, zoxide, starship, atuin, git, delta, lazygit, neovim, node and python all exist in both, and a second copy only drifts. The shell hook is sourced from `.zprofile` *before* the path array, so `/opt/homebrew/bin` outranks `~/.nix-profile/bin` (measured: positions 6 and 11 in a login shell), and `/etc/zshrc` is deliberately left unedited. `.zprofile` is login-only, so a Bash tool call may not see `nix` at all — this session's did not. `command -v nix-shell` is the check, and sourcing `/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh` first is the fix; don't splice `/nix/...` into a tool call's PATH by hand. Flakes are on via `.config/nix/nix.conf`, and `direnv` (Homebrew, with nix-direnv fetched by `.config/direnv/direnvrc`) loads a project's dev shell on `cd` — ghostty, rio and kennybdev each carry an `.envrc`. That is a prompt hook, so a tool call never gets the shell; run `nix develop -c <cmd>` from the project instead.
-- Shell is zsh. `~/.zshrc`, `~/.zprofile`, `~/.profile`, `~/.zshenv`, `~/.gitconfig`, `~/.editorconfig`, `~/.prettierrc`, `~/.claude/CLAUDE.md`, `~/.claude/hooks/notify.sh`, `~/.claude/statusline.sh`, every `~/.claude/skills/<skill>` directory and every `~/.config/<tool>` entry are symlinks into `~/dotfiles` — edit the file in `~/dotfiles`, never the symlink target path in `$HOME`.
-- Editor is `nvim`. There is no Python version manager — `pyenv` was removed because it managed zero versions; `python3` is Homebrew's.
-- **`node` is version-skewed by shell type.** `nvm` is lazy-loaded (`NVM_LAZY_LOAD` in `.zprofile`, turbo-deferred in `zsh/zinit.zsh`) and is a shim *function*, not a binary. It manages one version, v26.5.0. Non-interactive shells and scripts — which is what a Bash tool call is — never load the plugin and get Homebrew's `/opt/homebrew/bin/node`, currently v26.7.0 (measured). An interactive shell gets the shim and v26.5.0. So a version you observe through a tool call is not the version I get at a prompt; `whence -w node` in a real interactive shell is the only honest check, not `zsh -i -c`, which exits before turbo fires.
+- macOS, Apple Silicon. Homebrew at `/opt/homebrew`; prefer its binaries over `/usr/bin`.
+- Nix sits beside Homebrew and is for per-project environments only (`nix-shell`, `nix develop`). Homebrew owns every global tool, so never `nix profile install` or `nix-env -i` anything the Brewfile has. A tool call may not have `nix` at all: check with `command -v nix-shell`, and if it's missing, source `/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh` rather than splicing `/nix/...` into PATH by hand. direnv never fires in a tool call, so run `nix develop -c <cmd>` from the project.
+- Shell is zsh. `~/.zshrc`, `~/.zprofile`, `~/.profile`, `~/.zshenv`, `~/.gitconfig`, `~/.editorconfig`, `~/.prettierrc`, `~/.claude/CLAUDE.md`, `~/.claude/REFERENCE.md`, `~/.claude/hooks/notify.sh`, `~/.claude/statusline.sh`, every `~/.claude/skills/<skill>` directory and every `~/.config/<tool>` entry are symlinks into `~/dotfiles`. Edit the file in `~/dotfiles`, never the path in `$HOME`.
+- Editor is `nvim`. No Python version manager; `python3` is Homebrew's.
+- `node` differs by shell type. Tool calls get Homebrew's `/opt/homebrew/bin/node`; my interactive shell gets nvm's lazy-loaded version. So a version you see in a tool call may not be mine. `whence -w node` in a real interactive shell is the only honest check, since `zsh -i -c` exits before nvm loads.
 - Shell history is `atuin`.
 
-GNU `coreutils`, `grep` and `gnu-sed` are installed but `gnubin` is deliberately
-off `PATH`: the defaults are BSD, and the GNU versions are **g-prefixed** —
-`ggrep`, `gsed`, `gls`, `gsort`, `gdircolors`. If a script needs GNU flags
-(`sed -i` without an argument, `grep -P`), call the `g`-prefixed binary
-explicitly rather than assuming. There is no `gfind` — `findutils` is not
-installed, so `find` is always BSD `find`. Reach for `fd` instead.
+GNU `coreutils`, `grep` and `gnu-sed` are installed g-prefixed (`ggrep`, `gsed`,
+`gls`, `gsort`) and the defaults are BSD. Call the g-prefixed binary when you need
+GNU flags (`sed -i` without an argument, `grep -P`). There is no `gfind`; use `fd`.
 
-Interactive aliases *do* reach non-interactive tool calls via the shell snapshot.
-That is a hazard, not a convenience: `ls` is `eza`/`lsd` with icons, and `tree` —
-which is not installed as a binary — resolves to the `llt` alias. **When parsing
-output, call the real binary** — `/bin/ls`, or better, `fd`.
+Interactive aliases reach tool calls through the shell snapshot: `ls` is
+`eza`/`lsd` with icons and `tree` is an alias. **When parsing output, call the
+real binary**, `/bin/ls` or better `fd`.
 
 ## Reach for these first
 
@@ -48,18 +41,17 @@ output, call the real binary** — `/bin/ls`, or better, `fd`.
 | Read a file | the Read tool | `cat`, `bat`, `head` |
 | Processes | `procs` | `ps aux \| grep` |
 
-Also installed and worth knowing: `fzf`, `zoxide`, `delta`, `lazygit`, `gitui`,
-`glow`, `yazi`, `btop`, `httpie` (the binary is `http`), `zstd`, and `sevenzip`
-(the binary is `7zz` — there is no `7z`). Homebrew's `sqlite` is keg-only and
-therefore off `PATH`, so a bare `sqlite3` is macOS's older system copy; call
+Also installed: `fzf`, `zoxide`, `delta`, `lazygit`, `gitui`, `glow`, `yazi`,
+`btop`, `httpie` (the binary is `http`), `zstd`, and `sevenzip` (the binary is
+`7zz`; there is no `7z`). A bare `sqlite3` is macOS's older copy; call
 `/opt/homebrew/opt/sqlite/bin/sqlite3` when the version matters.
 
 ## The gotcha that actually bites
 
 **`rg` and `fd` both respect `.gitignore` and both skip hidden files.** A search
 that comes back empty may be a search that never looked. When the target could be
-ignored or vendored — `node_modules`, `vendor`, `dist`, build output, lockfiles,
-anything under a dot-directory — pass the flags:
+ignored or vendored (`node_modules`, `vendor`, `dist`, build output, lockfiles,
+anything under a dot-directory), pass the flags:
 
 ```sh
 rg -n 'pattern'                      # default: tracked, non-hidden
@@ -69,16 +61,9 @@ fd -e ts 'name'                      # smart-case, .gitignore-aware
 fd -H -I 'name'                      # hidden + no-ignore (also bypasses the global ignore)
 ```
 
-`rg -l` for the file list alone, `rg -c` for counts — cheaper than dumping matches
-when you only need to know where something lives.
-
-`fd` also reads a **global ignore** at `.config/fd/ignore` (deployed to
-`~/.config/fd/ignore`, read automatically with no env var wiring it up). It
-excludes `.git/` and `.DS_Store` and nothing else — that is signal-to-noise, not
-speed: `--hidden` was making CTRL-T list 501 files in `~/dotfiles` of which 415
-were `.git/` internals. `node_modules/`, `vendor/` and `dist/` are deliberately
-*not* in it, so the advice above still holds for them. `-I` bypasses the global
-ignore along with `.gitignore`.
+Use `rg -l` or `rg -c` when you only need to know where something lives. `fd` also
+reads a global ignore at `~/.config/fd/ignore` that excludes only `.git/` and
+`.DS_Store`; `-I` bypasses it.
 
 ## Where things live
 
@@ -89,9 +74,9 @@ ignore along with `.gitignore`.
 ## How I want you to work
 
 - **Investigate first.** Never speculate about code you have not read. Read files and `rg` for usages before making claims, and read any file I reference before answering. If uncertain, say so and propose how to verify — don't fabricate APIs, paths, or behavior.
-- **Read `CLAUDE-REFERENCE.md` before planning or editing, when the repo has one.** Claude Code auto-loads `CLAUDE.md` and nothing else, so a repo that splits its mandatory rules from its architecture reference — `cnc-claims` does, and the reference is where the framework's real behaviour is written down — hands you only half of what it wrote for you, and withholds exactly the half that stops you guessing at code you have not read. Look for it at the repo root at the start of a task and read it in full before you plan or touch anything; treat it as loaded context, not as a file to skim if a search happens to surface it. This is *investigate first* aimed at documentation the harness will not hand you.
+- **Read `CLAUDE-REFERENCE.md` before planning or editing, when the repo has one.** Claude Code auto-loads only `CLAUDE.md`, so a repo that splits its rules from its architecture reference (`cnc-claims` does) hands you half of what it wrote. Look for it at the repo root at the start of a task and read it in full before you plan or touch anything.
 - **Scope to the request.** Do what is asked; nothing more. Don't refactor adjacent code or create abstractions for a single use. Default to research and recommendations — only edit when explicitly asked. If the ambiguity would change the work materially, ask once up front rather than guessing and rewriting later.
-- **Find the smallest change that works.** The bullet above bounds *what you work on*; this one bounds *how much you touch to do it*. Before editing, work out the minimal set of files and lines that has to change to get the result, and change only those — then say what that scope was and what you left alone, so I can check the boundary rather than reverse-engineer it from a diff. Renaming something the task didn't require, reformatting lines you only read, moving code to where it 'should' live, introducing config for a single call site and "while I'm here" fixes are all the same failure: they bury the three lines that matter in a diff nobody can review, and every one of them is a change I have to test. This is *fight for the obvious solution* applied to the edit rather than the design. The escape hatch, and it matters: if the minimal change only papers over a real defect, say so and let me decide — widening scope on your own is the thing to avoid, not telling me the narrow fix is wrong.
+- **Find the smallest change that works.** Before editing, work out the minimal set of files and lines that has to change, and change only those. Then say what that scope was and what you left alone. Renames the task didn't need, reformatting lines you only read, moving code to where it 'should' live, config for a single call site and "while I'm here" fixes are all out. If the minimal change only papers over a real defect, say so and let me decide rather than widening scope yourself.
 - **Clean up your own orphans, and only your own.** A change that leaves an import, variable or function unused is not finished — remove what *your* edit stranded, in the same pass. Pre-existing dead code is a different thing: leave it, and mention it, so removing it stays my call.
 - **File discipline.** Edit existing files in place; don't create new ones unless required. No README or summary markdown unless I ask. Clean up scratch files.
 - **Verify before done.** Re-check each requirement, run typecheck, tests and lint, and state what changed, what was verified, and what could not be. When something fails, show me the actual command output — don't paraphrase a test failure.
@@ -108,32 +93,27 @@ Follow the repo's existing style first. Absent a repo convention:
 - 2-space indent, LF line endings, UTF-8, final newline, no trailing whitespace. CSS/SCSS use tabs (4).
 - JS/TS: single quotes, no semicolons, 80 cols, `es5` trailing commas, arrow parens omitted for single args — i.e. run Prettier with `~/.prettierrc`.
 - PHP: 120 cols, double quotes, no trailing commas, PHP 8.1 target.
-- Swift: 4-space indent — the one language here that does not take the 2-space default above (measured: the Swift projects here are 4 throughout). 100 columns. Standard Swift API design guidelines. `XCTest` unless the repo already imports `Testing`. No third-party formatter unless the repo ships one.
-- Swift packages: `swift-tools-version: 6.0`, `platforms: [.macOS(.v14)]`, and an explicit `swiftLanguageMode` carrying a comment that says why that mode — then leave it alone. One package here is `.v6` because a threading mistake in it stalls the event tap and the system answers by killing the app; another is `.v5` on purpose because its AppKit panels hand state across callbacks that strict concurrency cannot prove safe, and main-thread confinement already covers it. Both reasons sit next to the setting; migrating one because the newer mode is newer discards an argument I already had.
+- Swift: 4-space indent, 100 columns, standard Swift API design guidelines. `XCTest` unless the repo already imports `Testing`. No third-party formatter unless the repo ships one.
+- Swift packages: `swift-tools-version: 6.0`, `platforms: [.macOS(.v14)]`, and an explicit `swiftLanguageMode` with a comment that says why that mode. Then leave it alone; don't migrate a package because a newer mode exists.
 
 Regardless of language: small, focused functions; early returns rather than
-nested conditionals; and no comment or docstring that only restates the code.
-A repo that documents its *reasoning* in comments — `~/dotfiles` does, and says
-so in its own `CLAUDE.md` — overrides that last one, as repo convention always
-does.
+nested conditionals; and no comment or docstring that only restates the code. A
+repo that documents its *reasoning* in comments (`~/dotfiles` does) overrides that
+last one, as repo convention always does.
 
 ## Tests
 
 Write tests the way a developer on the team would. Read the tests already in the
 repo before adding one, and match their framework, file layout, naming, fixtures
-and helpers, so the new test looks like it came from whoever wrote the one beside
-it. Model-written tests have tells just as model-written prose does, and a
-reviewer who spots them stops trusting that the suite checks anything. This
-holds for every framework I use: PHPUnit, Laravel Dusk, Jest, Vitest and
-Cypress, browser tests as much as unit tests. Absent a repo convention:
+and helpers. This holds for PHPUnit, Laravel Dusk, Jest, Vitest and Cypress alike.
+Absent a repo convention:
 
 - **Name the behaviour plainly.** `rejects a claim with no policy number`, or
   `test_rounds_partial_hours_down`. Not `should successfully and correctly
-  handle the case where...`. The name already describes the test, so don't put
-  a comment above it that says the same thing again.
-- **No scaffolding comments.** Leave out `// Arrange` / `// Act` / `// Assert`
-  banners and the comment over an assertion that restates it. A comment belongs
-  in a test when it explains why an odd input or value was chosen.
+  handle the case where...`. No comment above the test repeating its name.
+- **No scaffolding comments.** No `// Arrange` / `// Act` / `// Assert` banners
+  and no comment restating an assertion. A comment belongs in a test when it
+  explains why an odd input or value was chosen.
 - **Test what the code does, not how it does it.** Assert on what a caller could
   see: return values, output, saved state. Mocking the unit under test, or
   asserting only that a mock received the arguments you just handed it, proves
@@ -143,135 +123,98 @@ Cypress, browser tests as much as unit tests. Absent a repo convention:
   behaviour that could break, plus the edge cases the code actually has. No
   tests for trivial getters, no five near-copies where a data provider or table
   would do, and no `toBeDefined()` warm-up before the assertion that matters.
-  Coverage is a side effect, not the target.
 - **Assert exact values.** `toBe(42)`, `assertSame(42, $total)` and the full
   expected string, not `toBeTruthy()`, `assertNotEmpty()` or "returns an
   array". A loose assertion passes when the code is wrong.
-- **In browser tests, wait for something and select by a test hook.** A fixed
-  sleep (`cy.wait(5000)`, `$browser->pause(2000)`) is either longer than it
-  needs to be, which slows the suite, or shorter, which makes it flaky. Wait on
-  what the user would see instead: `waitFor('@save')` or `waitForText()` in
-  Dusk, and in Cypress let `cy.get()` retry or `cy.wait('@alias')` on an
-  intercepted request. Find elements by an attribute that exists for the tests
+- **In browser tests, wait for something and select by a test hook.** No fixed
+  sleeps. Wait on what the user would see: `waitFor('@save')` or
+  `waitForText()` in Dusk, and in Cypress let `cy.get()` retry or
+  `cy.wait('@alias')` on an intercepted request. Select by a test attribute
   (`dusk="save"`, read as `@save`, or `data-cy="save"`), not a CSS path copied
-  out of devtools like `.row > .col-md-6:nth-child(2) button`, which breaks the
-  next time someone moves the layout. If the element has no hook, add one to the
-  markup rather than writing a longer selector.
+  out of devtools. If the element has no hook, add one to the markup.
 - **Keep setup in the test.** Pull it into a helper or factory once several
   tests share it. A builder class for a single test is the single-use
   abstraction *scope to the request* already rules out.
 - **Never bend a test until it passes.** When one fails, either the code or the
   expectation is wrong, and finding out which is the job. Don't loosen the
   assertion, wrap it in a `try`, skip it, or change the expected value to
-  whatever the code returns now without telling me. That is the *no faking
-  success* rule from *Fight for the "obvious" solution*, applied to a suite.
+  whatever the code returns now without telling me.
 
 ## Linters and formatters
 
-Installed as real binaries, not editor-managed: `shellcheck`, `shfmt`, `stylua`,
-`php-cs-fixer` from Homebrew, plus Prettier as a pnpm global (`~/Library/pnpm/bin`)
-reading `~/.prettierrc`. The shell and the editor run the same binaries on
-purpose — Neovim's Mason provides language servers only. Prefer a repo's own
-pinned tooling when it ships one.
+Installed as real binaries: `shellcheck`, `shfmt`, `stylua` and `php-cs-fixer`
+from Homebrew, plus Prettier as a pnpm global reading `~/.prettierrc`. Prefer a
+repo's own pinned tooling when it ships one.
 
-Swift has none of that installed. `swift format` (6.3.0) ships inside Xcode's
-toolchain, so it is first-party and the *Code style* rule above does not forbid
-it — but its default indent is **2 spaces** and both Swift repos here are 4, so a
-bare `swift format -i` reindents the whole tree. Run it only with a config
-pinning `indentation.spaces: 4`, and prefer not to run it at all: both repos are
-already internally consistent, so the diff would be reindentation burying
-whatever actually changed. `swiftlint` is not installed and not in the Brewfile,
-so a repo that asks for it needs `brew install swiftlint` first; say so rather
-than skipping the lint step.
+Swift: `swift format` ships with Xcode but defaults to 2 spaces, so run it only
+with a config pinning `indentation.spaces: 4`, and prefer not to run it at all.
+`swiftlint` is not installed; a repo that asks for it needs
+`brew install swiftlint` first, so say so rather than skipping the lint step.
 
 Verify shell edits without executing them: `bash -n` / `zsh -n` to parse,
 `shellcheck` to lint.
 
-Swift work is not finished at a clean compile — build the app and install it.
-My apps take the same flag: `./build.sh --install` builds the release bundle and
-puts it in `/Applications`, so what I run is what you just changed. Do that once
-the change is complete, not per edit. Expect the running copy to go down with
-it: the installer quits the app, deletes the installed bundle, copies the new
-one in and relaunches it, so the app disappearing for a second is the install
-working rather than a crash. A repo with its own build script still wins — one
-here uses a different build tool entirely.
+Swift work is not finished at a clean compile. Once the change is complete (not
+per edit), run `./build.sh --install`, which builds the release bundle and
+installs it to `/Applications`. The running app quits and relaunches during the
+install; that is expected. A repo with its own build script still wins.
 
 ## Git
 
-- Both remotes sign, each as its own identity: GitHub as `kenny@kennyb.dev`, Bitbucket as the work identity via `~/.gitconfig-work` (a plain file in `$HOME`, deliberately not in this repo), pulled in by `.gitconfig`'s `includeIf hasconfig:remote.*.url`. Separate signing keys and separate allowed-signers files — which is why `.config/git/allowed_signers` lists only the personal key while the work one stays untracked at `~/.gitconfig-work-signers`. Both sign through 1Password's `op-ssh-sign`, so a verification failure in a work repo is usually the signers file rather than the signing.
+- Commits are SSH-signed through 1Password's `op-ssh-sign`, and the identity follows the remote: GitHub signs as the personal identity, Bitbucket as the work one from `~/.gitconfig-work`. A verification failure in a work repo is usually the signers file. A repo with **no remote yet** signs as personal, so add the Bitbucket remote before the first commit in a work repo.
 - Don't disable either half: no `-c commit.gpgsign=false` to get past a signing prompt — tell me instead — and no per-repo `user.email` or `user.signingkey` set by hand.
-- The switch keys off the remote, so a repo with **no remote yet** falls through to the personal identity and signs with the personal key. Measured: a fresh `git init` reports `kenny@kennyb.dev`, and both identity and key flip the moment the Bitbucket remote is added. Add the remote before the first commit in a work repo, or that commit lands under my personal name signed with a key the work account cannot attribute.
 - Never commit, push, or create a PR unless I ask.
 - **No co-author trailers.** Commit messages end at the last line of prose — no
   `Co-Authored-By:`, no "Generated with Claude Code" in a PR body, no attribution
   footer of any kind. This overrides the harness default, which appends one.
-  `attribution.commit`/`attribution.pr` are set to `""` in `~/.claude/settings.json`
-  to enforce it, but that file is untracked, so the rule lives here too.
 - **Write commit messages the way a developer on the team would.** Run
   `git log --oneline -20` first and match the repo's tone and length. The subject
   is imperative ("Fix", "Add", "Drop"), under about 60 characters, with no
   trailing period and no `feat:`/`fix:` prefix unless the history already uses
   them. Plenty of commits need nothing more. When the reason isn't obvious from
   the diff, add a body wrapped at 72 columns that says why: the problem, the
-  option you passed on, anything you didn't get to test. Make it as long as the
-  reason needs. A one-line fix gets one line. The diff already shows what
-  changed, so don't walk through it file by file. Leave out markdown headings,
+  option you passed on, anything you didn't get to test. A one-line fix gets one
+  line. Don't walk through the diff file by file. Leave out markdown headings,
   bold, emoji, "Summary" or "Changes" sections, and bullet lists of touched
   files. Don't open with "This commit" or end on a line that repeats the
-  subject. The *write like a person* rule under *How I want you to work* covers
-  commits too; this is what it looks like in `git log`.
-- **Never create a branch.** Commit on whatever branch I'm already on, including the
-  default branch — this overrides the harness default of branching first when on
-  `main`/`master`. If a commit really shouldn't land on the current branch, say so
-  and let me decide; don't run `git checkout -b`/`git switch -c` on your own.
-- **Never merge `develop` or `staging` into another branch.** They are integration
-  branches carrying everyone's in-flight work, so merging one into a feature branch
-  pulls other people's commits into my history: the diff stops being reviewable, the
-  *audit only my own changes* rule below has to work around it, and unpicking it
-  afterwards costs far more than the merge saved. That holds for every target,
-  including another long-lived branch and including a merge that would only
-  fast-forward. If a branch has fallen behind, say so and let me decide how to catch
-  it up — rebasing onto the branch it was cut from is usually the answer, but that is
-  my call, not yours.
+  subject.
+- **Never create a branch.** Commit on whatever branch I'm already on, including
+  the default branch; this overrides the harness default of branching first on
+  `main`/`master`. If a commit really shouldn't land on the current branch, say
+  so and let me decide.
+- **Never merge `develop` or `staging` into another branch.** They carry
+  everyone's in-flight work, so a merge pulls other people's commits into my
+  history. That holds for every target, including a merge that would only
+  fast-forward. If a branch has fallen behind, say so and let me decide how to
+  catch it up.
 - Work repos use Bitbucket Pipelines (`bitbucket-pipelines.yml`), not GitHub Actions — check the right CI config.
-- `delta` is **not** git's pager here — it is invoked explicitly by the fzf-tab previews in `.zshrc`. So `git diff` and `git show` emit plain, parseable output; no `--no-pager` dance is needed. Add `--no-pager` anyway when piping a command whose pager behaviour you have not checked.
+- `delta` is **not** git's pager here, so `git diff` and `git show` emit plain output. Add `--no-pager` anyway when piping a command whose pager behaviour you have not checked.
 
 ## Audits and Jira comments
 
 These four read in the order you execute them: pick the diff, write it up,
 format it, sign it.
 
-- **Audit only my own changes.** When you audit the code changes on a branch, the subject is what *I* wrote on it — not everything the branch's diff against the base happens to contain. A branch picks up other people's commits by merge or rebase from the base branch and, on a shared branch, by their own work, and a `git diff base...HEAD` shows all of it without distinguishing. So take the merge-base, list the commits authored by me (`git log --author="$(git config user.email)" $(git merge-base origin/HEAD HEAD)..HEAD`), and diff those — reviewing a colleague's code back to them under my name is worse than a thin audit. If that leaves nothing, say the branch has no commits of mine rather than widening the net to fill the report.
-- **Audits are written for non-programmers.** Whoever reads an audit — and especially whoever reads it as a Jira comment — is a claims handler, a tester or a manager, not a developer. So describe every change as observable behaviour: what the system did before, what it does now, and what they should look at to confirm it. Cover *all* of them, not the interesting ones — a change you skip because it is mechanical is a change nobody knows to retest. File paths, class and method names, and framework vocabulary go in a trailing parenthetical at most, never in the sentence carrying the meaning: "renamed `getClaimant()` to `getPolicyholder()` in `ClaimController`" tells that reader nothing, while "the claimant is now called the policyholder everywhere it appears on screen" tells them what to check. Reach for the voice of the `plain` skill in `.claude/skills/plain/`, not the voice of a commit message.
-- **Jira comments carry no AI byline.** When you post an audit of code changes to a ticket, the heading is `Audit of the code changes` — strip the `AI-generated` the model reaches for by default, and don't reinstate it in the body as a footer or disclaimer. Same instinct as the *no co-author trailers* rule under *Git*: it goes up under my name as my review, and labelling it machine output invites the reader to treat it as unvetted.
-- **Format Jira comments deliberately.** `addCommentToJiraIssue` takes a `contentFormat` of `markdown` or `adf`, and its own schema says the default *varies by tool when omitted* — so omit it and you are gambling on how the body is parsed, which surfaces as literal `##` and `**` sitting in a comment under my name. Always pass `contentFormat: "markdown"` and write ordinary markdown: a `##` heading, `-` bullets, bold used sparingly for the thing that matters. Don't hand-roll ADF JSON — it is verbose, easy to get subtly wrong, and markdown covers everything an audit needs. Don't paste diffs or code blocks either; that fights the *audits are written for non-programmers* rule above. Read the comment back afterwards to confirm it rendered, because a format mistake is invisible until it is posted — and fix one by passing `commentId` to update that comment in place, never by posting a second comment correcting the first.
+- **Audit only my own changes.** The subject is what *I* wrote on the branch, not everything its diff against the base contains. Take the merge-base, list my commits (`git log --author="$(git config user.email)" $(git merge-base origin/HEAD HEAD)..HEAD`), and diff those. If that leaves nothing, say the branch has no commits of mine rather than widening the net to fill the report.
+- **Audits are written for non-programmers.** Describe every change as observable behaviour: what the system did before, what it does now, and what to look at to confirm it. Cover *all* of them, including the mechanical ones. File paths, class and method names, and framework vocabulary go in a trailing parenthetical at most: "renamed `getClaimant()` to `getPolicyholder()` in `ClaimController`" tells that reader nothing, while "the claimant is now called the policyholder everywhere it appears on screen" tells them what to check. Use the voice of the `plain` skill, not a commit message.
+- **Jira comments carry no AI byline.** The heading is `Audit of the code changes`. Strip the `AI-generated` label, and don't reinstate it as a footer or disclaimer.
+- **Format Jira comments deliberately.** Always pass `contentFormat: "markdown"` to `addCommentToJiraIssue`, because the default varies when omitted. Write ordinary markdown: a `##` heading, `-` bullets, bold used sparingly. No hand-rolled ADF JSON, no diffs or code blocks. Read the comment back afterwards to confirm it rendered, and fix a mistake by passing `commentId` to update it in place, never by posting a second comment.
 
 ## Memory
 
-The harness already gives you the format and the path. What it does not give you
-is the point: a session that re-derives what the last one worked out is a session
-wasted, and memory is the only thing that survives a `/clear`, a compaction, or a
-day off. So the test for writing a file is "would the next session have to redo
-this?" — a measured number, a traced call path, a root cause, an approach ruled
-out *and why* (the most expensive thing to rediscover, because nothing in the
-tree records a road not taken), a goal in flight with what is left of it, or a
-pointer with no home in the repo. Write it the moment it is established, not at
-the end; a session can end abruptly and usually does.
-
-Two guards, so this stays cheap:
+Write a memory when the next session would otherwise have to redo the work: a
+measured number, a traced call path, a root cause, an approach ruled out *and
+why*, a goal in flight with what is left of it, or a pointer with no home in the
+repo. Write it the moment it is established, not at the end.
 
 - **A durable rule belongs in this file, not in memory.** If a memory would begin
-  "Kenny prefers…" or "always run…", it is a CLAUDE.md edit — propose it here,
-  where it is version-controlled and survives a rebuild. Memory carries *what we
-  found*; this file carries *how I want you to work*.
+  "Kenny prefers…" or "always run…", propose it as a CLAUDE.md edit instead.
 - **Recalled memories are dated, not authoritative.** Re-read any file, flag,
   version or command one names before acting on it, and delete the memory when it
-  turns out wrong. A stale one is worse than a missing one: it arrives sounding
-  established and costs a session to unpick.
+  turns out wrong.
 
 Never write anything sensitive — credentials, tokens, client data, or the work
-identity in `~/.gitconfig-work`. This is the context curation rule applied across
-sessions rather than within one.
+identity in `~/.gitconfig-work`.
 
 ## Philosophy
 

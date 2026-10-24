@@ -202,9 +202,17 @@ link_dotfiles() {
   link "$DOTFILES_DIR/.zprofile" "$HOME/.zprofile"
   link "$DOTFILES_DIR/.zprofile" "$HOME/.profile"
 
-  # Claude Code's global instructions. Only CLAUDE.md is deployed: the rest of
-  # ~/.claude is state Claude writes itself (settings.local.json, projects/,
-  # todos/), so the directory is created and linked into, never linked over.
+  # Claude Code's global instructions. The rest of ~/.claude is state Claude
+  # writes itself (settings.local.json, projects/, todos/), so the directory is
+  # created and linked into, never linked over.
+  #
+  # Two files, split by cost. CLAUDE.md is loaded into every session in every
+  # project, so it carries the rules alone. REFERENCE.md carries the
+  # measurements and history behind them and is read only when CLAUDE.md sends
+  # Claude there. They used to be one 29 KB file, about 7k tokens paid at the
+  # start of every session and again in most subagents, most of it reasoning a
+  # normal turn never needed. Not an `@REFERENCE.md` import: imports load
+  # eagerly, which would put the cost straight back.
   #
   # There used to be a second file here, AGENTS.md, linked for the sake of
   # tools that DO look for it at user scope and pulled into CLAUDE.md by an
@@ -215,6 +223,7 @@ link_dotfiles() {
   # Its contents now live in CLAUDE.md directly.
   mkdir -p "$HOME/.claude"
   link "$DOTFILES_DIR/.claude/CLAUDE.md" "$HOME/.claude/CLAUDE.md"
+  link "$DOTFILES_DIR/.claude/REFERENCE.md" "$HOME/.claude/REFERENCE.md"
 
   # The Notification hook script. ~/.claude/settings.json points at it but is
   # NOT tracked here — it is mostly state Claude writes itself — so the hook

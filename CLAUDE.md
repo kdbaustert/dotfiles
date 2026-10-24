@@ -15,9 +15,9 @@ file staged here for deployment to `~/.claude/` — it is not about this repo.
 
 `~/.zshrc`, `~/.zprofile`, `~/.profile` (a second link to `.zprofile`),
 `~/.zshenv`, `~/.gitconfig`, `~/.editorconfig`, `~/.prettierrc`,
-`~/.claude/CLAUDE.md`, `~/.claude/hooks/notify.sh`, `~/.claude/statusline.sh`,
-every `~/.claude/skills/<skill>` directory and every `~/.config/<tool>` entry
-are symlinks into this repo. **Edit the file in `~/dotfiles`.** Never write to the
+`~/.claude/CLAUDE.md`, `~/.claude/REFERENCE.md`, `~/.claude/hooks/notify.sh`,
+`~/.claude/statusline.sh`, every `~/.claude/skills/<skill>` directory and every
+`~/.config/<tool>` entry are symlinks into this repo. **Edit the file in `~/dotfiles`.** Never write to the
 `$HOME` path. One exception: `~/.hushlogin`, which `install.sh` `touch`es
 rather than links because only its existence is ever read.
 
@@ -62,6 +62,7 @@ Known offenders:
 | `themes/voltage.md`   | Canonical palette + the list of files that carry it               |
 | `iterm/`, `obsidian/` | App-specific config                                            |
 | `.claude/CLAUDE.md`   | Global Claude Code instructions                                   |
+| `.claude/REFERENCE.md` | The reasoning behind them, read on demand rather than every session |
 | `.claude/hooks/`      | `notify.sh`, the Notification hook (terminal-notifier / notify-send) |
 | `.claude/statusline.sh` | The status line — plan usage, context, model, on every render   |
 | `.claude/skills/`     | Skills, one dir per skill — all ten vendored, none ours            |
@@ -77,7 +78,7 @@ pointing at it at all — git reads `$XDG_CONFIG_HOME/git/ignore` on its own, so
 the symlink is the whole wiring.
 
 `.claude/` is tracked in full but only partly deployed: `install.sh` links
-`CLAUDE.md`, `hooks/notify.sh`, `statusline.sh`, every file under `agents/`,
+`CLAUDE.md`, `REFERENCE.md`, `hooks/notify.sh`, `statusline.sh`, every file under `agents/`,
 every file under `commands/` and every directory under `skills/`, so
 `themes/my-theme.json` rides along for reference and is applied by hand. The
 installer also sweeps the retired `~/.claude/AGENTS.md` link on re-run.

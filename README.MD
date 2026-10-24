@@ -169,7 +169,9 @@ LunarVim's own code.
 hand.
 
 **Part of `.claude/` is deployed.** `CLAUDE.md` — Claude Code's global
-instructions, applied to every project — plus `hooks/notify.sh`,
+instructions, applied to every project — plus `REFERENCE.md` (the reasoning
+behind them, which Claude reads only when `CLAUDE.md` points it there),
+`hooks/notify.sh`,
 `statusline.sh` and every directory under `skills/` are symlinked into
 `~/.claude/`. The rest of `~/.claude` is state Claude writes itself
 (`settings.json`, `settings.local.json`, `projects/`, `todos/`), so the
