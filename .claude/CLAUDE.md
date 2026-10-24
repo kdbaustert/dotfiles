@@ -158,6 +158,19 @@ here uses a different build tool entirely.
   footer of any kind. This overrides the harness default, which appends one.
   `attribution.commit`/`attribution.pr` are set to `""` in `~/.claude/settings.json`
   to enforce it, but that file is untracked, so the rule lives here too.
+- **Write commit messages the way a developer on the team would.** Run
+  `git log --oneline -20` first and match the repo's tone and length. The subject
+  is imperative ("Fix", "Add", "Drop"), under about 60 characters, with no
+  trailing period and no `feat:`/`fix:` prefix unless the history already uses
+  them. Plenty of commits need nothing more. When the reason isn't obvious from
+  the diff, add a body wrapped at 72 columns that says why: the problem, the
+  option you passed on, anything you didn't get to test. Make it as long as the
+  reason needs. A one-line fix gets one line. The diff already shows what
+  changed, so don't walk through it file by file. Leave out markdown headings,
+  bold, emoji, "Summary" or "Changes" sections, and bullet lists of touched
+  files. Don't open with "This commit" or end on a line that repeats the
+  subject. The *write like a person* rule under *How I want you to work* covers
+  commits too; this is what it looks like in `git log`.
 - **Never create a branch.** Commit on whatever branch I'm already on, including the
   default branch — this overrides the harness default of branching first when on
   `main`/`master`. If a commit really shouldn't land on the current branch, say so
