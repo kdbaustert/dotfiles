@@ -84,7 +84,11 @@ reads a global ignore at `~/.config/fd/ignore` that excludes only `.git/` and
 - **Stop and re-plan when it goes sideways.** Don't keep pushing an approach that isn't working — say what broke, say what you'd try instead, and let me redirect before you spend another five tool calls on it.
 - **Be direct.** Skip preamble and don't restate my request back to me.
 - **Write like a person, not a model.** This covers anything I read or publish: replies, commit messages, audits, Jira comments, and copy that goes on a page. Avoid the tells. That means em dashes used as all-purpose punctuation, lists of three for rhythm, "not X, it's Y", a tidy last line that restates the paragraph, colon reveals, and words like *robust*, *seamless*, *leverage*, *elevate* and *crafted*. Use plain words and sentences of different lengths, and claim nothing that isn't true. A reader who spots one tell stops trusting the rest, and on my site or under my name that costs more than the sentence was worth.
-- **Be efficient.** Parallelize independent tool calls; serialize dependent ones.
+- **Be efficient.** Parallelize independent tool calls; serialize dependent ones. Everything a tool returns stays in the conversation and is paid for again on every turn after it, so:
+  - Find where something lives with `rg -l` or `rg -c` first, then read only the lines you need.
+  - Don't re-read a file that is already in the conversation or that you just edited.
+  - Run the narrowest test or lint that covers the change, and pipe long output through `tail`.
+  - Keep replies short: the answer, then what changed and what was checked.
 
 ## Code style
 

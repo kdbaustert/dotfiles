@@ -237,6 +237,40 @@ The same file carries the other untracked-but-load-bearing setting,
 `Co-Authored-By` trailer Claude Code would otherwise append to every commit.
 `.claude/CLAUDE.md` states the rule as well, since only one of the two travels.
 
+Three more settings there keep tool output from filling the context, and all
+three are manual on a new machine for the same reason. The deny list stops the Read tool
+opening files that are only ever noise. `composer.lock` is left readable on
+purpose, because working out an installed package version sometimes needs it.
+`vendor/` is denied, so in a PHP repo where Claude has to read a library's
+source, allow it in that project's own settings rather than here.
+
+```json
+"permissions": { "defaultMode": "auto", "deny": [
+  "Read(**/*.map)", "Read(**/*.min.css)", "Read(**/*.min.js)",
+  "Read(**/dist/**)", "Read(**/node_modules/**)", "Read(**/vendor/**)",
+  "Read(**/package-lock.json)", "Read(**/pnpm-lock.yaml)", "Read(**/yarn.lock)"
+] }
+```
+
+The last two bound what one command, connector call or file read can return.
+`bashOutputMaxChars` is a top-level setting, not an env var: Bash output past it
+is saved to a file and Claude gets a preview plus the path (default 30000, per
+2.1.309's own schema text), so lowering it loses nothing that cannot be fetched.
+`BASH_MAX_OUTPUT_LENGTH` looks like the knob for this and isn't; on its own it
+only sizes the read-back window. `CLAUDE_AUTOCOMPACT_PCT_OVERRIDE` compacts
+earlier, because every turn resends the whole conversation; the cost is a
+summary that drops detail. The env caps live in `settings.json` and not
+`.zshenv` because the desktop app does not start through zsh.
+
+```json
+"bashOutputMaxChars": 15000,
+"env": {
+  "MAX_MCP_OUTPUT_TOKENS": "15000",
+  "CLAUDE_CODE_FILE_READ_MAX_OUTPUT_TOKENS": "15000",
+  "CLAUDE_AUTOCOMPACT_PCT_OVERRIDE": "70"
+}
+```
+
 Two Neovim configs, deliberately independent: `.config/nvim` (hand-rolled,
 lazy.nvim) and `.config/lvim` (LunarVim). They share only `.config/voltage.nvim`,
 the colorscheme, which both put on their runtimepath. Never fold one into the
