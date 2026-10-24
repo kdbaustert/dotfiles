@@ -1,6 +1,6 @@
 ---
 name: feature-scout
-description: Surveys a project for gaps and opportunities, then proposes new features with a rationale for why each is worth building. Use proactively when asked "what should we add next", "what's missing", or when planning a project's next iteration.
+description: Surveys a project for gaps and opportunities, then proposes new features with a rationale for why each is worth building. Use when asked "what should we add next", "what's missing", or when planning a project's next iteration.
 tools: Read, Grep, Glob, Bash, WebFetch, WebSearch
 model: sonnet
 memory: project

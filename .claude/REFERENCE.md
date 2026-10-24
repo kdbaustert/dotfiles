@@ -185,6 +185,19 @@ surfaces as literal `##` and `**` sitting in a comment under my name. Hand-rolle
 ADF is verbose, easy to get subtly wrong, and markdown covers everything an audit
 needs. A format mistake is invisible until it is posted, hence the read-back.
 
+## Philosophy
+
+The *curate context* paragraph used to send nearly everything to a subagent:
+researching, exploring, tracing, testing, reviewing, searching and reading
+documentation, with "if you find yourself asking yourself questions, that is the
+signal to ask a subagent instead". Five of the custom agents also said "use
+proactively" in their descriptions, `code-reviewer` after every code change and
+`quick-lookup` for any single search. Together they turned one question into
+several fresh agent runs, each paying for its system prompt and instructions
+again. Both were narrowed on
+2026-10-24: delegation is for broad or parallel work, and the agents run when
+asked.
+
 ## Memory
 
 The harness gives you the format and the path but not the point: a session that

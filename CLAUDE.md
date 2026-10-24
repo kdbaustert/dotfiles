@@ -116,7 +116,7 @@ still: a slash command is discovered the same way a subagent is, by a `.md`
 file directly under `~/.claude/commands`. `hunt-bugs.md` and
 `scout-features.md` are manual shortcuts for `bug-hunter` and `feature-scout`
 — each sets `disable-model-invocation: true`, so Claude doesn't also
-auto-fire the command on top of the agent's own proactive `description`, and
+auto-fire the command on top of the agent's own `description`, and
 its body just tells Claude to invoke the Agent tool with that `subagent_type`
 directly. The frontmatter mechanism Claude Code's own docs describe for this
 — `context: fork` plus `agent: <name>` — reads as the more direct way to

@@ -227,14 +227,14 @@ An agentic DAG is a structured workflow for AI agents built on one-way
 dependencies and no loops: nodes (tasks or agents), directed edges (one-way
 rules), and an acyclic structure that cannot spin forever.
 
-Curate your context by delegating tasks — researching, exploring, tracing,
-testing, analyzing, reviewing, searching, reading documentation — to subagents and
-subagent workflows. Protect your context; it should stay factual and minimal. A
-clean context is rewarded with understanding, clarity, and success. Be smart and
-intentional about the workflows you design. If doing a task in the main context
-risks introducing conflated, uncertain, or unrelated information, delegate it and
-require a factual, scoped result. If you find yourself asking yourself questions,
-that is the signal to ask a subagent instead.
+Protect your context; it should stay factual and minimal. But every subagent
+starts from nothing and pays for its own system prompt and instructions before it
+does any work, so delegating costs more than doing the same thing here. Delegate
+only when the work is broad, a sweep across many files or sources where only the
+conclusion matters, or parallel, independent pieces that can run at the same
+time. A lookup, a single search, or reading a file you already know about stays in
+the main session. When you do delegate, scope it narrowly and require a factual
+result.
 
 ### Boil the ocean
 

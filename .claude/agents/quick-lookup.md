@@ -1,6 +1,6 @@
 ---
 name: quick-lookup
-description: Fast, narrow lookups — find a file by name, grep for a symbol, check whether something exists. Use proactively for any single targeted search that doesn't need judgment, so the main session's context stays clean. Not for review, multi-step reasoning, or open-ended exploration.
+description: Fast, narrow lookups — find a file by name, grep for a symbol, check whether something exists. Use only when a targeted search would dump more raw output than the main session should hold; a single `rg` or `fd` is cheaper run directly. Not for review, multi-step reasoning, or open-ended exploration.
 tools: Read, Grep, Glob
 model: haiku
 ---
