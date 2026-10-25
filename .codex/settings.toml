@@ -1,0 +1,4 @@
+# Merged by the installers; the live config also contains app-managed state.
+model_reasoning_effort = "low"
+model_verbosity = "low"
+tool_output_token_limit = 4000

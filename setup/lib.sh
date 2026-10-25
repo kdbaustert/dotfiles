@@ -148,6 +148,121 @@ sweep_dangling() {
   done
 }
 
+# merge_claude_settings — merge preferences while keeping hooks and local state.
+# Nested env preferences need a merge too; replacing env would drop unrelated
+# variables. A matching config is left alone so repeat installs do not rewrite it.
+merge_claude_settings() {
+  if ! command -v python3 &>/dev/null; then
+    warning "Python 3 is needed to merge Claude settings."
+    return
+  fi
+
+  if python3 - "$DOTFILES_DIR/.claude/settings.portable.json" "${CLAUDE_CONFIG_DIR:-$HOME/.claude}/settings.json" <<'PYTHON'
+import json
+import os
+from pathlib import Path
+import stat
+import sys
+import tempfile
+
+source, target = map(Path, sys.argv[1:])
+if target.is_symlink():
+    raise SystemExit("Claude settings is a symlink; refusing to modify its target.")
+
+settings = json.loads(source.read_text())
+before = json.loads(target.read_text()) if target.exists() else {}
+if not isinstance(before, dict) or not isinstance(settings, dict):
+    raise SystemExit("Claude settings must be JSON objects; left untouched.")
+updated = {**before, **settings}
+updated["env"] = {**before.get("env", {}), **settings["env"]}
+if updated == before:
+    raise SystemExit(0)
+
+serialized = json.dumps(updated, indent=2) + "\n"
+assert json.loads(serialized) == updated
+target.parent.mkdir(parents=True, exist_ok=True)
+with tempfile.NamedTemporaryFile(mode="w", dir=target.parent, delete=False) as file:
+    temporary = Path(file.name)
+    try:
+        file.write(serialized)
+        file.flush()
+        if target.exists():
+            os.chmod(temporary, stat.S_IMODE(target.stat().st_mode))
+        os.replace(temporary, target)
+    finally:
+        temporary.unlink(missing_ok=True)
+PYTHON
+  then
+    success "Claude portable settings applied."
+  else
+    warning "Could not merge Claude settings; existing settings left untouched."
+  fi
+}
+
+# merge_codex_settings — apply portable preferences without tracking app state.
+# Requires Python 3.11+ for TOML validation. A failed merge leaves config alone
+# and warns rather than preventing the rest of the dotfiles from deploying.
+merge_codex_settings() {
+  if ! command -v python3 &>/dev/null; then
+    warning "Python 3.11+ is needed to merge Codex settings."
+    return
+  fi
+
+  if python3 - "$DOTFILES_DIR/.codex/settings.toml" "${CODEX_HOME:-$HOME/.codex}/config.toml" <<'PYTHON'
+import os
+from pathlib import Path
+import re
+import stat
+import sys
+import tempfile
+import tomllib
+
+source, target = map(Path, sys.argv[1:])
+if target.is_symlink():
+    raise SystemExit("Codex config is a symlink; refusing to modify its target.")
+
+settings_text = source.read_text()
+settings = tomllib.loads(settings_text)
+original = target.read_text() if target.exists() else ""
+before = tomllib.loads(original)
+if all(before.get(key) == value for key, value in settings.items()):
+    raise SystemExit(0)
+
+# Only remove managed root keys. TOML validation below rejects any edit that
+# would accidentally change a table or a multiline string containing one.
+lines = []
+in_root = True
+for line in original.splitlines(keepends=True):
+    if line.lstrip().startswith("["):
+        in_root = False
+    assignment = re.match(r"^\s*([A-Za-z0-9_-]+)\s*=", line)
+    if in_root and assignment and assignment[1] in settings:
+        continue
+    lines.append(line)
+
+updated = settings_text.rstrip() + "\n\n" + "".join(lines)
+if tomllib.loads(updated) != {**before, **settings}:
+    raise SystemExit("Codex merge would change unrelated settings; left untouched.")
+
+target.parent.mkdir(parents=True, exist_ok=True)
+with tempfile.NamedTemporaryFile(mode="w", dir=target.parent, delete=False) as file:
+    temporary = Path(file.name)
+    try:
+        file.write(updated)
+        file.flush()
+        if target.exists():
+            os.chmod(temporary, stat.S_IMODE(target.stat().st_mode))
+        os.replace(temporary, target)
+    finally:
+        temporary.unlink(missing_ok=True)
+PYTHON
+  then
+    success "Codex token-saving settings applied."
+  else
+    warning "Could not merge Codex settings; existing config left untouched."
+  fi
+}
+
 #------------------------------------------------------------------------------
 # link_dotfiles <os>
 #------------------------------------------------------------------------------
@@ -224,6 +339,7 @@ link_dotfiles() {
   mkdir -p "$HOME/.claude"
   link "$DOTFILES_DIR/.claude/CLAUDE.md" "$HOME/.claude/CLAUDE.md"
   link "$DOTFILES_DIR/.claude/REFERENCE.md" "$HOME/.claude/REFERENCE.md"
+  merge_claude_settings
 
   # Codex reads the same rules. It looks for its global instructions in
   # $CODEX_HOME, AGENTS.override.md first and AGENTS.md only when the override
@@ -237,6 +353,7 @@ link_dotfiles() {
   # like settings.json; CLAUDE.md carries them.
   mkdir -p "${CODEX_HOME:-$HOME/.codex}"
   link "$DOTFILES_DIR/.claude/CLAUDE.md" "${CODEX_HOME:-$HOME/.codex}/AGENTS.override.md"
+  merge_codex_settings
 
   # The Notification hook script. ~/.claude/settings.json points at it but is
   # NOT tracked here — it is mostly state Claude writes itself — so the hook

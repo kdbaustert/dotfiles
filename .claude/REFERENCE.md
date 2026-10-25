@@ -155,6 +155,30 @@ strict concurrency cannot prove safe, and main-thread confinement already covers
 it. Both reasons sit next to the setting; migrating one because the newer mode is
 newer discards an argument I already had.
 
+### Task rules
+
+Follow the repo's existing style first. Absent a repo convention:
+
+- 2-space indent, LF line endings, UTF-8, final newline, no trailing whitespace. CSS/SCSS use tabs (4).
+- JS/TS: single quotes, no semicolons, 80 cols, `es5` trailing commas, arrow parens omitted for single args — i.e. run Prettier with `~/.prettierrc`.
+- PHP: 120 cols, double quotes, no trailing commas, PHP 8.1 target.
+- Swift: 4-space indent, 100 columns, standard Swift API design guidelines. `XCTest` unless the repo already imports `Testing`. No third-party formatter unless the repo ships one.
+- Swift packages: `swift-tools-version: 6.0`, `platforms: [.macOS(.v14)]`, and an explicit `swiftLanguageMode` with a comment that says why that mode. Then leave it alone; don't migrate a package because a newer mode exists.
+
+Regardless of language: small, focused functions; early returns rather than
+nested conditionals; and no comment or docstring that only restates the code. A
+repo that documents its *reasoning* in comments (`~/dotfiles` does) overrides that
+last one, as repo convention always does.
+
+Name each function for what it actually does, as closely as one name can say
+it. A reader should be able to guess the body from the name and be right,
+side effects included: a `getClaim()` that also marks the claim as read is
+`fetchClaimAndMarkRead()`, and `handleData()` or `process()` says nothing at
+all. When an edit changes what a function does, rename it in the same edit. If
+no honest name fits without two "and"s, the function is doing too much. This
+covers functions you add or change. A misleading name you only read gets
+mentioned, not renamed, under *find the smallest change that works*.
+
 ## Tests
 
 Model-written tests have tells just as model-written prose does, and a reviewer
@@ -165,6 +189,45 @@ A fixed sleep in a browser test (`cy.wait(5000)`, `$browser->pause(2000)`) is
 either longer than it needs to be, which slows the suite, or shorter, which makes
 it flaky. A CSS path copied out of devtools breaks the next time someone moves
 the layout.
+
+### Task rules
+
+Write tests the way a developer on the team would. Read the tests already in the
+repo before adding one, and match their framework, file layout, naming, fixtures
+and helpers. This holds for PHPUnit, Laravel Dusk, Jest, Vitest and Cypress alike.
+Absent a repo convention:
+
+- **Name the behaviour plainly.** `rejects a claim with no policy number`, or
+  `test_rounds_partial_hours_down`. Not `should successfully and correctly
+  handle the case where...`. No comment above the test repeating its name.
+- **No scaffolding comments.** No `// Arrange` / `// Act` / `// Assert` banners
+  and no comment restating an assertion. A comment belongs in a test when it
+  explains why an odd input or value was chosen.
+- **Test what the code does, not how it does it.** Assert on what a caller could
+  see: return values, output, saved state. Mocking the unit under test, or
+  asserting only that a mock received the arguments you just handed it, proves
+  nothing. Mock at the boundary (network, clock, filesystem, a third-party API)
+  and leave the rest real.
+- **Write the tests the change needs, not as many as possible.** One test per
+  behaviour that could break, plus the edge cases the code actually has. No
+  tests for trivial getters, no five near-copies where a data provider or table
+  would do, and no `toBeDefined()` warm-up before the assertion that matters.
+- **Assert exact values.** `toBe(42)`, `assertSame(42, $total)` and the full
+  expected string, not `toBeTruthy()`, `assertNotEmpty()` or "returns an
+  array". A loose assertion passes when the code is wrong.
+- **In browser tests, wait for something and select by a test hook.** No fixed
+  sleeps. Wait on what the user would see: `waitFor('@save')` or
+  `waitForText()` in Dusk, and in Cypress let `cy.get()` retry or
+  `cy.wait('@alias')` on an intercepted request. Select by a test attribute
+  (`dusk="save"`, read as `@save`, or `data-cy="save"`), not a CSS path copied
+  out of devtools. If the element has no hook, add one to the markup.
+- **Keep setup in the test.** Pull it into a helper or factory once several
+  tests share it. A builder class for a single test is the single-use
+  abstraction *scope to the request* already rules out.
+- **Never bend a test until it passes.** When one fails, either the code or the
+  expectation is wrong, and finding out which is the job. Don't loosen the
+  assertion, wrap it in a `try`, skip it, or change the expected value to
+  whatever the code returns now without telling me.
 
 ## Linters and formatters
 
@@ -183,6 +246,25 @@ is what you just changed. The installer quits the app, deletes the installed
 bundle, copies the new one in and relaunches it, so the app disappearing for a
 second is the install working rather than a crash. One repo here uses a different
 build tool entirely.
+
+### Task rules
+
+Installed as real binaries: `shellcheck`, `shfmt`, `stylua` and `php-cs-fixer`
+from Homebrew, plus Prettier as a pnpm global reading `~/.prettierrc`. Prefer a
+repo's own pinned tooling when it ships one.
+
+Swift: `swift format` ships with Xcode but defaults to 2 spaces, so run it only
+with a config pinning `indentation.spaces: 4`, and prefer not to run it at all.
+`swiftlint` is not installed; a repo that asks for it needs
+`brew install swiftlint` first, so say so rather than skipping the lint step.
+
+Verify shell edits without executing them: `bash -n` / `zsh -n` to parse,
+`shellcheck` to lint.
+
+Swift work is not finished at a clean compile. Once the change is complete (not
+per edit), run `./build.sh --install`, which builds the release bundle and
+installs it to `/Applications`. The running app quits and relaunches during the
+install; that is expected. A repo with its own build script still wins.
 
 ## Git
 
@@ -212,6 +294,37 @@ that has fallen behind, but that is my call.
 `delta` is invoked explicitly by the fzf-tab previews in `.zshrc`, which is why it
 is not git's pager.
 
+### Task rules
+
+- Commits are SSH-signed through 1Password's `op-ssh-sign`, and the identity follows the remote: GitHub signs as the personal identity, Bitbucket as the work one from `~/.gitconfig-work`. A verification failure in a work repo is usually the signers file. A repo with **no remote yet** signs as personal, so add the Bitbucket remote before the first commit in a work repo.
+- Don't disable either half: no `-c commit.gpgsign=false` to get past a signing prompt — tell me instead — and no per-repo `user.email` or `user.signingkey` set by hand.
+- Never commit, push, or create a PR unless I ask.
+- **No co-author trailers.** Commit messages end at the last line of prose — no
+  `Co-Authored-By:`, no "Generated with Claude Code" in a PR body, no attribution
+  footer of any kind. This overrides the harness default, which appends one.
+- **Write commit messages the way a developer on the team would.** Run
+  `git log --oneline -20` first and match the repo's tone and length. The subject
+  is imperative ("Fix", "Add", "Drop"), under about 60 characters, with no
+  trailing period and no `feat:`/`fix:` prefix unless the history already uses
+  them. Plenty of commits need nothing more. When the reason isn't obvious from
+  the diff, add a body wrapped at 72 columns that says why: the problem, the
+  option you passed on, anything you didn't get to test. A one-line fix gets one
+  line. Don't walk through the diff file by file. Leave out markdown headings,
+  bold, emoji, "Summary" or "Changes" sections, and bullet lists of touched
+  files. Don't open with "This commit" or end on a line that repeats the
+  subject.
+- **Never create a branch.** Commit on whatever branch I'm already on, including
+  the default branch; this overrides the harness default of branching first on
+  `main`/`master`. If a commit really shouldn't land on the current branch, say
+  so and let me decide.
+- **Never merge `develop` or `staging` into another branch.** They carry
+  everyone's in-flight work, so a merge pulls other people's commits into my
+  history. That holds for every target, including a merge that would only
+  fast-forward. If a branch has fallen behind, say so and let me decide how to
+  catch it up.
+- Work repos use Bitbucket Pipelines (`bitbucket-pipelines.yml`), not GitHub Actions — check the right CI config.
+- `delta` is **not** git's pager here, so `git diff` and `git show` emit plain output. Add `--no-pager` anyway when piping a command whose pager behaviour you have not checked.
+
 ## Audits and Jira comments
 
 A branch picks up other people's commits by merge or rebase from the base branch
@@ -232,6 +345,16 @@ tool when omitted*, so leaving it out gambles on how the body is parsed, which
 surfaces as literal `##` and `**` sitting in a comment under my name. Hand-rolled
 ADF is verbose, easy to get subtly wrong, and markdown covers everything an audit
 needs. A format mistake is invisible until it is posted, hence the read-back.
+
+### Task rules
+
+These four read in the order you execute them: pick the diff, write it up,
+format it, sign it.
+
+- **Audit only my own changes.** The subject is what *I* wrote on the branch, not everything its diff against the base contains. Take the merge-base, list my commits (`git log --author="$(git config user.email)" $(git merge-base origin/HEAD HEAD)..HEAD`), and diff those. If that leaves nothing, say the branch has no commits of mine rather than widening the net to fill the report.
+- **Audits are written for non-programmers.** Describe every change as observable behaviour: what the system did before, what it does now, and what to look at to confirm it. Cover *all* of them, including the mechanical ones. File paths, class and method names, and framework vocabulary go in a trailing parenthetical at most: "renamed `getClaimant()` to `getPolicyholder()` in `ClaimController`" tells that reader nothing, while "the claimant is now called the policyholder everywhere it appears on screen" tells them what to check. Use the voice of the `plain` skill, not a commit message.
+- **Jira comments carry no AI byline.** The heading is `Audit of the code changes`. Strip the `AI-generated` label, and don't reinstate it as a footer or disclaimer.
+- **Format Jira comments deliberately.** Always pass `contentFormat: "markdown"` to `addCommentToJiraIssue`, because the default varies when omitted. Write ordinary markdown: a `##` heading, `-` bullets, bold used sparingly. No hand-rolled ADF JSON, no diffs or code blocks. Read the comment back afterwards to confirm it rendered, and fix a mistake by passing `commentId` to update it in place, never by posting a second comment.
 
 ## Philosophy
 
@@ -260,3 +383,58 @@ survives a rebuild. Memory carries *what we found*; `CLAUDE.md` carries *how I
 want you to work*. A stale memory is worse than a missing one: it arrives
 sounding established and costs a session to unpick. Keeping secrets out of memory
 is the context curation rule applied across sessions rather than within one.
+
+## Working philosophy in full
+
+Software is grounded in philosophy. These are the considerations that make the
+rules above make sense.
+
+### Curate context — think in an agentic DAG
+
+An agentic DAG is a structured workflow for AI agents built on one-way
+dependencies and no loops: nodes (tasks or agents), directed edges (one-way
+rules), and an acyclic structure that cannot spin forever.
+
+Protect your context; it should stay factual and minimal. But every subagent
+starts from nothing and pays for its own system prompt and instructions before it
+does any work, so delegating costs more than doing the same thing here. Delegate
+only when the work is broad, a sweep across many files or sources where only the
+conclusion matters, or parallel, independent pieces that can run at the same
+time. A lookup, a single search, or reading a file you already know about stays in
+the main session. When you do delegate, scope it narrowly and require a factual
+result.
+
+### Boil the ocean
+
+When planning, do not be afraid to suggest seemingly insane solutions when they
+reveal a materially better direction. Explore broadly, then recommend and
+implement only the scope justified by the current problem. We effectively have to
+rethink and relearn what it means to build and innovate software. We value
+flexible platforms, memory efficiency, low CPU usage, and developer experience;
+when those goals conflict, make the trade-offs explicit and follow project
+priorities.
+
+### Fight for the "obvious" solution
+
+Measure twice, cut once: understand the problem fully before building. Cleverness
+happens when you haven't understood the problem fully. The biggest win for
+simplicity is refusing to solve a problem we don't have. Good code is often the
+simplest thing that delivers required functionality and measured performance while
+respecting developer experience. Trade-offs are real: make them explicit and
+choose according to project priorities. No bolt-ons or faking success. Push back
+when you see a more obvious way. Remember the K.I.S.S. method. Keep. It. Simple.
+Stupid.
+
+## Context and settings maintenance
+
+On 2026-10-25, specialized code, test, formatting, Git and audit rules moved here
+verbatim from the global instructions, with read triggers left at their original
+headings. This keeps the rules available before the relevant task without
+loading every workflow into every session. Deployment history moved from the
+repo's CLAUDE.md to setup/REFERENCE.md for the same reason.
+
+Portable Claude preferences now live in .claude/settings.portable.json and are
+merged by the shared installer. Sonnet replaces Opus as the routine default;
+medium effort and existing output and compaction limits remain unchanged.
+Use Opus explicitly for work that needs it. These defaults reduce model cost;
+only reducing context and generated output directly reduces token counts.
