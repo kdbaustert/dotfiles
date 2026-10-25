@@ -301,18 +301,22 @@ is saved to a file and Claude gets a preview plus the path (default 30000, per
 `BASH_MAX_OUTPUT_LENGTH` looks like the knob for this and isn't; on its own it
 only sizes the read-back window. `CLAUDE_AUTOCOMPACT_PCT_OVERRIDE` compacts
 earlier, because every turn resends the whole conversation; the cost is a
-summary that drops detail. It is 30, not 70, because the model is `opus[1m]`:
-at 70 compaction waited until ~700k tokens, and a week's transcripts showed a
-third of all main-session spend on calls carrying 200k-700k of context. The
-env caps live in `settings.json` and not `.zshenv` because the desktop app
-does not start through zsh.
+summary that drops detail. It is 15 because the model is `opus[1m]`, so the
+percentage is of a 1M window. At 70 compaction waited until ~700k tokens, and
+a week's transcripts showed a third of all main-session spend on calls
+carrying 200k-700k of context. 30 wasn't low enough either: a 2026-10-25 audit
+found Fable's 44.4M weekly tokens spread over only 196 calls, 77% of them
+carrying 200k-400k, mostly sessions switched from Opus to Fable mid-way and
+left to run near the 300k line. 15 compacts at ~150k. The env caps live in
+`settings.json` and not `.zshenv` because the desktop app does not start
+through zsh.
 
 ```json
 "bashOutputMaxChars": 15000,
 "env": {
   "MAX_MCP_OUTPUT_TOKENS": "15000",
   "CLAUDE_CODE_FILE_READ_MAX_OUTPUT_TOKENS": "15000",
-  "CLAUDE_AUTOCOMPACT_PCT_OVERRIDE": "30"
+  "CLAUDE_AUTOCOMPACT_PCT_OVERRIDE": "15"
 }
 ```
 
