@@ -232,6 +232,11 @@ link_dotfiles() {
   mkdir -p "$HOME/.claude/hooks"
   link "$DOTFILES_DIR/.claude/hooks/notify.sh" "$HOME/.claude/hooks/notify.sh"
 
+  # The PreToolUse hook that rejects a widened rg/fd missing the noise-folder
+  # excludes. Same manual settings.json step; its header carries the block.
+  link "$DOTFILES_DIR/.claude/hooks/search-excludes.sh" \
+    "$HOME/.claude/hooks/search-excludes.sh"
+
   # The status line command — the plan's 5-hour and 7-day usage windows on
   # screen at all times, rather than only when /usage is asked. Same
   # untracked-settings story as the hook above: the script deploys, the

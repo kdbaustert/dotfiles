@@ -16,7 +16,7 @@ file staged here for deployment to `~/.claude/` — it is not about this repo.
 `~/.zshrc`, `~/.zprofile`, `~/.profile` (a second link to `.zprofile`),
 `~/.zshenv`, `~/.gitconfig`, `~/.editorconfig`, `~/.prettierrc`,
 `~/.claude/CLAUDE.md`, `~/.claude/REFERENCE.md`, `~/.claude/hooks/notify.sh`,
-`~/.claude/statusline.sh`, every `~/.claude/skills/<skill>` directory and every
+`~/.claude/hooks/search-excludes.sh`, `~/.claude/statusline.sh`, every `~/.claude/skills/<skill>` directory and every
 `~/.config/<tool>` entry are symlinks into this repo. **Edit the file in `~/dotfiles`.** Never write to the
 `$HOME` path. One exception: `~/.hushlogin`, which `install.sh` `touch`es
 rather than links because only its existence is ever read.
@@ -63,7 +63,7 @@ Known offenders:
 | `iterm/`, `obsidian/` | App-specific config                                            |
 | `.claude/CLAUDE.md`   | Global Claude Code instructions                                   |
 | `.claude/REFERENCE.md` | The reasoning behind them, read on demand rather than every session |
-| `.claude/hooks/`      | `notify.sh`, the Notification hook (terminal-notifier / notify-send) |
+| `.claude/hooks/`      | `notify.sh`, the Notification hook (terminal-notifier / notify-send); `search-excludes.sh`, the PreToolUse hook that rejects a widened rg/fd missing the noise-folder excludes |
 | `.claude/statusline.sh` | The status line — plan usage, context, model, on every render   |
 | `.claude/skills/`     | Skills, one dir per skill — all ten vendored, none ours            |
 | `.claude/agents/`     | Custom subagents, one `.md` file per agent, ours                  |
@@ -78,7 +78,7 @@ pointing at it at all — git reads `$XDG_CONFIG_HOME/git/ignore` on its own, so
 the symlink is the whole wiring.
 
 `.claude/` is tracked in full but only partly deployed: `install.sh` links
-`CLAUDE.md`, `REFERENCE.md`, `hooks/notify.sh`, `statusline.sh`, every file under `agents/`,
+`CLAUDE.md`, `REFERENCE.md`, `hooks/notify.sh`, `hooks/search-excludes.sh`, `statusline.sh`, every file under `agents/`,
 every file under `commands/` and every directory under `skills/`, so
 `themes/my-theme.json` rides along for reference and is applied by hand. The
 installer also sweeps the retired `~/.claude/AGENTS.md` link on re-run.
@@ -183,8 +183,8 @@ rules win — these skills are reference material, not authority.
 
 `~/.claude/settings.json` is **not** tracked — it is mostly state Claude writes
 itself (model, `enabledPlugins`, the atuin hooks), so a symlink would fight it.
-That makes the two blocks wiring the deployed scripts up a manual step on a new
-machine — one under `hooks`, one at the top level:
+That makes the three blocks wiring the deployed scripts up a manual step on a
+new machine — two under `hooks`, one at the top level:
 
 ```json
 "Notification": [{ "hooks": [{ "type": "command",
@@ -192,11 +192,21 @@ machine — one under `hooks`, one at the top level:
 ```
 
 ```json
+"PreToolUse": [{ "matcher": "Bash", "hooks": [{ "type": "command",
+  "command": "$HOME/.claude/hooks/search-excludes.sh" }] }]
+```
+
+The `PreToolUse` entry goes *beside* the atuin one already in that array, not in
+place of it. It is the backstop for the search-folder rule in
+`.claude/CLAUDE.md`; `.claude/REFERENCE.md` says what it checks and what it
+misses.
+
+```json
 "statusLine": { "type": "command",
   "command": "$HOME/.claude/statusline.sh", "padding": 0 }
 ```
 
-`Notification` is the only event hooked, on purpose — it fires when Claude is
+`Notification` is the only event that banners, on purpose — it fires when Claude is
 blocked on you (a permission prompt, an idle question). `Stop` would banner
 every turn, which is how you end up leaving Do Not Disturb on.
 
@@ -398,7 +408,7 @@ LaunchAgents. Verify narrowly instead:
 ```sh
 bash -n install.sh && bash -n install-linux.sh    # bash: parse both
 shellcheck install.sh install-linux.sh setup/*.sh \
-  .claude/hooks/notify.sh .claude/statusline.sh   # ...then lint every one
+  .claude/hooks/*.sh .claude/statusline.sh        # ...then lint every one
 for f in .zshenv .zprofile .zshrc zsh/*.zsh zsh/extra/*.zsh zsh/os/*.zsh; do
   zsh -n "$f" || echo "FAIL $f"                          # zsh: parse only
 done

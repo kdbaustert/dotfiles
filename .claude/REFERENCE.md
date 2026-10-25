@@ -87,7 +87,40 @@ tree), so one flag covers all eight.
 `public/` is the risky entry. In a framework app it is build output, but a plain
 PHP project can keep hand-written entry points there. The exception clause in
 the rule covers a task that is about one of these folders, but a broad search
-for a symbol will now miss a match in `public/`.
+for a symbol will now miss a match in `public/`. kennybdev's `build/` is the
+same trap: it holds hand-written scripts (`npm run og` runs
+`build/og-render.js`).
+
+The rule is short in `CLAUDE.md` because that file loads into every session;
+the reasons for it are here. One hit in any of the eight folders buries the
+results that matter, and `.gitignore` alone doesn't keep them out: not every
+repo ignores them, and `-uu`, `-I` or a path passed straight to the search lets
+them back in. Hence naming them on the command, and the hook as a backstop.
+
+`.claude/hooks/search-excludes.sh` is that backstop, a PreToolUse hook on Bash.
+It looks for an `rg` or `fd` command widened past the ignore files (`-u` in any
+flag cluster, `--no-ignore*`, `--unrestricted`, or `fd -I`) and rejects it
+with exit 2 if the command doesn't name all eight folders. Exit 2 hands the
+message back to Claude, which reruns the search with the glob. A command whose
+search path starts inside one of the folders passes, since that is the
+exception the rule allows. It is a string check, not a shell parser: a widened
+search hidden behind a variable or an alias gets through. It stays out of the
+plain `rg`/`fd` case on purpose, because `.gitignore` covers that one in most
+repos and blocking every search would cost more turns than it saves.
+
+`--max-columns=200 --max-columns-preview`: one match in a minified bundle or a
+SQL dump can be a single line tens of kilobytes long, and all of it lands in
+the context. Checked on ripgrep 15.2.0: a 10,000-character matching line came
+back as about 230 characters ending in `[... omitted end of long line]`. The
+preview keeps the start of the line, so a match deep in it is cut off; `-o`
+with a bounded pattern printed just the match and its 40 characters either
+side (89 bytes for the same line).
+
+A project's `.ignore` is the per-repo half. `rg` and `fd` read it by default,
+like `.gitignore`, but it isn't git's, so it can hide things a repo tracks on
+purpose (a committed minified bundle, a fixtures dump) from searches without
+untracking them. `-uu` and `-I` bypass it, which is why the global eight still
+travel on the command.
 
 ## How I want you to work
 

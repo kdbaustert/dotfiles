@@ -171,20 +171,25 @@ hand.
 **Part of `.claude/` is deployed.** `CLAUDE.md` — Claude Code's global
 instructions, applied to every project — plus `REFERENCE.md` (the reasoning
 behind them, which Claude reads only when `CLAUDE.md` points it there),
-`hooks/notify.sh`,
+`hooks/notify.sh`, `hooks/search-excludes.sh`,
 `statusline.sh` and every directory under `skills/` are symlinked into
 `~/.claude/`. The rest of `~/.claude` is state Claude writes itself
 (`settings.json`, `settings.local.json`, `projects/`, `todos/`), so the
 directory is created and linked *into* rather than linked over.
 `.claude/themes/` is kept here for reference only; nothing links it.
 
-**Two settings blocks are manual.** Both deployed scripts are named by
-`~/.claude/settings.json`, which is untracked, so on a new machine add this
-under `hooks`:
+**Three settings blocks are manual.** All the deployed scripts are named by
+`~/.claude/settings.json`, which is untracked, so on a new machine add these
+under `hooks` (the `PreToolUse` one beside any entry already there):
 
 ```json
 "Notification": [{ "hooks": [{ "type": "command",
   "command": "$HOME/.claude/hooks/notify.sh" }] }]
+```
+
+```json
+"PreToolUse": [{ "matcher": "Bash", "hooks": [{ "type": "command",
+  "command": "$HOME/.claude/hooks/search-excludes.sh" }] }]
 ```
 
 and this at the top level:
@@ -197,6 +202,9 @@ and this at the top level:
 `hooks/notify.sh` fires a `terminal-notifier` banner when Claude is waiting on
 you. Only the `Notification` event is hooked — permission prompts and idle
 questions. Hooking `Stop` as well would banner every single turn.
+`hooks/search-excludes.sh` stops Claude running an `rg` or `fd` that skips the
+ignore files without also excluding `node_modules`, `vendor` and the other
+noise folders.
 
 `statusline.sh` keeps the plan's usage on screen as four bars, one per window,
 each coloured green → yellow → orange → red as it fills:

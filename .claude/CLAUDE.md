@@ -14,7 +14,7 @@ node versions, git signing identities, or Swift formatting and language modes.
 
 - macOS, Apple Silicon. Homebrew at `/opt/homebrew`; prefer its binaries over `/usr/bin`.
 - Nix sits beside Homebrew and is for per-project environments only (`nix-shell`, `nix develop`). Homebrew owns every global tool, so never `nix profile install` or `nix-env -i` anything the Brewfile has. A tool call may not have `nix` at all: check with `command -v nix-shell`, and if it's missing, source `/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh` rather than splicing `/nix/...` into PATH by hand. direnv never fires in a tool call, so run `nix develop -c <cmd>` from the project.
-- Shell is zsh. `~/.zshrc`, `~/.zprofile`, `~/.profile`, `~/.zshenv`, `~/.gitconfig`, `~/.editorconfig`, `~/.prettierrc`, `~/.claude/CLAUDE.md`, `~/.claude/REFERENCE.md`, `~/.claude/hooks/notify.sh`, `~/.claude/statusline.sh`, every `~/.claude/skills/<skill>` directory and every `~/.config/<tool>` entry are symlinks into `~/dotfiles`. Edit the file in `~/dotfiles`, never the path in `$HOME`.
+- Shell is zsh. `~/.zshrc`, `~/.zprofile`, `~/.profile`, `~/.zshenv`, `~/.gitconfig`, `~/.editorconfig`, `~/.prettierrc`, `~/.claude/CLAUDE.md`, `~/.claude/REFERENCE.md`, `~/.claude/hooks/notify.sh`, `~/.claude/hooks/search-excludes.sh`, `~/.claude/statusline.sh`, every `~/.claude/skills/<skill>` directory and every `~/.config/<tool>` entry are symlinks into `~/dotfiles`. Edit the file in `~/dotfiles`, never the path in `$HOME`.
 - Editor is `nvim`. No Python version manager; `python3` is Homebrew's.
 - `node` differs by shell type. Tool calls get Homebrew's `/opt/homebrew/bin/node`; my interactive shell gets nvm's lazy-loaded version. So a version you see in a tool call may not be mine. `whence -w node` in a real interactive shell is the only honest check, since `zsh -i -c` exits before nvm loads.
 - Shell history is `atuin`.
@@ -56,25 +56,29 @@ ignored (`dist`, build output, lockfiles, anything under a dot-directory), pass
 the flags:
 
 ```sh
-rg -n 'pattern'                      # default: tracked, non-hidden
-rg -n --hidden -g '!.git' 'pattern'  # include dotfiles, still skip .git
-rg -nuu -g '!{node_modules,vendor,build,out,public,storage,logs,tmp}' 'pattern'
+rg -n --max-columns=200 --max-columns-preview 'pattern'  # tracked, non-hidden
+rg -n --max-columns=200 --max-columns-preview --hidden -g '!.git' 'pattern'
+rg -nuu --max-columns=200 --max-columns-preview \
+  -g '!{node_modules,vendor,build,out,public,storage,logs,tmp}' 'pattern'
 fd -e ts 'name'                      # smart-case, .gitignore-aware
 fd -H -I -E '{node_modules,vendor,build,out,public,storage,logs,tmp}' 'name'
 ```
 
-The last `rg` ignores `.gitignore` and includes hidden files; the last `fd` does
-the same and also bypasses the global ignore.
+The second `rg` adds dotfiles but still skips `.git`. The last `rg` ignores
+`.gitignore` and includes hidden files; the last `fd` does the same and also
+bypasses the global ignore.
+
+Every `rg` carries `--max-columns=200 --max-columns-preview` so one minified
+line can't flood the context. If the match sits past column 200, rerun with
+`-o '.{0,40}needle.{0,40}'`.
 
 **Never search `node_modules`, `vendor`, `build`, `out`, `public`, `storage`,
-`logs` or `tmp`.** They hold third-party code, build output, uploads and logs,
-and one hit in any of them buries the results that matter. `.gitignore` usually
-keeps them out, but not every repo ignores them, and `-uu`, `-I` or a path passed
-straight to the search lets them back in. So exclude all eight by name whenever
-you widen a search, as above, and pass the same exclusions to the Grep and Glob
-tools and to any subagent you hand a search. The one exception is a task about
-something inside one of them, such as a dependency's source or a specific log.
-Then search only that folder, not the whole tree.
+`logs` or `tmp`.** Exclude all eight by name whenever you widen a search, as
+above, and in any search you hand the Grep or Glob tool or a subagent. A
+PreToolUse hook rejects a widened `rg` or `fd` that leaves one out. The
+exception is a task about something inside one of them: search only that
+folder. A project's own `.ignore` lists its other noise, and `rg`, `fd` and the
+Grep tool read it with no flags.
 
 Use `rg -l` or `rg -c` when you only need to know where something lives. `fd` also
 reads a global ignore at `~/.config/fd/ignore` that excludes only `.git/` and
@@ -103,7 +107,9 @@ reads a global ignore at `~/.config/fd/ignore` that excludes only `.git/` and
   - Find where something lives with `rg -l` or `rg -c` first, then read only the lines you need.
   - Don't re-read a file that is already in the conversation or that you just edited.
   - Run the narrowest test or lint that covers the change, and pipe long output through `tail`.
+  - Ask for the compact form first: `git diff --stat` before the full diff, `git log --oneline`, `phpunit --no-progress`, `vitest --reporter=dot`, `jest --silent`. Expand only the part that needs it.
   - Keep replies short: the answer, then what changed and what was checked.
+  - When a long session turns to unrelated work, say so and suggest a fresh session or `/compact`. Every turn resends the whole history, so old context costs more than any single search.
 
 ## Code style
 
