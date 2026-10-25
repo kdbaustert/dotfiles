@@ -50,16 +50,29 @@ Also installed: `fzf`, `zoxide`, `delta`, `lazygit`, `gitui`, `glow`, `yazi`,
 
 **`rg` and `fd` both respect `.gitignore` and both skip hidden files.** A search
 that comes back empty may be a search that never looked. When the target could be
-ignored or vendored (`node_modules`, `vendor`, `dist`, build output, lockfiles,
-anything under a dot-directory), pass the flags:
+ignored (`dist`, build output, lockfiles, anything under a dot-directory), pass
+the flags:
 
 ```sh
 rg -n 'pattern'                      # default: tracked, non-hidden
 rg -n --hidden -g '!.git' 'pattern'  # include dotfiles, still skip .git
-rg -nuu 'pattern'                    # ignore .gitignore AND include hidden
+rg -nuu -g '!{node_modules,vendor,build,out,public,storage,logs,tmp}' 'pattern'
 fd -e ts 'name'                      # smart-case, .gitignore-aware
-fd -H -I 'name'                      # hidden + no-ignore (also bypasses the global ignore)
+fd -H -I -E '{node_modules,vendor,build,out,public,storage,logs,tmp}' 'name'
 ```
+
+The last `rg` ignores `.gitignore` and includes hidden files; the last `fd` does
+the same and also bypasses the global ignore.
+
+**Never search `node_modules`, `vendor`, `build`, `out`, `public`, `storage`,
+`logs` or `tmp`.** They hold third-party code, build output, uploads and logs,
+and one hit in any of them buries the results that matter. `.gitignore` usually
+keeps them out, but not every repo ignores them, and `-uu`, `-I` or a path passed
+straight to the search lets them back in. So exclude all eight by name whenever
+you widen a search, as above, and pass the same exclusions to the Grep and Glob
+tools and to any subagent you hand a search. The one exception is a task about
+something inside one of them, such as a dependency's source or a specific log.
+Then search only that folder, not the whole tree.
 
 Use `rg -l` or `rg -c` when you only need to know where something lives. `fd` also
 reads a global ignore at `~/.config/fd/ignore` that excludes only `.git/` and

@@ -72,7 +72,22 @@ not installed as a binary and resolves to the `llt` alias.
 excludes `.git/` and `.DS_Store` and nothing else — that is signal-to-noise, not
 speed: `--hidden` was making CTRL-T list 501 files in `~/dotfiles` of which 415
 were `.git/` internals. `node_modules/`, `vendor/` and `dist/` are deliberately
-*not* in it, so the advice about passing flags still holds for them.
+*not* in it, so the advice about passing flags still holds for `dist/`.
+
+Claude is told never to search `node_modules/`, `vendor/`, `build/`, `out/`,
+`public/`, `storage/`, `logs/` or `tmp/` at all, and that rule lives in
+`CLAUDE.md` rather than in this ignore file or an rg config. Adding them here
+would also hide them from CTRL-T and every interactive `fd`, where looking inside
+a dependency or a log is sometimes the point. And `-I`, which the flag advice
+tells Claude to reach for, bypasses this file anyway, so the exclusion has to
+travel with the command as one brace glob, `-E '{node_modules,vendor,...}'`. `rg
+-g` and `fd -E` both expand the braces (checked with rg and fd on a scratch
+tree), so one flag covers all eight.
+
+`public/` is the risky entry. In a framework app it is build output, but a plain
+PHP project can keep hand-written entry points there. The exception clause in
+the rule covers a task that is about one of these folders, but a broad search
+for a symbol will now miss a match in `public/`.
 
 ## How I want you to work
 
