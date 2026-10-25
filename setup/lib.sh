@@ -225,6 +225,19 @@ link_dotfiles() {
   link "$DOTFILES_DIR/.claude/CLAUDE.md" "$HOME/.claude/CLAUDE.md"
   link "$DOTFILES_DIR/.claude/REFERENCE.md" "$HOME/.claude/REFERENCE.md"
 
+  # Codex reads the same rules. It looks for its global instructions in
+  # $CODEX_HOME, AGENTS.override.md first and AGENTS.md only when the override
+  # is empty or missing. The override is the one linked, because nodeterm
+  # rewrites marked blocks inside ~/.codex/AGENTS.md: a link there would land
+  # its ~350 lines in the tracked CLAUDE.md, the same in-place-rewrite hazard
+  # as `iris setup`. The cost is that Codex stops seeing nodeterm's canvas
+  # instructions while the override exists. A copy kept in a marked block of
+  # its own beside nodeterm's was the other option, passed on because it goes
+  # stale between installs. Two config.toml lines go with this and are manual,
+  # like settings.json; CLAUDE.md carries them.
+  mkdir -p "${CODEX_HOME:-$HOME/.codex}"
+  link "$DOTFILES_DIR/.claude/CLAUDE.md" "${CODEX_HOME:-$HOME/.codex}/AGENTS.override.md"
+
   # The Notification hook script. ~/.claude/settings.json points at it but is
   # NOT tracked here — it is mostly state Claude writes itself — so the hook
   # block has to be pasted in by hand once per machine. notify.sh's own header
