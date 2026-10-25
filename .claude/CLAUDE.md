@@ -126,6 +126,15 @@ nested conditionals; and no comment or docstring that only restates the code. A
 repo that documents its *reasoning* in comments (`~/dotfiles` does) overrides that
 last one, as repo convention always does.
 
+Name each function for what it actually does, as closely as one name can say
+it. A reader should be able to guess the body from the name and be right,
+side effects included: a `getClaim()` that also marks the claim as read is
+`fetchClaimAndMarkRead()`, and `handleData()` or `process()` says nothing at
+all. When an edit changes what a function does, rename it in the same edit. If
+no honest name fits without two "and"s, the function is doing too much. This
+covers functions you add or change. A misleading name you only read gets
+mentioned, not renamed, under *find the smallest change that works*.
+
 ## Tests
 
 Write tests the way a developer on the team would. Read the tests already in the
