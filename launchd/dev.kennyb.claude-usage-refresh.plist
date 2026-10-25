@@ -11,6 +11,12 @@
   symlinked out of the repo unmodified, like everything else install.sh
   deploys, so it can't carry a machine-specific path.
 
+  The same tick then runs .claude/hooks/resume-after-limit.sh - -sweep, which
+  resumes any session that stopped on the usage limit once the cache shows the
+  limit has reset. It rides on this job rather than having its own because it
+  needs a cache refreshed just before it looks, and `;` in one job is the only
+  ordering launchd guarantees. Its header covers the rest.
+
   Indented with spaces, not the tabs plutil and Xcode emit by default:
   .editorconfig's [*] section governs every file here except CSS/SCSS, and
   there is no .plist exemption.
@@ -23,7 +29,7 @@
   <array>
     <string>/bin/zsh</string>
     <string>-c</string>
-    <string>exec "$HOME/.claude/statusline.sh" --refresh</string>
+    <string>"$HOME/.claude/statusline.sh" --refresh; exec "$HOME/.claude/hooks/resume-after-limit.sh" --sweep</string>
   </array>
   <key>StartInterval</key>
   <integer>300</integer>

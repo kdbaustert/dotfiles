@@ -237,6 +237,12 @@ link_dotfiles() {
   link "$DOTFILES_DIR/.claude/hooks/search-excludes.sh" \
     "$HOME/.claude/hooks/search-excludes.sh"
 
+  # The StopFailure hook that resumes a session after the usage limit resets.
+  # Same manual settings.json step; its header carries the block and explains
+  # the --sweep half the usage-refresh LaunchAgent and systemd unit run.
+  link "$DOTFILES_DIR/.claude/hooks/resume-after-limit.sh" \
+    "$HOME/.claude/hooks/resume-after-limit.sh"
+
   # The status line command — the plan's 5-hour and 7-day usage windows on
   # screen at all times, rather than only when /usage is asked. Same
   # untracked-settings story as the hook above: the script deploys, the

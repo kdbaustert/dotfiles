@@ -8,6 +8,11 @@
 # path. systemd expands %h to the user's home directory, which is why this
 # needs no `sh -c` wrapper — the plist does only because launchd has no
 # equivalent specifier.
+#
+# The second ExecStart is the resume sweep, run after the refresh for the same
+# reason the plist chains them: it reads the cache the first line just wrote.
+# A oneshot runs its ExecStart lines in order and has no start timeout by
+# default, so a long resume is not killed partway.
 
 [Unit]
 Description=Refresh the Claude Code usage cache read by the status line
@@ -16,3 +21,4 @@ Documentation=file:%h/.claude/statusline.sh
 [Service]
 Type=oneshot
 ExecStart=%h/.claude/statusline.sh --refresh
+ExecStart=%h/.claude/hooks/resume-after-limit.sh --sweep

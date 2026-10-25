@@ -16,7 +16,7 @@ file staged here for deployment to `~/.claude/` — it is not about this repo.
 `~/.zshrc`, `~/.zprofile`, `~/.profile` (a second link to `.zprofile`),
 `~/.zshenv`, `~/.gitconfig`, `~/.editorconfig`, `~/.prettierrc`,
 `~/.claude/CLAUDE.md`, `~/.claude/REFERENCE.md`, `~/.claude/hooks/notify.sh`,
-`~/.claude/hooks/search-excludes.sh`, `~/.claude/statusline.sh`, every `~/.claude/skills/<skill>` directory and every
+`~/.claude/hooks/search-excludes.sh`, `~/.claude/hooks/resume-after-limit.sh`, `~/.claude/statusline.sh`, every `~/.claude/skills/<skill>` directory and every
 `~/.config/<tool>` entry are symlinks into this repo. **Edit the file in `~/dotfiles`.** Never write to the
 `$HOME` path. One exception: `~/.hushlogin`, which `install.sh` `touch`es
 rather than links because only its existence is ever read.
@@ -63,7 +63,7 @@ Known offenders:
 | `iterm/`, `obsidian/` | App-specific config                                            |
 | `.claude/CLAUDE.md`   | Global Claude Code instructions                                   |
 | `.claude/REFERENCE.md` | The reasoning behind them, read on demand rather than every session |
-| `.claude/hooks/`      | `notify.sh`, the Notification hook (terminal-notifier / notify-send); `search-excludes.sh`, the PreToolUse hook that rejects a widened rg/fd missing the noise-folder excludes |
+| `.claude/hooks/`      | `notify.sh`, the Notification hook (terminal-notifier / notify-send); `search-excludes.sh`, the PreToolUse hook that rejects a widened rg/fd missing the noise-folder excludes; `resume-after-limit.sh`, the StopFailure hook (and launchd/systemd sweep) that resumes a session once the usage limit resets |
 | `.claude/statusline.sh` | The status line — plan usage, context, model, on every render   |
 | `.claude/skills/`     | Skills, one dir per skill — all ten vendored, none ours            |
 | `.claude/agents/`     | Custom subagents, one `.md` file per agent, ours                  |
@@ -78,7 +78,7 @@ pointing at it at all — git reads `$XDG_CONFIG_HOME/git/ignore` on its own, so
 the symlink is the whole wiring.
 
 `.claude/` is tracked in full but only partly deployed: `install.sh` links
-`CLAUDE.md`, `REFERENCE.md`, `hooks/notify.sh`, `hooks/search-excludes.sh`, `statusline.sh`, every file under `agents/`,
+`CLAUDE.md`, `REFERENCE.md`, `hooks/notify.sh`, `hooks/search-excludes.sh`, `hooks/resume-after-limit.sh`, `statusline.sh`, every file under `agents/`,
 every file under `commands/` and every directory under `skills/`, so
 `themes/my-theme.json` rides along for reference and is applied by hand. The
 installer also sweeps the retired `~/.claude/AGENTS.md` link on re-run.
@@ -183,8 +183,8 @@ rules win — these skills are reference material, not authority.
 
 `~/.claude/settings.json` is **not** tracked — it is mostly state Claude writes
 itself (model, `enabledPlugins`, the atuin hooks), so a symlink would fight it.
-That makes the three blocks wiring the deployed scripts up a manual step on a
-new machine — two under `hooks`, one at the top level:
+That makes the four blocks wiring the deployed scripts up a manual step on a
+new machine — three under `hooks`, one at the top level:
 
 ```json
 "Notification": [{ "hooks": [{ "type": "command",
@@ -200,6 +200,17 @@ The `PreToolUse` entry goes *beside* the atuin one already in that array, not in
 place of it. It is the backstop for the search-folder rule in
 `.claude/CLAUDE.md`; `.claude/REFERENCE.md` says what it checks and what it
 misses.
+
+```json
+"StopFailure": [{ "matcher": "rate_limit", "hooks": [{ "type": "command",
+  "command": "$HOME/.claude/hooks/resume-after-limit.sh" }] }]
+```
+
+Also beside whatever is already in that array. It marks a session that died on
+the usage limit; the usage-refresh LaunchAgent (and its systemd twin) then runs
+the same script with `--sweep` after each refresh and resumes the session
+headless once the cache shows the limit has reset. The script's header covers
+when it holds back and why the resume goes through a login shell.
 
 ```json
 "statusLine": { "type": "command",

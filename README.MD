@@ -171,16 +171,17 @@ hand.
 **Part of `.claude/` is deployed.** `CLAUDE.md` — Claude Code's global
 instructions, applied to every project — plus `REFERENCE.md` (the reasoning
 behind them, which Claude reads only when `CLAUDE.md` points it there),
-`hooks/notify.sh`, `hooks/search-excludes.sh`,
+`hooks/notify.sh`, `hooks/search-excludes.sh`, `hooks/resume-after-limit.sh`,
 `statusline.sh` and every directory under `skills/` are symlinked into
 `~/.claude/`. The rest of `~/.claude` is state Claude writes itself
 (`settings.json`, `settings.local.json`, `projects/`, `todos/`), so the
 directory is created and linked *into* rather than linked over.
 `.claude/themes/` is kept here for reference only; nothing links it.
 
-**Three settings blocks are manual.** All the deployed scripts are named by
+**Four settings blocks are manual.** All the deployed scripts are named by
 `~/.claude/settings.json`, which is untracked, so on a new machine add these
-under `hooks` (the `PreToolUse` one beside any entry already there):
+under `hooks` (the `PreToolUse` and `StopFailure` ones beside any entry already
+there):
 
 ```json
 "Notification": [{ "hooks": [{ "type": "command",
@@ -190,6 +191,11 @@ under `hooks` (the `PreToolUse` one beside any entry already there):
 ```json
 "PreToolUse": [{ "matcher": "Bash", "hooks": [{ "type": "command",
   "command": "$HOME/.claude/hooks/search-excludes.sh" }] }]
+```
+
+```json
+"StopFailure": [{ "matcher": "rate_limit", "hooks": [{ "type": "command",
+  "command": "$HOME/.claude/hooks/resume-after-limit.sh" }] }]
 ```
 
 and this at the top level:
@@ -205,6 +211,9 @@ questions. Hooking `Stop` as well would banner every single turn.
 `hooks/search-excludes.sh` stops Claude running an `rg` or `fd` that skips the
 ignore files without also excluding `node_modules`, `vendor` and the other
 noise folders.
+`hooks/resume-after-limit.sh` picks a session back up by itself when it stopped
+on the usage limit: once the limit resets, the usage-refresh LaunchAgent resumes
+it in the background and a banner says so.
 
 `statusline.sh` keeps the plan's usage on screen as four bars, one per window,
 each coloured green → yellow → orange → red as it fills:
