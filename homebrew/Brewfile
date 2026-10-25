@@ -61,6 +61,20 @@ brew "zlib"
 brew "assh"
 # brew "procs"  # nix: setup/nixos-packages.nix (NixOS equivalent)
 # brew "ripgrep"
+# ast-grep — structural code search. Call it as `ast-grep`; the short `sg`
+# alias still ships but prints a deprecation warning as of 0.51. It matches on
+# the syntax tree, so a search for a call skips comments, strings and
+# look-alike names that rg can't tell apart. It was installed by hand and left
+# undeclared; declared now so a fresh box gets it.
+brew "ast-grep"
+# typescript-language-server — also installed as a pnpm global by
+# setup/pnpm.sh, and this copy comes first on PATH. It was tried as the fix
+# for Claude Code's LSP tool failing on JS/TS in projects with no typescript of
+# their own, and it isn't one: it pulls in Homebrew's `typescript` formula,
+# which is 7.x, and the server needs a tsserver.js that 7.x no longer ships.
+# Kept anyway. Side effect: Homebrew's tsc 7 now shadows the pnpm tsc that
+# setup/pnpm.sh holds at 6 wherever /opt/homebrew/bin comes first on PATH.
+brew "typescript-language-server"
 # brew "nnn"  # nix: setup/nixos-packages.nix (NixOS equivalent)
 # node — the default Node here. nvm is loaded (see zsh/zinit.zsh) but manages no
 # versions, so this is what actually resolves. It was installed by hand and left

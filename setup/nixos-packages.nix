@@ -48,6 +48,7 @@ with pkgs;
 
   # --- The tools .zshrc and CLAUDE.md actually name ---------------------------
   ripgrep
+  ast-grep
   fd
   fzf
   jq

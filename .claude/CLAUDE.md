@@ -32,6 +32,8 @@ real binary**, `/bin/ls` or better `fd`.
 | Task | Use | Not |
 | ---- | --- | --- |
 | Search file contents | `rg` | `grep -r`, `find -exec grep` |
+| Find code by shape (calls, patterns) | `ast-grep run -p '$OBJ->save($$$)' -l php` (metavariables are uppercase; `$obj` matches only a variable named `$obj`) | regex in `rg`; `sg` (deprecated alias) |
+| A symbol's definition, references, callers | the LSP tool (PHP, Swift; TS/JS only where the project has `typescript` installed) | `rg` for the name |
 | Find files by name | `fd` | `find` |
 | List every file in a tree | `fd . -t f`, `rg --files` | `ls -R`, `tree` |
 | List one directory | `/bin/ls -la` | the aliased `ls` |
