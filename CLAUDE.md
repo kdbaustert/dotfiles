@@ -4,9 +4,27 @@ Personal macOS dotfiles (Apple silicon). Everything here is deployed into `$HOME
 as **symlinks** by `install.sh`. `README.MD` documents the repo for a human
 installing it; this file is the working contract for an agent editing it.
 
-Claude Code is the only agent that edits this repo and reads no `AGENTS.md` at
-either scope, so the rules below live in this file rather than in a sibling one
-pulled in by an `@AGENTS.md` import — a line whose deletion lost them silently.
+Claude Code and Codex both edit this repo, and both read this file. Claude Code
+reads no `AGENTS.md` at either scope, so the rules below live in this file rather
+than in a sibling one pulled in by an `@AGENTS.md` import — a line whose deletion
+lost them silently. Codex reaches it the other way round: its own discovery looks
+for `AGENTS.md`, and two lines in `~/.codex/config.toml` point it here instead.
+That file is untracked for the same reason `~/.claude/settings.json` is (Codex
+writes it), so the lines are a manual step on a new machine:
+
+```toml
+project_doc_fallback_filenames = ["CLAUDE.md"]
+project_doc_max_bytes = 65536
+```
+
+The second line is headroom, not a fix. `project_doc_max_bytes` (32 KiB by
+default) caps the project files only, not the global one, and a file over it is
+cut off at the limit with no warning: the rules at the bottom of this file are
+the ones that go. This file was 32,316 bytes when the line went in, 452 under the
+default. Measured with `codex debug prompt-input` on codex-cli 0.164, which
+prints what the model would be sent. Both lines sit at the top of `config.toml`,
+above its first `[table]`; below one, TOML scopes them to that table and Codex
+never sees them.
 
 Not to be confused with `.claude/CLAUDE.md`, which is the *global* instruction
 file staged here for deployment to `~/.claude/` — it is not about this repo.
@@ -15,7 +33,8 @@ file staged here for deployment to `~/.claude/` — it is not about this repo.
 
 `~/.zshrc`, `~/.zprofile`, `~/.profile` (a second link to `.zprofile`),
 `~/.zshenv`, `~/.gitconfig`, `~/.editorconfig`, `~/.prettierrc`,
-`~/.claude/CLAUDE.md`, `~/.claude/REFERENCE.md`, `~/.claude/hooks/notify.sh`,
+`~/.claude/CLAUDE.md`, `~/.codex/AGENTS.override.md` (a second link to it),
+`~/.claude/REFERENCE.md`, `~/.claude/hooks/notify.sh`,
 `~/.claude/hooks/search-excludes.sh`, `~/.claude/hooks/resume-after-limit.sh`, `~/.claude/statusline.sh`, every `~/.claude/skills/<skill>` directory and every
 `~/.config/<tool>` entry are symlinks into this repo. **Edit the file in `~/dotfiles`.** Never write to the
 `$HOME` path. One exception: `~/.hushlogin`, which `install.sh` `touch`es
@@ -97,11 +116,13 @@ a skill installed by hand from elsewhere survives.
 `agents/` is the same loop-not-list pattern, one level shallower: a subagent is
 discovered by a `.md` file directly under `~/.claude/agents`, so the file itself
 is what gets linked, not a containing directory. Each file's frontmatter sets
-its own `model` — `quick-lookup` (haiku) and `researcher`/`code-reviewer`/
-`feature-scout` (sonnet) for search, review, and survey work, `heavy-refactor`
-and `bug-hunter` (opus) for work that needs to hold more context to get right
-in one pass — multi-file structural changes for the former, tracing a defect
-or a missing error path across callers and callees for the latter.
+its own `model` — `quick-lookup` (haiku), `researcher`/`code-reviewer`/
+`feature-scout`/`heavy-refactor` (sonnet) for search, review, survey and
+structural work, and `bug-hunter` (opus, `effort: high`) for tracing a defect
+or a missing error path across callers and callees. `heavy-refactor` ran on
+opus until a 7-day token audit (2026-10-25) put it at 26% of all usage, ~60M
+tokens per run; `bug-hunter` was `xhigh` and another 23%. One pass on sonnet
+is still cheaper than two, and a refactor that needs opus can ask for it.
 `CLAUDE_CODE_SUBAGENT_MODEL=sonnet` in `.zshenv` is only the fallback for
 subagents with no `model:` of their own — the built-ins (Explore,
 general-purpose, Plan) — not for these. `researcher`, `code-reviewer`,
@@ -280,15 +301,18 @@ is saved to a file and Claude gets a preview plus the path (default 30000, per
 `BASH_MAX_OUTPUT_LENGTH` looks like the knob for this and isn't; on its own it
 only sizes the read-back window. `CLAUDE_AUTOCOMPACT_PCT_OVERRIDE` compacts
 earlier, because every turn resends the whole conversation; the cost is a
-summary that drops detail. The env caps live in `settings.json` and not
-`.zshenv` because the desktop app does not start through zsh.
+summary that drops detail. It is 30, not 70, because the model is `opus[1m]`:
+at 70 compaction waited until ~700k tokens, and a week's transcripts showed a
+third of all main-session spend on calls carrying 200k-700k of context. The
+env caps live in `settings.json` and not `.zshenv` because the desktop app
+does not start through zsh.
 
 ```json
 "bashOutputMaxChars": 15000,
 "env": {
   "MAX_MCP_OUTPUT_TOKENS": "15000",
   "CLAUDE_CODE_FILE_READ_MAX_OUTPUT_TOKENS": "15000",
-  "CLAUDE_AUTOCOMPACT_PCT_OVERRIDE": "70"
+  "CLAUDE_AUTOCOMPACT_PCT_OVERRIDE": "30"
 }
 ```
 
@@ -506,11 +530,6 @@ bat, btop, lsd, atuin, fsh, yazi, glow, `voltage.nvim`). Update the doc and all
 consumers together; drift between two copies of the palette is the exact failure
 that file exists to prevent. `bat` and fast-syntax-highlighting compile their
 themes into caches and need the corresponding `install.sh` steps re-run.
-
-## Git
-
-Commits are SSH-signed through 1Password. Don't disable signing, don't set a
-per-repo `user.email`, and don't commit or push unless asked.
 
 # Coding Rules
 
