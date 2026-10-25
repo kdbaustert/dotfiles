@@ -19,7 +19,10 @@
 	gpgsign = true
 [gpg]
 	format = ssh
+[commit]
+  gpgsign = true
 [gpg "ssh"]
+    program = "/Applications/1Password.app/Contents/MacOS/op-ssh-sign"
 	# NB: gpg.ssh.program is NOT set here — it is an absolute path to the
 	# 1Password app bundle and differs per platform, so it comes from the
 	# ~/.gitconfig-os include below. See the comment there.
@@ -100,6 +103,10 @@
 # apart the last time (see the header). A hand edit is the whole fix; nothing
 # needs restoring afterwards.
 [safe]
+	directory = /opt/homebrew/Library/Taps/homebrew/homebrew-core
+	directory = /opt/homebrew/Library/Taps/homebrew/homebrew-cask
+	directory = /opt/homebrew/Library/Taps/homebrew/homebrew-core
+	directory = /opt/homebrew/Library/Taps/homebrew/homebrew-cask
 	directory = /opt/homebrew/Library/Taps/homebrew/homebrew-core
 	directory = /opt/homebrew/Library/Taps/homebrew/homebrew-cask
 	directory = /opt/homebrew/Library/Taps/homebrew/homebrew-core
