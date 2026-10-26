@@ -108,7 +108,7 @@ section_nix() {
   # and Nix owns per-project environments. `nix-shell` and `nix develop` give a
   # repo a pinned toolchain without touching anything global, which Homebrew has
   # no equivalent for. Don't install through Nix what the Brewfile already has:
-  # both ship ripgrep, fd, jq, bat, eza, fzf, zoxide, starship, atuin, git,
+  # both ship ripgrep, fd, jq, bat, eza, fzf, zoxide, atuin, git,
   # delta, lazygit, neovim, node and python, and a second copy only drifts.
   #
   # Upstream's installer, not Determinate Systems'. Determinate's writes a
@@ -211,10 +211,10 @@ section_zsh() {
   # own signed release, pinned and checksummed, into ~/.local/bin (already on
   # PATH via .zprofile).
   #
-  # The release only ships .tar.zst, which is why this isn't a zinit `gh-r` block
-  # like starship — zinit's extractor handles zip/tar.gz/tar.xz/7z but not zstd.
+  # The release only ships .tar.zst, which is why this was never a zinit `gh-r`
+  # block — zinit's extractor handles zip/tar.gz/tar.xz/7z but not zstd.
   #
-  # arm64 only, matching the aarch64 pin on starship in zsh/zinit.zsh. The
+  # arm64 only, because this repo targets Apple Silicon alone. The
   # install itself is install_pay_respects in setup/lib.sh; the asset name and
   # its checksum change with the version and architecture, so they are pinned
   # here as arguments rather than guessed from `uname`.

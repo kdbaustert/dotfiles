@@ -196,6 +196,49 @@ fi
 # be too late. Runs once per regeneration; see zcache in zsh/extra/cache.zsh.
 setopt PROMPT_SUBST   # required for the lazy form below; zinit.zsh also sets it
 zcache_post_starship() { sed "s|^PROMPT2=\"\\\$(\(.*\))\"\$|PROMPT2='\$(\1)'|" }
+
+# starship comes from its own official installer
+# (https://starship.rs/install.sh), not Homebrew and not zinit, installed to
+# ~/.local/bin, the directory .zprofile already puts on $PATH for hand-installed
+# binaries. homebrew/Brewfile keeps it commented out, so this check is the only
+# thing that installs it.
+#
+# It sits here, right above the zcache line, because zcache no-ops when the
+# binary is missing. It used to live in zsh/zinit.zsh, which is sourced further
+# down, so on a fresh machine the first shell installed starship after the
+# prompt init had already been skipped and came up with no prompt.
+#
+# History: it was first a zinit gh-r binary, which made it the one plugin loaded
+# eagerly (a prompt can't be turbo-deferred) and put zinit's plugin-load
+# machinery (~16ms, the largest entry in `zprof`) on the critical path. Then it
+# moved to Homebrew, and then to the upstream installer once
+# `starship --version` showed the two builds diverging. This way there is
+# exactly one updater (`~/.local/bin/starship` re-running its own installer)
+# instead of brew and starship both claiming the binary.
+#
+# The check costs one `command -v` per shell startup and only shells out to
+# curl when the binary is actually missing: a fresh machine, or this one after
+# `~/.local/bin/starship` gets removed by hand.
+#
+# `command touch` after install matters: zcache (zsh/extra/cache.zsh)
+# invalidates its `starship init zsh` cache by comparing the binary's mtime to
+# the cache's, on the assumption an install always leaves a fresher binary —
+# true for a brew pour, but the official installer's tarball preserves the
+# upstream release's original build timestamp instead of setting it to install
+# time. A binary dated earlier than an existing cache silently keeps that
+# stale cache forever (hit once already: an old cache with Homebrew's
+# `/opt/homebrew/bin/starship` baked into `$PROMPT` outlived the switch to
+# this installer). Touching the binary after every install restores the
+# "newer install invalidates the cache" invariant zcache relies on.
+if ! command -v starship >/dev/null 2>&1; then
+  print -P "%F{33}▓▒░ %F{160}Installing starship (https://starship.rs)…%f"
+  command mkdir -p "$HOME/.local/bin"
+  curl -sS https://starship.rs/install.sh | sh -s -- -y -b "$HOME/.local/bin" \
+    && command touch "$HOME/.local/bin/starship" \
+    && print -P "%F{34}▓▒░ Installation successful.%f" \
+    || print -P "%F{160}▓▒░ Install failed.%f"
+fi
+
 zcache starship starship init zsh
 
 #------------------------------------------------------------------------------

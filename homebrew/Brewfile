@@ -12,10 +12,16 @@ brew "tmux"
 brew "gnupg"
 brew "openssl"
 brew "wget"
-# fzf — now fetched by zinit as a gh-r binary (zsh/zinit.zsh section 5), not
-# installed here. Left declared, commented, so the package isn't lost from
-# this list.
-# brew "fzf"
+# fzf, and bat, lsd, fd, zoxide, git-delta, ripgrep and vivid below, are back
+# here after a stretch as zinit gh-r binaries. Homebrew copies got installed
+# anyway, so each tool existed twice: interactive shells ran zinit's once its
+# turbo load finished, while scripts and agent tool calls, which never load
+# zinit, ran Homebrew's. delta had already split (zinit 0.19.2, Homebrew
+# 0.20.1), the same shape as the atuin break described at its entry. One owner
+# for every CLI binary, and it has to be the one every non-interactive caller
+# can see. It also takes zinit's eager plugin load for fzf, zoxide and vivid
+# off the startup path.
+brew "fzf"
 brew "git-lfs"
 brew "httpie"
 brew "jq"
@@ -42,25 +48,23 @@ brew "lolcat"
 brew "ccat"
 brew "navi"
 brew "ffmpeg"
-# bat, lsd, fd, zoxide, git-delta, ripgrep — now fetched by zinit as gh-r
-# binaries (zsh/zinit.zsh section 5), not installed here. Left declared,
-# commented, so the packages aren't lost from this list.
-# brew "bat"
+# bat, lsd, fd, zoxide, git-delta, ripgrep: see the fzf entry.
+brew "bat"
 brew "ox"
 brew "mdcat"
 brew "xplr"
 brew "glow"
-# brew "lsd"
-# brew "fd"
+brew "lsd"
+brew "fd"
 brew "sqlite"
 brew "zlib"
-# brew "zoxide"
-# brew "git-delta"
+brew "zoxide"
+brew "git-delta"
 brew "lazygit"
 brew "eza"
 brew "assh"
 brew "procs"
-# brew "ripgrep"
+brew "ripgrep"
 # ast-grep — structural code search. Call it as `ast-grep`; the short `sg`
 # alias still ships but prints a deprecation warning as of 0.51. It matches on
 # the syntax tree, so a search for a call skips comments, strings and
@@ -87,10 +91,8 @@ brew "pnpm"
 # The caching half, nix-direnv, is not a formula; .config/direnv/direnvrc
 # fetches it pinned and checksummed. The zsh hook is the zcache line in .zshrc.
 brew "direnv"
-# vivid — now fetched by zinit as a gh-r binary (zsh/zinit.zsh section 5), not
-# installed here. Left declared, commented, so the package isn't lost from
-# this list.
-# brew "vivid"
+# vivid: see the fzf entry.
+brew "vivid"
 brew "imagemagick"
 brew "nss"
 brew "shfmt"
@@ -111,11 +113,13 @@ brew "stylua"
 # as sh.atuin.daemon, and a brew service would be a second one on the same
 # socket.
 brew "atuin"
-# starship — the prompt. Previously fetched as a gh-r binary by zinit, which
-# forced zinit to load eagerly (a prompt can't be turbo-deferred) and put ~16ms
-# of plugin machinery on the critical path. Declared here so it's installed like
-# every other CLI binary; zsh/zinit.zsh no longer mentions it.
-brew "starship"
+# starship — the prompt. Not installed here: zsh/zinit.zsh runs the official
+# installer into ~/.local/bin the first time a shell finds it missing, so that
+# script is its one updater. Declaring it here as well made `brew bundle
+# check` fail on every machine where the installer had already run, and a
+# `brew bundle install` would put a second copy on PATH. Left declared,
+# commented, so the package isn't lost from this list.
+# brew "starship"
 brew "poppler"
 brew "sevenzip"
 # zstd — provides unzstd, which install.sh needs to unpack the pay-respects

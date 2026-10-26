@@ -1,38 +1,26 @@
 #==============================================================================
 #  zinit — plugin manager bootstrap + plugins
 #------------------------------------------------------------------------------
-#  Philosophy: zinit manages zsh *plugins*, and also most CLI *binaries* —
-#  fetched as prebuilt gh-r releases rather than left to Homebrew. Two tools
-#  are the exception and stay on Homebrew on purpose: eza and navi ship no
-#  macOS release asset at all (checked against their latest GitHub releases on
-#  2026-09-14 — every asset is Linux/Windows only), so there is no binary for
-#  zinit to fetch. starship is neither zinit- nor Homebrew-managed; it comes
-#  from its own official install script, kept below. Everything else Homebrew
-#  still installs (openssl, zlib, nss, …) is a library or system dependency,
-#  not a CLI binary, and is out of scope here.
+#  Philosophy: zinit manages zsh *plugins* only. CLI binaries come from
+#  homebrew/Brewfile; starship is the one exception, installed by its own
+#  official script from .zshrc, just above its `zcache starship` line.
 #
-#  This reintroduces the exact risk this file used to avoid entirely — the
-#  arm64/x86_64 gh-r asset-naming mismatches that previously broke mcfly — so
-#  every ice in section 5 pins an exact `bpick` verified against the release's real
-#  asset list (`gh api repos/<org>/<repo>/releases/latest --jq
-#  '.assets[].name'`) rather than trusting zinit's OS/arch autodetection.
-#  Re-verify `bpick` if a tool's upstream renames its release assets.
-#
-#  It also breaks the "everything here is turbo-deferred" property this file
-#  used to guarantee: fzf, zoxide and vivid are `zcache`'d synchronously
-#  in .zshrc immediately after this file is sourced (eval "$(zoxide init
-#  zsh)" and friends), so those three load eagerly in section 5, with no `wait`
-#  ice — a turbo-deferred one would not exist on $PATH yet when .zshrc gets to
-#  them. bat, fd, delta, lsd and ripgrep are only ever referenced from aliases,
-#  zstyles and fzf-tab previews (never eval'd at startup), so those stay
-#  turbo-deferred like the rest of the file.
+#  This file used to fetch fzf, zoxide, vivid, bat, fd, delta, lsd, ripgrep and
+#  atuin as gh-r release binaries in a section 5. That went for two reasons.
+#  Homebrew copies kept getting installed beside them, and only interactive
+#  shells load zinit, so scripts and agent tool calls ran one build while the
+#  prompt ran another: atuin's daemon rejecting its own shell hooks for three
+#  days, and delta at 0.19.2 vs 0.20.1, both came from that. And fzf, zoxide
+#  and vivid are `zcache`'d synchronously in .zshrc right after this file is
+#  sourced, so they had to load eagerly, putting zinit's plugin-load machinery
+#  on the startup path. With that section gone, everything below is
+#  turbo-deferred again. homebrew/Brewfile has the matching note at fzf.
 #
 #  File order is deliberate and is the one thing to preserve when editing:
 #    1. Bootstrap          — clone/source zinit itself
 #    2. Helper functions   — referenced by ices below, so must exist first
 #    3. Plugin config      — every var a plugin reads AT SOURCE TIME
 #    4. Plugin loading     — zsh *plugins* (completions, highlighting, …)
-#    5. CLI binaries       — gh-r fetched programs (bat, fd, fzf, zoxide, …)
 #
 #  Sections 3 and 4 used to be interleaved, which made "this must be set before
 #  the plugin loads" a property of where a line happened to sit rather than
@@ -64,47 +52,6 @@ autoload -Uz _zinit
 ZINIT[ZCOMPDUMP_PATH]="${ZSH_CACHE_DIR:-$HOME/.cache/zsh}/zcompdump"
 
 setopt PROMPT_SUBST
-
-# Prompt: starship comes from its own official installer
-# (https://starship.rs/install.sh), not Homebrew and not zinit's gh-r fetcher,
-# installed to ~/.local/bin — the directory .zprofile already puts on $PATH for
-# hand-installed binaries. It is initialised from .zshrc via the cached
-# `starship init zsh` output.
-#
-# It used to be fetched here as a gh-r binary, which made it the ONE plugin
-# loaded eagerly — a prompt cannot be turbo-deferred, since it has to exist
-# before the first prompt is drawn. That put zinit's full plugin-load machinery
-# (~16ms, the single largest entry in `zprof`) on the critical path just to put
-# one binary on $PATH and eval its init. It then moved to Homebrew for the same
-# reason every other CLI binary here was — until now, when it moved again to
-# the upstream installer script; `starship --version` output already showed
-# the two builds diverging, and this way there is exactly one updater
-# (`~/.local/bin/starship` re-running its own installer) instead of brew and
-# starship both claiming to own the binary.
-#
-# The check below costs one `command -v` per shell startup (a single stat,
-# same budget class as the zinit bootstrap check above) and only shells out to
-# curl the one time the binary is actually missing — a fresh machine, or this
-# one after `~/.local/bin/starship` gets removed by hand.
-#
-# `command touch` after install matters: zcache (zsh/extra/cache.zsh)
-# invalidates its `starship init zsh` cache by comparing the binary's mtime to
-# the cache's, on the assumption an install always leaves a fresher binary —
-# true for a brew pour, but the official installer's tarball preserves the
-# upstream release's original build timestamp instead of setting it to install
-# time. A binary dated earlier than an existing cache silently keeps that
-# stale cache forever (hit once already: an old cache with Homebrew's
-# `/opt/homebrew/bin/starship` baked into `$PROMPT` outlived the switch to
-# this installer). Touching the binary after every install restores the
-# "newer install invalidates the cache" invariant zcache relies on.
-if ! command -v starship >/dev/null 2>&1; then
-  print -P "%F{33}▓▒░ %F{160}Installing starship (https://starship.rs)…%f"
-  command mkdir -p "$HOME/.local/bin"
-  curl -sS https://starship.rs/install.sh | sh -s -- -y -b "$HOME/.local/bin" \
-    && command touch "$HOME/.local/bin/starship" \
-    && print -P "%F{34}▓▒░ Installation successful.%f" \
-    || print -P "%F{160}▓▒░ Install failed.%f"
-fi
 
 #------------------------------------------------------------------------------
 # 2. Helper functions
@@ -510,64 +457,3 @@ zinit wait lucid for \
   as"program" pick"zsh-bench" \
     romkatv/zsh-bench \
   romkatv/zsh-prompt-benchmark
-
-#------------------------------------------------------------------------------
-# 5. CLI binaries (gh-r) — macOS only
-#------------------------------------------------------------------------------
-# Prebuilt release binaries fetched straight from GitHub instead of Homebrew.
-#
-# Every `bpick` below names a darwin asset. The block can't move to
-# zsh/os/macos-interactive.zsh (the usual home for macOS-only code): that file
-# is sourced late in .zshrc, after the `zcache fzf/zoxide/vivid` lines
-# that need these three binaries on $PATH already.
-
-# `bpick` is pinned to the exact asset filename for aarch64 (Apple Silicon) —
-# verified 2026-09-14 with:
-#   gh api repos/<org>/<repo>/releases/latest --jq '.assets[].name'
-# and the archive layout confirmed with `tar -tzf` before writing each `pick`,
-# because guessing here is exactly how mcfly broke last time (see the header).
-# Homebrew still lists all of these (homebrew/Brewfile, commented out per
-# entry) so the packages aren't lost, just not what installs them anymore.
-#
-# fzf, zoxide, vivid — NOT `wait`-deferred. .zshrc zcache's each of
-# these (`zoxide init zsh`, `fzf --zsh`, `vivid generate`) synchronously right
-# after this file is sourced, so a turbo-deferred binary would not exist on
-# $PATH yet when those evals run. Loading them here puts zinit's plugin-load
-# machinery back on the critical path for these three — the exact cost the
-# starship move above was written to avoid — accepted as the trade-off for not
-# depending on Homebrew for them.
-#
-# atuin was the fourth and went back to Homebrew on 2026-10-26. Its launchd
-# daemon has to run the same build as the shell hooks, and a second, Homebrew
-# copy beside this one is what broke history recording. homebrew/Brewfile has
-# the full story.
-zinit ice from"gh-r" as"program" bpick"fzf-*-darwin_arm64.tar.gz" pick"fzf"
-zinit load junegunn/fzf
-
-zinit ice from"gh-r" as"program" bpick"zoxide-*-aarch64-apple-darwin.tar.gz" pick"zoxide"
-zinit load ajeetdsouza/zoxide
-
-zinit ice from"gh-r" as"program" bpick"vivid-*-aarch64-apple-darwin.tar.gz" pick"vivid-*/vivid"
-zinit load sharkdp/vivid
-
-# bat, fd, delta, lsd, ripgrep — only ever invoked from aliases, zstyles and
-# fzf-tab previews (never eval'd at startup), so these stay turbo-deferred
-# like every zsh plugin above. Two-step ice+load, not the `for` form: with a
-# single repo ID, `for` misparses `bpick`'s glob and swallows the ID as part
-# of the previous ice (verified — it threw "No plugin or snippet ID given"
-# and silently dropped every ice after the first failure), where ice+load
-# does not.
-zinit ice wait lucid from"gh-r" as"program" bpick"bat-*-aarch64-apple-darwin.tar.gz" pick"bat-*/bat"
-zinit load sharkdp/bat
-
-zinit ice wait lucid from"gh-r" as"program" bpick"fd-*-aarch64-apple-darwin.tar.gz" pick"fd-*/fd"
-zinit load sharkdp/fd
-
-zinit ice wait lucid from"gh-r" as"program" bpick"delta-*-aarch64-apple-darwin.tar.gz" pick"delta-*/delta"
-zinit load dandavison/delta
-
-zinit ice wait lucid from"gh-r" as"program" bpick"lsd-*-aarch64-apple-darwin.tar.gz" pick"lsd-*/lsd"
-zinit load lsd-rs/lsd
-
-zinit ice wait lucid from"gh-r" as"program" bpick"ripgrep-*-aarch64-apple-darwin.tar.gz" pick"ripgrep-*/rg"
-zinit load BurntSushi/ripgrep
