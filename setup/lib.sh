@@ -565,6 +565,68 @@ bootstrap_zinit() {
 }
 
 #------------------------------------------------------------------------------
+# sync_atuin_daemon <plist> <binary>
+#------------------------------------------------------------------------------
+# Keeps atuin's launchd daemon on the same binary the zsh hooks call. Since
+# 18.24 the daemon refuses a client from a different build ("daemon is build
+# 18.24.2, client sent no build"), and the hooks send `atuin history end`'s
+# stderr to /dev/null, so a mismatch stops history from recording with no
+# message anywhere. That happened on 2026-10-23 and went unnoticed for three
+# days: a Homebrew atuin landed beside zinit's, and autostart wrote the plist
+# with whichever binary started the daemon first. atuin is Homebrew-only now
+# (homebrew/Brewfile), but autostart still writes whatever binary it ran from,
+# and 18.24 has no `atuin daemon install` to regenerate the plist, so this
+# edits its ProgramArguments in place.
+#
+# Other atuin binaries on PATH are only reported, not removed. One of them is
+# how the plist drifts, but uninstalling a package is the user's call.
+#
+# Arguments:
+#   $1  the daemon's LaunchAgent plist; skipped when missing, because autostart
+#       writes it the first time a shell needs the daemon
+#   $2  the atuin binary the shell hooks resolve: Homebrew's bin link
+sync_atuin_daemon() {
+  local plist="$1" binary="$2"
+  local current label other
+
+  if [ ! -x "$binary" ]; then
+    warning "Skipping atuin daemon check — atuin not found at $binary (brew bundle installs it)."
+    return 0
+  fi
+
+  while IFS= read -r other; do
+    [ "$other" = "$binary" ] && continue
+    warning "Second atuin at $other — remove it so only one build talks to the daemon."
+  done < <(type -ap atuin)
+
+  if [ ! -f "$plist" ]; then
+    info "No atuin daemon agent yet — autostart writes it on first use."
+    return 0
+  fi
+
+  current="$(/usr/libexec/PlistBuddy -c 'Print :ProgramArguments:0' "$plist" 2>/dev/null)"
+  if [ "$current" = "$binary" ]; then
+    info "atuin daemon already runs $binary."
+    return 0
+  fi
+
+  info "atuin daemon runs ${current:-nothing}; pointing it at $binary..."
+  label="$(/usr/libexec/PlistBuddy -c 'Print :Label' "$plist")"
+  /usr/libexec/PlistBuddy -c "Set :ProgramArguments:0 $binary" "$plist"
+
+  # bootstrap can report "5: Input/output error" while launchd is still tearing
+  # down the job bootout just stopped, even though the new one loads. So the
+  # check reads the running program back instead of trusting either exit code.
+  launchctl bootout "gui/$(id -u)/$label" &>/dev/null
+  launchctl bootstrap "gui/$(id -u)" "$plist" &>/dev/null
+  if launchctl print "gui/$(id -u)/$label" 2>/dev/null | grep -qF "program = $binary"; then
+    success "atuin daemon now runs $binary."
+  else
+    warning "atuin daemon plist updated but not reloaded — run: launchctl kickstart -k gui/$(id -u)/$label"
+  fi
+}
+
+#------------------------------------------------------------------------------
 # build_themes
 #------------------------------------------------------------------------------
 # Most of the Voltage palette is plain config that the symlink step already put

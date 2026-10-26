@@ -99,10 +99,18 @@ brew "shellcheck"
 # .config/lvim wires it into none-ls, which shells out to PATH: a Mason copy
 # would live under ~/.local/share and vanish with the editor's runtime.
 brew "stylua"
-# atuin — now fetched by zinit as a gh-r binary (zsh/zinit.zsh section 5), not
-# installed here. Left declared, commented, so the package isn't lost from
-# this list.
-# brew "atuin"
+# atuin — shell history. Back here after a stretch as a zinit gh-r binary. That
+# move put zinit's plugin machinery on the startup critical path, and it left
+# two copies installed once a Homebrew one landed anyway. On 2026-10-23 the
+# launchd daemon ran the 18.24.2 Homebrew build while the shell hooks called
+# zinit's 18.22.0, and the daemon rejected every `atuin history end`, so
+# nothing was recorded for three days. One install, and /opt/homebrew/bin/atuin
+# is a link that survives `brew upgrade`, so the daemon's plist stays valid.
+# install.sh's sync_atuin_daemon keeps the plist on it. Ignore the formula's
+# `brew services start atuin` caveat: atuin's autostart already runs the daemon
+# as sh.atuin.daemon, and a brew service would be a second one on the same
+# socket.
+brew "atuin"
 # starship — the prompt. Previously fetched as a gh-r binary by zinit, which
 # forced zinit to load eagerly (a prompt can't be turbo-deferred) and put ~16ms
 # of plugin machinery on the critical path. Declared here so it's installed like

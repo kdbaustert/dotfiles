@@ -195,7 +195,7 @@ section_claude() {
 
 #------------------------------------------------------------------------------
 section_zsh() {
-  title "zsh (pay-respects, LS_COLORS, zinit, Voltage themes)"
+  title "zsh (pay-respects, LS_COLORS, zinit, atuin daemon, Voltage themes)"
   # Everything the shell needs beyond its symlinked config, as one answer rather
   # than four. Runs after the symlinks section because the zinit and theme steps
   # launch `zsh -ic`, which has to find the linked ~/.zshrc. The order inside is
@@ -235,6 +235,11 @@ section_zsh() {
   install_ls_colors
 
   bootstrap_zinit
+
+  # The Brewfile's link, not the Cellar path behind it, which changes with
+  # every `brew upgrade` and would strand the plist.
+  sync_atuin_daemon "$HOME/Library/LaunchAgents/sh.atuin.daemon.plist" \
+    "$(brew --prefix)/bin/atuin"
 
   build_themes
 }
@@ -437,7 +442,7 @@ SECTIONS=(
   "nix|Nix, multi-user daemon"
   "symlinks|Symlink every dotfile into \$HOME"
   "claude|Claude Code plugins and the usage cache LaunchAgent"
-  "zsh|pay-respects, LS_COLORS, zinit plugins, Voltage themes (bat, syntax highlighting)"
+  "zsh|pay-respects, LS_COLORS, zinit plugins, atuin daemon, Voltage themes (bat, syntax highlighting)"
   "hosts|Hosts blocklist and its weekly LaunchDaemon"
   "touchid|Touch ID for sudo"
   "iterm|(iTerm2) Preferences"

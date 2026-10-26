@@ -19,9 +19,9 @@
 #  Re-verify `bpick` if a tool's upstream renames its release assets.
 #
 #  It also breaks the "everything here is turbo-deferred" property this file
-#  used to guarantee: fzf, zoxide, atuin and vivid are `zcache`'d synchronously
+#  used to guarantee: fzf, zoxide and vivid are `zcache`'d synchronously
 #  in .zshrc immediately after this file is sourced (eval "$(zoxide init
-#  zsh)" and friends), so those four load eagerly in section 5, with no `wait`
+#  zsh)" and friends), so those three load eagerly in section 5, with no `wait`
 #  ice — a turbo-deferred one would not exist on $PATH yet when .zshrc gets to
 #  them. bat, fd, delta, lsd and ripgrep are only ever referenced from aliases,
 #  zstyles and fzf-tab previews (never eval'd at startup), so those stay
@@ -518,8 +518,8 @@ zinit wait lucid for \
 #
 # Every `bpick` below names a darwin asset. The block can't move to
 # zsh/os/macos-interactive.zsh (the usual home for macOS-only code): that file
-# is sourced late in .zshrc, after the `zcache fzf/zoxide/atuin/vivid` lines
-# that need these four binaries on $PATH already.
+# is sourced late in .zshrc, after the `zcache fzf/zoxide/vivid` lines
+# that need these three binaries on $PATH already.
 
 # `bpick` is pinned to the exact asset filename for aarch64 (Apple Silicon) —
 # verified 2026-09-14 with:
@@ -529,21 +529,23 @@ zinit wait lucid for \
 # Homebrew still lists all of these (homebrew/Brewfile, commented out per
 # entry) so the packages aren't lost, just not what installs them anymore.
 #
-# fzf, zoxide, atuin, vivid — NOT `wait`-deferred. .zshrc zcache's each of
-# these (`zoxide init zsh`, `atuin init zsh`, `fzf --zsh`, `vivid generate`)
-# synchronously right after this file is sourced, so a turbo-deferred binary
-# would not exist on $PATH yet when those evals run. Loading them here puts
-# zinit's plugin-load machinery back on the critical path for these four —
-# the exact cost the starship move above was written to avoid — accepted as
-# the trade-off for not depending on Homebrew for them.
+# fzf, zoxide, vivid — NOT `wait`-deferred. .zshrc zcache's each of
+# these (`zoxide init zsh`, `fzf --zsh`, `vivid generate`) synchronously right
+# after this file is sourced, so a turbo-deferred binary would not exist on
+# $PATH yet when those evals run. Loading them here puts zinit's plugin-load
+# machinery back on the critical path for these three — the exact cost the
+# starship move above was written to avoid — accepted as the trade-off for not
+# depending on Homebrew for them.
+#
+# atuin was the fourth and went back to Homebrew on 2026-10-26. Its launchd
+# daemon has to run the same build as the shell hooks, and a second, Homebrew
+# copy beside this one is what broke history recording. homebrew/Brewfile has
+# the full story.
 zinit ice from"gh-r" as"program" bpick"fzf-*-darwin_arm64.tar.gz" pick"fzf"
 zinit load junegunn/fzf
 
 zinit ice from"gh-r" as"program" bpick"zoxide-*-aarch64-apple-darwin.tar.gz" pick"zoxide"
 zinit load ajeetdsouza/zoxide
-
-zinit ice from"gh-r" as"program" bpick"atuin-aarch64-apple-darwin.tar.gz" pick"atuin-*/atuin"
-zinit load atuinsh/atuin
 
 zinit ice from"gh-r" as"program" bpick"vivid-*-aarch64-apple-darwin.tar.gz" pick"vivid-*/vivid"
 zinit load sharkdp/vivid
