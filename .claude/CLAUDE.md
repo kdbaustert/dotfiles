@@ -113,7 +113,10 @@ reads a global ignore at `~/.config/fd/ignore` that excludes only `.git/` and
 
 ## Code style
 
-Before writing or changing code, read **Code style** in `~/.claude/REFERENCE.md`.
+Before writing or changing code, read **Code style** in `~/.claude/REFERENCE.md`
+and follow `~/.claude/rules/clean-code.md` and `~/.claude/rules/code-complete.md`.
+Claude Code loads both once it works with a source file. Codex never reads
+`~/.claude/rules/`, so open them before writing code.
 
 ## Tests
 
