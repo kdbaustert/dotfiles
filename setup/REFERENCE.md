@@ -446,11 +446,54 @@ near the top of `.zshrc`, and the file byte-compiles itself at the end. Anything
 you add to the critical path should be measured, and a new `eval "$(tool init
 zsh)"` should go through `zcache`, not straight into `.zshrc`.
 
+## Agent instructions
+
+The repo's own instructions live in `AGENTS.md`, and `CLAUDE.md` is a relative
+symlink to it. Codex and Claude Code each find the file under the name they look
+for, and there is only one copy of the text to drift. Set up on 2026-10-26; this
+reverses the merge described under the history below.
+
+What each tool does, measured that day with sentinel files and
+`claude -p --tools ""` on Claude Code 2.1.310:
+
+- Claude Code loads `CLAUDE.md` and follows the link. The text loads once.
+- 2.1.310 also ships a builtin plugin, `cc-plugin-agents-md`, that loads
+  `AGENTS.md`, but only where the project and its ancestors have no `CLAUDE.md`.
+  Its `instructionFiles` option (`claude plugin configure
+  cc-plugin-agents-md@builtin`) can load it beside `CLAUDE.md` instead. Set
+  that way, this repo's rules would load twice.
+- Codex reads one file per directory, `AGENTS.override.md` then `AGENTS.md` then
+  the `project_doc_fallback_filenames` names, per its docs. It takes `AGENTS.md`
+  here and never reaches the link.
+
+Why a symlink and not the other two ways to do this:
+
+- An `@AGENTS.md` import in a real `CLAUDE.md` is what this repo used before,
+  and deleting that one line dropped the rules without an error.
+- `AGENTS.md` alone, leaning on the builtin plugin, works on 2.1.310 with the
+  plugin's defaults. It breaks on an older build, which the Arch machine may be
+  running, and it breaks if the plugin is disabled or reconfigured. Both fail
+  silently.
+
+The link's weak spot is anything that replaces the file rather than writing
+into it. GNU `sed -i` turned it into a regular file holding a copy in the same
+test, and git shows that only as `typechange: CLAUDE.md`. Claude Code's Edit
+tool refuses to write through a symlink and names the target, so Claude itself
+is safe. `setup/check-agents-md.sh` checks the link is there and relative, and
+that `AGENTS.md` is under 32 KiB, Codex's default `project_doc_max_bytes`. With
+`--eval` it also asks Claude Code (haiku, paid) a question only `AGENTS.md`
+answers, and runs `codex debug prompt-input` when Codex is installed. The Codex
+half hasn't been run yet; Codex wasn't installed on the machine that wrote it.
+
+`~/.codex/config.toml` no longer needs either discovery key for this repo.
+`project_doc_fallback_filenames = ["CLAUDE.md"]` is still worth keeping for
+projects that only have a `CLAUDE.md`, such as `cnc-claims`, and
+`project_doc_max_bytes = 65536` is headroom this repo no longer relies on.
+
 ## Instruction discovery history
 
-The following records the discovery setup before portable preference merging
-was added. The current setup is described in CLAUDE.md and Portable app settings
-above; the discovery keys still require manual setup.
+The following records the discovery setup from before `AGENTS.md` came back.
+The current setup is under **Agent instructions** above.
 
 Personal macOS dotfiles (Apple silicon). Everything here is deployed into `$HOME`
 as **symlinks** by `install.sh`. `README.MD` documents the repo for a human

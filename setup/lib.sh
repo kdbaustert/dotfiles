@@ -332,10 +332,13 @@ link_dotfiles() {
   # There used to be a second file here, AGENTS.md, linked for the sake of
   # tools that DO look for it at user scope and pulled into CLAUDE.md by an
   # `@AGENTS.md` import. Claude Code never discovered it on its own — verified
-  # against 2.1.231: neither ~/.claude/AGENTS.md nor <project>/AGENTS.md is
-  # read, only CLAUDE.md is — so the import was the only thing loading it, and
+  # against 2.1.231: neither ~/.claude/AGENTS.md nor <project>/AGENTS.md was
+  # read, only CLAUDE.md was — so the import was the only thing loading it, and
   # deleting that one line lost the tooling rules silently rather than failing.
-  # Its contents now live in CLAUDE.md directly.
+  # Its contents now live in CLAUDE.md directly. (2.1.310's builtin agents-md
+  # plugin reads a project AGENTS.md where there is no CLAUDE.md, which is a
+  # project-scope change and leaves this one alone. The repo root now uses
+  # AGENTS.md with CLAUDE.md linked to it; setup/REFERENCE.md has why.)
   mkdir -p "$HOME/.claude"
   link "$DOTFILES_DIR/.claude/CLAUDE.md" "$HOME/.claude/CLAUDE.md"
   link "$DOTFILES_DIR/.claude/REFERENCE.md" "$HOME/.claude/REFERENCE.md"

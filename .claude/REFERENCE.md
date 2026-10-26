@@ -17,10 +17,12 @@ rule in `CLAUDE.md` is the only mechanism there is. A project file that override
 a rule should name the rule it overrides, so the override still reads as
 deliberate after the global file changes.
 
-Claude Code has no AGENTS.md discovery path at either scope — verified against
-2.1.231, neither `~/.claude/AGENTS.md` nor `<project>/AGENTS.md` is read — so the
-tooling contract lives in `CLAUDE.md` rather than in a sibling one pulled in by an
-`@AGENTS.md` import, which went missing silently rather than erroring.
+Claude Code had no AGENTS.md discovery path at either scope when measured on
+2.1.231, so the tooling contract lives in `CLAUDE.md` rather than in a sibling
+one pulled in by an `@AGENTS.md` import, which went missing silently rather than
+erroring. 2.1.310 added a builtin `cc-plugin-agents-md` plugin that loads a
+project's `AGENTS.md` where it has no `CLAUDE.md`. User scope on 2.1.310 hasn't
+been tested.
 
 This file is not an `@import` for the same kind of reason in reverse: an import
 is loaded eagerly, which would put every line here back into every session and

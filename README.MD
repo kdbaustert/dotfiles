@@ -247,20 +247,21 @@ every five minutes. The installers deploy and enable them. Without it the cache
 ages past its one-hour cutoff overnight and the first render of the morning has
 nothing to draw those rows from.
 
-**There is no `AGENTS.md` at either scope any more.** `.claude/` used to carry
-one alongside `CLAUDE.md` — the vendor-neutral name other agent tools read
-directly, holding the "which binary to reach for" rules (`rg`, `fd`, `jq`, the
-`g`-prefixed GNU tools). Claude Code has no `AGENTS.md` discovery path, though —
-verified against 2.1.231, neither `~/.claude/AGENTS.md` nor `<project>/AGENTS.md`
-is picked up, only `CLAUDE.md` is — so an `@AGENTS.md` import line was the only
-thing loading it, and deleting that line lost the rules quietly rather than
-erroring. Those rules are now inlined in `.claude/CLAUDE.md`. `install.sh`
-removes the retired `~/.claude/AGENTS.md` symlink on its next run.
+**There is no `AGENTS.md` in `.claude/` any more.** It used to sit beside
+`CLAUDE.md`, the vendor-neutral name other agent tools read directly, holding
+the "which binary to reach for" rules (`rg`, `fd`, `jq`, the `g`-prefixed GNU
+tools). Claude Code had no `AGENTS.md` discovery path when that was measured on
+2.1.231, so an `@AGENTS.md` import line was the only thing loading it, and
+deleting that line lost the rules quietly rather than erroring. Those rules are
+now inlined in `.claude/CLAUDE.md`, and Codex gets the same file as
+`~/.codex/AGENTS.override.md`. `install.sh` removes the retired
+`~/.claude/AGENTS.md` symlink on its next run.
 
-The root of this repo carried the same pair and was merged first, for the same
-reasons: the rules for editing *this* repo are inlined directly in the top-level
-`CLAUDE.md`, since Claude Code is the only agent that edits it and one file can't
-drift from its copy.
+**The root of this repo is the other way round.** Its rules live in `AGENTS.md`,
+which Codex reads, and `CLAUDE.md` is a relative symlink to it for Claude Code.
+Edit `AGENTS.md`, and run `setup/check-agents-md.sh` afterwards: a `sed -i` on
+`CLAUDE.md` replaces the link with a copy that drifts. **Agent instructions** in
+`setup/REFERENCE.md` covers why a link and not an import.
 
 **`iris` autostarts, and `IRIS_AUTOSTART=0` opts one shell out.** It wraps the
 shell rather than plugging into zle, so it arbitrates keys against atuin,
