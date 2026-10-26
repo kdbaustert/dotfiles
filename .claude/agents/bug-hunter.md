@@ -2,7 +2,7 @@
 name: bug-hunter
 description: Hunts a codebase for existing bugs and for spots where error handling is missing, silent, or inadequate. Use when asked for a health check of a project, to find bugs, or to audit error handling rather than review a specific diff.
 tools: Read, Grep, Glob, Bash
-model: opus
+model: sonnet
 memory: project
 effort: high
 ---
