@@ -118,7 +118,7 @@ brew "stylua"
 # as sh.atuin.daemon, and a brew service would be a second one on the same
 # socket.
 brew "atuin"
-# starship — the prompt. Not installed here: zsh/zinit.zsh runs the official
+# starship — the prompt. Not installed here: .zshrc runs the official
 # installer into ~/.local/bin the first time a shell finds it missing, so that
 # script is its one updater. Declaring it here as well made `brew bundle
 # check` fail on every machine where the installer had already run, and a
@@ -158,7 +158,7 @@ brew "php-cs-fixer"
 brew "mariadb"
 brew "redis"
 brew "composer"
-# brew "wp-cli"
+brew "wp-cli"
 # brew "shopify-cli"
 # brew "theme-check"
 
@@ -204,8 +204,8 @@ cask "adguard"
 cask "balenaetcher"
 cask "brave-browser"
 cask "jetbrains-toolbox"   # was declared twice; deduplicated to this one
-cask "microsoft-office"
-cask "microsoft-teams"
+# cask "microsoft-office"
+# cask "microsoft-teams"
 cask "micro-snitch"
 cask "ngrok"
 cask "rio"
@@ -222,6 +222,11 @@ cask "utm"
 # cask "memory-cleaner"
 cask "transmission"
 cask "visual-studio-code@insiders"
+cask "blockblock"
+cask "iina"
+cask "knockknock"
+cask "lulu"
+cask "oversight"
 
 # cask "wins"
 # cask "zed"
@@ -242,6 +247,7 @@ cask "font-monaspace"
 cask "font-symbols-only-nerd-font"
 cask "font-jetbrains-mono-nerd-font"  # v3 Nerd Font — Rio + NvChad devicons need v3 glyphs
 cask "font-hack"   # plain Hack; installed here but was undeclared
+cask "font-noto-emoji"
 # "Hack Nerd Font Mono" is the family .config/ghostty/config and
 # .config/rio/config.toml actually name, and font-hack above does NOT provide it
 # (it ships only Hack-Regular/Bold/Italic). The faces currently resolve from
