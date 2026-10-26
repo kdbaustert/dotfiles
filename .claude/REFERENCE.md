@@ -318,6 +318,12 @@ that has fallen behind, but that is my call.
 `delta` is invoked explicitly by the fzf-tab previews in `.zshrc`, which is why it
 is not git's pager.
 
+A confirmed force push is `git push --force-with-lease --force-if-includes`.
+`--force-with-lease` alone compares against the remote-tracking ref, and the
+`git fetch` people run before a rebase updates that ref, so the lease passes
+and a teammate's commit is dropped without a word. `--force-if-includes` also
+checks that the remote tip is in your reflog, which a fetch alone can't fake.
+
 ### Task rules
 
 - Commits are SSH-signed through 1Password's `op-ssh-sign`, and the identity follows the remote: GitHub signs as the personal identity, Bitbucket as the work one from `~/.gitconfig-work`. A verification failure in a work repo is usually the signers file. A repo with **no remote yet** signs as personal, so add the Bitbucket remote before the first commit in a work repo.
