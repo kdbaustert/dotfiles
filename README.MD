@@ -1,6 +1,6 @@
 # Kenny's dotfiles
 
-My personal dotfiles, for macOS and Arch/Manjaro. Take anything you want, but
+My personal dotfiles, for macOS on Apple silicon. Take anything you want, but
 at your own risk.
 
 You should first review the code and remove things you don't want or need.
@@ -11,14 +11,12 @@ Don't blindly use my settings unless you know what that entails.
 ```sh
 git clone https://github.com/kdbaustert/dotfiles.git ~/dotfiles
 cd ~/dotfiles
-./install.sh          # macOS (Apple silicon)
-./install-linux.sh    # Arch / Manjaro
+./install.sh
 ```
 
-Both are idempotent — safe to re-run, and re-running is how you update. Existing
-real files are backed up (`.backup-<timestamp>`) before being replaced by
-symlinks; existing symlinks are simply re-pointed. Both ask for your sudo
-password up front, and each refuses to run on the other's platform.
+It is idempotent, so it's safe to re-run, and re-running is how you update.
+Existing real files are backed up (`.backup-<timestamp>`) before being replaced
+by symlinks; existing symlinks are simply re-pointed.
 
 `install.sh` is interactive. Run bare, it asks a yes/no for every section
 (drawn with [gum](https://github.com/charmbracelet/gum), fetched pinned into
@@ -37,30 +35,12 @@ one you kept needs it.
 
 Without a terminal (piped, over ssh without `-t`) it behaves as `-y`.
 
-They are siblings rather than forks: everything that is the same on both — the
-symlinks, zinit, the theme caches, LS_COLORS, the setup-script runner — lives in
-`setup/lib.sh` and is called from each. What is left in the two scripts is only
-what Homebrew, PAM and CoreText do differently from pacman, systemd and
-fontconfig.
+The longer sections (the symlinks, zinit, the theme caches, LS_COLORS, the
+setup-script runner) live in `setup/lib.sh`, which `install.sh` sources, so the
+installer itself reads as a list of sections.
 
 `install.sh` expects Apple silicon (the `pay-respects` install in the `zsh`
 step is pinned to arm64 and skips itself elsewhere).
-`install-linux.sh` expects `pacman`, and its
-`pay-respects` step is **disabled until you fill in the checksum** — the Linux
-release asset could not be hashed from the Mac this was ported on, so the step
-warns and skips rather than installing something unverified. See the comment
-above that block.
-
-Two things on Linux are worth knowing before the first run:
-
-- **The package lists in `arch/` were transcribed, not verified.** The installer
-  checks every name against the sync database and reports the ones pacman does
-  not recognise instead of aborting, so the first run tells you what to fix.
-- **`.config/ghostty/config` is not deployed here at all.** Ghostty is macOS-only
-  in this setup, so it is the one `.config` entry the symlink step skips on
-  Linux; a re-run also removes a link an earlier one left. `.config/rio/config.toml`
-  *is* deployed and is still macOS-shaped — Rio needs `navigation.mode` off
-  `NativeTab` and `renderer.backend` off `Metal` by hand.
 
 ### What it does
 
@@ -249,10 +229,9 @@ The cache also fills in the session and week rows when the session has not seen
 them yet. The script's header has the detail.
 
 That refresher only runs while something is rendering, so a scheduled job keeps
-the cache warm when nothing is — a LaunchAgent on macOS
-(`launchd/dev.kennyb.claude-usage-refresh.plist`), a user timer on Arch
-(`systemd/claude-usage-refresh.timer`), both calling `statusline.sh --refresh`
-every five minutes. The installers deploy and enable them. Without it the cache
+the cache warm when nothing is — a LaunchAgent
+(`launchd/dev.kennyb.claude-usage-refresh.plist`) that calls
+`statusline.sh --refresh` every five minutes. `install.sh` deploys and loads it. Without it the cache
 ages past its one-hour cutoff overnight and the first render of the morning has
 nothing to draw those rows from.
 

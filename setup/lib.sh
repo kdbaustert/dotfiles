@@ -1,24 +1,16 @@
 #!/usr/bin/env bash
 #==============================================================================
-#  setup/lib.sh — the parts of the installer that are the same on every machine
+#  setup/lib.sh — the installer's reusable steps
 #------------------------------------------------------------------------------
-#  Sourced by install.sh (macOS) and install-linux.sh (Arch/Manjaro). It is NOT
-#  executable and does nothing on its own; every function here is called by one
-#  of those two.
+#  Sourced by install.sh. It is NOT executable and does nothing on its own;
+#  every function here is called from one of install.sh's sections.
 #
-#  Why a library rather than two self-contained installers: the symlink section
-#  alone is ~120 lines and changes every time a skill, an agent or a .config
-#  entry is added. Two copies of it would drift within a week, and the failure
-#  mode is the silent one this repo keeps running into — a new skill deploys on
-#  one machine and simply never appears on the other, with nothing to notice.
-#  The same argument the palette doc makes about hex values applies here.
-#
-#  What stays OUT of this file: anything a package manager, an OS service or a
-#  system path makes specific to one platform. Homebrew, Nix's Darwin notes,
-#  Touch ID and the iTerm2 prefs live in install.sh; pacman, the AUR helper and
-#  fontconfig live in install-linux.sh. If a function here
-#  ever needs an `if macos` inside it, that is the signal it belongs to the
-#  callers instead.
+#  This used to be the half shared with a Linux installer, which is gone. It
+#  stays a separate file because install.sh reads as a list of sections, and
+#  ~800 lines of symlink loops and settings merges inlined into it would bury
+#  that list. The split is the same as before: install.sh owns the section
+#  order, the prompts and anything that talks to Homebrew, launchd or system
+#  defaults; this file owns the steps those sections call.
 #
 #  Callers must set DOTFILES_DIR before sourcing.
 #==============================================================================
@@ -40,7 +32,7 @@ success() { echo -e "${COLOR_GREEN}$1${COLOR_NONE}"; }
 # spinner_run <label> <command...>
 # Runs a command while a header line (spinner + elapsed seconds) plus a
 # scrolling window of the command's own latest output lines redraws in place,
-# so a step that would otherwise sit blank for minutes (an AUR build, a silent
+# so a step that would otherwise sit blank for minutes (a brew bundle, a silent
 # download) reads as "still going, and here's what it's doing" rather than
 # "stuck". Falls back to passing output straight through when stdout isn't a
 # terminal (piped/logged runs), where cursor-movement escapes would just print
@@ -108,7 +100,7 @@ spinner_run() {
 # a summary nobody gets to read.
 ISSUES=()
 
-# print_summary — call once, at the very end of install.sh / install-linux.sh.
+# print_summary — call once, at the very end of install.sh.
 print_summary() {
   if [ ${#ISSUES[@]} -eq 0 ]; then
     success "\nNo warnings — every step completed cleanly."
@@ -264,13 +256,11 @@ PYTHON
 }
 
 #------------------------------------------------------------------------------
-# link_dotfiles <os>
+# link_dotfiles
 #------------------------------------------------------------------------------
-# Every symlink this repo deploys. <os> is `macos` or `linux` and selects the
-# .gitconfig-os target — see the [include] in .gitconfig for why that one
-# setting cannot be a runtime branch like the shell files use.
+# Every symlink this repo deploys.
 link_dotfiles() {
-  local os="$1" f item
+  local f item
 
   # Root-level dotfiles (only those that exist in the repo are linked).
   # .vimrc and .default-npm-packages were dropped from this list: neither has
@@ -279,10 +269,6 @@ link_dotfiles() {
   for f in .zshenv .zshrc .gitconfig .editorconfig .prettierrc; do
     link "$DOTFILES_DIR/$f" "$HOME/$f"
   done
-
-  # The platform half of .gitconfig, pulled in by its [include]. Both source
-  # files are tracked; only one is ever linked on a given machine.
-  link "$DOTFILES_DIR/.gitconfig-$os" "$HOME/.gitconfig-os"
 
   # The work identity that .gitconfig's includeIf pulls in for bitbucket
   # remotes, plus the allowed-signers file it points
@@ -306,8 +292,11 @@ link_dotfiles() {
 
   # Retired links, removed on re-run. Only ever unlinks a SYMLINK whose target
   # is inside $DOTFILES_DIR — a real file of the same name is left alone.
+  # .gitconfig-os pointed at .gitconfig-macos or .gitconfig-linux, the platform
+  # half of .gitconfig; with Linux support gone that half moved into .gitconfig
+  # itself and both source files were deleted, so the old link now dangles.
   for f in .gitignore .eslintrc .eslintignore .stylelintrc .prettierignore \
-           tsconfig.json; do
+           tsconfig.json .gitconfig-os; do
     if [ -L "$HOME/$f" ] && case "$(readlink "$HOME/$f")" in "$DOTFILES_DIR"/*) true ;; *) false ;; esac; then
       rm -f "$HOME/$f" && info "Removed retired symlink ~/$f"
     fi
@@ -372,7 +361,7 @@ link_dotfiles() {
 
   # The StopFailure hook that resumes a session after the usage limit resets.
   # Same manual settings.json step; its header carries the block and explains
-  # the --sweep half the usage-refresh LaunchAgent and systemd unit run.
+  # the --sweep half the usage-refresh LaunchAgent runs.
   link "$DOTFILES_DIR/.claude/hooks/resume-after-limit.sh" \
     "$HOME/.claude/hooks/resume-after-limit.sh"
 
@@ -470,29 +459,11 @@ link_dotfiles() {
     shopt -s dotglob nullglob
     for item in "$DOTFILES_DIR/.config"/*; do
       [ -e "$item" ] || continue
-      case "$(basename "$item")" in
-        .DS_Store) continue ;;
-        # ghostty is the one .config entry that is not deployed everywhere.
-        # The terminal is macOS-only in this setup and the config is written for
-        # it — macos-titlebar-style, window-colorspace and font-thicken are all
-        # no-ops in the GTK build — so linking it on Arch put a file there for a
-        # terminal that is not installed. The exclusion lives here rather than
-        # in a per-OS file because the rest of the loop is genuinely shared; see
-        # the macOS/Linux section of CLAUDE.md for which layer takes which case.
-        ghostty) [ "$os" = macos ] || continue ;;
-      esac
+      case "$(basename "$item")" in .DS_Store) continue ;; esac
       link "$item" "$HOME/.config/$(basename "$item")"
     done
     shopt -u dotglob nullglob
     sweep_dangling "$HOME/.config"
-  fi
-
-  # Retire a ghostty link left by a run from before that exclusion. Same guard
-  # as every other sweep here: a symlink pointing into this repo and nothing
-  # else, so a real directory or one someone linked from elsewhere survives.
-  if [ "$os" != macos ] && [ -L "$HOME/.config/ghostty" ] \
-    && case "$(readlink "$HOME/.config/ghostty")" in "$DOTFILES_DIR"/*) true ;; *) false ;; esac; then
-    rm -f "$HOME/.config/ghostty" && info "Removed ~/.config/ghostty — that config is macOS-only."
   fi
 }
 
@@ -506,9 +477,8 @@ link_dotfiles() {
 # Cloned, not fetched as a release: upstream publishes no tarball. Only the
 # LS_COLORS data file is used — its lscolors.sh wrapper is ignored, because it
 # hardcodes `dircolors`, which does not exist on macOS (coreutils installs GNU
-# tools g-prefixed and gnubin is off PATH by design). On Arch the unprefixed
-# name is the right one and .zshrc's probe already prefers it, so this function
-# is genuinely identical on both platforms.
+# tools g-prefixed and gnubin is off PATH by design). .zshrc runs the database
+# through `gdircolors` itself.
 #
 # Deliberately NOT a zinit plugin. Everything zinit loads is turbo-deferred to
 # after the first prompt, but LS_COLORS has to exist before the
@@ -629,9 +599,8 @@ build_themes() {
 #------------------------------------------------------------------------------
 # install_pay_respects <version> <sha256> <asset>
 #------------------------------------------------------------------------------
-# Command correction (the `fuck` alias in .zshrc). Not installed from a system
-# package manager on either platform: there is no Homebrew core formula, and the
-# tap upstream points at is a third-party repo pinning `version "nightly"` — a
+# Command correction (the `fuck` alias in .zshrc). Not installed from Homebrew:
+# there is no core formula, and the tap upstream points at is a third-party repo pinning `version "nightly"` — a
 # moving target for a tool that reads the command line. So: pull the author's
 # own signed release, pinned and checksummed, into ~/.local/bin (already on PATH
 # via .zprofile).
@@ -639,8 +608,9 @@ build_themes() {
 # The release only ships .tar.zst, which is why this isn't a zinit `gh-r` block
 # like starship was — zinit's extractor handles zip/tar.gz/tar.xz/7z, not zstd.
 #
-# Asset name and checksum are the caller's to supply because they are per
-# platform and per architecture; everything else about the install is identical.
+# Asset name and checksum are the caller's to supply because they change with
+# every version bump and with the architecture; install.sh pins both next to the
+# arm64 check that picks the asset.
 install_pay_respects() {
   local version="$1" sha256="$2" asset="$3"
   local url="https://github.com/iffse/pay-respects/releases/download/v${version}/${asset}"
@@ -678,13 +648,9 @@ install_pay_respects() {
 #------------------------------------------------------------------------------
 # CLAUDE_PLUGINS
 #------------------------------------------------------------------------------
-# The plugin set install_claude_plugins (below) installs, declared once and
-# shared by install.sh and install-linux.sh — both call
-# `install_claude_plugins "${CLAUDE_PLUGINS[@]}"` rather than each carrying its
-# own copy of the list. Same reasoning as link_dotfiles living here instead of
-# in both installers: a list that grows over time and exists twice drifts
-# silently the first time only one copy gets edited. Add a plugin by appending
-# a line; a bare name installs as `<name>@claude-plugins-official`.
+# The plugin set install_claude_plugins (below) installs; install.sh's claude
+# section calls `install_claude_plugins "${CLAUDE_PLUGINS[@]}"`. Add a plugin by
+# appending a line; a bare name installs as `<name>@claude-plugins-official`.
 #
 # A plugin from anywhere else is written `<name>@<owner>/<repo>`: the GitHub
 # repo is its marketplace, added first, and the plugin installs as
@@ -695,7 +661,7 @@ install_pay_respects() {
 # (no --json, checked on 2.1.285). A marketplace that breaks the convention
 # fails loudly as a "Failed to install" warning, not silently.
 #
-# shellcheck disable=SC2034 # read by install.sh and install-linux.sh after they source this file
+# shellcheck disable=SC2034 # read by install.sh after it sources this file
 CLAUDE_PLUGINS=(
   php-lsp          # intelephense, for cnc-claims' PHP
   swift-lsp        # SourceKit-LSP, for the Developer/ Swift projects
@@ -787,12 +753,14 @@ install_claude_plugins() {
 #     SETUP_SCRIPTS="pnpm composer" ./install.sh
 #     SETUP_SCRIPTS=all ./install.sh
 #
-# <default-list> is what `all` expands to, and it differs per platform: mas.sh
-# has no meaning on Arch.
+# <default-list> is what `all` expands to. It is the caller's rather than a
+# glob of setup/*.sh because setup/ also holds scripts that are not optional
+# extras: check-agents-md.sh, check-memory-bank.sh, and macos.sh and hosts.sh,
+# which install.sh runs as sections of their own.
 #
 # Executed directly rather than through `sh`: every script in setup/ declares a
 # bash shebang and uses bash arrays, which `sh` survives only by accident on
-# macOS (where /bin/sh is bash in POSIX mode) and not at all where it is dash.
+# macOS, where /bin/sh is bash in POSIX mode.
 run_setup_scripts() {
   local all_list="$1" s setup_script
   local requested="${SETUP_SCRIPTS:-}"

@@ -1,7 +1,7 @@
 # dotfiles
 
-Personal macOS and Arch/Manjaro dotfiles, deployed by `install.sh` and
-`install-linux.sh`. Both source `setup/lib.sh`. This is the repo contract for
+Personal macOS dotfiles, deployed by `install.sh`, which sources
+`setup/lib.sh`. This is the repo contract for
 Claude Code, Codex and any other agent that reads `AGENTS.md`;
 `.claude/CLAUDE.md` is the separate global contract.
 
@@ -60,15 +60,13 @@ This block is mandatory and verbose on purpose. Kenny reads it to see what mode 
 
 ## The one rule that breaks everything else
 
-`~/.zshrc`, `~/.zprofile`, `~/.profile` (a second link to `.zprofile`),
-`~/.zshenv`, `~/.gitconfig`, `~/.editorconfig`, `~/.prettierrc`,
-`~/.claude/CLAUDE.md`, `~/.codex/AGENTS.override.md` (a second link to it),
-`~/.claude/REFERENCE.md`, `~/.claude/hooks/notify.sh`,
-`~/.claude/hooks/search-excludes.sh`, `~/.claude/hooks/resume-after-limit.sh`, `~/.claude/statusline.sh`, every `~/.claude/skills/<skill>` directory, every
-`~/.claude/rules/<rule>.md` file and every
-`~/.config/<tool>` entry are symlinks into this repo. **Edit the file in `~/dotfiles`.** Never write to the
-`$HOME` path. One exception: `~/.hushlogin`, which `install.sh` `touch`es
-rather than links because only its existence is ever read.
+Every path the global `.claude/CLAUDE.md` lists under **Environment** as a
+symlink into `~/dotfiles` is one (`~/.profile` is a second link to
+`.zprofile`). The list lives there alone because both agents load that file in
+every project, so a copy here only cost tokens and drifted. **Edit the file in
+`~/dotfiles`.** Never write to the `$HOME` path. One exception:
+`~/.hushlogin`, which `install.sh` `touch`es rather than links because only its
+existence is ever read.
 
 The corollary is the real hazard: **never run a tool that rewrites one of these
 files in place**, because it lands in the tracked file with no indication it did.
@@ -98,35 +96,31 @@ editing vendored skills, read its provenance and conflict rules: refresh them
 from upstream and diff rather than editing them in place. Global style wins.
 The Neovim and LunarVim configs stay independent and share only voltage.nvim.
 
-## macOS and Linux
+## macOS only
 
-Deploy to both macOS and Arch/Manjaro. Keep one tracked source per setting.
-Shared installer behavior belongs in `setup/lib.sh`; OS-specific behavior belongs
-in its installer. Prefer portable values, then inline `$DOTFILES_OS` branches
-for paired values, and `zsh/os/<os>-{env,interactive}.zsh` for one-platform code.
-Read **macOS and Linux** in `setup/REFERENCE.md` before changing OS dispatch or
-terminal deployment; source order and the Ghostty exception are intentional.
+This repo targets macOS on Apple Silicon. Linux support (`install-linux.sh`,
+the Arch package lists, the systemd units, `$DOTFILES_OS`) was removed on
+2026-10-26; don't add platform branches back without being asked. Code that
+calls Apple tools, Homebrew or `~/Library` paths goes in
+`zsh/os/macos-{env,interactive}.zsh`, and .zprofile and .zshrc source those
+files by fixed path at points that matter. Read **zsh/os** in
+`setup/REFERENCE.md` before moving either source line.
 
 ## Adding or changing config
 
-Every symlink now lives in `link_dotfiles()` in `setup/lib.sh`, not in either
-installer — that is the one place to change, and changing it deploys to both
-machines at once.
+Every symlink lives in `link_dotfiles()` in `setup/lib.sh`, not in
+`install.sh`. That is the one place to change.
 
 - A new tool config goes in `.config/<tool>/` — `link_dotfiles()` links every
   `.config/*` entry automatically, so no installer change is needed.
 - A new **root-level** dotfile must be added to the `for f in ...` list in
   `link_dotfiles()` (`setup/lib.sh`), or it never gets deployed.
-- Anything that leaves a file outside this repo needs a step in an installer —
-  **and picking which one is the decision**: shared behaviour goes in
-  `setup/lib.sh`, a `defaults write` or a `launchctl` bootstrap in `install.sh`,
-  a `systemctl` or `fc-cache` call in `install-linux.sh`. Every step must be
-  **idempotent**, guarded, and print via `info`/`success`/`warning`/`error`.
-- A new package goes in `homebrew/Brewfile` *and* `arch/pkglist` (or
-  `arch/aurlist`). The Arch lists were transcribed from the Brewfile and have
-  never been checked against a live mirror; `install-linux.sh` validates every
-  name against the sync database and reports the unknown ones rather than
-  failing the transaction, so the first real run is what settles them.
+- Anything that leaves a file outside this repo needs a step in `install.sh`,
+  or in `setup/lib.sh` when it is long enough to crowd the section list. A
+  `defaults write` or a `launchctl` bootstrap goes in `install.sh`. Every step
+  must be **idempotent**, guarded, and print via
+  `info`/`success`/`warning`/`error`.
+- A new package goes in `homebrew/Brewfile`.
 - Removing a config: `link_dotfiles()` already sweeps dangling `~/.config`,
   `~/.claude/skills` and `~/.claude/agents` symlinks that point into this repo.
   Root-level retirements go in the "Retired links" list instead.
@@ -134,19 +128,16 @@ machines at once.
 ### Never hard-code a name
 
 Nothing you add or change here may name a specific user, home directory,
-machine or account. No `kenny`, no `/Users/kenny`, no `/home/kenny`, no
-`Kenny's MacBook Pro`. Resolve it when the file runs instead. This repo deploys to more than one
-machine, the macOS and Linux home roots are different, and a new machine might
-use a different account name. A literal works on the machine it was written on
+machine or account. No `kenny`, no `/Users/kenny`, no
+`Kenny's MacBook Pro`. Resolve it when the file runs instead. A new machine
+might use a different account name or hostname. A literal works on the machine it was written on
 and breaks without warning everywhere else. That is the same silent failure the
 installer loops exist to prevent.
 
 Use whatever dynamic form the file format supports:
 
-- Shell: `$HOME`, `$USER` / `$(id -un)`, `$(hostname -s)`, `$DOTFILES_OS`, and
-  `~` wherever the shell expands it.
-- systemd units: `%h`, `%u`. `systemd/claude-usage-refresh.service` is the
-  model to follow.
+- Shell: `$HOME`, `$USER` / `$(id -un)`, `$(hostname -s)`, and `~` wherever
+  the shell expands it.
 - A plist, TOML or YAML with no variables of its own: generate it or substitute
   into it from the installer at deploy time, which is how the hosts-refresh
   LaunchDaemon is built. If the tool reads a path relative to `$HOME` or
@@ -163,12 +154,12 @@ point it out; don't fix it silently as part of an unrelated change.
 
 ## Do not run `install.sh` to test a change
 
-Neither full installer is a test: they install packages and change services and
+`install.sh` is not a test: it installs packages and change services and
 system files. Test functions in isolation with temporary destinations.
 Read **Do not run `install.sh` to test a change** in `setup/REFERENCE.md` before
 verification, then run only the checks relevant to the edit. Parse shell files
-individually, and lint changed scripts plus callers. ShellCheck has eight known
-SC2015 findings across the installers and shared library; inspect findings
+individually, and lint changed scripts plus callers. ShellCheck has three known
+SC2015 findings, two in `install.sh` and one in `setup/lib.sh`; inspect findings
 rather than treating its exit status as proof of a regression.
 
 Shell startup is budgeted: keep new work off the critical path, use the existing
@@ -228,26 +219,21 @@ When you are using compact, please focus on test output and code changes
 ### Tests and evals — every time, no exceptions
 
 - Scope what you RUN by the triage size (see "Task sizing"): small and medium changes run only the tests covering the touched code; the full suite is for large and contract changes. State in the report which lane ran and why. Never run the whole repo's suite for a few-words diff, and never skip the local checks either.
-- What you WRITE still follows the rules below. "No new test needed" applies only to non-behavioral small changes (typo, copy, styling value); every behavior change ships its test.
-- Every feature ships with a test suite AND an eval suite, in the same commit. Not the next PR.
-- Every bug fix ships with a test AND an eval that would have caught the bug. The regression test is the proof the bug is fixed. The eval is the proof the fix generalizes.
-- "I'll add tests later" is banned. If the tests/evals aren't in the diff, the work isn't done.
-- Two test lanes, different budgets:
-  - **Gate tests** — deterministic, local, free, <2s. Run on every commit via pre-commit hook. Never flaky.
-  - **Periodic evals** — paid (LLM calls), slower, quality-measuring. Run before ship and nightly. Allowed to be non-deterministic but must have a pass threshold.
+- What you WRITE: every behavior change ships its test in the same diff, and every bug fix ships a regression test that fails with the bug present. "I'll add tests later" is banned. "No new test needed" applies only to non-behavioral small changes (typo, copy, styling value).
+- Evals apply only to code that calls an LLM. They are paid, slow and non-deterministic, so writing one for a shell, config or doc change buys nothing and costs a session's worth of tokens. Where a change does touch LLM-calling code, it ships an eval with a pass threshold, run before ship rather than on every commit.
 
   ### Tech choice — vanilla by default
 
 - Simplest vanilla tech wins. No framework-of-the-month. No clever abstractions for hypothetical reuse.
 - Do not recreate what already exists. Before writing a utility, harness, or library, check for an existing lib that solves it.
-- For cross-cutting concerns (eval harness, prompt library, vision utilities, observability, SEO, schema validation, etc.) grep GitHub in parallel for top candidates. Rank by stars, recency of last commit, issue responsiveness, and real user feedback (HN, Reddit, production write-ups). Return the best option with reasoning, not a list. Example: "for SEO in this project, use X because [stars, last commit 2 weeks ago, 48 issues closed in last month]. Second choice Y. Rejected Z because [last commit 14 months ago]."
+- Only when about to add a new dependency for a cross-cutting concern (eval harness, prompt library, vision utilities, observability, SEO, schema validation, etc.), search GitHub for top candidates. Don't run this survey for a change that adds no dependency. Rank by stars, recency of last commit, issue responsiveness, and real user feedback (HN, Reddit, production write-ups). Return the best option with reasoning, not a list. Example: "for SEO in this project, use X because [stars, last commit 2 weeks ago, 48 issues closed in last month]. Second choice Y. Rejected Z because [last commit 14 months ago]."
 - If two options are equally viable, name the trade-off explicitly and ask Kenny.
 
 ### Check for skills
 
 When a task matches a specialized domain (SEO, schema, security audit, design review, etc.), use the installed Claude Code skill. Don't reinvent what an installed skill already does well. Invoke via the Skill tool, not by re-implementing.
 
-**The critic per work type** (the pattern is constant, the weapon changes):
+**The critic per work type** (the pattern is constant, the weapon changes). This is the large-task critic loop; small tasks get none and medium tasks get the single pass from "Task sizing":
 
 - **Copy/parity:** real reference, blind side-by-side, visual and behavioral.
 - **New feature:** rubric plus best-in-class analog; critic uses it cold like a first-time user.
@@ -281,13 +267,6 @@ Before starting any long-running background job (batch, migration, backfill, scr
 - Never commit binaries, compiled outputs, or model weights to the repo. Use Git LFS or cloud storage with a pointer.
 - Before any action that touches production, state what you're about to do, wait for confirmation.
 
-## How Kenny wants to be talked to
-
-- Direct. Short. Concrete. No preamble.
-- Specific file names, function names, line numbers. Not "there's an issue in the classifier" — it's `food_vision/classifier.py:47`.
-- No em dashes. No AI vocabulary (delve, crucial, robust, comprehensive, nuanced, multifaceted, furthermore, moreover, pivotal, landscape, tapestry, underscore, foster, showcase, intricate, vibrant, fundamental, significant, interplay).
-- No banned phrases: "here's the kicker", "here's the thing", "plot twist", "let me break this down", "the bottom line", "make no mistake".
-- If something is broken, say so plainly.
-- End responses with the next action, not a recap of what was just done.
-
-When Kenny asks for something, the answer is the finished product — not a plan. Tests included. Evals included. Docs included.
+How to talk to Kenny lives in the global `.claude/CLAUDE.md` (*Be direct*,
+*Write like a person*) and `.claude/rules/human-writing.md`, which load in every
+project. A third copy here was dropped on 2026-10-26 to cut startup tokens.

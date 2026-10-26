@@ -16,7 +16,7 @@
 set -uo pipefail
 
 if ! command -v pnpm >/dev/null 2>&1; then
-  echo "pnpm not found — skipping. Install it first (Homebrew on macOS, pkglist on Arch)." >&2
+  echo "pnpm not found — skipping. Install it first (brew install pnpm)." >&2
   exit 0
 fi
 

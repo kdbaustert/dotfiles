@@ -2,13 +2,13 @@
 #==============================================================================
 #  zsh/os/macos-env.zsh — login environment that exists only on macOS
 #------------------------------------------------------------------------------
-#  Sourced from the end of .zprofile via $DOTFILES_OS (set in .zshenv). Login
-#  shells only: this is PATH and environment, not interactive config — the
-#  aliases and the command-not-found handler are in macos-interactive.zsh.
+#  Sourced from the end of .zprofile. Login shells only: this is PATH and
+#  environment, not interactive config — the aliases and the command-not-found
+#  handler are in macos-interactive.zsh.
 #
-#  The rule for what belongs here: a setting with no counterpart on the other
-#  platform. A setting that exists on both with a different value stays inline
-#  in .zprofile as an if/else, so the pair is visible in one place.
+#  What belongs here: Homebrew, Apple and app-bundle paths, the things that
+#  would be wrong on any other machine. A setting that only names a tool and
+#  lets $PATH find it stays in .zprofile.
 #==============================================================================
 
 #------------------------------------------------------------------------------
@@ -38,9 +38,6 @@ export INFOPATH="/opt/homebrew/share/info:${INFOPATH:-}"
 
 # Completions shipped by Homebrew formulae. compinit (run from zinit's turbo
 # block in .zshrc) picks these up from fpath.
-#
-# The Linux side needs no twin: Arch packages drop their completions into
-# /usr/share/zsh/site-functions, which is on zsh's default fpath already.
 fpath=("/opt/homebrew/share/zsh/site-functions" $fpath)
 
 # NB: brew shellenv also exported MANPATH. That is deliberately dropped — it is

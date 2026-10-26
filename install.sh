@@ -17,11 +17,9 @@ set -uo pipefail
 
 DOTFILES_DIR="${DOTFILES:-$HOME/dotfiles}"
 
-# The print helpers, link(), and every section that is identical on Arch —
-# symlinking, zinit, the theme caches, LS_COLORS, pay-respects, the setup-script
-# runner. install-linux.sh sources the same file, which is the point: the
-# symlink section changes every time a skill or a .config entry is added, and
-# two copies of it would drift silently. See setup/lib.sh's header.
+# The print helpers, link(), and the longer sections: symlinking, zinit, the
+# theme caches, LS_COLORS, pay-respects, the setup-script runner. Kept out of
+# this file so it reads as a list of sections. See setup/lib.sh's header.
 # shellcheck source=setup/lib.sh
 source "$DOTFILES_DIR/setup/lib.sh"
 
@@ -148,10 +146,8 @@ section_nix() {
 #------------------------------------------------------------------------------
 section_symlinks() {
   title "Symlinking dotfiles"
-  # Every symlink lives in setup/lib.sh so install-linux.sh deploys exactly the
-  # same set. `macos` selects which .gitconfig-os half is linked — the one setting
-  # git cannot branch on at runtime.
-  link_dotfiles macos
+  # Every symlink lives in link_dotfiles() in setup/lib.sh.
+  link_dotfiles
 }
 
 #------------------------------------------------------------------------------
@@ -163,17 +159,16 @@ section_claude() {
   # deployed by the symlinks section, which runs before this one.
 
   # See CLAUDE_PLUGINS and install_claude_plugins in setup/lib.sh — the plugin
-  # list is declared once there, shared with install-linux.sh, and installing
-  # has to be a command run again on every machine rather than a symlink like
+  # list is declared there, and installing has to be a command run again on every machine rather than a symlink like
   # the rest of .claude.
   install_claude_plugins "${CLAUDE_PLUGINS[@]}"
 
   # The usage cache LaunchAgent keeps ~/.cache/claude-usage.json warm between
   # Claude Code sessions — see the "THE REFRESHER" comment in
   # .claude/statusline.sh for why a session-less gap otherwise leaves the cache
-  # up to an hour stale. macOS-only, so it lives here rather than in
-  # link_dotfiles() (setup/lib.sh), which install-linux.sh shares and which has
-  # no LaunchAgent equivalent to reach for.
+  # up to an hour stale. It lives here rather than in link_dotfiles()
+  # (setup/lib.sh) because it needs the launchctl bootstrap below, not just a
+  # link.
   LAUNCH_AGENT_LABEL="dev.kennyb.claude-usage-refresh"
   LAUNCH_AGENT_PLIST="$HOME/Library/LaunchAgents/$LAUNCH_AGENT_LABEL.plist"
   mkdir -p "$HOME/Library/LaunchAgents"
@@ -220,9 +215,9 @@ section_zsh() {
   # like starship — zinit's extractor handles zip/tar.gz/tar.xz/7z but not zstd.
   #
   # arm64 only, matching the aarch64 pin on starship in zsh/zinit.zsh. The
-  # install itself is shared — see install_pay_respects in setup/lib.sh; only the
-  # asset name and its checksum are platform-specific, which is why they are
-  # arguments rather than something the library guesses from `uname`.
+  # install itself is install_pay_respects in setup/lib.sh; the asset name and
+  # its checksum change with the version and architecture, so they are pinned
+  # here as arguments rather than guessed from `uname`.
   # To bump: change PR_VERSION, then update PR_SHA256 from the new asset.
   PR_VERSION="0.8.8"
   PR_SHA256="e834e928dcaf9cd72a99478bb61e0630ba76e32c7b228eb3a7be9c5f404cd548"
@@ -236,9 +231,7 @@ section_zsh() {
 
   # The second LS_COLORS database (trapd00r), alongside the vivid/Voltage one
   # that .zshrc defaults to. Why it is a clone rather than a release, and why it
-  # is not a zinit plugin, is in setup/lib.sh — identical on both platforms, so
-  # the reasoning lives with the code rather than being copied into two
-  # installers.
+  # is not a zinit plugin, is in setup/lib.sh with the code.
   install_ls_colors
 
   bootstrap_zinit
@@ -401,8 +394,7 @@ section_iterm() {
 section_setup_scripts() {
   title "Optional setup scripts"
   # Opt-in and off by default — see run_setup_scripts in setup/lib.sh for how the
-  # selection works. mas.sh appears in this `all` list and not in the Linux one,
-  # because it drives the Mac App Store. macos.sh used to be here too and is now
+  # selection works. macos.sh used to be here too and is now
   # the `macos` section below, so it gets a yes/no of its own instead of hiding
   # behind an environment variable.
   #

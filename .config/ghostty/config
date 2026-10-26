@@ -8,7 +8,7 @@
 #
 # TERM travels over ssh; the terminfo entry describing it does not. Ghostty
 # ships xterm-ghostty and installs it locally, so every box that has never had
-# Ghostty on it — which is every server, container and the Arch machine here —
+# Ghostty on it — which is every server and container —
 # cannot resolve the name, and anything built on curses fails there: `tput`,
 # `clear`, less, htop, and zsh itself complaining before the prompt appears.
 # xterm-256color is the name that is present essentially everywhere.

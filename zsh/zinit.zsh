@@ -1,10 +1,8 @@
 #==============================================================================
 #  zinit — plugin manager bootstrap + plugins
 #------------------------------------------------------------------------------
-#  Philosophy: zinit manages zsh *plugins*, and on macOS also most CLI
-#  *binaries* — fetched as prebuilt gh-r releases rather than left to Homebrew
-#  (on Linux those same tools come from arch/pkglist, and section 5 is skipped
-#  entirely — see its header). Two tools
+#  Philosophy: zinit manages zsh *plugins*, and also most CLI *binaries* —
+#  fetched as prebuilt gh-r releases rather than left to Homebrew. Two tools
 #  are the exception and stay on Homebrew on purpose: eza and navi ship no
 #  macOS release asset at all (checked against their latest GitHub releases on
 #  2026-09-14 — every asset is Linux/Windows only), so there is no binary for
@@ -422,15 +420,10 @@ zinit wait lucid id-as'carapace-init' has'carapace' \
 #   - forgit              — fzf-powered git (glo, gss, gcb…); honours delta,
 #                           and is put on $PATH so `git forgit <cmd>` works
 #   - zsh-auto-notify     — desktop notification when a long command finishes.
-#                           Platform-switched upstream: osascript on Darwin,
-#                           notify-send on Linux (libnotify — install it or the
-#                           plugin prints a warning on load). This comment used
-#                           to say terminal-notifier, which the plugin never
-#                           calls on either platform; the Homebrew formula of
-#                           that name is used by zsh/extra/notify.zsh instead.
-#                           It is also why that file stays macOS-only — this
-#                           plugin already covers Linux, and two notifiers on
-#                           one machine would double-ping every slow command.
+#                           Uses osascript on macOS. This comment used to say
+#                           terminal-notifier, which the plugin never calls;
+#                           the Homebrew formula of that name is used by
+#                           zsh/extra/notify.zsh instead.
 #   - zsh-abbr            — fish-style abbreviations; store is section 3's
 #                           $ABBR_USER_ABBREVIATIONS_FILE
 #
@@ -523,18 +516,10 @@ zinit wait lucid for \
 #------------------------------------------------------------------------------
 # Prebuilt release binaries fetched straight from GitHub instead of Homebrew.
 #
-# macOS only, and the guard is a `return` rather than an `if` around forty
-# lines: this file is sourced, so `return` ends it here, and nothing follows
-# this section — which is the constraint to keep. Anything appended below
-# would silently never run, so a new section goes ABOVE this one. Every
-# `bpick` below names a darwin asset, and on Linux the same nine tools come
-# from arch/pkglist via pacman, so without this guard a Linux shell would try
-# to match `*-apple-darwin.tar.gz` against a release that has no such asset
-# on every start, for binaries already on $PATH. The block can't move to
-# zsh/os/macos-interactive.zsh (the usual home for platform-only code): that
-# file is sourced late in .zshrc, after the `zcache fzf/zoxide/atuin/vivid`
-# lines that need these four binaries on $PATH already.
-[[ $DOTFILES_OS == macos ]] || return 0
+# Every `bpick` below names a darwin asset. The block can't move to
+# zsh/os/macos-interactive.zsh (the usual home for macOS-only code): that file
+# is sourced late in .zshrc, after the `zcache fzf/zoxide/atuin/vivid` lines
+# that need these four binaries on $PATH already.
 
 # `bpick` is pinned to the exact asset filename for aarch64 (Apple Silicon) —
 # verified 2026-09-14 with:

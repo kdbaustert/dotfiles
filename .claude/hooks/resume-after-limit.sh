@@ -10,8 +10,7 @@
 #              and nothing else; it cannot wait for the reset itself, because
 #              Claude Code ignores a StopFailure hook's output and a hook that
 #              sleeps for hours just holds the session open.
-#   --sweep    run by the usage-refresh LaunchAgent (and the systemd service on
-#              Linux) every 5 minutes, straight after the cache refresh. For
+#   --sweep    run by the usage-refresh LaunchAgent every 5 minutes, straight after the cache refresh. For
 #              each marker, once the limits have room again, it resumes that
 #              session headless with a "carry on" prompt.
 #
@@ -132,8 +131,6 @@ notify_resumed() {
 
   if command -v terminal-notifier >/dev/null 2>&1; then
     terminal-notifier -title 'Claude Code' -message "$message" >/dev/null 2>&1
-  elif command -v notify-send >/dev/null 2>&1; then
-    notify-send 'Claude Code' "$message" >/dev/null 2>&1
   fi
 }
 

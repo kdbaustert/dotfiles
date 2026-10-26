@@ -12,11 +12,6 @@ alias x+="chmod +x"
 # variant that used to sit here was shadowed by it anyway, and `pkey`/`pubkey`
 # already cover copying the public key.
 alias reload="source ~/.zshrc"
-# `pbcopy` is macOS's, and on Linux it is a function defined in
-# zsh/os/linux-interactive.zsh that forwards to wl-copy or xclip. Keeping the
-# macOS name as the portable one — rather than inventing a `clipcopy` both
-# platforms have to learn — is what lets these two lines, and pkey/pubkey
-# below, stay here unbranched.
 alias shrug="echo '¯\_(ツ)_/¯' | pbcopy"
 alias genpass='LC_ALL=C tr -dc "[:alnum:]" < /dev/urandom | head -c 20 | pbcopy'
 # Exact -name, not '*.DS_Store': the glob also matches any real file whose name
@@ -35,11 +30,10 @@ alias dev="cd $HOME/Development"
 alias sites="cd $HOME/Sites"
 alias dl="cd $HOME/Downloads"
 alias dotfiles="cd $HOME/dotfiles"
-# `phpdir`, `vscode` and `icloud` name platform-specific directories and moved
-# to zsh/os/$DOTFILES_OS-interactive.zsh; the two below are the same path on
-# both machines and stay here.
+# `phpdir`, `vscode` and `icloud` name Homebrew and ~/Library directories and
+# live in zsh/os/macos-interactive.zsh.
 #
-# These were missing the `cd` that every other entry in this block has, so they
+# The two below were missing the `cd` that every other entry in this block has, so they
 # expanded to a bare path and the shell tried to *execute* the directory. The
 # inner single quotes matter for a path containing a space: $HOME is expanded
 # now, at definition time, and the quotes survive into the alias body.
@@ -111,9 +105,8 @@ alias pkey="pbcopy < ~/.ssh/github_1p.pub"
 alias pubkey="pbcopy < ~/.ssh/github_1p.pub && echo '=> Public key copied to pasteboard.'"
 
 # Power, session and OS-maintenance commands (lock, reboot, poweroff, the DNS
-# cache flush, the LaunchServices rebuild, the volume mute) are all the same
-# idea reached through completely different tools on each platform, so they live
-# in zsh/os/$DOTFILES_OS-interactive.zsh rather than as if/else pairs here.
+# cache flush, the LaunchServices rebuild, the volume mute) call Apple tools and
+# live in zsh/os/macos-interactive.zsh.
 
 # Removes all node_modules folders older than 4 months:
 alias cnodeold='find . -name "node_modules" -type d -mtime +120 | xargs rm -rf'
@@ -131,16 +124,13 @@ alias chmodssh='sudo chmod 700 ~/.ssh && chmod 600 ~/.ssh/*'
 
 alias permission='chmod +x'
 
-# `update` is the system package manager plus the language ones, so its first
-# three commands differ entirely per platform — see the OS interactive files.
+# `update` starts with Homebrew and lives in zsh/os/macos-interactive.zsh.
 
-# Recursively remove .DS_Store files. Kept portable rather than filed under
-# macOS: a shared drive or a repo touched by a Mac carries these onto Linux too,
-# and `find -delete` is the same on both.
+# Recursively remove .DS_Store files.
 alias dsnuke="find . -name '*.DS_Store' -type f -ls -delete"
 
-# `chromekill` matches on the macOS helper-process name and moved to the OS
-# files; the Linux renderer processes are named differently.
+# `chromekill` matches on the macOS helper-process name and lives in
+# zsh/os/macos-interactive.zsh.
 
 # IP addresses
 alias ip="dig +short myip.opendns.com @resolver1.opendns.com"

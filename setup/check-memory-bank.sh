@@ -40,7 +40,7 @@ skip() { echo "skip: $1"; }
 # Without rg, every name check below would report the name missing from every
 # file, which reads like broken wiring rather than a missing tool.
 if ! command -v rg >/dev/null 2>&1; then
-  echo "FAIL: rg not found; it's in homebrew/Brewfile and arch/pkglist" >&2
+  echo "FAIL: rg not found; it's in homebrew/Brewfile" >&2
   exit 1
 fi
 

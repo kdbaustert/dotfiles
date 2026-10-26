@@ -2,15 +2,13 @@
 #==============================================================================
 #  zsh/os/macos-interactive.zsh — interactive config that exists only on macOS
 #------------------------------------------------------------------------------
-#  Sourced from .zshrc via $DOTFILES_OS, AFTER zsh/aliases.zsh (so anything here
-#  can override a portable alias) and after the tool-integration block (so the
+#  Sourced from .zshrc AFTER zsh/aliases.zsh (so anything here can override a
+#  portable alias) and after the tool-integration block (so the
 #  command-not-found handler below is the last one defined — see .zshrc).
 #
-#  What belongs here: aliases and integrations with no counterpart on Linux, or
-#  whose two versions share nothing but intent. A setting that is the same knob
-#  with a different value stays inline in the shared file so the pair is
-#  visible — `pbcopy` is deliberately NOT redefined here for that reason: it is
-#  a real macOS binary, and the Linux file provides the shim instead.
+#  What belongs here: aliases and integrations that call Apple tools, Homebrew
+#  or paths under ~/Library. Aliases that only need ordinary CLI tools stay in
+#  zsh/aliases.zsh.
 #==============================================================================
 
 #------------------------------------------------------------------------------
@@ -71,10 +69,8 @@ alias resetlsd=fixlsd
 # Clean up LaunchServices to remove duplicates in the “Open With” menu
 alias lscleanup="/System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister -kill -r -domain local -domain system -domain user && killall Finder"
 
-# Delete all screenshots from the Desktop. macOS-only because of the filename:
-# it is the "Screenshot 2026-09-13 at 10.41.02.png" / "Screen Shot …" pair the
-# system writes. Linux screenshot tools each name their own way, so there is no
-# faithful equivalent to pair this with.
+# Delete all screenshots from the Desktop. Matches the
+# "Screenshot 2026-09-13 at 10.41.02.png" / "Screen Shot …" names macOS writes.
 alias rmshots="find ~/Desktop -maxdepth 1 -type f \( -name 'Screenshot *.png' -o -name 'Screen Shot *.png' \) -print -delete"
 
 # Kill all the tabs in Chrome to free up memory
@@ -87,9 +83,5 @@ alias chromekill="ps ux | grep '[C]hrome Helper --type=renderer' | grep -v exten
 alias brewf='$(brew --prefix)'
 alias ibrew='arch -x86_64 /usr/local/bin/brew'
 
-# Everything the machine can update in one go. The tail (npm/composer/zinit) is
-# identical on Linux; only the package-manager head differs, which is why the
-# whole alias is duplicated per platform rather than split into two halves —
-# a `$PKG_UPDATE` variable spliced into a shared string would be harder to read
-# than the two plain lines it saves.
+# Everything the machine can update in one go.
 alias update='brew update; brew upgrade; brew cleanup; npm install npm -g; npm update -g; composer global update; zinit update'
