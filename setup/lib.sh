@@ -825,6 +825,64 @@ install_claude_plugins() {
 }
 
 #------------------------------------------------------------------------------
+# install_tweakcc
+#------------------------------------------------------------------------------
+# Builds tweakcc from a pinned commit into ~/.local/share/tweakcc and links its
+# CLI to ~/.local/bin/tweakcc. It only installs the tool; running `tweakcc
+# --apply --yes` stays a manual step after each `claude update`, and the config
+# it reads is the tracked .config/tweakcc/config.json that link_dotfiles links.
+#
+# Built from source, not `npm i -g tweakcc`, because 4.4.0 on npm (2026-10-10)
+# is killed at about 12 GB on Claude Code 2.1.310 and the fix (tweakcc #1053)
+# has no release yet. Move the pin to a release and switch to npm once one
+# ships. Pinned to a commit rather than main so a bad push upstream can't break
+# the install, the same reason pay-respects is pinned. Rejected: a checkout in
+# ~/Developer, which is for projects Kenny works on, not tools the installer
+# owns.
+#
+# Re-runs are cheap: the build only repeats when the checkout moved to a new
+# pin or dist is missing.
+TWEAKCC_COMMIT="e030828f6fb5a832e7cda68fbefd100762b97591"
+
+install_tweakcc() {
+  local dir="${XDG_DATA_HOME:-$HOME/.local/share}/tweakcc"
+  local needs_build=0
+
+  if ! command -v git &>/dev/null || ! command -v pnpm &>/dev/null; then
+    warning "Skipping tweakcc — it needs git and pnpm, both from the Brewfile (run the brew section first)."
+    return 0
+  fi
+
+  if [ "$(git -C "$dir" rev-parse HEAD 2>/dev/null)" != "$TWEAKCC_COMMIT" ]; then
+    info "Fetching tweakcc ${TWEAKCC_COMMIT:0:7}..."
+    # Fetching one commit by hash works on GitHub and avoids cloning the whole
+    # history just to check out a pin.
+    if ! { mkdir -p "$dir" \
+      && git -C "$dir" init --quiet \
+      && { git -C "$dir" remote add origin https://github.com/Piebald-AI/tweakcc 2>/dev/null \
+        || git -C "$dir" remote set-url origin https://github.com/Piebald-AI/tweakcc; } \
+      && git -C "$dir" fetch --quiet --depth=1 origin "$TWEAKCC_COMMIT" \
+      && git -C "$dir" checkout --quiet --force FETCH_HEAD; }; then
+      warning "Could not fetch tweakcc — skipping it."
+      return 0
+    fi
+    needs_build=1
+  fi
+
+  if [ "$needs_build" = 1 ] || [ ! -f "$dir/dist/index.mjs" ]; then
+    info "Building tweakcc..."
+    # HUSKY=0: its prepare script would point the clone's git hooks at itself.
+    if ! (cd "$dir" && HUSKY=0 pnpm install --frozen-lockfile --silent && pnpm --silent build >/dev/null); then
+      warning "tweakcc build failed — skipping it. Re-run the claude section to retry."
+      return 0
+    fi
+  fi
+
+  mkdir -p "$HOME/.local/bin"
+  link "$dir/dist/index.mjs" "$HOME/.local/bin/tweakcc"
+}
+
+#------------------------------------------------------------------------------
 # run_setup_scripts <default-list>
 #------------------------------------------------------------------------------
 # Opt-in, and off by default: these pull down a lot of global packages.

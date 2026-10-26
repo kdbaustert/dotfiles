@@ -299,7 +299,12 @@ install, so the environment variable is the only switch that works (tweakcc's
 README, "Keep customizations across Claude Code updates"). Update by hand with
 `claude update`, then re-run `tweakcc --apply --yes`. On 2026-10-26 tweakcc 4.4.0
 was killed at about 12 GB on Claude Code 2.1.310, and the fix (tweakcc #1053)
-was on `main` but unreleased, so it was built from `~/Developer/tweakcc`.
+was on `main` but unreleased, so `install_tweakcc()` (the `claude` section)
+builds the commit pinned in `TWEAKCC_COMMIT` into `~/.local/share/tweakcc` and
+links `~/.local/bin/tweakcc` to it. It installs the tool and does not apply it:
+`claude update` and `tweakcc --apply --yes` stay manual. When a release newer
+than 4.4.0 ships, drop the pin and install from npm. A checkout made by hand in
+`~/Developer/tweakcc` is not used by the installer and can be deleted.
 
 `.config/tweakcc/config.json` is the one file of tweakcc's state that is
 tracked, and `link_dotfiles()` links it file by file instead of through the

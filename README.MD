@@ -52,6 +52,8 @@ step is pinned to arm64 and skips itself elsewhere).
 - Symlinks the root dotfiles and every `.config/*` entry into `$HOME`, except
   `.config/tweakcc`, where only `config.json` is linked
 - Installs `pay-respects` (pinned + checksummed) into `~/.local/bin`
+- Builds `tweakcc` from a pinned commit into `~/.local/share/tweakcc` and links
+  it to `~/.local/bin/tweakcc`
 - Clones the trapd00r `LS_COLORS` database as an alternative to the default
   vivid/Voltage one — see `themes/voltage.md`
 - Bootstraps zinit and pre-installs/compiles the zsh plugins

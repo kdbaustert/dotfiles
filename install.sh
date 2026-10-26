@@ -179,7 +179,7 @@ section_symlinks() {
 
 #------------------------------------------------------------------------------
 section_claude() {
-  title "Claude Code (plugins, usage cache refresh)"
+  title "Claude Code (plugins, tweakcc, usage cache refresh)"
   # One section for the two Claude Code steps that are not symlinks, so setting
   # up Claude on a machine is a single answer rather than two scattered through
   # the run. The .claude files themselves (CLAUDE.md, hooks, skills, agents) are
@@ -189,6 +189,10 @@ section_claude() {
   # list is declared there, and installing has to be a command run again on
   # every machine rather than a symlink like the rest of .claude.
   install_claude_plugins "${CLAUDE_PLUGINS[@]}"
+
+  # tweakcc, which patches the Claude Code binary. The tool only; applying it
+  # is a manual step. See install_tweakcc in setup/lib.sh.
+  install_tweakcc
 
   # The usage cache LaunchAgent keeps ~/.cache/claude-usage.json warm between
   # Claude Code sessions. See the "THE REFRESHER" comment in
@@ -490,7 +494,7 @@ SECTIONS=(
   "brew|Homebrew, then everything in homebrew/Brewfile"
   "nix|Nix, multi-user daemon"
   "symlinks|Symlink every dotfile into \$HOME"
-  "claude|Claude Code plugins and the usage cache LaunchAgent"
+  "claude|Claude Code plugins, tweakcc and the usage cache LaunchAgent"
   "zsh|pay-respects, LS_COLORS, zinit plugins, atuin daemon, Voltage themes (bat, syntax highlighting)"
   "hosts|Hosts blocklist and its weekly LaunchDaemon"
   "touchid|Touch ID for sudo"
