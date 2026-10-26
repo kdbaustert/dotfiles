@@ -85,6 +85,11 @@ brew "nnn"
 # undeclared, meaning `brew bundle` on a fresh box produced a shell with pnpm but
 # no node; declare it so that stays reproducible.
 brew "node"
+# python — the python3 that setup/lib.sh's settings merges run. The Codex one
+# needs tomllib (3.11+), which macOS's /usr/bin/python3 (3.9) lacks. It used to
+# arrive only as a dependency of openssh and ranger, so dropping both would
+# have left the merge to Apple's copy, which fails it on every run.
+brew "python"
 brew "pnpm"
 # direnv — per-directory environments, which here means a project's Nix dev
 # shell: ghostty, rio and kennybdev each carry an .envrc saying `use flake`.

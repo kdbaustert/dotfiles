@@ -29,73 +29,9 @@ warning() { echo -e "${COLOR_YELLOW}Warning: ${COLOR_NONE}$1"; ISSUES+=("$1"); }
 info()    { echo -e "${COLOR_BLUE}Info: ${COLOR_NONE}$1"; }
 success() { echo -e "${COLOR_GREEN}$1${COLOR_NONE}"; }
 
-# spinner_run <label> <command...>
-# Runs a command while a header line (spinner + elapsed seconds) plus a
-# scrolling window of the command's own latest output lines redraws in place,
-# so a step that would otherwise sit blank for minutes (a brew bundle, a silent
-# download) reads as "still going, and here's what it's doing" rather than
-# "stuck". Falls back to passing output straight through when stdout isn't a
-# terminal (piped/logged runs), where cursor-movement escapes would just print
-# garbage.
-# On failure the full log is left in place and its path printed, since a
-# build failure with no output is unactionable; on success it's removed.
-# Returns the command's own exit status.
-spinner_run() {
-  local label="$1"; shift
-  local logfile
-  logfile="$(mktemp)"
-
-  if [ ! -t 1 ]; then
-    info "$label"
-    "$@" </dev/null 2>&1 | tee "$logfile"
-    local st=${PIPESTATUS[0]}
-    [ "$st" -eq 0 ] && rm -f "$logfile"
-    return "$st"
-  fi
-
-  "$@" </dev/null >"$logfile" 2>&1 &
-  local pid=$! frames='⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏' i=0 start=$SECONDS
-  local cols window=5 drawn=0
-  cols=$(tput cols 2>/dev/null || echo 80)
-  # Rows a printed line actually occupies once the terminal wraps it — the
-  # header/tail lines are shown in full (no truncation), so a long one can
-  # span more than one row and the cursor-up math below has to account for it.
-  _spinner_rows() { local len=$1; ((len == 0)) && { echo 1; return; }; echo $(((len + cols - 1) / cols)); }
-  while kill -0 "$pid" 2>/dev/null; do
-    # Move up over whatever this loop drew last iteration, then redraw the
-    # header + tail so the block updates in place instead of scrolling.
-    [ "$drawn" -gt 0 ] && printf '\033[%dA' "$drawn"
-    local header rows=0
-    header="$(printf '%s %s (%ss)' "${frames:i%${#frames}:1}" "$label" "$((SECONDS - start))")"
-    printf '\r%s\033[K\n' "$header"
-    rows=$(_spinner_rows "${#header}")
-    local lines=()
-    while IFS= read -r line; do
-      lines+=("$line")
-    done < <(tail -n "$window" "$logfile" 2>/dev/null | tr -d '\r')
-    for line in "${lines[@]}"; do
-      printf '  %s\033[K\n' "$line"
-      rows=$((rows + $(_spinner_rows $((${#line} + 2)))))
-    done
-    drawn=$rows
-    i=$((i + 1))
-    sleep 0.1
-  done
-  wait "$pid"
-  local status=$?
-  [ "$drawn" -gt 0 ] && printf '\033[%dA' "$drawn"
-  printf '\033[J'
-  if [ "$status" -eq 0 ]; then
-    rm -f "$logfile"
-  else
-    warning "$label failed — full output in $logfile"
-  fi
-  return $status
-}
-
 # Every warning collected during the run, so a step's failure does not scroll
 # off screen by the time the installer finishes. `error` is deliberately not
-# collected here — its four call sites are all preconditions the rest of the
+# collected here — every call site is a precondition the rest of the
 # script cannot run without, so it still exits immediately rather than joining
 # a summary nobody gets to read.
 ISSUES=()
@@ -121,22 +57,63 @@ link() {
     warning "Skipping $(basename "$dst") — source missing: $src"
     return
   fi
+  # Stops when the backup fails. Going on, `ln -sfn` onto a real directory
+  # puts the link inside it, and the line below used to report that as linked.
   if [ -e "$dst" ] && [ ! -L "$dst" ]; then
-    mv "$dst" "${dst}.backup-$(date +%Y%m%d-%H%M%S)" && info "Backed up existing $dst"
+    if ! mv "$dst" "${dst}.backup-$(date +%Y%m%d-%H%M%S)"; then
+      warning "Could not back up $dst — left it in place and did not link it."
+      return
+    fi
+    info "Backed up existing $dst"
   fi
-  ln -sfn "$src" "$dst" && success "linked  $dst → $src"
+  if ln -sfn "$src" "$dst"; then
+    success "linked  $dst → $src"
+  else
+    warning "Could not link $dst → $src"
+  fi
 }
 
-# Remove a symlink that points into this repo and is now dangling. Never
-# touches a real file, and never touches a link installed by hand from
-# somewhere else — that guard is what lets the sweeps run unattended.
+# is_dangling_repo_link <path> — whether <path> is a symlink into this repo
+# whose target is gone. Never true for a real file or for a link installed by
+# hand from somewhere else; that guard is what lets the sweeps run unattended.
+# The repo path is matched as typed and resolved (pwd -P), because a link made
+# by an earlier run through a symlinked or differently spelled path would
+# otherwise never be recognised, and its LaunchAgent never retired.
+is_dangling_repo_link() {
+  local target physical
+
+  [ -L "$1" ] && [ ! -e "$1" ] || return 1
+  target="$(readlink "$1")"
+  physical="$(CDPATH='' cd -- "$DOTFILES_DIR" 2>/dev/null && pwd -P)"
+  case "$target" in
+    "$DOTFILES_DIR"/*) return 0 ;;
+    "${physical:-$DOTFILES_DIR}"/*) return 0 ;;
+  esac
+  return 1
+}
+
+# sweep_dangling <dir> — remove the dangling repo links directly under <dir>.
 sweep_dangling() {
   local item
   for item in "$1"/*; do
-    if [ -L "$item" ] && [ ! -e "$item" ] \
-      && case "$(readlink "$item")" in "$DOTFILES_DIR"/*) true ;; *) false ;; esac; then
+    if is_dangling_repo_link "$item"; then
       rm -f "$item" && info "Removed dangling symlink $item"
     fi
+  done
+}
+
+# retire_launch_agents <dir> — unload and remove the LaunchAgent plists under
+# <dir> that are dangling repo links. A plain sweep would delete the file and
+# leave the job loaded until logout, still running whatever it was told to.
+# The label is read off the file name, launchd's naming convention, since the
+# file that held the Label key is the one that is gone.
+retire_launch_agents() {
+  local item label
+  for item in "$1"/*.plist; do
+    is_dangling_repo_link "$item" || continue
+    label="$(basename "$item" .plist)"
+    launchctl bootout "gui/$(id -u)/$label" &>/dev/null
+    rm -f "$item" && info "Retired LaunchAgent $label (its plist left the repo)."
   done
 }
 
@@ -198,8 +175,10 @@ PYTHON
 # Requires Python 3.11+ for TOML validation. A failed merge leaves config alone
 # and warns rather than preventing the rest of the dotfiles from deploying.
 merge_codex_settings() {
-  if ! command -v python3 &>/dev/null; then
-    warning "Python 3.11+ is needed to merge Codex settings."
+  # Checked up front so an old python3 gets this warning, not a traceback
+  # followed by "Could not merge". macOS's /usr/bin/python3 is 3.9.
+  if ! python3 -c 'import tomllib' &>/dev/null; then
+    warning "Python 3.11+ is needed to merge Codex settings (python3 is $(command -v python3 || echo missing)); brew bundle installs it."
     return
   fi
 

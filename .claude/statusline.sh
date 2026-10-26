@@ -127,7 +127,7 @@
 # inside a render, when the cache is already stale. With no Claude Code session
 # running, nothing renders, so the cache just sits there aging past the 1-hour
 # `$fresh` cutoff and the next session's first render shows nothing for a beat
-# until its own background refresh lands. `launchd/dev.kennyb.claude-usage-refresh.plist`
+# until its own background refresh lands. `launchd/claude-usage-refresh.plist`
 # covers that gap from outside any session: it invokes this script with
 # `--refresh` every 5 minutes (the same TTL the render path already uses) so
 # the cache is warm before a render ever asks. `--refresh` runs the fetch in

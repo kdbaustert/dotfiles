@@ -5,11 +5,16 @@
   open to trigger the opportunistic refresh in .claude/statusline.sh — see the
   "THE REFRESHER" comment there for the render-path half of this.
 
+  The Label below is a placeholder. install.sh copies this file into
+  ~/Library/LaunchAgents as local.<account>.claude-usage-refresh and sets the
+  Label to match, the way it builds the hosts daemon's, so the tracked file
+  names no one. It is copied rather than linked because launchd reads the
+  Label out of the file, and a link would hand it the placeholder.
+
   ProgramArguments runs through `zsh -c` rather than naming the script
-  directly so `$HOME` is expanded by the shell at launch time instead of
-  baked into this file as a literal `/Users/kenny/...` — this plist is
-  symlinked out of the repo unmodified, like everything else install.sh
-  deploys, so it can't carry a machine-specific path.
+  directly so `$HOME` is expanded by the shell at launch time. The copy is
+  otherwise byte for byte this file, so it can't carry a machine-specific
+  path either.
 
   The same tick then runs .claude/hooks/resume-after-limit.sh - -sweep, which
   resumes any session that stopped on the usage limit once the cache shows the
@@ -24,7 +29,7 @@
 <plist version="1.0">
 <dict>
   <key>Label</key>
-  <string>dev.kennyb.claude-usage-refresh</string>
+  <string>claude-usage-refresh</string>
   <key>ProgramArguments</key>
   <array>
     <string>/bin/zsh</string>

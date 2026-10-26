@@ -282,7 +282,7 @@ prompt box rather than indented by one column.
 That refresher only ever fires from inside a render, so a machine with no
 Claude Code session open just lets the cache age past its one-hour cutoff —
 the next session's first render then shows nothing for that row until its own
-background fetch lands. `launchd/dev.kennyb.claude-usage-refresh.plist`, loaded
+background fetch lands. `launchd/claude-usage-refresh.plist`, loaded
 by `install.sh`, closes that gap by calling `statusline.sh --refresh` every 5
 minutes regardless of whether a session is open — see the "THE REFRESHER"
 comment in the script for the full split between the two paths.

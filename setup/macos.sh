@@ -29,9 +29,57 @@ done 2>/dev/null &
 # General UI/UX                                                               #
 ###############################################################################
 
-# Set computer name (as done via System Preferences → Sharing)
-sudo scutil --set ComputerName "Kenny’s MacBook Pro"
-sudo scutil --set LocalHostName "Kennys-MacBook-Pro"
+# Set computer name (as done via System Preferences → Sharing). Asked for
+# rather than written in, so the script can run on any Mac without renaming
+# it after the one it was written on.
+#
+# local_host_name <name> — the Bonjour form of a computer name. LocalHostName
+# allows letters, digits and hyphens, at most 63 of them. Apostrophes are
+# dropped rather than turned into hyphens, so "Ada’s Mac" becomes Adas-Mac,
+# the same as System Settings does.
+local_host_name() {
+  local name="$1"
+
+  name="${name//\'/}"
+  name="${name//’/}"
+  name="$(printf '%s' "$name" | LC_ALL=C tr -cs 'A-Za-z0-9' '-')"
+  name="${name#-}"
+  name="${name:0:63}"
+  name="${name%-}"
+  printf '%s\n' "$name"
+}
+
+# set_computer_name — ask for the name and set ComputerName plus the
+# LocalHostName derived from it. Enter sets nothing: re-deriving from the
+# current name would overwrite a LocalHostName chosen by hand, such as a short
+# "kennys-mbp". Skipped under install.sh -y (ASSUME_YES=true), which promises
+# no questions, and when stdin is not a terminal, where read would get EOF and
+# nobody is around to answer anyway.
+set_computer_name() {
+  local current name bonjour
+
+  current="$(scutil --get ComputerName 2>/dev/null)"
+  if [ "${ASSUME_YES:-false}" = true ] || [ ! -t 0 ]; then
+    echo "Not asking for a computer name; left as \"$current\"."
+    return 0
+  fi
+
+  read -r -p "Computer name (Enter keeps \"$current\"): " name || return 0
+  if [ -z "$name" ]; then
+    echo "Computer name left as \"$current\"."
+    return 0
+  fi
+
+  bonjour="$(local_host_name "$name")"
+  sudo scutil --set ComputerName "$name"
+  if [ -n "$bonjour" ]; then
+    sudo scutil --set LocalHostName "$bonjour"
+  else
+    echo "\"$name\" has no letters or digits for a LocalHostName; left that unchanged."
+  fi
+}
+
+set_computer_name
 
 # Set sidebar icon size to medium
 defaults write NSGlobalDomain NSTableViewDefaultSizeMode -int 2

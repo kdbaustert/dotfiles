@@ -230,7 +230,7 @@ them yet. The script's header has the detail.
 
 That refresher only runs while something is rendering, so a scheduled job keeps
 the cache warm when nothing is — a LaunchAgent
-(`launchd/dev.kennyb.claude-usage-refresh.plist`) that calls
+(`launchd/claude-usage-refresh.plist`) that calls
 `statusline.sh --refresh` every five minutes. `install.sh` deploys and loads it. Without it the cache
 ages past its one-hour cutoff overnight and the first render of the morning has
 nothing to draw those rows from.

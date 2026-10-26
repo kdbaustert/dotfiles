@@ -15,13 +15,35 @@
 
 set -uo pipefail
 
-DOTFILES_DIR="${DOTFILES:-$HOME/dotfiles}"
+# The checkout this script lives in, not $DOTFILES. .zshenv exports that as
+# ~/dotfiles in every shell, so honoring it would make a clone anywhere else
+# source some other checkout's lib.sh (or none, on a fresh Mac) and link $HOME
+# into the wrong tree. This covers the installer only: .zshenv still sets
+# DOTFILES to ~/dotfiles, so the shell config expects the clone there. CDPATH
+# is cleared so `cd` prints nothing into the capture. No -P, so links are
+# written with the path as typed; is_dangling_repo_link accepts the resolved
+# spelling as well.
+DOTFILES_DIR="$(CDPATH='' cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 
 # The print helpers, link(), and the longer sections: symlinking, zinit, the
 # theme caches, LS_COLORS, pay-respects, the setup-script runner. Kept out of
 # this file so it reads as a list of sections. See setup/lib.sh's header.
+# Checked by hand because `error` is one of the things it defines; without the
+# check a failed source ran on into "command not found" for every helper.
 # shellcheck source=setup/lib.sh
-source "$DOTFILES_DIR/setup/lib.sh"
+if ! source "$DOTFILES_DIR/setup/lib.sh"; then
+  echo "Error: could not load $DOTFILES_DIR/setup/lib.sh" >&2
+  exit 1
+fi
+
+# A Homebrew that is installed but not on PATH, as in a shell opened before
+# .zprofile was linked or a bare `bash install.sh` over ssh. Without this the
+# brew section reruns the Homebrew installer over a working install, and later
+# steps resolve python3 to macOS's 3.9 (too old for the Codex merge) and
+# `brew --prefix` to nothing.
+if ! command -v brew &>/dev/null && [ -x /opt/homebrew/bin/brew ]; then
+  eval "$(/opt/homebrew/bin/brew shellenv)"
+fi
 
 #------------------------------------------------------------------------------
 # print_banner — the DOTFILES wordmark, shown once at the start of a run.
@@ -65,12 +87,17 @@ request_sudo() {
 #------------------------------------------------------------------------------
 section_xcode() {
   title "Xcode command line tools"
+  # Stops the run once the install is triggered. Carrying on would start the
+  # Homebrew installer while the tools are still missing, and it installs them
+  # itself through softwareupdate, racing the dialog this just opened. A failed
+  # --install stops it too: the usual cause is an install already running from
+  # an earlier attempt, and that is the same race.
   if xcode-select --print-path &>/dev/null; then
     success "Xcode command line tools already installed."
   elif xcode-select --install &>/dev/null; then
-    success "Triggered install of Xcode command line tools — finish the GUI prompt, then re-run."
+    error "Xcode command line tools are installing. Finish the dialog, then re-run ./install.sh."
   else
-    warning "Could not trigger Xcode command line tools install."
+    error "Could not start the Xcode command line tools install (one may already be running). Finish or run 'xcode-select --install', then re-run ./install.sh."
   fi
 }
 
@@ -168,11 +195,24 @@ section_claude() {
   # .claude/statusline.sh for why a session-less gap otherwise leaves the cache
   # up to an hour stale. It lives here rather than in link_dotfiles()
   # (setup/lib.sh) because it needs the launchctl bootstrap below, not just a
-  # link.
-  LAUNCH_AGENT_LABEL="dev.kennyb.claude-usage-refresh"
+  # file in place.
+  #
+  # The label is built from the account running the installer, as the hosts
+  # daemon's is, and set in a copy of the tracked plist rather than a link to
+  # it; the plist's header says why. The copy loses nothing a link gave:
+  # launchd only rereads a plist at bootstrap, which takes this re-run either
+  # way. The old agent was linked under a label naming a person; renaming its
+  # file left that link dangling, and retire_launch_agents unloads it.
+  LAUNCH_AGENT_LABEL="local.$(id -un).claude-usage-refresh"
   LAUNCH_AGENT_PLIST="$HOME/Library/LaunchAgents/$LAUNCH_AGENT_LABEL.plist"
   mkdir -p "$HOME/Library/LaunchAgents"
-  link "$DOTFILES_DIR/launchd/$LAUNCH_AGENT_LABEL.plist" "$LAUNCH_AGENT_PLIST"
+  retire_launch_agents "$HOME/Library/LaunchAgents"
+
+  if ! install -m 644 "$DOTFILES_DIR/launchd/claude-usage-refresh.plist" "$LAUNCH_AGENT_PLIST" \
+    || ! /usr/libexec/PlistBuddy -c "Set :Label $LAUNCH_AGENT_LABEL" "$LAUNCH_AGENT_PLIST"; then
+    warning "Could not write $LAUNCH_AGENT_PLIST — the usage cache will only refresh during an active Claude Code session."
+    return 0
+  fi
 
   # bootout-then-bootstrap rather than a load/already-loaded check: it is what
   # makes a re-run pick up an edited plist (StartInterval, etc.), and booting out
@@ -237,9 +277,14 @@ section_zsh() {
   bootstrap_zinit
 
   # The Brewfile's link, not the Cellar path behind it, which changes with
-  # every `brew upgrade` and would strand the plist.
-  sync_atuin_daemon "$HOME/Library/LaunchAgents/sh.atuin.daemon.plist" \
-    "$(brew --prefix)/bin/atuin"
+  # every `brew upgrade` and would strand the plist. Guarded because with no
+  # brew, `$(brew --prefix)` is empty and the check went looking for /bin/atuin.
+  if command -v brew &>/dev/null; then
+    sync_atuin_daemon "$HOME/Library/LaunchAgents/sh.atuin.daemon.plist" \
+      "$(brew --prefix)/bin/atuin"
+  else
+    warning "Skipping atuin daemon check — brew is not on PATH."
+  fi
 
   build_themes
 }
@@ -249,8 +294,8 @@ section_hosts() {
   title "Hosts blocklist (LaunchDaemon)"
   # Splices the blocklist into /etc/hosts now and installs the root job that
   # re-splices it every Monday — see the header of setup/hosts.sh for why a root
-  # job is acceptable here. Unlike the agent above, both files are root owned and
-  # never linked: the daemon must not run anything I can edit, and launchd
+  # job is acceptable here. Both files are copied, like the agent's plist, but
+  # root owned: the daemon must not run anything I can edit, and launchd
   # refuses a daemon plist not owned by root. That makes this section what
   # carries an edit to setup/hosts.sh or the plist over to the running job.
   #
@@ -260,9 +305,9 @@ section_hosts() {
   #
   # The label is built from the account running the installer, not written into
   # the repo, so the same checkout installs cleanly under any user name. For the
-  # same reason the plist is generated here rather than tracked in launchd/: the
-  # label and both paths inside it all carry that name. `id -un` rather than
-  # $USER, which is unset in some non-login contexts.
+  # same reason the plist is generated here rather than copied from launchd/ as
+  # the agent's is: the label and both paths inside it all carry that name.
+  # `id -un` rather than $USER, which is unset in some non-login contexts.
   HOSTS_DAEMON_LABEL="local.$(id -un).hosts-refresh"
   HOSTS_DAEMON_PLIST="/Library/LaunchDaemons/$HOSTS_DAEMON_LABEL.plist"
   HOSTS_DAEMON_SCRIPT="/usr/local/libexec/$HOSTS_DAEMON_LABEL"
@@ -420,7 +465,9 @@ section_macos() {
   # Terminal so they reread their settings — and when the installer is running
   # in Terminal.app, that kills the installer too. As the final section, the only
   # thing that loss can cost is the summary.
-  if "$DOTFILES_DIR/setup/macos.sh"; then
+  # ASSUME_YES goes along so -y skips the computer-name prompt too; without it
+  # a -y run from a terminal would still stop and wait there.
+  if ASSUME_YES="$ASSUME_YES" "$DOTFILES_DIR/setup/macos.sh"; then
     success "macOS defaults applied — some take effect only after a logout."
   else
     warning "setup/macos.sh exited non-zero — see the output above."
@@ -531,9 +578,9 @@ ensure_gum() {
   tmp="$(mktemp -d)"
   if curl -sSfL -o "$tmp/$asset.tar.gz" "$url" \
     && echo "${GUM_SHA256}  $tmp/$asset.tar.gz" | shasum -a 256 -c - >/dev/null 2>&1 \
-    && tar -xzf "$tmp/$asset.tar.gz" -C "$tmp"; then
-    mkdir -p "$HOME/.local/bin"
-    install -m 755 "$tmp/$asset/gum" "$HOME/.local/bin/gum"
+    && tar -xzf "$tmp/$asset.tar.gz" -C "$tmp" \
+    && mkdir -p "$HOME/.local/bin" \
+    && install -m 755 "$tmp/$asset/gum" "$HOME/.local/bin/gum"; then
     GUM="$HOME/.local/bin/gum"
   else
     warning "Could not fetch gum (download or checksum) — using plain prompts instead."
