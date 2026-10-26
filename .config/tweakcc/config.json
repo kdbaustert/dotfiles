@@ -1,7 +1,7 @@
 {
   "ccVersion": "2.1.310",
   "ccInstallationPath": null,
-  "lastModified": "2026-10-26T16:40:58.963Z",
+  "lastModified": "2026-10-26T17:39:41.345Z",
   "changesApplied": true,
   "settings": {
     "themes": [
@@ -246,7 +246,7 @@
       "fitBoxToContent": false
     },
     "inputBox": {
-      "removeBorder": false,
+      "removeBorder": true,
       "chevronIdleThemeColor": "success",
       "cursorColor": null
     },
@@ -305,7 +305,7 @@
       "generalPurpose": null
     },
     "inputPatternHighlighters": [],
-    "inputPatternHighlightersTestText": "Type test text here to see highlighting",
+    "inputPatternHighlightersTestText": "Type test text here to",
     "claudeMdAltNames": [
       "AGENTS.md",
       "GEMINI.md",
