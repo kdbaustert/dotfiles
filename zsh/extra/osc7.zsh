@@ -54,7 +54,9 @@ _osc7_report_cwd() {
 
 # chpwd covers every directory change (cd, pushd/popd, zoxide); the explicit
 # call reports the directory the shell started in, which no hook would fire for.
-if [[ -o interactive ]]; then
+# -t 1 because only a terminal reads OSC 7: `zsh -ic 'cmd' | jq` is
+# interactive too, and without it the pipe's first bytes were the escape.
+if [[ -o interactive && -t 1 ]]; then
   autoload -Uz add-zsh-hook
   add-zsh-hook chpwd _osc7_report_cwd
   _osc7_report_cwd
