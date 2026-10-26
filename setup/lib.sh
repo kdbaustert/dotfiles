@@ -753,8 +753,6 @@ CLAUDE_PLUGINS=(
   miro             # board access via MCP; auth happens on first use, not here
   frontend-design  # design-quality guidance for new/reshaped UI work
   code-simplifier  # reuse/simplification pass over recently changed code
-  atlassian        # Jira + Confluence; backs .claude/CLAUDE.md's Jira-comment workflow
-  asana            # Asana task/project MCP; needs /asana-setup once, after install
   code-review      # multi-agent PR review with confidence-scored findings
 
   # Third-party; opt-in twice over: /i-have-adhd per session, or every session
