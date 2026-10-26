@@ -9,7 +9,7 @@
 # WHY. Both fail quietly. A merge that replaces `hooks` deletes the atuin and
 # nodeterm hooks on the next install, and nobody notices until history stops
 # syncing. A guard pattern that is too wide blocks ordinary work (`git config
-# user.email` is read by the audit recipe), and one too narrow stops guarding.
+# user.email` is an ordinary read), and one too narrow stops guarding.
 #
 # Usage:
 #   setup/check-claude-settings.sh

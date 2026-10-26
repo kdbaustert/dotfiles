@@ -332,9 +332,8 @@ settings.
 
 `develop` and `staging` are integration branches carrying everyone's in-flight
 work, so merging one into a feature branch pulls other people's commits into my
-history: the diff stops being reviewable, the *audit only my own changes* rule has
-to work around it, and unpicking it afterwards costs far more than the merge
-saved. Rebasing onto the branch it was cut from is usually the answer to a branch
+history: the diff stops being reviewable, and unpicking it afterwards costs
+far more than the merge saved. Rebasing onto the branch it was cut from is usually the answer to a branch
 that has fallen behind, but that is my call.
 
 `delta` is invoked explicitly by the fzf-tab previews in `.zshrc`, which is why it
@@ -376,37 +375,6 @@ checks that the remote tip is in your reflog, which a fetch alone can't fake.
   catch it up.
 - Work repos use Bitbucket Pipelines (`bitbucket-pipelines.yml`), not GitHub Actions — check the right CI config.
 - `delta` is **not** git's pager here, so `git diff` and `git show` emit plain output. Add `--no-pager` anyway when piping a command whose pager behaviour you have not checked.
-
-## Audits and Jira comments
-
-A branch picks up other people's commits by merge or rebase from the base branch
-and, on a shared branch, by their own work, and a `git diff base...HEAD` shows all
-of it without distinguishing. Reviewing a colleague's code back to them under my
-name is worse than a thin audit.
-
-Whoever reads an audit, and especially whoever reads it as a Jira comment, is a
-support lead, a tester or a manager. A change you skip because it is mechanical
-is a change nobody knows to retest.
-
-The Jira byline goes because the audit goes up under my name as my review, and
-labelling it machine output invites the reader to treat it as unvetted. Same
-instinct as the co-author rule.
-
-`addCommentToJiraIssue`'s own schema says the `contentFormat` default *varies by
-tool when omitted*, so leaving it out gambles on how the body is parsed, which
-surfaces as literal `##` and `**` sitting in a comment under my name. Hand-rolled
-ADF is verbose, easy to get subtly wrong, and markdown covers everything an audit
-needs. A format mistake is invisible until it is posted, hence the read-back.
-
-### Task rules
-
-These four read in the order you execute them: pick the diff, write it up,
-format it, sign it.
-
-- **Audit only my own changes.** The subject is what *I* wrote on the branch, not everything its diff against the base contains. Take the merge-base, list my commits (`git log --author="$(git config user.email)" $(git merge-base origin/HEAD HEAD)..HEAD`), and diff those. If that leaves nothing, say the branch has no commits of mine rather than widening the net to fill the report.
-- **Audits are written for non-programmers.** Describe every change as observable behaviour: what the system did before, what it does now, and what to look at to confirm it. Cover *all* of them, including the mechanical ones. File paths, class and method names, and framework vocabulary go in a trailing parenthetical at most: "renamed `getBuyer()` to `getCustomer()` in `OrderController`" tells that reader nothing, while "the buyer is now called the customer everywhere it appears on screen" tells them what to check. Use the voice of the `plain` skill, not a commit message.
-- **Jira comments carry no AI byline.** The heading is `Audit of the code changes`. Strip the `AI-generated` label, and don't reinstate it as a footer or disclaimer.
-- **Format Jira comments deliberately.** Always pass `contentFormat: "markdown"` to `addCommentToJiraIssue`, because the default varies when omitted. Write ordinary markdown: a `##` heading, `-` bullets, bold used sparingly. No hand-rolled ADF JSON, no diffs or code blocks. Read the comment back afterwards to confirm it rendered, and fix a mistake by passing `commentId` to update it in place, never by posting a second comment.
 
 ## Philosophy
 

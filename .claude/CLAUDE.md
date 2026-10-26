@@ -112,12 +112,6 @@ Before a Git task, read **Git** in `~/.claude/REFERENCE.md`. Never commit, push
 or create a PR unless asked. Never create a branch, disable signing, add
 attribution trailers, or merge `develop` or `staging` into another branch.
 
-## Audits and Jira comments
-
-Before an audit or Jira comment, read **Audits and Jira comments** in
-`~/.claude/REFERENCE.md`. Audit only my own changes and write for non-programmers.
-Do not post a comment unless asked.
-
 ## Memory
 
 Write a memory the moment you establish something the next session would
