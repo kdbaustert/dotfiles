@@ -386,6 +386,52 @@ want you to work*. A stale memory is worse than a missing one: it arrives
 sounding established and costs a session to unpick. Keeping secrets out of memory
 is the context curation rule applied across sessions rather than within one.
 
+**The memory bank** comes from centminmod/my-claude-code-setup (MIT, George
+Liu), as of commit `7d5c3743942606a9c5756de47ecdb41e2317c8b6`, 2026-10-26: the
+six `CLAUDE-*.md` files and their "read when" column from
+`CLAUDE-template-2.md`, the `memory-bank-synchronizer` agent and the
+`update-memory-bank` command. It was adapted rather than vendored, so there's no
+upstream copy to diff against. Refresh by reading upstream's files again and
+deciding change by change. What was changed and why:
+
+- **Out of git.** Upstream already says not to commit these files. Here that's
+  done in `.config/git/ignore`, by exact name, because a `CLAUDE-*.md` glob
+  would also ignore tracked files with that prefix (cnc-claims'
+  `CLAUDE-REFERENCE.md`). The ignore has a side effect upstream doesn't
+  mention: `rg`, `fd`, Grep and Glob all skip the files, which is why the rule
+  says to open them by path. Two more costs of being untracked: `git clean
+  -fdx` deletes the whole memory bank without asking, and a `git worktree`
+  starts without one, since the files live only in the checkout that wrote
+  them.
+- **No mirroring into auto memory.** Upstream's "dual memory" copies every
+  update into `memory/*.md` as a backup against a wiped `CLAUDE.md`. That
+  contradicts this file's rule against saving what files already hold, doubles
+  the tokens, and covers a case that can't happen here: the memory bank isn't
+  in `CLAUDE.md`, and `CLAUDE.md` is tracked. Auto memory stays for what isn't
+  about the repo, such as an external pointer.
+- **The point is Codex.** Codex can't read Claude's auto memory. It does read
+  this file, as `~/.codex/AGENTS.override.md`, so both agents follow the same
+  memory bank rule and read the same files.
+- **Never edits `CLAUDE.md`.** Upstream's command updates "CLAUDE.md and memory
+  bank files", and its agent rewrites both. Here `CLAUDE.md` and `AGENTS.md`
+  are tracked contracts, often shared, so both tools propose edits to them and
+  leave the change to a person.
+- **Not proactive.** Upstream's agent description says "use proactively", which
+  invites unrequested spawns at a full agent's startup cost. This one runs when
+  asked. Upstream's `CLAUDE-todo-list.md` and its roadmap and business-plan
+  preservation rules were dropped; none of those files exist here.
+- **Skipped:** the template's core rules (this file already has them, close to
+  word for word), its progressive-disclosure table, and its backup
+  section. Backups would only matter if these notes outgrew one machine.
+
+`setup/check-memory-bank.sh` checks that the six names agree across
+`.claude/CLAUDE.md`, the git ignore and the agent, and that the ignore leaves
+`CLAUDE-REFERENCE.md` alone. With `--eval` it checks that Claude actually reads
+`CLAUDE-activeContext.md` when asked about a project's current goal, and asks
+Codex too when it's installed. The Codex half has never run, and a Codex pass
+is weaker: Codex can `ls` the directory, so it proves the file is reachable,
+not that the instructions sent it there.
+
 ## Working philosophy in full
 
 Software is grounded in philosophy. These are the considerations that make the

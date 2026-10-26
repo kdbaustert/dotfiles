@@ -178,6 +178,15 @@ behind them, which Claude reads only when `CLAUDE.md` points it there),
 directory is created and linked *into* rather than linked over.
 `.claude/themes/` is kept here for reference only; nothing links it.
 
+**Every project gets a memory bank.** The **Memory** section of
+`.claude/CLAUDE.md` tells Claude and Codex to keep project notes in six
+`CLAUDE-*.md` files at the repo root (active context, patterns, decisions,
+troubleshooting, config variables, scratch) and to read them on demand.
+`.config/git/ignore` keeps those six out of every repo. `/update-memory-bank`
+records a session in them, and the `memory-bank-synchronizer` agent checks them
+against the code. Both come from centminmod/my-claude-code-setup, adapted;
+`.claude/REFERENCE.md` lists what changed and why.
+
 **Four settings blocks are manual.** All the deployed scripts are named by
 `~/.claude/settings.json`, which is untracked, so on a new machine add these
 under `hooks` (the `PreToolUse` and `StopFailure` ones beside any entry already

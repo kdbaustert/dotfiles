@@ -144,6 +144,27 @@ measured number, a traced call path, a root cause, an approach ruled out *and
 why*, a goal in flight with what is left of it, or a pointer with no home in the
 repo. Write it the moment it is established, not at the end.
 
+In a project, those findings go in its memory bank: `CLAUDE-*.md` files at the
+repo root. Claude and Codex both read them, so whichever agent runs next starts
+where the last one stopped. Create a file the first time it has something to
+hold.
+
+| File | Holds | Read it |
+| ---- | ----- | ------- |
+| `CLAUDE-activeContext.md` | The goal in flight, what's done, what's left | At the start of a task |
+| `CLAUDE-patterns.md` | Conventions the code follows that one file won't show | Before writing code |
+| `CLAUDE-decisions.md` | Choices made, and approaches ruled out *and why* | Before a design choice |
+| `CLAUDE-troubleshooting.md` | Root causes and the fixes that worked | When debugging |
+| `CLAUDE-config-variables.md` | Config and env variables, and what reads each | When touching config |
+| `CLAUDE-temp.md` | Scratch | Only when I point at it |
+
+Read only what the task needs and skip files that don't exist. The global git
+ignore lists all six, so `rg`, `fd` and the Grep and Glob tools never see them:
+open them by exact path. Never stage or commit one. Date each entry, and fix or
+delete it when it turns out wrong. Claude's auto memory keeps what isn't about
+the repo and never copies the memory bank. `/update-memory-bank` records a
+session; the `memory-bank-synchronizer` agent checks the files against the code.
+
 - **A durable rule belongs in this file, not in memory.** If a memory would begin
   "Kenny prefers…" or "always run…", propose it as a CLAUDE.md edit instead.
 - **Recalled memories are dated, not authoritative.** Re-read any file, flag,
