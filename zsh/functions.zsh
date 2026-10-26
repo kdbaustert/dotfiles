@@ -55,12 +55,11 @@ function dataurl() {
 # Reload the zsh session, rebuilding the completion dump from scratch.
 # (Adapted from OMZ:plugins/zsh_reload.)
 #
-# Use this after installing something whose completions you want *now* — the
+# Use this after installing something whose completions you want now. The
 # normal path only re-scans once every 24h (see zsh_compinit in zsh/zinit.zsh).
 #
 # The dump path must match the one zsh_compinit uses, or this would rebuild a
-# file nothing reads: it previously wrote "$ZSH_CACHE_DIR/zcomp-$HOST" while
-# compinit read ~/.zcompdump, so `zreload` never actually refreshed anything.
+# file nothing reads and `zreload` would never refresh anything.
 zreload() {
   local dump="${ZINIT[ZCOMPDUMP_PATH]:-${ZSH_CACHE_DIR:-$HOME/.cache/zsh}/zcompdump}"
   autoload -Uz compinit zrecompile
@@ -77,7 +76,7 @@ zreload() {
   [[ -n "$SHELL" ]] && exec ${SHELL#-} || exec zsh
 }
 
-# Fuzzy-cd into a subdirectory (renamed from `fd` so it no longer shadows the
+# Fuzzy-cd into a subdirectory (not named `fd`, which would shadow the
 # `fd` binary that fzf/eza/etc. rely on). `z`/`zi` from zoxide cover most cases.
 fcd() {
   local dir

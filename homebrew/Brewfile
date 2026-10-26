@@ -12,15 +12,16 @@ brew "tmux"
 brew "gnupg"
 brew "openssl"
 brew "wget"
-# fzf, and bat, lsd, fd, zoxide, git-delta, ripgrep and vivid below, are back
-# here after a stretch as zinit gh-r binaries. Homebrew copies got installed
-# anyway, so each tool existed twice: interactive shells ran zinit's once its
-# turbo load finished, while scripts and agent tool calls, which never load
-# zinit, ran Homebrew's. delta had already split (zinit 0.19.2, Homebrew
-# 0.20.1), the same shape as the atuin break described at its entry. One owner
-# for every CLI binary, and it has to be the one every non-interactive caller
-# can see. It also takes zinit's eager plugin load for fzf, zoxide and vivid
-# off the startup path.
+# fzf, and bat, lsd, fd, zoxide, git-delta, ripgrep and vivid below, come from
+# Homebrew and not from zinit gh-r binaries. With both installed, each tool
+# exists twice: interactive shells run zinit's once its turbo load finishes,
+# while scripts and agent tool calls, which never load zinit, run Homebrew's.
+# The two versions drift apart (delta at 0.19.2 from zinit against 0.20.1
+# from Homebrew), the same shape as the atuin break described at its entry.
+# Each CLI binary
+# needs one owner, and it has to be the one every non-interactive caller can
+# see. This also keeps zinit's eager plugin load for fzf, zoxide and vivid off
+# the startup path.
 brew "fzf"
 brew "git-lfs"
 brew "httpie"
@@ -65,33 +66,31 @@ brew "eza"
 brew "assh"
 brew "procs"
 brew "ripgrep"
-# ast-grep — structural code search. Call it as `ast-grep`; the short `sg`
-# alias still ships but prints a deprecation warning as of 0.51. It matches on
+# ast-grep: structural code search. Call it as `ast-grep`; the short `sg`
+# alias still ships but prints a deprecation warning from 0.51. It matches on
 # the syntax tree, so a search for a call skips comments, strings and
-# look-alike names that rg can't tell apart. It was installed by hand and left
-# undeclared; declared now so a fresh box gets it.
+# look-alike names that rg can't tell apart. Declared so a fresh box gets it.
 brew "ast-grep"
-# typescript-language-server — also installed as a pnpm global by
-# setup/pnpm.sh, and this copy comes first on PATH. It was tried as the fix
-# for Claude Code's LSP tool failing on JS/TS in projects with no typescript of
-# their own, and it isn't one: it pulls in Homebrew's `typescript` formula,
-# which is 7.x, and the server needs a tsserver.js that 7.x no longer ships.
-# Kept anyway. Side effect: Homebrew's tsc 7 now shadows the pnpm tsc that
-# setup/pnpm.sh holds at 6 wherever /opt/homebrew/bin comes first on PATH.
+# typescript-language-server: also installed as a pnpm global by
+# setup/pnpm.sh, and this copy comes first on PATH. It doesn't fix Claude
+# Code's LSP tool failing on JS/TS in projects with no typescript of their own:
+# it pulls in Homebrew's `typescript` formula, which is 7.x, and the server
+# needs a tsserver.js that 7.x doesn't ship. It stays anyway. Side effect:
+# Homebrew's tsc 7 shadows the pnpm tsc that setup/pnpm.sh holds at 6 wherever
+# /opt/homebrew/bin comes first on PATH.
 brew "typescript-language-server"
 brew "nnn"
-# node — the default Node here. nvm is loaded (see zsh/zinit.zsh) but manages no
-# versions, so this is what actually resolves. It was installed by hand and left
-# undeclared, meaning `brew bundle` on a fresh box produced a shell with pnpm but
-# no node; declare it so that stays reproducible.
+# node: the default Node here. nvm's node (see zsh/zinit.zsh) only reaches
+# interactive shells, so this is what scripts and tool calls resolve. Without it declared,
+# `brew bundle` on a fresh box produces a shell with pnpm but no node.
 brew "node"
-# python — the python3 that setup/lib.sh's settings merges run. The Codex one
-# needs tomllib (3.11+), which macOS's /usr/bin/python3 (3.9) lacks. It used to
-# arrive only as a dependency of openssh and ranger, so dropping both would
-# have left the merge to Apple's copy, which fails it on every run.
+# python: the python3 that setup/lib.sh's settings merges run. The Codex one
+# needs tomllib (3.11+), which macOS's /usr/bin/python3 (3.9) lacks. Relying on
+# it arriving as a dependency of openssh or ranger would leave the merge to
+# Apple's copy if both went away, and Apple's copy fails it every run.
 brew "python"
 brew "pnpm"
-# direnv — per-directory environments, which here means a project's Nix dev
+# direnv: per-directory environments, which here means a project's Nix dev
 # shell: ghostty, rio and kennybdev each carry an .envrc saying `use flake`.
 # The caching half, nix-direnv, is not a formula; .config/direnv/direnvrc
 # fetches it pinned and checksummed. The zsh hook is the zcache line in .zshrc.
@@ -100,36 +99,39 @@ brew "direnv"
 brew "vivid"
 brew "imagemagick"
 brew "nss"
+# shfmt: also .claude/hooks/command-guard.sh parses every Bash call with it,
+# and the guard lets everything through when it is missing.
 brew "shfmt"
 brew "shellcheck"
-# stylua — Lua formatter. Declared here rather than left to Mason because
+# stylua: Lua formatter. Declared here rather than left to Mason because
 # .config/lvim wires it into none-ls, which shells out to PATH: a Mason copy
 # would live under ~/.local/share and vanish with the editor's runtime.
 brew "stylua"
-# atuin — shell history. Back here after a stretch as a zinit gh-r binary. That
-# move put zinit's plugin machinery on the startup critical path, and it left
-# two copies installed once a Homebrew one landed anyway. On 2026-10-23 the
-# launchd daemon ran the 18.24.2 Homebrew build while the shell hooks called
-# zinit's 18.22.0, and the daemon rejected every `atuin history end`, so
-# nothing was recorded for three days. One install, and /opt/homebrew/bin/atuin
-# is a link that survives `brew upgrade`, so the daemon's plist stays valid.
+# atuin: shell history. It comes from Homebrew and not from a zinit gh-r
+# binary, which puts zinit's plugin machinery on the startup critical path and
+# leaves two copies installed once a Homebrew one lands anyway. With two
+# copies, the launchd daemon can run the Homebrew build (18.24.2) while the
+# shell hooks call zinit's (18.22.0); the daemon then rejects every
+# `atuin history end` and nothing is recorded. One install avoids that, and
+# /opt/homebrew/bin/atuin is a link that survives `brew upgrade`, so the
+# daemon's plist stays valid.
 # install.sh's sync_atuin_daemon keeps the plist on it. Ignore the formula's
 # `brew services start atuin` caveat: atuin's autostart already runs the daemon
 # as sh.atuin.daemon, and a brew service would be a second one on the same
 # socket.
 brew "atuin"
-# starship — the prompt. Not installed here: .zshrc runs the official
+# starship: the prompt. Not installed here: .zshrc runs the official
 # installer into ~/.local/bin the first time a shell finds it missing, so that
-# script is its one updater. Declaring it here as well made `brew bundle
-# check` fail on every machine where the installer had already run, and a
-# `brew bundle install` would put a second copy on PATH. Left declared,
-# commented, so the package isn't lost from this list.
+# script is its one updater. Declaring it here as well makes `brew bundle
+# check` fail on every machine where the installer has already run, and a
+# `brew bundle install` would put a second copy on PATH. It stays here as a
+# commented line so the package isn't lost from this list.
 # brew "starship"
 brew "poppler"
 brew "sevenzip"
-# zstd — provides unzstd, which install.sh needs to unpack the pay-respects
-# release (it ships .tar.zst only). Previously present merely as a transitive
-# dep of curl/imagemagick/etc; declare it now that a script depends on it.
+# zstd: provides unzstd, which install.sh needs to unpack the pay-respects
+# release (it ships .tar.zst only). Declared because a script depends on it,
+# rather than leaving it as a transitive dep of curl/imagemagick/etc.
 brew "zstd"
 brew "helix"
 brew "yazi"
@@ -137,10 +139,10 @@ brew "btop"
 brew "fastfetch"
 brew "firebase-cli"
 brew "zig"
-# iris — inline completion overlay (IntelliSense for the prompt). Config and
+# iris: inline completion overlay (IntelliSense for the prompt). Config and
 # theme live in .config/iris and are symlinked by install.sh; the autostart hook
 # is in .zshrc. The tap is the author's own, and is the only distribution
-# channel that isn't `curl | sh` or a self-updating binary — which is also why
+# channel that isn't `curl | sh` or a self-updating binary, which is also why
 # [updater] is switched off in config.toml: brew owns this binary, so letting
 # iris rewrite its own Cellar path would desync `brew upgrade`.
 brew "versenilvis/iris/iris"
@@ -168,12 +170,12 @@ cask "firefox@developer-edition"
 cask "google-chrome"
 cask "iterm2@nightly"
 cask "spotify"
-cask "1password-cli" # was brew "1password-cli@beta" (now a cask, beta removed)
+cask "1password-cli"
 cask "1password@beta"
 # cask "brooklyn"
-# carbon-copy-cloner / aerial / kitty — declared but not installed on this
-# machine; disabled rather than deleted so a fresh box doesn't reinstall apps
-# that were deliberately dropped. Same treatment as the block further down.
+# carbon-copy-cloner / aerial / kitty: declared but not installed on this
+# machine; commented out rather than deleted so a fresh box doesn't reinstall
+# apps I chose not to keep. Same treatment as the block further down.
 # cask "carbon-copy-cloner"
 # cask "aerial"
 cask "visual-studio-code"
@@ -203,7 +205,7 @@ cask "onyx"
 cask "adguard"
 cask "balenaetcher"
 cask "brave-browser"
-cask "jetbrains-toolbox"   # was declared twice; deduplicated to this one
+cask "jetbrains-toolbox"
 # cask "microsoft-office"
 # cask "microsoft-teams"
 cask "micro-snitch"
@@ -212,8 +214,7 @@ cask "rio"
 # cask "iconchanger"
 cask "ghostty"
 
-# Installed here but previously undeclared (or commented out despite still being
-# installed), so `brew bundle` on a fresh box produced a different machine.
+# Declared so `brew bundle` on a fresh box produces the same machine.
 # karabiner-elements matters most: .config/karabiner is symlinked and actively
 # managed, so the app has to be declared alongside its config.
 cask "karabiner-elements"
@@ -245,20 +246,20 @@ cask "oversight"
 cask "font-fira-code"
 cask "font-monaspace"
 cask "font-symbols-only-nerd-font"
-cask "font-jetbrains-mono-nerd-font"  # v3 Nerd Font — Rio + NvChad devicons need v3 glyphs
-cask "font-hack"   # plain Hack; installed here but was undeclared
+cask "font-jetbrains-mono-nerd-font"  # v3 Nerd Font, since Rio + NvChad devicons need v3 glyphs
+cask "font-hack"   # plain Hack
 cask "font-noto-emoji"
 # "Hack Nerd Font Mono" is the family .config/ghostty/config and
-# .config/rio/config.toml actually name, and font-hack above does NOT provide it
+# .config/rio/config.toml actually name, and font-hack above does not provide it
 # (it ships only Hack-Regular/Bold/Italic). The faces currently resolve from
-# hand-installed files in ~/Library/Fonts named "Hack * Nerd Font Complete*.ttf"
-# — that's Nerd Font v2 naming, dropped in v3. So a fresh box gets no Nerd Hack
-# at all, and this box has only v2 glyph coverage. Declared for reproducibility;
-# NOT installed yet, because adding v3 faces beside the v2 files would register
-# two fonts claiming the same family name. Remove the v2 files first, then
-# `brew install --cask font-hack-nerd-font`.
+# hand-installed files in ~/Library/Fonts named "Hack * Nerd Font Complete*.ttf",
+# which is Nerd Font v2 naming that v3 dropped. So a fresh box gets no Nerd Hack
+# at all, and this box has only v2 glyph coverage. Declared for reproducibility,
+# but not installed here yet, because adding v3 faces beside the v2 files would
+# register two fonts claiming the same family name. Remove the v2 files first,
+# then `brew install --cask font-hack-nerd-font`.
 cask "font-hack-nerd-font"
-# Installed but undeclared until now.
+# More Nerd Font variants.
 cask "font-fira-code-nerd-font"
 cask "font-fira-mono-nerd-font"
 cask "font-roboto-mono-nerd-font"

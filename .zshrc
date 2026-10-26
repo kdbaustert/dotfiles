@@ -2,7 +2,7 @@
 
 
 #==============================================================================
-#  .zshrc — interactive shell configuration
+#  .zshrc: interactive shell configuration
 #  Login/environment setup lives in .zprofile; this file is interactive-only.
 #==============================================================================
 
@@ -61,14 +61,14 @@ autoload -Uz colors && colors
 bindkey -e
 bindkey '^U' backward-kill-line
 
-# Ctrl-X Ctrl-E — open the current command line in $EDITOR (nvim); on save it
-# runs. Invaluable for long/multiline commands.
+# Ctrl-X Ctrl-E: open the current command line in $EDITOR (nvim); on save it
+# runs. Handy for long or multiline commands.
 autoload -Uz edit-command-line
 zle -N edit-command-line
 bindkey '^X^E' edit-command-line
 
 #------------------------------------------------------------------------------
-# Init caching — `zcache` / `zcache_value`, used throughout this file
+# Init caching: `zcache` / `zcache_value`, used throughout this file
 #------------------------------------------------------------------------------
 # Must come before the first zcache call. Turns `eval "$(tool init zsh)"` into a
 # cached `source`, removing seven serial subprocesses from startup. See the file
@@ -76,25 +76,24 @@ bindkey '^X^E' edit-command-line
 source "$DOTFILES/zsh/extra/cache.zsh"
 
 #------------------------------------------------------------------------------
-# iris — inline completion overlay, ON (autostart defaults on)
+# iris: inline completion overlay, OFF (autostart defaults off)
 #------------------------------------------------------------------------------
 # Every terminal opens into iris, which then runs zsh underneath it. To get a
 # plain shell for one invocation, set the switch to 0 rather than unsetting it:
 # `IRIS_AUTOSTART=0 zsh`. That hatch is worth keeping precisely because iris
-# wraps the whole terminal — "edit a tracked file to get my shell back" is the
+# wraps the whole terminal: "edit a tracked file to get my shell back" is the
 # wrong order of operations when the line editor is the thing misbehaving.
 #
-# This was off between 12 Aug and 12 Sep 2026, and the reason it could be turned
-# back on is the first bullet under KNOWN CONFLICTS below: iris used to swallow
-# the empty-prompt Up arrow before atuin saw it, and 0.7.0's navigate-closed
-# setting hands that key back. The two conflicts that remain are settled in
-# config.toml rather than endured.
+# It can run alongside atuin because of the first bullet under KNOWN CONFLICTS
+# below: 0.7.0's navigate-closed setting hands the empty-prompt Up arrow back to
+# atuin. The two conflicts after that are settled in config.toml rather than
+# endured.
 #
-# `iris init zsh` emits TWO blocks and this shell runs exactly one of them:
+# `iris init zsh` emits two blocks and this shell runs exactly one of them:
 #
-#   1. the autostart — `exec iris`, replacing this shell with the iris binary,
+#   1. the autostart: `exec iris`, replacing this shell with the iris binary,
 #      which then runs zsh in a pty underneath;
-#   2. the zle hooks — _iris_send_lbuffer plus the precmd/preexec/chpwd trio,
+#   2. the zle hooks: _iris_send_lbuffer plus the precmd/preexec/chpwd trio,
 #      which pipe the current line and cwd to iris over $IRIS_FD. Installed
 #      instead when $IRIS_PID is already set, i.e. in that child shell, which is
 #      where the interactive session actually lives.
@@ -103,7 +102,7 @@ source "$DOTFILES/zsh/extra/cache.zsh"
 # only in the child. That is why the call sits here rather than with the other
 # zcache lines further down: on the first pass the shell execs away at this
 # point, so only history, the setopts, the keymap and cache.zsh are paid for
-# twice — starship, zinit, completion and fzf are not.
+# twice; starship, zinit, completion and fzf are not.
 #
 # The guard is not `command -v iris`; zcache already no-ops when the binary is
 # missing. What it has to stop is `exec iris` firing in a shell that is
@@ -112,47 +111,46 @@ source "$DOTFILES/zsh/extra/cache.zsh"
 # drops into an interactive iris and hangs. -t 1 catches the same shape when
 # stdout is a pipe.
 #
-# KNOWN CONFLICTS. iris is not a zle plugin — it wraps the terminal and redraws
-# the command line from OUTSIDE zle, while fzf-tab, fast-syntax-highlighting,
-# zsh-autosuggestions and atuin's widgets all live INSIDE it. They arbitrate the
+# KNOWN CONFLICTS. iris is not a zle plugin: it wraps the terminal and redraws
+# the command line from outside zle, while fzf-tab, fast-syntax-highlighting,
+# zsh-autosuggestions and atuin's widgets all live inside it. They arbitrate the
 # same keystrokes, and iris answers first, unconditionally, whether its menu is
-# open or not. What that has actually cost here:
+# open or not. What that costs here:
 #
-#   - the empty-prompt Up arrow used to be swallowed before atuin saw it. Fixed
-#     in iris 0.7.0 by core.navigate-closed = "shell" in config.toml, which hands
-#     the key back to zle whenever the menu is closed; atuin-history = 2 stays,
-#     so iris's own history mode still reads atuin's database;
-#   - iris's accept key must NOT be bound to enter — doing so garbles atuin's
-#     insert into escape sequences, because both answer the same keypress;
+#   - the empty-prompt Up arrow is swallowed before atuin sees it, unless
+#     core.navigate-closed = "shell" is set in config.toml (iris 0.7.0+), which
+#     hands the key back to zle whenever the menu is closed; atuin-history = 2
+#     stays, so iris's own history mode still reads atuin's database;
+#   - iris's accept key must not be bound to enter, because that garbles atuin's
+#     insert into escape sequences when both answer the same keypress;
 #   - typed aliases get rewritten in place by expand-alias. The alias table is
-#     untouched (124 of them resolve inside the wrapper, `ll` included) — it is
+#     untouched (124 of them resolve inside the wrapper, `ll` included); it is
 #     the on-screen rewrite that reads as breakage;
-#   - OFF as of 2026-09-14, and the reason this bullet list keeps growing
-#     instead of shrinking. iris's zle hook sends its own wire protocol
-#     ("IRIS_LINE:<len>:<buffer>") over a side-channel pipe ($IRIS_FD) on
-#     every zle line-pre-redraw — which fires on every Up/Down history press
+#   - autostart defaults to off because of this one. iris's zle hook sends
+#     its own wire protocol ("IRIS_LINE:<len>:<buffer>") over a side-channel
+#     pipe ($IRIS_FD) on every zle line-pre-redraw, which fires on every Up/Down history press
 #     because a 2-line starship prompt has to fully redraw each time. That
-#     string was observed leaking onto the actual command line instead of
-#     staying on the pipe, and once it leaks once it's part of $BUFFER, so the
-#     next redraw resends "IRIS_LINE:<len>:IRIS_LINE:<len>:...", compounding.
-#     Reproduced with plain Up/Down, no menu open. iris 0.7.0's changelog
-#     already claims two fixes in exactly this area ("overlay drawing
-#     conflicts with full-screen TUI tools like Atuin", "overlay jitter
-#     navigating history with Up/Down") — this is that same seam
-#     (navigate-closed = "shell" handing Up to atuin's full-screen TUI while
-#     iris still owns the outer pty) still not fully solid on the current
-#     release. Re-enable (flip the default below to 1) once upstream ships a
-#     fix; until then this is a known-bad interaction, not a misconfiguration.
+#     string can leak onto the actual command line instead of staying on the
+#     pipe, and once it leaks it's part of $BUFFER, so the next redraw resends
+#     "IRIS_LINE:<len>:IRIS_LINE:<len>:...", compounding. It reproduces with
+#     plain Up/Down, no menu open. iris 0.7.0's changelog already claims two
+#     fixes in exactly this area ("overlay drawing conflicts with full-screen
+#     TUI tools like Atuin", "overlay jitter navigating history with Up/Down");
+#     this is that same seam (navigate-closed = "shell" handing Up to atuin's
+#     full-screen TUI while iris still owns the outer pty) not fully solid on
+#     the current release. Re-enable (flip the default below to 1) once
+#     upstream ships a fix; until then this is a known-bad interaction, not a
+#     misconfiguration.
 #
-# Config and Voltage theme are in .config/iris. Do NOT run `iris setup` or
+# Config and Voltage theme are in .config/iris. Do not run `iris setup` or
 # `iris uninstall`: both rewrite the RC file in place, and ~/.zshrc is a symlink
 # into this repo. See README.MD.
-# Branch 1 — already inside a shell iris started, whether by hand or by the
+# Branch 1: already inside a shell iris started, whether by hand or by the
 # autostart below. Install the zle hooks and nothing else: $IRIS_RESCUE is a
 # kill switch the generated exec branch checks, so it cannot re-exec. Without
 # this branch a hand-started `iris` has no line feed and suggests nothing.
 #
-# Branch 2 — the autostart, and the branch a fresh terminal takes. It tests
+# Branch 2: the autostart, and the branch a fresh terminal takes. It tests
 # != 0 rather than -n so that turning iris off is a value you set for one shell
 # rather than a variable you have to remember to unset. The rest of that guard
 # stops `exec iris` firing in a shell that is interactive but not a session:
@@ -163,7 +161,7 @@ source "$DOTFILES/zsh/extra/cache.zsh"
 # Not exported: the child shell reaches Branch 1 on $IRIS_PID regardless, and
 # leaving it shell-local keeps it out of the environment of everything iris runs.
 #
-# Default is 0 (was 1) — see the IRIS_LINE leak bullet in KNOWN CONFLICTS
+# Default is 0; see the IRIS_LINE leak bullet in KNOWN CONFLICTS
 # above. `IRIS_AUTOSTART=1 zsh` re-enables it for one shell to retest once
 # upstream ships a fix.
 : ${IRIS_AUTOSTART:=0}
@@ -177,22 +175,22 @@ elif [[ $IRIS_AUTOSTART != 0 && -z $ZSH_EXECUTION_STRING && -t 1 && $TERM != dum
 fi
 
 #------------------------------------------------------------------------------
-# Prompt (starship) — first, so the prompt is ready before anything optional
+# Prompt (starship): first, so the prompt is ready before anything optional
 #------------------------------------------------------------------------------
 # PROMPT and RPROMPT come out of `starship init zsh` single-quoted, so they run
-# starship once per prompt — correct, and why editing starship.toml takes effect
-# without clearing this cache. PROMPT2 (the continuation prompt, shown only after
-# an unterminated quote or a trailing `\`) is the odd one out: upstream emits it
-# *double*-quoted, so it forks and execs starship at source time — on every shell
-# start — to build a string most sessions never display. That single subprocess
-# was ~4.2ms, the largest remaining item in `zprof`.
+# starship once per prompt, which is correct and why editing starship.toml takes
+# effect without clearing this cache. PROMPT2 (the continuation prompt, shown
+# only after an unterminated quote or a trailing `\`) is the odd one out:
+# upstream emits it double-quoted, so it forks and execs starship at source
+# time, on every shell start, to build a string most sessions never display.
+# That single subprocess costs ~4.2ms, the largest item in `zprof`.
 #
 # Re-quoting it makes it behave like the other two: expanded by PROMPT_SUBST at
 # the moment it's drawn. Config stays live and the fork only happens if a
 # continuation prompt is actually shown.
 #
 # Done as a cache filter rather than an override after the fact because sourcing
-# the cache is itself what pays the cost — reassigning PROMPT2 afterwards would
+# the cache is itself what pays the cost, so reassigning PROMPT2 afterwards would
 # be too late. Runs once per regeneration; see zcache in zsh/extra/cache.zsh.
 setopt PROMPT_SUBST   # required for the lazy form below; zinit.zsh also sets it
 zcache_post_starship() { sed "s|^PROMPT2=\"\\\$(\(.*\))\"\$|PROMPT2='\$(\1)'|" }
@@ -204,30 +202,30 @@ zcache_post_starship() { sed "s|^PROMPT2=\"\\\$(\(.*\))\"\$|PROMPT2='\$(\1)'|" }
 # thing that installs it.
 #
 # It sits here, right above the zcache line, because zcache no-ops when the
-# binary is missing. It used to live in zsh/zinit.zsh, which is sourced further
-# down, so on a fresh machine the first shell installed starship after the
-# prompt init had already been skipped and came up with no prompt.
+# binary is missing. If it lived in zsh/zinit.zsh, which is sourced further
+# down, a fresh machine's first shell would install starship after the prompt
+# init had already been skipped and come up with no prompt.
 #
-# History: it was first a zinit gh-r binary, which made it the one plugin loaded
-# eagerly (a prompt can't be turbo-deferred) and put zinit's plugin-load
-# machinery (~16ms, the largest entry in `zprof`) on the critical path. Then it
-# moved to Homebrew, and then to the upstream installer once
-# `starship --version` showed the two builds diverging. This way there is
-# exactly one updater (`~/.local/bin/starship` re-running its own installer)
-# instead of brew and starship both claiming the binary.
+# A zinit gh-r binary would make it the one plugin loaded eagerly (a prompt
+# can't be turbo-deferred) and put zinit's plugin-load machinery (~16ms, the
+# largest entry in `zprof`) on the critical path. Homebrew isn't used because
+# its build diverges from upstream's (`starship --version` shows it). The
+# installer leaves exactly one updater (`~/.local/bin/starship`
+# re-running its own installer) instead of brew and starship both claiming the
+# binary.
 #
 # The check costs one `command -v` per shell startup and only shells out to
-# curl when the binary is actually missing: a fresh machine, or this one after
-# `~/.local/bin/starship` gets removed by hand.
+# curl when the binary is actually missing: a fresh machine, or one where
+# `~/.local/bin/starship` was removed by hand.
 #
 # `command touch` after install matters: zcache (zsh/extra/cache.zsh)
 # invalidates its `starship init zsh` cache by comparing the binary's mtime to
-# the cache's, on the assumption an install always leaves a fresher binary —
-# true for a brew pour, but the official installer's tarball preserves the
+# the cache's, on the assumption an install always leaves a fresher binary.
+# That holds for a brew pour, but the official installer's tarball preserves the
 # upstream release's original build timestamp instead of setting it to install
 # time. A binary dated earlier than an existing cache silently keeps that
-# stale cache forever (hit once already: an old cache with Homebrew's
-# `/opt/homebrew/bin/starship` baked into `$PROMPT` outlived the switch to
+# stale cache forever (for example, a cache with Homebrew's
+# `/opt/homebrew/bin/starship` baked into `$PROMPT` survives a switch to
 # this installer). Touching the binary after every install restores the
 # "newer install invalidates the cache" invariant zcache relies on.
 if ! command -v starship >/dev/null 2>&1; then
@@ -244,16 +242,16 @@ zcache starship starship init zsh
 #------------------------------------------------------------------------------
 # Syntax-highlighting theme location
 #------------------------------------------------------------------------------
-# fast-syntax-highlighting's state dir. Must be set BEFORE zinit loads the
+# fast-syntax-highlighting's state dir. Must be set before zinit loads the
 # plugin below, because the plugin reads it at source time and defaults it to
-# ${XDG_CACHE_HOME:-~/.cache}/fast-syntax-highlighting — a cache dir, i.e. not
+# ${XDG_CACHE_HOME:-~/.cache}/fast-syntax-highlighting, a cache dir, i.e. not
 # in this repo and not reproducible on a new machine. Pointing it here is what
 # makes .config/fsh/current_theme.zsh (the applied Voltage theme, generated
 # from voltage.ini by `fast-theme XDG:voltage`) load automatically on every box.
 export FAST_WORK_DIR="$HOME/.config/fsh"
 
 #------------------------------------------------------------------------------
-# Plugins (zinit) — completions, autosuggestions, highlighting (all turbo)
+# Plugins (zinit): completions, autosuggestions, highlighting (all turbo)
 #------------------------------------------------------------------------------
 [ -f "$DOTFILES/zsh/zinit.zsh" ] && source "$DOTFILES/zsh/zinit.zsh"
 
@@ -262,20 +260,20 @@ export FAST_WORK_DIR="$HOME/.config/fsh"
 #------------------------------------------------------------------------------
 source "$DOTFILES/zsh/extra/completion.zsh"
 
-# LS_COLORS — colorizes the completion menu, fzf-tab previews and eza listings.
+# LS_COLORS: colorizes the completion menu, fzf-tab previews and eza listings.
 #
 # Two databases are installed; $LS_COLORS_SOURCE picks which one populates the
 # variable:
 #
 #   vivid     (default) this repo's own Voltage theme, .config/vivid/themes/
-#             voltage.yml — not a vivid built-in; vivid resolves a bare name
+#             voltage.yml, not a vivid built-in; vivid resolves a bare name
 #             against ~/.config/vivid/themes first, and install.sh symlinks
-#             .config/vivid there. 677 entries, and the ONLY option that agrees
+#             .config/vivid there. 677 entries, and the only option that agrees
 #             with the prompt, fzf, bat, delta and EZA_COLORS. This is the one
 #             themes/voltage.md documents.
 #
 #   trapd00r  github.com/trapd00r/LS_COLORS, cloned by install.sh. Comparable
-#             breadth, but on its own 256-colour scheme — selecting it means
+#             breadth, but on its own 256-colour scheme, so selecting it means
 #             file listings and completion menus deliberately stop matching
 #             everything else in the palette. Installed for comparison, not as
 #             a recommendation; nothing else in this repo tracks its colours.
@@ -284,15 +282,15 @@ source "$DOTFILES/zsh/extra/completion.zsh"
 : "${LS_COLORS_SOURCE:=vivid}"
 
 if [[ $LS_COLORS_SOURCE == trapd00r ]]; then
-  # gdircolors, NOT dircolors. Upstream's own lscolors.sh calls `dircolors`,
+  # gdircolors, not dircolors. Upstream's own lscolors.sh calls `dircolors`,
   # which does not exist on macOS: Homebrew's coreutils installs the GNU tools
   # g-prefixed, and libexec/gnubin is deliberately absent from the PATH array in
   # .zprofile. Calling the unprefixed name would fail silently and leave
-  # LS_COLORS empty — hence the explicit probe, with a plain `dircolors` branch
+  # LS_COLORS empty, hence the explicit probe, with a plain `dircolors` branch
   # in case one ever does land on PATH first.
   #
   # NB: zcache invalidates on the *binary's* mtime, so editing or `git pull`-ing
-  # the database does not rebuild this — install.sh drops the cache file when it
+  # the database does not rebuild this. install.sh drops the cache file when it
   # updates the clone, and `zcache_clear` is the manual escape hatch.
   _ls_colors_db="${XDG_DATA_HOME:-$HOME/.local/share}/LS_COLORS/LS_COLORS"
   if [[ -r $_ls_colors_db ]]; then
@@ -306,14 +304,14 @@ if [[ $LS_COLORS_SOURCE == trapd00r ]]; then
 fi
 
 # vivid is both the default and the fallback. The `-z` half matters: if the
-# branch above was selected but could not deliver (repo not cloned yet on a
+# branch above was selected but could not deliver (repo not cloned on a
 # fresh box, no dircolors of either name), LS_COLORS would still be empty here,
 # and a shell with no LS_COLORS renders every completion menu and eza listing in
 # flat white. Recovering on the variable rather than on $LS_COLORS_SOURCE makes
 # that automatic instead of a silent downgrade.
 #
 # Cached: vivid re-generates the same ~17KB string every start otherwise. Change
-# the theme here — or edit the theme file — and run `zcache_clear`; mtime
+# the theme here, or edit the theme file, and run `zcache_clear`; mtime
 # invalidation only sees a new vivid binary, not new arguments or a new theme.
 if [[ $LS_COLORS_SOURCE == vivid || -z $LS_COLORS ]]; then
   zcache_value vivid-ls-colors LS_COLORS vivid generate voltage
@@ -325,7 +323,7 @@ if [[ $LS_COLORS_SOURCE == vivid || -z $LS_COLORS ]]; then
   # place the distinction can be drawn.
   #
   # Rewritten in place rather than appended as an override entry: eza and GNU ls
-  # resolve a filename against the *last* matching pattern, zsh's completion
+  # resolve a filename against the last matching pattern, zsh's completion
   # menu against the first, and only an in-place edit reads the same to all
   # three. `${...%%38;2;*}` preserves whatever attribute prefix vivid emitted,
   # so the bold that singles out README.md / TODO.md survives the recolour.
@@ -333,7 +331,7 @@ if [[ $LS_COLORS_SOURCE == vivid || -z $LS_COLORS ]]; then
   LS_COLORS="${LS_COLORS//(#m)\*[^:]#.(md|markdown|mdown|mdx|mkd)=[^:]#/${MATCH%%=*}=${${MATCH##*=}%%38;2;*}38;2;102;56;240}"
 
   # vivid emits lowercase patterns only, and LS_COLORS matching is case
-  # sensitive — so this repo's own README.MD matched nothing above. Worse than
+  # sensitive, so this repo's own README.MD matches nothing above. Worse than
   # falling back to plain text: eza classifies anything named README* as an
   # "immediate" file and paints its own bold underlined ANSI yellow when no
   # LS_COLORS pattern claims it, which is the yellow that survives the recolour.
@@ -359,32 +357,32 @@ zstyle ':fzf-tab:*' show-group quiet
 
 # Accept the highlighted candidate and immediately re-complete, so a deep path
 # can be walked with one Tab and then '/' per segment. This is fzf-tab's own
-# default (lib/-ftb-fzf falls back to '/' off-cygwin) — pinned here so it's
+# default (lib/-ftb-fzf falls back to '/' off-cygwin), pinned here so it's
 # visible next to switch-group, which owns ',' and '.'.
-# Trade-off: '/' can no longer be typed into the fzf query to narrow matches.
+# Trade-off: '/' can't be typed into the fzf query to narrow matches.
 zstyle ':fzf-tab:*' continuous-trigger '/'
 
 # Taller completion menu. fzf-tab sizes itself as
 #   min(max(candidates + fzf-pad, fzf-min-height), LINES / 3 * 2)
 # so it will never exceed two-thirds of the screen, and `fzf-min-height` can't
 # lift that ceiling. Worse, lib/-ftb-fzf:89 writes the result through
-# ${FZF_TMUX_HEIGHT:=...} without declaring the variable local, so the FIRST
+# ${FZF_TMUX_HEIGHT:=...} without declaring the variable local, so the first
 # completion of the session pins that row count globally and every later menu
 # reuses it regardless of candidate count or window size.
 # Overriding via fzf-flags avoids both: they're appended last (lib/-ftb-fzf:97)
 # and fzf resolves duplicate options in favour of the later one.
-# NB: fzf-flags is most-specific-wins, NOT merged — every context below that
+# NB: fzf-flags is most-specific-wins, not merged: every context below that
 # sets its own fzf-flags has to repeat $_ftb_height or it falls back to the
 # pinned default. Change the height here, in one place.
 _ftb_height='--height=80%'
 zstyle ':fzf-tab:*' fzf-flags $_ftb_height
 
-# fzf-tab previews — show context for the candidate under the cursor
+# fzf-tab previews: show context for the candidate under the cursor
 zstyle ':fzf-tab:complete:cd:*'                fzf-preview 'eza -1 --color=always --icons=always --group-directories-first $realpath'
 zstyle ':fzf-tab:complete:__zoxide_z:*'        fzf-preview 'eza -1 --color=always --icons=always --group-directories-first $realpath'
 
 # Command position (incl. aliases/functions): show what the candidate resolves
-# to — `command -V` prints "x is an alias for …" / "… is a shell function" / path.
+# to: `command -V` prints "x is an alias for ..." / "... is a shell function" / path.
 zstyle ':fzf-tab:complete:-command-:*'         fzf-preview 'command -V $word 2>/dev/null | head -20 || echo $word'
 zstyle ':fzf-tab:complete:-command-:*'         fzf-flags $_ftb_height '--preview-window=down:3:wrap'
 zstyle ':fzf-tab:complete:(cat|bat|less|nvim|vim|vi|nano):*' \
@@ -394,17 +392,18 @@ zstyle ':fzf-tab:complete:(-command-|export|unset):*' \
 zstyle ':fzf-tab:complete:(kill|ps):argument-rest:*' \
                                                fzf-preview 'ps -p $word -o comm= -o args 2>/dev/null'
 zstyle ':fzf-tab:complete:(kill|ps):argument-rest:*' fzf-flags $_ftb_height '--preview-window=down:3:wrap'
-# Was `dig +short $word` — a DNS query on every cursor move, measured at 53-67ms
-# and unbounded when DNS is slow or a VPN is up. `ssh -G` parses ~/.ssh/config
-# locally (10ms, no network) and is strictly more informative: it resolves Host
-# aliases to the hostname/user/port actually used, which dig can only NXDOMAIN.
+# `ssh -G` rather than `dig +short $word`: dig makes a DNS query on every cursor
+# move, measured at 53-67ms and unbounded when DNS is slow or a VPN is up.
+# `ssh -G` parses ~/.ssh/config locally (10ms, no network) and is more
+# informative: it resolves Host aliases to the hostname/user/port actually
+# used, which dig can only NXDOMAIN.
 zstyle ':fzf-tab:complete:(ssh|scp|sftp):*' \
                                                fzf-preview 'ssh -G $word 2>/dev/null | awk "/^(hostname|user|port|identityfile) /{print}"'
 zstyle ':fzf-tab:complete:(ssh|scp|sftp):*'    fzf-flags $_ftb_height '--preview-window=down:5:wrap'
-# `head -300` before delta: these were unbounded, and delta was syntax-
-# highlighting the whole diff even though only a screenful is ever visible. HEAD
-# alone is 622 lines here and there are commits at 541 insertions. Measured
-# 42ms/31ms before the cap.
+# `head -300` before delta: unbounded, delta would syntax-highlight the whole
+# diff even though only a screenful is ever visible. HEAD alone is 622 lines
+# here and there are commits at 541 insertions. Measured 42ms/31ms without the
+# cap.
 zstyle ':fzf-tab:complete:git-(add|diff|restore|checkout|stash):*' \
                                                fzf-preview 'git diff --color=always -- $word 2>/dev/null | head -300 | delta'
 zstyle ':fzf-tab:complete:git-(log|show):*'    fzf-preview 'git show --color=always $word 2>/dev/null | head -300 | delta'
@@ -413,10 +412,10 @@ zstyle ':fzf-tab:complete:git-(log|show):*'    fzf-preview 'git show --color=alw
 # FZF_DEFAULT_OPTS already asked for globally; fzf-tab ignores that (see the
 # use-fzf-default-opts note above), so it has to be set here as an explicit flag.
 zstyle ':fzf-tab:complete:git-*:*'             fzf-flags $_ftb_height '--preview-window=right:hidden:wrap' '--bind=ctrl-/:toggle-preview'
-unset _ftb_height   # must stay after the LAST use above
+unset _ftb_height   # must stay after the last use above
 
 #------------------------------------------------------------------------------
-# fzf — fuzzy finder
+# fzf: fuzzy finder
 #------------------------------------------------------------------------------
 [ -f "$DOTFILES/zsh/extra/fzf.zsh" ] && source "$DOTFILES/zsh/extra/fzf.zsh"
 # Ctrl-T (files) and Alt-C (cd) keybindings + completion. Ctrl-R is owned by atuin.
@@ -450,77 +449,78 @@ source "$DOTFILES/zsh/aliases.zsh"
 # All of these print a static zsh integration on stdout; zcache sources it from
 # disk instead of forking the tool on every start. See zsh/extra/cache.zsh.
 
-# zoxide — smarter `cd` (provides `z` and `zi`)
+# zoxide: smarter `cd` (provides `z` and `zi`)
 zcache zoxide zoxide init zsh
 
-# atuin — shell history (owns Ctrl-R / Up). Initialised exactly once.
+# atuin: shell history (owns Ctrl-R / Up). Initialised exactly once.
 zcache atuin atuin init zsh
 
-# navi — interactive cheatsheets (Ctrl-G)
+# navi: interactive cheatsheets (Ctrl-G)
 zcache navi navi widget zsh
 
-# direnv — loads a project's environment on cd; here that is a Nix dev shell
+# direnv: loads a project's environment on cd; here that is a Nix dev shell
 # through `use flake`, cached by nix-direnv (see .config/direnv/direnvrc). The
 # hook is a precmd that runs `direnv export zsh` before every prompt: one fork,
 # 5.9ms measured over 20 runs in a directory with no .envrc, so the cost is per
 # prompt rather than at startup, and small enough to live outside a guard.
 zcache direnv direnv hook zsh
 
-# pay-respects — corrects the last failed command (replaces thefuck, whose repo
-# is dead and which spawned a Python interpreter on every invocation). Kept on
-# `fuck` for muscle memory; the binary's own default is `f`, which would collide
-# with our fzf alias. Also binds ^X^X to fix the current line in place.
+# pay-respects: corrects the last failed command. It's used instead of thefuck,
+# whose repo is dead and which spawns a Python interpreter on every invocation.
+# Aliased to `fuck` for muscle memory; the binary's own default is `f`, which
+# would collide with our fzf alias. Also binds ^X^X to fix the current line in
+# place.
 #
-# --nocnf is REQUIRED, not cosmetic: without it pay-respects installs its own
+# --nocnf is required, not cosmetic: without it pay-respects installs its own
 # command_not_found_handler, which does typo-correction but knows nothing about
 # Homebrew (no brew/formula lookup in the binary at all) and would silently
-# shadow the brew handler below — losing "install it with brew install X".
+# shadow the brew handler below, losing "install it with brew install X".
 #
 # NB: the --alias/--nocnf arguments are baked into the cached output. If they
-# ever change, run `zcache_clear` — mtime invalidation only catches a new binary.
+# ever change, run `zcache_clear`; mtime invalidation only catches a new binary.
 zcache pay-respects pay-respects zsh --alias fuck --nocnf
 
 # The macOS-only aliases and integrations, including Homebrew's
 # command-not-found handler (suggests the formula that provides an unknown
 # command).
 #
-# Sourced here, at the END of the tool-integration section, because the handler
+# Sourced here, at the end of the tool-integration section, because the handler
 # it defines has to win: with --nocnf above, pay-respects installs none of its
 # own, but if that flag is ever dropped the last definition is the one that
-# takes effect. That ordering is the reason for the placement — do not move
+# takes effect. That ordering is the reason for the placement, so don't move
 # this line up next to the aliases.
 [ -r "$DOTFILES/zsh/os/macos-interactive.zsh" ] \
   && source "$DOTFILES/zsh/os/macos-interactive.zsh"
 
 #------------------------------------------------------------------------------
-# Colors — everything on Voltage
+# Colors: everything on Voltage
 #------------------------------------------------------------------------------
 # This repo's own palette; the canonical values and the full list of files that
-# carry it are in themes/voltage.md — which is the list to trust, since the TUIs
+# carry it are in themes/voltage.md, which is the list to trust, since the TUIs
 # (atuin, lazygit, yazi, btop, glow) each carry their own theme file and are
 # easy to miss from here. They all have to agree or the shell looks patched
 # together. The ones set in this file are MANPAGER, BAT_THEME and EZA_COLORS
 # below; the terminal itself (.config/ghostty/config), vivid (LS_COLORS, above),
 # starship (.config/starship.toml) and fzf (zsh/extra/fzf.zsh) are elsewhere.
 
-# bat's theme. This also themes delta, which has no syntax theme of its own —
+# bat's theme. This also themes delta, which has no syntax theme of its own:
 # it renders through bat's highlighting engine and reads $BAT_THEME when
 # --syntax-theme isn't passed. delta is used by the git-diff/git-show fzf-tab
 # previews above, so this is what makes those previews match everything else.
 #
 # Unlike the built-in themes, "Voltage" is ours (.config/bat/themes/
-# Voltage.tmTheme) and only exists once `bat cache --build` has run — install.sh
-# does that. If bat ever falls back to its default theme, that build is why.
+# Voltage.tmTheme) and only exists once `bat cache --build` has run, which
+# install.sh does. If bat ever falls back to its default theme, that build is why.
 export BAT_THEME="Voltage"
 
 # man pages. Left alone, man emits backspace-overstrike sequences that a plain
-# pager renders as bold/underline and nothing else, so man was the one
+# pager renders as bold/underline and nothing else, which leaves man as a
 # high-traffic surface with no palette at all. `col -bx` flattens those
 # sequences (bat would otherwise print them literally) and bat re-highlights
 # the result through the `man` syntax, picking up $BAT_THEME above.
 #
 # No MANROFFOPT here: it is the documented companion on groff systems, but
-# macOS ships mandoc, which ignores it — verified identical output either way.
+# macOS ships mandoc, which ignores it (verified identical output either way).
 export MANPAGER="sh -c 'col -bx | bat -l man -p'"
 
 # -R lets ANSI color survive the pager instead of being escaped into visible
@@ -528,11 +528,10 @@ export MANPAGER="sh -c 'col -bx | bat -l man -p'"
 # `git log`/`git diff` keep their color when they page.
 export LESS="-R"
 
-# eza's colors. Note this is EZA_COLORS, not EXA_COLORS: the latter is from the
-# pre-rename exa days and eza does not read it. The dead .config/exa/EXA_COLORS
-# that used to sit alongside this comment has been removed — install.sh links
-# every .config/* entry, so keeping it meant planting a dead symlink in
-# ~/.config on every machine.
+# eza's colors. Note this is EZA_COLORS, not EXA_COLORS: that is exa's old
+# name and eza does not read it. Don't add a .config/exa/EXA_COLORS
+# either: install.sh links every .config/* entry, so it would plant a dead
+# symlink in ~/.config on every machine.
 #
 # eza reads LS_COLORS too (set above), so this only overrides what LS_COLORS
 # has no opinion on: the permission bits, ownership and size columns that
@@ -558,12 +557,12 @@ export ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE="fg=#6b6b6b"
 # Byte-compile the config
 #------------------------------------------------------------------------------
 # zsh parses these ~850 lines from source on every start unless a .zwc sits
-# next to each file — `source` (and zsh's own startup-file loading) prefers a
+# next to each file. `source` (and zsh's own startup-file loading) prefers a
 # .zwc that is newer than its source, transparently.
 #
 # Done last, and cheaply: this is a stat per file, and it only writes when a
 # file has actually changed. A recompile therefore costs nothing on a normal
-# start, and an edit is picked up automatically on the *next* shell — no manual
+# start, and an edit is picked up automatically on the next shell, with no manual
 # `zcompile` step to forget after editing a dotfile.
 #
 # zcompile -R (rather than -M) maps the file eagerly, which is what we want for
@@ -580,7 +579,7 @@ export ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE="fg=#6b6b6b"
     $DOTFILES/zsh/extra/*.zsh(N) \
     $DOTFILES/zsh/os/*.zsh(N)
   do
-    # -nt follows symlinks, so the $HOME/.zshrc → dotfiles/.zshrc links compare
+    # -nt follows symlinks, so the $HOME/.zshrc -> dotfiles/.zshrc links compare
     # against the real file's mtime and recompile when the repo copy is edited.
     [[ -s $f && ( ! -s $f.zwc || $f -nt $f.zwc ) ]] && zcompile -R -- $f 2>/dev/null
   done

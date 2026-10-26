@@ -1,12 +1,12 @@
-# zsh-abbr user abbreviations — seeded from zsh/aliases.zsh.
+# zsh-abbr user abbreviations, alongside zsh/aliases.zsh.
 #
 # Loaded via $ABBR_USER_ABBREVIATIONS_FILE (set in zsh/zinit.zsh). Unlike an
 # alias, an abbreviation expands inline as you type (SPACE/ENTER), so the full
-# command is what runs AND what lands in history. Manage with `abbr add NAME=…`,
+# command is what runs and what lands in history. Manage with `abbr add NAME=…`,
 # `abbr erase NAME`, `abbr list`.
 #
 # NOTE: abbr rewrites this file on `abbr add`/`erase` and does not preserve
-# comments — this header and the section breaks below survive only until the
+# comments, so this header and the section breaks below survive only until the
 # first such mutation.
 
 # --- git ---------------------------------------------------------------------

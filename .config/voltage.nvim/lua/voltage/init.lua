@@ -8,7 +8,7 @@
 --
 -- Neovim is not one of the tools that can track the terminal for free. It sets
 -- `termguicolors`, so it emits 24-bit hex and resolves nothing through the
--- Ghostty palette — which is why this file spells out every group instead of
+-- Ghostty palette, which is why this file spells out every group instead of
 -- leaning on ANSI indices the way rg, git and jq do.
 --
 -- Entry point is colors/voltage.lua; this module only knows how to paint.
@@ -19,7 +19,7 @@ local M = {}
 
 -- Deliberately close to the ANSI set: `:terminal` buffers and anything drawing
 -- through them (lazygit, the toggleterm splits) resolve through these, so they
--- are the one place Neovim *can* hand color decisions back to the palette.
+-- are the one place Neovim can hand color decisions back to the palette.
 local terminal_colors = {
   p.black,
   p.red,
@@ -227,7 +227,7 @@ local groups = {
   ["@keyword.directive"] = { fg = p.magenta_br },
 
   -- Punctuation carries no meaning, so it is deliberately the dimmest thing
-  -- on screen that is still text — brackets slightly above delimiters so
+  -- on screen that is still text, with brackets slightly above delimiters so
   -- nesting stays traceable.
   ["@punctuation.delimiter"] = { fg = p.subtle },
   ["@punctuation.bracket"] = { fg = p.fg },

@@ -6,7 +6,7 @@
 #
 # WHY A CHECK AND NOT TRUST. The link breaks without a sound. GNU `sed -i` (and
 # `perl -i`, and any editor that saves by rename) replaces CLAUDE.md with a
-# regular file holding a copy of the text, measured on 2026-10-26. Claude Code
+# regular file holding a copy of the text (measured). Claude Code
 # keeps loading that copy, Codex keeps loading AGENTS.md, and the two drift
 # from the next edit on. Git reports it only as `typechange: CLAUDE.md`, which
 # is easy to commit past. Claude Code's own Edit tool is safe: it refuses to
@@ -75,8 +75,8 @@ if [ "${1:-}" = "--eval" ]; then
   fi
 
   # `codex debug prompt-input` prints what the model would be sent; it is
-  # what setup/REFERENCE.md used to measure the byte limit on codex-cli 0.164.
-  # Not run on a machine with Codex installed since this check was written.
+  # how setup/REFERENCE.md measures the byte limit (codex-cli 0.164).
+  # Untested with Codex installed.
   if command -v codex >/dev/null 2>&1; then
     if prompt=$(cd "$root" && codex debug prompt-input 2>&1) && [[ "$prompt" == *"link_dotfiles"* ]]; then
       pass "Codex loads AGENTS.md"

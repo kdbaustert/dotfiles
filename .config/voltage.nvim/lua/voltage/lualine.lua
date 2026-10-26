@@ -1,6 +1,6 @@
 -- lualine theme.
 --
--- Mode color doubles as the mode indicator here — the same trick starship uses
+-- Mode color doubles as the mode indicator here, the same trick starship uses
 -- in `.config/starship.toml`, where the prompt character changes color instead
 -- of growing a word. Magenta is normal (it matches the cursor, so "the editor
 -- is idle and the cursor is yours"), and the louder colors mean you have

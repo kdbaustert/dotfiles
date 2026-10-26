@@ -225,41 +225,35 @@ rules win — these skills are reference material, not authority.
 
 ### Claude settings, hooks and usage refresh
 
-`~/.claude/settings.json` is **not** tracked — it is mostly state Claude writes
+`~/.claude/settings.json` is **not** tracked: it is mostly state Claude writes
 itself (model, `enabledPlugins`, the atuin hooks), so a symlink would fight it.
-That makes the four blocks wiring the deployed scripts up a manual step on a
-new machine — three under `hooks`, one at the top level:
+The blocks that wire the deployed scripts live in
+`.claude/settings.portable.json` instead, and `merge_claude_settings()` merges
+them in: three `Notification`, `PreToolUse` and `StopFailure` hook groups and
+the top-level `statusLine`.
 
-```json
-"Notification": [{ "hooks": [{ "type": "command",
-  "command": "$HOME/.claude/hooks/notify.sh" }] }]
-```
+Hooks merge differently from every other key. Each event already holds entries
+other tools wrote (atuin, nodeterm), so replacing `hooks` the way a top-level
+key is replaced would delete them. The merge only appends, and skips a portable
+hook whose `command` is already anywhere under its event, which is what keeps a
+block pasted in by hand before 2026-10-26 from being doubled. The cost is that
+removing a hook from the portable file doesn't remove it from a machine; delete
+it from `settings.json` by hand. `setup/check-claude-settings.sh` tests the
+merge against a temp config.
 
-```json
-"PreToolUse": [{ "matcher": "Bash", "hooks": [{ "type": "command",
-  "command": "$HOME/.claude/hooks/search-excludes.sh" }] }]
-```
-
-The `PreToolUse` entry goes *beside* the atuin one already in that array, not in
-place of it. It is the backstop for the search-folder rule in
+`search-excludes.sh` is the backstop for the search-folder rule in
 `.claude/CLAUDE.md`; `.claude/REFERENCE.md` says what it checks and what it
-misses.
-
-```json
-"StopFailure": [{ "matcher": "rate_limit", "hooks": [{ "type": "command",
-  "command": "$HOME/.claude/hooks/resume-after-limit.sh" }] }]
-```
-
-Also beside whatever is already in that array. It marks a session that died on
-the usage limit; the usage-refresh LaunchAgent then runs
-the same script with `--sweep` after each refresh and resumes the session
-headless once the cache shows the limit has reset. The script's header covers
-when it holds back and why the resume goes through a login shell.
-
-```json
-"statusLine": { "type": "command",
-  "command": "$HOME/.claude/statusline.sh", "padding": 0 }
-```
+misses. `command-guard.sh` is the backstop for every "never run" rule in the
+global and repo instructions; its header lists them, why `permissions.deny`
+wasn't used, how it follows indirection through `shfmt`'s syntax tree and the
+newest shell snapshot, and the forms it still misses. It costs about 50 to 85 ms
+a call (measured 2026-10-26), mostly one `shfmt` and one `jq` process per source
+it parses, against about 28 ms for the earlier awk splitter.
+`resume-after-limit.sh` marks a session that died on the usage limit; the
+usage-refresh LaunchAgent then runs the same
+script with `--sweep` after each refresh and resumes the session headless once
+the cache shows the limit has reset. The script's header covers when it holds
+back and why the resume goes through a login shell.
 
 `Notification` is the only event that banners, on purpose — it fires when Claude is
 blocked on you (a permission prompt, an idle question). `Stop` would banner
@@ -287,10 +281,12 @@ by `install.sh`, closes that gap by calling `statusline.sh --refresh` every 5
 minutes regardless of whether a session is open — see the "THE REFRESHER"
 comment in the script for the full split between the two paths.
 
-The same file carries the other untracked-but-load-bearing setting,
-`"attribution": { "commit": "", "pr": "" }`, which is what actually strips the
-`Co-Authored-By` trailer Claude Code would otherwise append to every commit.
-`.claude/CLAUDE.md` states the rule as well, since only one of the two travels.
+The portable file also carries `"attribution": { "commit": "", "pr": "" }`,
+which is what actually strips the `Co-Authored-By` trailer Claude Code would
+otherwise append to every commit. Until 2026-10-26 it lived only in the
+untracked `settings.json`, so a new machine went back to adding trailers.
+`.claude/CLAUDE.md` still states the rule, because Codex reads that file and
+never reads Claude's settings.
 
 The output and compaction defaults now live in `.claude/settings.portable.json`
 and merge during installation. Permission rules below remain a manual step. The deny list stops the Read tool
@@ -410,6 +406,7 @@ zsh -ic exit                                  # full interactive load
 time zsh -i -c exit                           # startup cost — it is budgeted
 stylua --check .config/nvim .config/lvim .config/voltage.nvim
 plutil -lint launchd/*.plist                  # plist syntax, no launchctl load
+setup/check-claude-settings.sh                # settings merge + command guard
 ```
 
 Both file lists are load-bearing, and both used to be shorter than they needed
@@ -487,7 +484,7 @@ half hasn't been run yet; Codex wasn't installed on the machine that wrote it.
 
 `~/.codex/config.toml` no longer needs either discovery key for this repo.
 `project_doc_fallback_filenames = ["CLAUDE.md"]` is still worth keeping for
-projects that only have a `CLAUDE.md`, such as `cnc-claims`, and
+projects that only have a `CLAUDE.md`, and
 `project_doc_max_bytes = 65536` is headroom this repo no longer relies on.
 
 ## Instruction discovery history

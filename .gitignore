@@ -12,7 +12,7 @@ Thumbs.db
 # Compiled Python files
 *.pyc
 
-# Byte-compiled zsh — generated next to each config file by the zcompile block
+# Byte-compiled zsh, generated next to each config file by the zcompile block
 # at the end of .zshrc. Machine- and zsh-version-specific; never commit.
 *.zwc
 *.zwc.old
@@ -21,13 +21,13 @@ Thumbs.db
 *.out
 
 # Shell history. HISTFILE points at ~/.zsh_history (see .zshrc), which is real,
-# machine-local and often full of secrets — it is not a config file and has no
-# business in the repo.
+# machine-local and often full of secrets. It isn't a config file and doesn't
+# belong in the repo.
 .zsh_history
 
 # fast-syntax-highlighting downloads this into $FAST_WORK_DIR (.config/fsh) on
-# first run if it isn't present. Not ours and not deterministic — unlike
-# current_theme.zsh next to it, which IS committed: that one is generated from
+# first run if it isn't present. Not ours and not deterministic, unlike
+# current_theme.zsh next to it, which is committed: that one is generated from
 # our own voltage.ini and is what makes the theme apply on a fresh machine.
 .config/fsh/secondary_theme.zsh
 
@@ -37,6 +37,6 @@ node_modules
 .sass-cache
 
 # macOS custom-folder icons. The file on disk is literally "Icon" followed by a
-# carriage return, so a bare `Icon` pattern matches nothing — the `?` is what
-# makes this work. Was listed twice, both times without it.
+# carriage return, so a bare `Icon` pattern matches nothing. The `?` is what
+# makes this work.
 Icon?

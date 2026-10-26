@@ -5,11 +5,11 @@
 -- failing is a formatter failing, not a mystery LSP error.
 --
 -- Every tool named here is one this repo already installs, and neither plugin
--- will fetch anything — prettier/eslint/stylelint come from setup/pnpm.sh, and
+-- will fetch anything. prettier/eslint/stylelint come from setup/pnpm.sh, and
 -- stylua/shfmt/shellcheck/php-cs-fixer from the Brewfile. Deliberately not
 -- mason: these are sharp little binaries the shell wants anyway, and a copy
 -- under ~/.local/share/nvim would vanish with the plugin dir. Language servers
--- go the other way — see the note in lsp.lua.
+-- go the other way; see the note in lsp.lua.
 
 return {
   {
@@ -108,7 +108,7 @@ return {
         group = vim.api.nvim_create_augroup("configs_lint", { clear = true }),
         callback = function()
           -- Only run linters whose binary actually exists, so a missing
-          -- global (stylelint is not currently installed — see README.MD)
+          -- global (stylelint is not installed, see README.MD)
           -- degrades to "no diagnostics" rather than an error per save.
           --
           -- `cmd` is not reliably a string: nvim-lint lets a linter be a

@@ -1,10 +1,10 @@
 #!/usr/bin/env zsh
 #==============================================================================
-#  zsh/os/macos-interactive.zsh — interactive config that exists only on macOS
+#  zsh/os/macos-interactive.zsh: interactive config that exists only on macOS
 #------------------------------------------------------------------------------
 #  Sourced from .zshrc AFTER zsh/aliases.zsh (so anything here can override a
 #  portable alias) and after the tool-integration block (so the
-#  command-not-found handler below is the last one defined — see .zshrc).
+#  command-not-found handler below is the last one defined; see .zshrc).
 #
 #  What belongs here: aliases and integrations that call Apple tools, Homebrew
 #  or paths under ~/Library. Aliases that only need ordinary CLI tools stay in
@@ -15,14 +15,13 @@
 # command-not-found
 #------------------------------------------------------------------------------
 # Suggest the formula that provides an unknown command (`brew which-formula`
-# under the hood). Shipped in Homebrew core now — the old
-# homebrew/command-not-found tap was deprecated.
+# under the hood). It ships in Homebrew core, so no tap is needed.
 #
 # Source the handler directly rather than `eval "$(brew command-not-found-init)"`
 # so we don't spawn brew on every startup; $HOMEBREW_REPOSITORY is exported by
 # zsh/os/macos-env.zsh. With pay-respects' --nocnf in .zshrc this is the only
-# handler defined — but .zshrc still sources this file last so it wins if that
-# flag is ever dropped.
+# handler defined, but .zshrc sources this file last so it wins if that flag
+# is ever dropped.
 () {
   local h="${HOMEBREW_REPOSITORY:-/opt/homebrew}/Library/Homebrew/command-not-found/handler.sh"
   [[ -r $h ]] && source "$h"
@@ -42,12 +41,12 @@ alias icloud="cd '$HOME/Library/Mobile Documents'"
 #------------------------------------------------------------------------------
 alias reboot='sudo /sbin/reboot'
 alias shutdown='sudo /sbin/shutdown'
-# CGSession is gone: Apple removed the "Menu Extras" bundle that carried it, so
-# the old path fails outright on macOS 26. pmset needs no Accessibility grant
+# CGSession isn't used: the "Menu Extras" bundle that carried it doesn't exist
+# on macOS 26, so that path fails outright. pmset needs no Accessibility grant
 # (the osascript Ctrl-Cmd-Q route fails silently without one) and locks straight
 # away here, since `sysadminctl -screenLock status` reports an immediate delay.
 alias lock='pmset displaysleepnow'
-# macOS ships no /sbin/poweroff (that's a Linux/systemd name) — only halt,
+# macOS ships no /sbin/poweroff (that's a Linux/systemd name), only halt,
 # shutdown and reboot. `shutdown -h now` is the faithful equivalent.
 alias poweroff='sudo /sbin/shutdown -h now'
 # 🔇
@@ -70,7 +69,7 @@ alias resetlsd=fixlsd
 alias lscleanup="/System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister -kill -r -domain local -domain system -domain user && killall Finder"
 
 # Delete all screenshots from the Desktop. Matches the
-# "Screenshot 2026-09-13 at 10.41.02.png" / "Screen Shot …" names macOS writes.
+# "Screenshot 2026-09-13 at 10.41.02.png" / "Screen Shot ..." names macOS writes.
 alias rmshots="find ~/Desktop -maxdepth 1 -type f \( -name 'Screenshot *.png' -o -name 'Screen Shot *.png' \) -print -delete"
 
 # Kill all the tabs in Chrome to free up memory

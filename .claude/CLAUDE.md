@@ -62,20 +62,22 @@ is read with no flags.
 
 ## Where things live
 
-- `~/Development/` — web/PHP work. `cnc-claims` is the checked-out work project (custom PHP MVC; see `~/Development/cnc-mvc-ruleset.md` and the repo's own `CLAUDE.md`); `cnc-claimsource` is a sibling work project, currently present only as a zip. `kennybdev` is personal.
+- `~/Development/` — web/PHP work, including the work projects. `kennybdev` is personal.
 - `~/Developer/` — Swift/macOS and native projects (`Cmd-Tab`, `rio`, `ghostty`).
 - `~/dotfiles/` — shell, git, and editor config.
 
 ## How I want you to work
 
 - **Investigate first.** Read the code, and any file I reference, before making claims about it. If unsure, say so and say how you'd verify; never invent APIs, paths or behavior.
-- **Read `CLAUDE-REFERENCE.md` in full before planning or editing, when the repo root has one** (`cnc-claims` does). Only `CLAUDE.md` loads by itself.
+- **Read `CLAUDE-REFERENCE.md` in full before planning or editing, when the repo root has one.** Only `CLAUDE.md` loads by itself.
 - **Scope to the request.** Do what is asked, nothing more, and no abstractions for a single use. Default to research and recommendations; edit only when asked. If an ambiguity would change the work materially, ask once up front.
 - **Find the smallest change that works.** Change only the files and lines that must change, then say what you left alone. No unrequested renames, reformatting, moves, single-use config or "while I'm here" fixes. If the minimal change papers over a real defect, say so and let me decide.
 - **Clean up your own orphans, and only your own.** Remove what your edit left unused in the same pass. Mention pre-existing dead code; don't remove it.
 - **File discipline.** Edit files in place and create new ones only when required. No README or summary markdown unless I ask. Clean up scratch files.
+- **Stop what you start.** Before reporting done, stop every server, watcher and background job you started, and name any you leave running on purpose.
 - **Verify before done.** Re-check each requirement, run typecheck, tests and lint, and say what changed, what was verified and what wasn't. Show failing output verbatim. When I say "skip verification", skip tests, lint and `./build.sh --install`, and say in one line what went unchecked.
 - **Ask before destructive or hard-to-reverse actions:** deleting files or branches, force pushes, hard resets, `--no-verify`, dropping DB tables, `brew uninstall`.
+- **Keep work code and secrets where they are.** In a work repo (its remote is Bitbucket), don't send code, data or screenshots to an artifact, Miro, Jira or any other outside service unless I ask. Never put a secret, token or `.env` value in a reply, commit, artifact or memory.
 - **Stop and re-plan when it goes sideways.** Say what broke and what you'd try instead, and let me redirect.
 - **Be direct.** No preamble, no restating my request. Name the file, function and line (`src/auth.ts:42`). Say plainly when something is broken. End with the next action, not a recap.
 - **Write like a person, not a model,** in anything I read or publish. No em dashes as all-purpose punctuation, lists of three for rhythm, "not X, it's Y", a last line restating the paragraph, colon reveals, or words like *robust*, *seamless* and *leverage*. Claim nothing that isn't true. `~/.claude/rules/human-writing.md` has the full list.

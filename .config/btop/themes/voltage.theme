@@ -1,4 +1,4 @@
-# Voltage — themes/voltage.md.
+# Voltage: themes/voltage.md.
 #
 # btop's gauges are three-stop gradients (start/mid/end) rather than flat
 # colors, so most of this file is ramps. The palette has no dedicated ramp, so
@@ -8,7 +8,7 @@
 
 # Empty rather than a hex: btop then leaves the terminal background alone, so
 # Ghostty's transparency and blur show through. Naming #0f0d0e here would paint
-# an opaque panel over it -- the same reason fzf uses bg:-1.
+# an opaque panel over it, the same reason fzf uses bg:-1.
 theme[main_bg]=""
 theme[main_fg]="#e7e7e7"
 theme[title]="#f8f8f8"
@@ -38,7 +38,7 @@ theme[cpu_start]="#b3e053"
 theme[cpu_mid]="#f9e906"
 theme[cpu_end]="#ff4d5e"
 
-# Free memory — more is better, so this ramp runs the opposite way to `used`.
+# Free memory: more is better, so this ramp runs the opposite way to `used`.
 theme[free_start]="#17d5df"
 theme[free_mid]="#5cc9f5"
 theme[free_end]="#b3e053"
@@ -51,7 +51,7 @@ theme[available_start]="#b3e053"
 theme[available_mid]="#c6ee6e"
 theme[available_end]="#17d5df"
 
-# Used memory — more is worse.
+# Used memory: more is worse.
 theme[used_start]="#b3e053"
 theme[used_mid]="#f9e906"
 theme[used_end]="#ff4d5e"

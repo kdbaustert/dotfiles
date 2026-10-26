@@ -1,8 +1,8 @@
-# Voltage — themes/voltage.md.
+# Voltage: themes/voltage.md.
 #
 # glow's `style` takes either a built-in name or a path to a glamour JSON
-# style. "auto" (the default this replaced) picks glamour's stock dark or light
-# set, which is the one markdown surface that was still off-palette.
+# style. "auto" (glow's default) picks glamour's stock dark or light set, which
+# would leave markdown as the one surface off-palette.
 #
 # The path has to be absolute: glow resolves it against the current working
 # directory, not against this config file, so a relative path works only when

@@ -9,15 +9,15 @@
 # Spliced rather than symlinked or tracked. FlyEnv owns its own marker block in
 # the same file (#X-HOSTS-BEGIN# … #X-HOSTS-END#) and rewrites it whenever a
 # local site is added, so a symlink into this repo would have FlyEnv editing a
-# tracked file — the hazard CLAUDE.md warns about. A tracked copy of the list
+# tracked file, the hazard CLAUDE.md warns about. A tracked copy of the list
 # itself would be ~150k lines, 4 MB, and stale within a week. So only this
 # script is tracked: everything outside the markers, FlyEnv's block and Apple's
 # localhost lines included, is carried through untouched.
 #
 # Refreshed weekly by a root LaunchDaemon, local.<user>.hosts-refresh, that
-# install.sh generates and installs, then runs this once. This was first rejected:
-# a root job pulling a file off the internet into /etc/hosts is a worse trade
-# than a list a few weeks old. Two guards are what make it acceptable now:
+# install.sh generates and installs, then runs this once. A root job pulling a
+# file off the internet into /etc/hosts is a worse trade than a list a few weeks
+# old, unless it has guards. Two make it acceptable:
 #
 #   - The daemon runs a root-owned copy of this script in /usr/local/libexec,
 #     never the file in ~/dotfiles. The repo is writable by anything running as
@@ -28,8 +28,8 @@
 #     address it controls. keep_reachable() then un-blocks the hosts that must
 #     never go dark, the updater's own download host among them.
 #
-# Re-run install.sh after editing this — that is what re-copies it to the root
-# location; until then the daemon keeps running the old copy.
+# Re-run install.sh after editing this. That re-copies it to the root location;
+# until then the daemon keeps running the old copy.
 #
 # To undo it, delete the lines from #BLOCKLIST-BEGIN# to #BLOCKLIST-END#
 # inclusive; nothing else in the file depends on them. To stop the schedule,
@@ -97,7 +97,7 @@ if [ "$entry_count" -lt "$MIN_ENTRIES" ]; then
 fi
 
 # awk rather than sed for the strip: it prints every kept line with a newline,
-# which also repairs a file whose last line has none — FlyEnv leaves its
+# which also repairs a file whose last line has none. FlyEnv leaves its
 # #X-HOSTS-END# marker that way, and a block appended straight after it would
 # land on the same line.
 {

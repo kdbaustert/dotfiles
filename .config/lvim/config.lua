@@ -3,7 +3,7 @@
 -- LunarVim keeps its own runtime in ~/.local/share/lunarvim (installed by its
 -- upstream script, not by install.sh) and reads exactly one file for user
 -- config: this one. Everything else in this directory is loaded from here or
--- found on the runtimepath, which `~/.config/lvim` is a member of — so the
+-- found on the runtimepath, which `~/.config/lvim` is a member of, so the
 -- symlink install.sh creates is what makes `require "voltage"` and
 -- `colors/voltage.lua` resolvable at all.
 --
@@ -22,9 +22,9 @@
 -- ---------------------------------------------------------------------------
 
 -- The colorscheme is a plugin-shaped directory shared with .config/nvim rather
--- than a copy living here — see .config/voltage.nvim and themes/voltage.md.
--- Two editors with two transcriptions of the same palette is precisely the
--- drift the palette exists to prevent, so both add this one path instead.
+-- than a copy living here (see .config/voltage.nvim and themes/voltage.md).
+-- Two editors with two transcriptions of the same palette is the drift the
+-- palette exists to prevent, so both add this one path instead.
 -- It has to go on the runtimepath before either the `require` below or
 -- LunarVim's `colorscheme` call can resolve out of it.
 vim.opt.rtp:append(vim.fn.expand "~/.config/voltage.nvim")
@@ -51,8 +51,8 @@ vim.opt.scrolloff = 8 -- never put the cursor on the very edge of the viewport
 vim.opt.sidescrolloff = 8
 
 -- Wrap at word boundaries and indent the continuation. Off by default in
--- LunarVim, but a lot of what gets opened here is prose — READMEs, Obsidian
--- notes, commit messages — where a hard cut mid-word is worse than a soft one.
+-- LunarVim, but a lot of what gets opened here is prose (READMEs, Obsidian
+-- notes, commit messages), where a hard cut mid-word is worse than a soft one.
 vim.opt.wrap = true
 vim.opt.linebreak = true
 vim.opt.breakindent = true
@@ -110,7 +110,7 @@ lvim.builtin.treesitter.rainbow.enable = false
 
 -- Mason installs anything missing in this list on first launch, which makes
 -- that one launch slow and every later one instant. Names are lspconfig's, not
--- Mason's — note `tsserver` rather than `ts_ls`, since the nvim-lspconfig
+-- Mason's. Note `tsserver` rather than `ts_ls`, since the nvim-lspconfig
 -- version pinned in lazy-lock.json predates that rename.
 lvim.lsp.installer.setup.ensure_installed = {
   "cssls",
@@ -128,7 +128,7 @@ lvim.lsp.installer.setup.ensure_installed = {
 -- ---------------------------------------------------------------------------
 
 -- Every tool named below is one this repo already installs, and none-ls only
--- shells out to PATH — it never fetches anything. So Mason is deliberately not
+-- shells out to PATH and never fetches anything. So Mason is deliberately not
 -- in the loop here: prettier/eslint/stylelint come from setup/pnpm.sh, and
 -- stylua/shfmt/shellcheck/php-cs-fixer from the Brewfile. A Mason-installed
 -- copy would sit under ~/.local/share/lunarvim and disappear the moment that
@@ -172,7 +172,7 @@ linters.setup {
 
 -- Safe to leave on because every formatter above reformats rather than
 -- rewrites, so saving can't change what the code means. The pattern is scoped
--- to the filetypes actually configured — without it, saving a file with no
+-- to the filetypes actually configured. Without it, saving a file with no
 -- registered formatter falls through to the LSP, which formats to its own
 -- defaults and quietly ignores .editorconfig.
 lvim.format_on_save.enabled = true
@@ -201,7 +201,7 @@ lvim.format_on_save.pattern = {
 -- bindings already train.
 lvim.keys.insert_mode["jk"] = "<Esc>"
 
--- Move by screen line when a line is wrapped, unless a count was given — so
+-- Move by screen line when a line is wrapped, unless a count was given, so
 -- `j` behaves visually but `5j` still means five real lines, which is what
 -- relativenumber is showing you.
 lvim.keys.normal_mode["j"] = { "v:count == 0 ? 'gj' : 'j'", { expr = true } }

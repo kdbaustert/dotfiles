@@ -1,4 +1,4 @@
-# Voltage — themes/voltage.md.
+# Voltage: themes/voltage.md.
 #
 # lazygit takes a list per role, where the trailing entries are attributes
 # ("bold"), not extra colors. It accepts hex, so these are the palette values
@@ -42,7 +42,7 @@ gui:
 
 keybinding:
   universal:
-    # Left arrow always goes "back" — from the diff/staging view it returns
+    # Left arrow always goes "back": from the diff/staging view it returns
     # focus to the files panel (the file select tree). Right arrow goes forward.
     return: [<esc>, <left>]
     prevBlock: [h, <backtab>]

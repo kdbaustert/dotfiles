@@ -1,16 +1,16 @@
 #!/usr/bin/env bash
 #==============================================================================
-#  Claude Code status line — plan usage on screen at all times
+#  Claude Code status line: plan usage on screen at all times
 #==============================================================================
-# Wired from ~/.claude/settings.json:
+# Wired by .claude/settings.portable.json, which merge_claude_settings() in
+# setup/lib.sh merges into ~/.claude/settings.json:
 #
 #   "statusLine": { "type": "command",
 #     "command": "$HOME/.claude/statusline.sh", "padding": 0 }
 #
-# settings.json is not tracked in this repo — same story as hooks/notify.sh: it
-# is mostly state Claude writes for itself and would fight a symlink. Only this
-# script is deployed; the block above is the manual step on a new machine, and
-# it is repeated in CLAUDE.md and README.MD.
+# settings.json is not tracked in this repo, for the same reason as
+# hooks/notify.sh: it is mostly state Claude writes for itself and would fight
+# a symlink. Only this script is linked.
 #
 # WHY THIS EXISTS: `/usage` and `/context` both answer the question on demand,
 # and by the time you think to ask, the 5-hour window is usually already the
@@ -24,22 +24,22 @@
 #   Fable week       █████░░░░░░░░░  38%  4d 9h left
 #   Context window   ████░░░░░░░░░░  31%  312K of 1.0M · Opus 5
 #
-# The rows are flush — no blank line between them — and that was tried both
-# ways. Blank separators are also close to impossible here: Claude Code
-# post-processes this script's output as, read off the 2.1.235 binary:
+# The rows are flush, with no blank line between them, because blank
+# separators are close to impossible here. Claude Code post-processes this
+# script's output as, read off the 2.1.235 binary:
 #
 #   stdout.trim().split("\n").flatMap(u => u.trim() || []).join("\n")
 #
-# Every line is trimmed, and a line that trims to empty is *dropped* rather than
+# Every line is trimmed, and a line that trims to empty is dropped rather than
 # rendered blank, so `join("\n\n")` and separators holding a space, an NBSP or
-# a BOM all vanish — every one of them is whitespace to JS `trim()`. The single
-# character that survives is U+200B: category Cf, not whitespace, zero columns.
-# That is the escape hatch if the block ever wants a gap again; the same
+# a BOM all vanish, since every one of them is whitespace to JS `trim()`. The
+# single character that survives is U+200B: category Cf, not whitespace, zero columns.
+# That is the escape hatch if the block ever needs a gap; the same
 # `.trim()` is also why no row here can be indented.
 #
 # The row order is deliberate and doubles as a fallback. Multi-line status
 # lines render in full here, but if a future version ever clipped to the first
-# line, the one that survives is the 5-hour window — the number that actually
+# line, the one that survives is the 5-hour window, the number that actually
 # decides whether you can keep working.
 #
 # `Current session` and `Current week` are Claude Code's own names for these
@@ -54,46 +54,46 @@
 # before it means anything, and the question being asked is always "how long
 # have I got", never "at what o'clock".
 #
-# Claude Code re-runs this on *every* render — it is on the interactive path in
+# Claude Code re-runs this on every render. It is on the interactive path in
 # exactly the way `.zshrc` is, and is budgeted the same way. Hence: one jq
 # process on the hot path, and nothing else. No git, no `date`, no per-field
 # subshell. jq does the arithmetic, the countdown, the bars and the ANSI, and
 # prints the finished block. The only other thing that ever runs is the
 # refresher below, in the background, at most once per five minutes.
 #
-# TWO SOURCES, NOT ONE. Claude Code's stdin carries the 5-hour and 7-day windows
-# but not the Fable one, and it carries them only when *this session* has seen
-# them — so the script also reads a small cache of the `/api/oauth/usage`
-# response, the same endpoint `/usage` itself calls. Why both, rather than the
-# cache alone: stdin is live, refreshed from the response headers of every
+# TWO SOURCES. Claude Code's stdin carries the 5-hour and 7-day windows
+# but not the Fable one, and it carries them only when this session has seen
+# them, so the script also reads a small cache of the `/api/oauth/usage`
+# response, the same endpoint `/usage` itself calls. The cache alone isn't
+# enough because stdin is live, refreshed from the response headers of every
 # turn, while the cache is up to five minutes old. Stdin wins when it has a
 # window; the cache fills in what stdin lacks.
 #
-# The Fable window has been "tracked but not forwarded" for a while, and each
-# version has moved it without exposing it:
+# Claude Code tracks the Fable window but doesn't forward it, as the binaries
+# show:
 #
 #   2.1.258  read off the `anthropic-ratelimit-unified-7d_oi-*` headers into
 #            `seven_day_overage_included`, labelled "Fable limit" internally
-#            and drawn by `/usage` as `Current week (Fable)` — but the object
+#            and drawn by `/usage` as `Current week (Fable)`, but the object
 #            handed to this script is rebuilt from `five_hour`, `seven_day`
 #            and (gateway-only) `spend_limit` alone, so the key is dropped.
-#   2.1.266  same builder, same three keys. A new `rate_limits.model_scoped[]`
+#   2.1.266  same builder, same three keys. A `rate_limits.model_scoped[]`
 #            array does carry per-model weekly windows with a server-supplied
 #            `display_name` of "Fable", but it lives on the usage snapshot
 #            handed to the SDK and remote clients, not on the status line's
-#            stdin. 2.1.266 also started persisting the `/usage` response as
+#            stdin. 2.1.266 also persists the `/usage` response as
 #            `cachedUsageUtilization` in ~/.claude.json, but only after
 #            `/usage` is opened and only for an hour, so it is not a source an
-#            always-on row can lean on — and parsing an 85KB file per render
+#            always-on row can lean on, and parsing an 85KB file per render
 #            would blow the budget anyway.
 #
-# So the row keeps a reader for `seven_day_overage_included` — free, and it
-# takes over the day the field is forwarded — and gets its numbers from the
+# So the row keeps a reader for `seven_day_overage_included` (free, and it
+# takes over the day the field is forwarded) and gets its numbers from the
 # cache until then.
 #
 # THE CACHE. `$XDG_CACHE_HOME/claude-usage.json` is the endpoint's JSON plus a
 # `fetched_at` epoch stamp, written atomically (tmp + mv) so a render never
-# reads a half-written file. jq reads it with `--slurpfile` in the *same*
+# reads a half-written file. jq reads it with `--slurpfile` in the same
 # process that renders the rows, so the hot path is still one jq; a missing
 # file is fed as /dev/null, which slurps to `[]`, so nothing has to exist for
 # the script to work. Two thresholds, both borrowed from Claude Code's own
@@ -103,7 +103,7 @@
 #              Older than this and jq appends a `REFRESH` marker line, which
 #              the shell strips and answers by spawning the refresher.
 #   1 hour     the persisted-cache lifetime (`nxo`). Older than this and the
-#              cached rows are hidden rather than shown stale — the usual
+#              cached rows are hidden rather than shown stale. The usual
 #              cause is an expired OAuth token, which Claude Code refreshes on
 #              its own; the row returns once it has.
 #
@@ -120,10 +120,10 @@
 # one older than two minutes is treated as left by a killed refresher and
 # removed. On any failure the refresher still restamps `fetched_at` over the
 # previous data, so a dead endpoint costs one attempt per five minutes rather
-# than one per render — and the stale-hiding rule above keeps old numbers from
+# than one per render, and the stale-hiding rule above keeps old numbers from
 # lingering on screen.
 #
-# The render path above only ever calls the refresher opportunistically — from
+# The render path above only ever calls the refresher opportunistically, from
 # inside a render, when the cache is already stale. With no Claude Code session
 # running, nothing renders, so the cache just sits there aging past the 1-hour
 # `$fresh` cutoff and the next session's first render shows nothing for a beat
@@ -131,35 +131,34 @@
 # covers that gap from outside any session: it invokes this script with
 # `--refresh` every 5 minutes (the same TTL the render path already uses) so
 # the cache is warm before a render ever asks. `--refresh` runs the fetch in
-# the foreground rather than backgrounding it — the launchd job already *is*
-# the background process — and skips the render entirely, since there is no
+# the foreground rather than backgrounding it, because the launchd job already is
+# the background process, and skips the render entirely, since there is no
 # Claude Code stdin to read outside of one.
 #
-# The stdin schema below was read off the 2.1.235 binary rather than the docs,
+# The stdin schema below comes from the 2.1.235 binary rather than the docs,
 # because these details are easy to get wrong and every one fails silently:
 #
-#   .rate_limits            absent entirely on API-key auth — it is built from
+#   .rate_limits            absent entirely on API-key auth; it is built from
 #                           `five_hour`/`seven_day` only when a subscription
 #                           reports them, so every field here must be optional
 #                           and a missing window drops its whole row.
 #   .rate_limits.*.used_percentage    0-100 (utilization × 100), not a fraction.
-#   .rate_limits.*.resets_at          ISO 8601 string, nullable. A *different*
+#   .rate_limits.*.resets_at          ISO 8601 string, nullable. A different
 #                           Claude Code schema carries the same key as epoch
 #                           seconds, so `secs` accepts both rather than
 #                           betting on which one shows up.
 #   .context_window.used_percentage   0-100, already rounded and clamped by the
-#                           caller — and null until the first turn has usage.
+#                           caller, and null until the first turn has usage.
 #
 # And the cache, i.e. the `/api/oauth/usage` response (schema from 2.1.269):
 #
 #   .five_hour / .seven_day .utilization is 0-100 here too, and .resets_at is
-#                           an ISO string. It was a 0-1 *fraction* on 2.1.266
-#                           and this script scaled it ×100; 2.1.269 returns
-#                           5.0 and 28.0 for 5% and 28%, and its own `/usage`
-#                           floors the value as-is (`Math.floor(a.utilization)`
-#                           in the binary) while the header-derived path now
-#                           multiplies *its* fraction by 100 to match. So no
-#                           scaling: the ×100 is what drew 500% and a bar
+#                           an ISO string. 2.1.269 returns 5.0 and 28.0 for 5%
+#                           and 28%, and its own `/usage` floors the value
+#                           as-is (`Math.floor(a.utilization)` in the binary),
+#                           so there is no scaling, unlike the stdin path,
+#                           which multiplies its own fraction by 100.
+#                           Multiplying this one by 100 draws 500% and a bar
 #                           five times the width of the terminal.
 #   .limits[]               the per-model windows. `.percent` is already 0-100,
 #                           `.scope.model.display_name` is the label ("Fable"),
@@ -170,7 +169,7 @@
 # the palette's greens and oranges are not in the 16-color set, and the whole
 # point of the heat ramp is that 78% and 92% look different at a glance. The
 # empty half of each bar is drawn in `black` rather than `subtle`, so the track
-# sits *behind* the label instead of competing with it.
+# sits behind the label instead of competing with it.
 #==============================================================================
 
 # Best-effort, like the notification hook: a status line that errors just puts
@@ -206,17 +205,17 @@ EOF
   rmdir "$lock" 2>/dev/null
 }
 
-# The LaunchAgent's entry point — see the refresher comment above. Exits before
+# The LaunchAgent's entry point; see the refresher comment above. Exits before
 # touching stdin, since a launchd-triggered run has none of Claude Code's JSON
 # to read.
 #
 # Always exit 0. `refresh` returns whatever its last command did, and both of
-# its ordinary non-fatal outcomes — another refresh already holding the lock,
-# or a cache directory it cannot write — come back non-zero, which launchd
+# its ordinary non-fatal outcomes (another refresh already holding the lock,
+# or a cache directory it cannot write) come back non-zero, which launchd
 # records as a failed job and shows as `last exit code = 1` forever after. This
 # is a best-effort cache warmer; a missed run is not a failure worth flagging.
-# The honest health check is the cache's own `fetched_at`, which answers the
-# question an exit code only gestures at: is the data actually being refreshed.
+# The health check to use is the cache's own `fetched_at`, which shows whether
+# the data is actually being refreshed, something an exit code only hints at.
 if [ "${1:-}" = "--refresh" ]; then
   refresh
   exit 0
@@ -247,8 +246,8 @@ out=$(jq -r --slurpfile c "$cache_in" '
     else green
     end;
 
-  # floor, not round, so the bar only fills completely at a genuine 100% —
-  # a full bar at 97% is the one reading that would make you stop early. The
+  # floor, not round, so the bar only fills completely at a real 100%. A full
+  # bar at 97% is the one reading that would make you stop early. The
   # max() keeps any non-zero usage showing at least one cell.
   def bar($p; $w):
     (if $p <= 0 then 0 else ([$p / 100 * $w | floor, 1] | max) end) as $n
@@ -257,7 +256,7 @@ out=$(jq -r --slurpfile c "$cache_in" '
   # Both accepted forms of resets_at, normalised to epoch seconds. The two
   # subs are for the cache: the endpoint writes `23:09:59.873787+00:00`, and
   # jq 1.8 fromdateiso8601 takes only whole seconds ending in `Z`, so without
-  # them every cached row silently lost its countdown (try/catch ate the
+  # them every cached row silently loses its countdown (try/catch eats the
   # parse error). Stdin already sends `Z`, and the subs are no-ops on it.
   def secs($v):
     if $v == null then null
@@ -296,7 +295,7 @@ out=$(jq -r --slurpfile c "$cache_in" '
   | ($at < now - 300) as $stale
 
   # A cached window reshaped to the stdin one, so `row` needs only one form.
-  # Empty, not null, when absent — `//` then falls through cleanly.
+  # Empty rather than null when absent, so `//` falls through cleanly.
   | def cached($k):
       if $fresh then
         $cache[$k]
@@ -311,7 +310,7 @@ out=$(jq -r --slurpfile c "$cache_in" '
   # already-rounded value only disagrees with that at a whole-number reading:
   # a stdin value of exactly 41.0 could come from a true percentage anywhere
   # in [40.95, 41.05), and nothing about 41.0 alone says which side of 41 it
-  # started on — so the floor in row can show one point higher than /usage does.
+  # started on, so the floor in row can show one point higher than /usage does.
   # That happens only in that one ambiguous case, so only there does this
   # prefer the cache percentage (fetched from the same endpoint /usage reads,
   # at whatever precision it returns) over the rounded stdin value; every
@@ -322,13 +321,13 @@ out=$(jq -r --slurpfile c "$cache_in" '
   # during a busy session is worth several points, so it is trusted only when
   # it lands where a tie-break can land: equal to the stdin reading, or one
   # below it. Anything further apart is a stale cache rather than a rounding
-  # disagreement, and stdin — which is live — wins.
+  # disagreement, and stdin wins because it is live.
   #
   # The `// null` on the binding below is load-bearing: cached() yields `empty`
   # when the cache is missing or stale, and `empty as $x | BODY` iterates zero
-  # times, so BODY never runs and the whole row silently disappears — stdin
-  # data and all. The old `//` chain this replaced absorbed that for free;
-  # a plain binding does not. Measured: without it, a fresh machine or a cache
+  # times, so BODY never runs and the whole row silently disappears, stdin data
+  # included. A plain binding has no fallback of its own, so `// null` supplies
+  # one. Measured: without it, a fresh machine or a cache
   # older than an hour renders an empty status line rather than the live rows.
   # Both null-guards below run before any arithmetic, because a window can
   # arrive present but empty: Claude Code builds these from whatever a
@@ -337,8 +336,8 @@ out=$(jq -r --slurpfile c "$cache_in" '
   # with a null in hand aborts the whole jq program, not just the one row, so
   # the status line goes blank rather than losing a line. A live window with no
   # percentage is a window stdin does not really have, so it falls through to
-  # the cache — which is the documented split, the cache filling in what stdin
-  # lacks — and if that has nothing either, the null drops the row downstream.
+  # the cache (the documented split, with the cache filling in what stdin
+  # lacks), and if that has nothing either, the null drops the row downstream.
   def resolved($k):
       (.rate_limits[$k]) as $live
       | (cached($k) // null) as $cached_val

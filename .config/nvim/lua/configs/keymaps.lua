@@ -1,7 +1,7 @@
 -- Mappings that belong to no plugin. Plugin mappings are declared in that
 -- plugin's own spec via lazy's `keys =`, so they double as lazy-load triggers.
 --
--- Leader is <Space>, matching .config/lvim — the two editors are different in
+-- Leader is <Space>, matching .config/lvim. The two editors are different in
 -- almost every other way, so the least they can do is not fight each other's
 -- muscle memory.
 
@@ -11,7 +11,7 @@ local map = vim.keymap.set
 map("i", "jk", "<Esc>", { desc = "Exit insert mode" })
 map("n", "<Esc>", "<cmd>nohlsearch<CR>", { desc = "Clear search highlight" })
 
--- Move by screen line when a line is wrapped — but only without a count, so
+-- Move by screen line when a line is wrapped, but only without a count, so
 -- `5j` still means five real lines, which is what relativenumber is showing.
 map({ "n", "x" }, "j", "v:count == 0 ? 'gj' : 'j'", { expr = true, silent = true })
 map({ "n", "x" }, "k", "v:count == 0 ? 'gk' : 'k'", { expr = true, silent = true })
@@ -71,7 +71,7 @@ map("n", "<leader>gg", function()
   vim.b.lazygit = true
 end, { desc = "Lazygit" })
 
--- <Esc> in a terminal buffer means "escape", not "send escape" — except in
+-- <Esc> in a terminal buffer means "escape", not "send escape", except in
 -- lazygit, which needs the real key to back out of its own panels.
 map("t", "<Esc>", function()
   return vim.b.lazygit and "<Esc>" or [[<C-\><C-n>]]

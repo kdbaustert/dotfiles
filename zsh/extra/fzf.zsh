@@ -8,7 +8,7 @@
 # Common fd command. --color=always makes fd tint each entry by file type from
 # $LS_COLORS, so the pickers agree with eza and the completion menu instead of
 # listing everything in flat white. The pickers pair it with --ansi, which
-# renders those escapes and strips them from the value fzf prints — what lands
+# renders those escapes and strips them from the value fzf prints, so what lands
 # on the command line is still a clean path.
 FD="fd --hidden --follow --strip-cwd-prefix --color=always"
 
@@ -31,11 +31,10 @@ export FZF_DEFAULT_OPTS="
 --ansi
 --prompt '⯈ '
 --marker=+
-# The preview pane. This window was configured here long before anything filled
-# it: with no --preview command and no toggle bind, it could never be shown or
-# populated. bat renders files through the Voltage theme (see BAT_THEME in
-# .zshrc), eza covers directories -- which is what ALT-C lists -- and the bare
-# echo is the fallback for input that is not a path at all, such as the hist
+# The preview pane. It needs both a --preview command and a toggle bind, or it
+# can never be shown or populated. bat renders files through the Voltage theme
+# (see BAT_THEME in .zshrc), eza covers directories (which is what ALT-C
+# lists), and the bare echo is the fallback for input that is not a path at all, such as the hist
 # alias piping shell history in. Without that last arm those previews print an
 # eza error instead of the line.
 #
@@ -47,23 +46,23 @@ export FZF_DEFAULT_OPTS="
 # unreachable on whichever terminal disagrees.
 --bind=ctrl-/:toggle-preview,ctrl-_:toggle-preview
 # Voltage (themes/voltage.md), matching ghostty / starship / LS_COLORS / bat /
-# delta. Hex rather than the 256 indices this used before: the old codes (203,
-# 220, 100…) were approximations that drifted from every other tool. bg:-1 and
+# delta. Hex rather than 256-color indices (203, 220, 100...), which only
+# approximate the palette and drift from every other tool. bg:-1 and
 # gutter:-1 keep the terminal's own background showing through, so fzf doesn't
 # paint a slightly-off panel over the blur.
 #
-# fg+ does not clobber the per-file ANSI colors on the current line — fzf layers
-# item color over the base — so the row under the cursor keeps its file-type
+# fg+ does not clobber the per-file ANSI colors on the current line (fzf layers
+# item color over the base), so the row under the cursor keeps its file-type
 # tint and only picks up the bg+ fill.
 --color=fg:#e7e7e7,fg+:#f8f8f8,bg:-1,bg+:#2a2427,gutter:-1
 --color=hl:#eb43f4,hl+:#f712ff
-# Marked rows (--multi). Previously only the marker glyph distinguished them;
-# selected-bg gives the row itself a fill, one step darker than the cursor's
-# bg+ so the two stay tellable apart.
+# Marked rows (--multi). selected-bg gives the row itself a fill, in addition
+# to the marker glyph, one step darker than the cursor's bg+ so the two stay
+# tellable apart.
 --color=selected-fg:#e7e7e7,selected-bg:#1c191a,selected-hl:#f712ff
 --color=info:#b3e053,prompt:#ff4d5e,pointer:#5cc9f5,query:#f8f8f8
-# marker was #fcf58d, which is an EZA_COLORS extra rather than a palette entry;
-# bright yellow is the documented slot.
+# marker uses bright yellow, the documented slot. #fcf58d is an EZA_COLORS
+# extra rather than a palette entry.
 --color=marker:#f8f079,spinner:#17d5df,header:#17d5df
 --color=border:#6b6b6b,separator:#393a3d,scrollbar:#6b6b6b
 --layout=reverse
@@ -94,7 +93,7 @@ export FZF_CTRL_R_OPTS="--no-ansi"
 # `unset FZF_DEFAULT_COMMAND` in the subshell *before* invoking this hook, so
 # expanding it here yields `eval " -- ./"` and the completion dies with
 # "command not found: --". $FD survives because it's a plain shell variable of
-# the interactive shell, which the subshell inherits — same as _fzf_compgen_dir.
+# the interactive shell, which the subshell inherits (same as _fzf_compgen_dir).
 _fzf_compgen_path() {
   eval "$FD --type f --type l -- $1"
 }
@@ -105,13 +104,13 @@ _fzf_compgen_dir() {
   eval "$FD --type d -- $1"
 }
 
-# Alias picker (Alt-A) — fuzzy-search every alias, insert the chosen name onto
+# Alias picker (Alt-A): fuzzy-search every alias, insert the chosen name onto
 # the command line. The expansion is shown in the preview pane so you can see
 # what it resolves to before committing. Ctrl-Space toggles inserting the full
 # expansion instead of the alias name.
 _fzf_alias_widget() {
   local pick col
-  # `alias` prints  name='expansion' — split on the first '=' into name<TAB>expansion.
+  # `alias` prints  name='expansion'; split on the first '=' into name<TAB>expansion.
   pick=$(alias | sed 's/=/\t/' | \
     fzf --height=45% --layout=reverse --delimiter='\t' --with-nth=1 \
         --prompt='alias ⯈ ' \

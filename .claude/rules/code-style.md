@@ -114,8 +114,8 @@ fixing them. Don't copy bad structure just because it sits nearby.
   `~/.claude/rules/human-writing.md` apply to comments too.
 
 ```
-// Bad:  This function is responsible for robustly retrieving the user's claims.
-// Good: Skips archived claims; the nightly export reads those separately.
+// Bad:  This function is responsible for robustly retrieving the user's orders.
+// Good: Skips archived orders; the nightly export reads those separately.
 ```
 
 ## Tests

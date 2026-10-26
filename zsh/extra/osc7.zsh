@@ -1,21 +1,19 @@
 #==============================================================================
-#  osc7.zsh — report the shell's working directory to the terminal (OSC 7)
+#  osc7.zsh: report the shell's working directory to the terminal (OSC 7)
 #------------------------------------------------------------------------------
 #  "New tab opens in the same directory" requires the terminal to know where the
 #  shell actually is. Terminals learn that one of two ways:
 #
 #    1. Inspect the foreground process on their own pty and read its cwd.
-#    2. Be told — the shell emits an OSC 7 escape sequence on every directory
+#    2. Be told: the shell emits an OSC 7 escape sequence on every directory
 #       change, carrying a file:// URI.
 #
 #  Route 1 is a guess, and it silently breaks whenever anything sits between the
 #  terminal and the shell on a second pty: an agent that wraps the shell, mosh,
 #  or a session multiplexer. The terminal reads the wrapper's cwd and opens the
-#  new tab somewhere stale, with no error to explain it. (Kiro CLI used to do
-#  exactly this here, which is what sent iTerm2 and Rio to the wrong directory
-#  until it was removed.)
+#  new tab somewhere stale, with no error to explain it.
 #
-#  Route 2 is authoritative — the shell states where it is, and escape sequences
+#  Route 2 is authoritative: the shell states where it is, and escape sequences
 #  travel through any wrapper untouched. Ghostty emits OSC 7 from its own
 #  injected shell integration, but that is Ghostty-only and rides on a ZDOTDIR
 #  handoff. Emitting it here covers Ghostty, iTerm2 and Rio alike and keeps the
@@ -28,7 +26,7 @@
 # a legal path separator and must stay literal).
 #
 # LC_ALL=C is load-bearing, not hygiene: it makes ${#PWD} and $PWD[i] operate on
-# BYTES. A multibyte character in a path has to be encoded one byte at a time —
+# bytes. A multibyte character in a path has to be encoded one byte at a time;
 # encoding it as a single "character" would emit a URI no terminal can decode.
 _osc7_report_cwd() {
   emulate -L zsh
@@ -55,7 +53,7 @@ _osc7_report_cwd() {
 # chpwd covers every directory change (cd, pushd/popd, zoxide); the explicit
 # call reports the directory the shell started in, which no hook would fire for.
 # -t 1 because only a terminal reads OSC 7: `zsh -ic 'cmd' | jq` is
-# interactive too, and without it the pipe's first bytes were the escape.
+# interactive too, and without it the pipe's first bytes would be the escape.
 if [[ -o interactive && -t 1 ]]; then
   autoload -Uz add-zsh-hook
   add-zsh-hook chpwd _osc7_report_cwd

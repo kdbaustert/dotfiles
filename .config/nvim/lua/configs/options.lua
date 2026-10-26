@@ -11,8 +11,8 @@ opt.scrolloff = 8 -- never park the cursor on the edge of the viewport
 opt.sidescrolloff = 8
 opt.signcolumn = "yes" -- always on, or the text shifts when a sign appears
 
--- Wrapping. On, because a lot of what gets opened here is prose — READMEs,
--- commit messages, Obsidian notes — and a hard cut mid-word is worse than a
+-- Wrapping. On, because a lot of what gets opened here is prose (READMEs,
+-- commit messages, Obsidian notes) and a hard cut mid-word is worse than a
 -- soft one. `breakindent` keeps the continuation aligned with the list item or
 -- indent it belongs to, which is what makes this bearable in code too.
 opt.wrap = true

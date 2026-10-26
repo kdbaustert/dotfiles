@@ -1,10 +1,10 @@
 -- LSP.
 --
--- Neovim 0.11 moved server configuration into core: `vim.lsp.config` merges
+-- Neovim 0.11 configures servers in core: `vim.lsp.config` merges
 -- settings into a named config and `vim.lsp.enable` starts it. nvim-lspconfig
--- is still here, but only as the *data* — it ships an `lsp/<name>.lua` per
--- server with the command and root markers — and mason-lspconfig calls
--- `vim.lsp.enable` for whatever mason has installed. So there is no
+-- supplies only the data (an `lsp/<name>.lua` per server with the command and
+-- root markers), and mason-lspconfig calls `vim.lsp.enable` for whatever mason
+-- has installed. So there is no
 -- `require("lspconfig").x.setup{}` anywhere below; that form is the old API.
 
 -- Servers are per-language and mostly node-based, so mason manages them here

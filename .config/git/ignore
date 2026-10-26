@@ -4,7 +4,7 @@
 # The memory bank (see Memory in .claude/CLAUDE.md): per-machine notes for
 # Claude and Codex, kept out of every repo, the work one included. Named one by
 # one, not as CLAUDE-*.md, because that glob would also hide tracked files that
-# share the prefix, like cnc-claims' CLAUDE-REFERENCE.md.
+# share the prefix, like a project's CLAUDE-REFERENCE.md.
 CLAUDE-activeContext.md
 CLAUDE-patterns.md
 CLAUDE-decisions.md

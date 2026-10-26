@@ -1,7 +1,7 @@
 -- Statusline.
 --
 -- The theme is the shared Voltage table (.config/voltage.nvim/lua/voltage/
--- lualine.lua), the same one .config/lvim uses — so both editors have the same
+-- lualine.lua), the same one .config/lvim uses, so both editors have the same
 -- statusline colors even though nothing else about them matches.
 
 return {

@@ -1,10 +1,10 @@
 #!/usr/bin/env zsh
 #==============================================================================
-#  notify.zsh — desktop notification when a long command finishes in Rio
+#  notify.zsh: desktop notification when a long command finishes in Rio
 #
 #  Rio already raises native notifications for OSC 9 / OSC 777 escapes, but it
 #  has no hook to fire one when an ordinary command completes. This adds that:
-#  when a foreground command runs longer than a threshold AND Rio is not the
+#  when a foreground command runs longer than a threshold and Rio is not the
 #  frontmost app (i.e. you've tabbed away), we post a notification via
 #  terminal-notifier. Clicking it focuses Rio.
 #
@@ -50,7 +50,7 @@ _rio_notify_preexec() {
   _RIO_NOTIFY_START=$EPOCHSECONDS
 }
 
-# precmd: runs before each prompt. Capture $? first — it's the exit status of
+# precmd: runs before each prompt. Capture $? first, since it's the exit status of
 # the command that just finished.
 _rio_notify_precmd() {
   local exit_status=$?

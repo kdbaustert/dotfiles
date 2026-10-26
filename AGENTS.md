@@ -17,26 +17,42 @@ default `project_doc_max_bytes`; past that it gets cut off. Run
 `setup/check-agents-md.sh` after editing it. **Agent instructions** in
 `setup/REFERENCE.md` has the reasons.
 
+## Where this file overrides the global rules
+
+The global `.claude/CLAUDE.md` loads first and asks a project that overrides
+one of its rules to name it. Here, follow this file on these three:
+
+- **Overrides *File discipline*'s "no README or summary markdown".** "Do it
+  with documentation" means a change ships with its comments, its
+  `setup/REFERENCE.md` section and the `README.MD` lines it makes stale. It
+  still doesn't mean a new summary file nobody asked for.
+- **Overrides *Scope to the request*'s "default to research".** A request for
+  a change gets the finished change, not a plan. A question still gets an
+  answer and no edits.
+- **Overrides the no-emoji rules** in `human-writing.md` and
+  `token-efficient.md`, for the four circles under *Completion status protocol*
+  only.
+
 ## How to work (high-level mindset)
 
 **This section is non-negotiable and must never be removed.**
 
-The marginal cost of completeness is near zero with AI. Do the whole thing. Do it right. Do it with tests. Do it with documentation. Do it so well that Kenny is genuinely impressed — not politely satisfied, actually impressed. Never offer to "table this for later" when the permanent solve is within reach. Never leave a dangling thread when tying it off takes five more minutes. Never present a workaround when the real fix exists. The standard isn't "good enough" — it's "holy shit, that's done."
+The marginal cost of completeness is near zero with AI. Do the whole thing. Do it right. Do it with tests. Do it with documentation. Do it so well that Kenny is actually impressed, not politely satisfied. Never offer to "table this for later" when the permanent solve is within reach. Never leave a dangling thread when tying it off takes five more minutes. Never present a workaround when the real fix exists. The standard is "holy shit, that's done."
 
 Search before building. Test before shipping. Ship the complete thing. When Kenny asks for something, the answer is the finished product, not a plan to build it.
 
 You can outsource the typing. You cannot outsource the understanding. Before you call anything DONE you must be able to explain why the code is correct and exactly where it would break. Tests passing is not understanding. If you can't walk the failure modes out loud, you're not done, you're guessing.
 
-## Task sizing — triage before spending tokens
+## Task sizing: triage before spending tokens
 
 **This section is non-negotiable and must never be removed.** It sets how much testing, fan-out and critique a task gets. "Do the whole thing" means what the task needs; a full protocol on a typo is waste.
 
-**Every task starts with this triage block, printed before any work.** Kenny reads it to check the mode and tune these rules, and the Branch line tells parallel sessions apart. Never skip it or bury it.
+**Every task starts with this triage block, printed before any work.** Kenny reads it to check the mode and tune these rules, and the Branch line tells parallel sessions apart. Never skip it or bury it. A question that changes no files isn't a task in this sense: answer it with no triage block and no status line.
 
 ```
-Size: small | medium | large — why
-Tests: local (which ones) | full suite — why
-Agents: solo | fan-out (how many, on what) — why
+Size: small | medium | large, why
+Tests: local (which ones) | full suite, why
+Agents: solo | fan-out (how many, on what), why
 Branch: <current branch> in <repo path>
 ```
 
@@ -130,7 +146,7 @@ Shell startup is budgeted: keep new work off the critical path, use the existing
 ## Style
 
 `.editorconfig` governs formatting. Shell scripts in `setup/` and `install.sh`
-declare a **bash** shebang and use bash arrays — they are run directly, never via
+declare a **bash** shebang and use bash arrays; they are run directly, never via
 `sh`.
 
 **Comments here explain *why*, and are expected to be long.** Rejected
@@ -161,13 +177,13 @@ When you are using compact, please focus on test output and code changes
 
 ## Non-negotiable rules
 
-### Tests and evals — every time, no exceptions
+### Tests and evals: every time, no exceptions
 
 - What you RUN follows the triage size. Never skip the local checks.
 - Every behavior change ships its test in the same diff, and every bug fix a regression test that fails with the bug present. No "tests later". Only non-behavioral small changes (typo, copy, styling value) skip a new test.
 - Evals are only for code that calls an LLM: it ships one with a pass threshold, run before ship, not on every commit.
 
-  ### Tech choice — vanilla by default
+### Tech choice: vanilla by default
 
 - Simplest vanilla tech wins. No framework-of-the-month. No clever abstractions for hypothetical reuse.
 - Do not recreate what already exists. Before writing a utility, harness, or library, check for an existing lib that solves it.
@@ -180,7 +196,7 @@ When a task matches an installed skill's domain (SEO, schema, security audit, de
 
 ## Completion status protocol
 
-End every task with one of these, emoji included; markdown has no color, so the circle is the signal.
+End every task with one of these, emoji included (a question that changed no files gets none); markdown has no color, so the circle is the signal.
 
 - **🟢 DONE**: every step done, evidence for each claim, tests and evals as the triage size requires.
 - **🟡 DONE_WITH_CONCERNS**: done, plus each concern with its severity and a follow-up.

@@ -1,17 +1,17 @@
 #!/usr/bin/env zsh
 #==============================================================================
-#  .zshenv — sourced for EVERY zsh: login, interactive, scripts, `zsh -c`,
+#  .zshenv: sourced for every zsh: login, interactive, scripts, `zsh -c`,
 #  git hooks, editor-spawned shells. Keep it minimal and subprocess-free.
 #
-#  Only truly-global environment belongs here. PATH construction and other
+#  Only global environment belongs here. PATH construction and other
 #  login-only setup stay in .zprofile; interactive config stays in .zshrc.
 #==============================================================================
 
 # Where these dotfiles live. Non-login shells never source .zprofile, so this
-# must be here — it replaces the old ": ${DOTFILES:=...}" fallback in .zshrc.
+# must be set here.
 export DOTFILES="$HOME/dotfiles"
 
-# XDG base directories — referenced (with fallbacks) by zinit and the zsh
+# XDG base directories, referenced (with fallbacks) by zinit and the zsh
 # completion cache. Set them explicitly so every context resolves the same dirs.
 export XDG_CONFIG_HOME="$HOME/.config"
 export XDG_DATA_HOME="$HOME/.local/share"
@@ -24,7 +24,7 @@ export XDG_STATE_HOME="$HOME/.local/state"
 export ZSH_CACHE_DIR="$XDG_CACHE_HOME/zsh"
 [[ -d $ZSH_CACHE_DIR ]] || command mkdir -p "$ZSH_CACHE_DIR"
 
-# Locale — needed by scripts and tools, not just interactive shells.
+# Locale: needed by scripts and tools, not just interactive shells.
 export LANG=en_US.UTF-8
 export LC_ALL=en_US.UTF-8
 
@@ -34,9 +34,9 @@ export VISUAL=$EDITOR
 export PAGER='less'
 
 # Fallback model for Claude Code subagents (Task tool) that don't pin their
-# own — the built-ins (Explore, general-purpose, Plan) and anything without a
+# own: the built-ins (Explore, general-purpose, Plan) and anything without a
 # `model:` in its frontmatter. Custom agents in .claude/agents/ (dotfiles repo)
-# set their own tier per task; this just keeps the rest off Opus by default.
+# set their own tier per task; this keeps the rest off Opus by default.
 # Belongs in .zshenv, not .zprofile: Claude Code spawns subagent processes
 # non-interactively, and those only source .zshenv.
 export CLAUDE_CODE_SUBAGENT_MODEL='sonnet'

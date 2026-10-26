@@ -8,7 +8,7 @@
 # global git ignore, the sync agent and this script. A name changed in one and
 # not the others fails quietly: the agent skips a file, or a note ends up
 # staged in a work repo. The ignore is the other risk. Widening it to a
-# CLAUDE-*.md glob would hide tracked files such as cnc-claims'
+# CLAUDE-*.md glob would hide tracked files such as a project's
 # CLAUDE-REFERENCE.md, so that file is checked to stay visible.
 #
 # Usage:
@@ -116,8 +116,8 @@ if [ "${1:-}" = "--eval" ]; then
 
   # Claude Code puts git status in its context, and an untracked file shows up
   # there by name, so the model would find the goal without ever being told
-  # where to look. A control run proved it: the goal stored as CLAUDE-context.md
-  # was found while untracked and missed once excluded. The deployed global
+  # where to look. In a control run, the goal stored as CLAUDE-context.md was
+  # found while untracked and missed once excluded. The deployed global
   # ignore hides the file only on a machine that has run the installer, so the
   # repo excludes it itself.
   echo CLAUDE-activeContext.md >>"$project/.git/info/exclude"
@@ -144,7 +144,7 @@ if [ "${1:-}" = "--eval" ]; then
     skip "claude not installed"
   fi
 
-  # Not run on a machine with Codex installed since this check was written.
+  # Untested with Codex installed.
   # Codex has a shell and can ls the directory, so a pass shows the file is
   # reachable, not that ~/.codex/AGENTS.override.md sent it there.
   if command -v codex >/dev/null 2>&1; then

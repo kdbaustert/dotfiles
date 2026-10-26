@@ -151,9 +151,9 @@ hand.
 **Part of `.claude/` is deployed.** `CLAUDE.md` — Claude Code's global
 instructions, applied to every project — plus `REFERENCE.md` (the reasoning
 behind them, which Claude reads only when `CLAUDE.md` points it there),
-`hooks/notify.sh`, `hooks/search-excludes.sh`, `hooks/resume-after-limit.sh`,
-`statusline.sh` and every directory under `skills/` are symlinked into
-`~/.claude/`. The rest of `~/.claude` is state Claude writes itself
+`hooks/notify.sh`, `hooks/search-excludes.sh`, `hooks/command-guard.sh`,
+`hooks/resume-after-limit.sh`, `statusline.sh` and every directory under
+`skills/` are symlinked into `~/.claude/`. The rest of `~/.claude` is state Claude writes itself
 (`settings.json`, `settings.local.json`, `projects/`, `todos/`), so the
 directory is created and linked *into* rather than linked over.
 `.claude/themes/` is kept here for reference only; nothing links it.
@@ -167,32 +167,12 @@ records a session in them, and the `memory-bank-synchronizer` agent checks them
 against the code. Both come from centminmod/my-claude-code-setup, adapted;
 `.claude/REFERENCE.md` lists what changed and why.
 
-**Four settings blocks are manual.** All the deployed scripts are named by
-`~/.claude/settings.json`, which is untracked, so on a new machine add these
-under `hooks` (the `PreToolUse` and `StopFailure` ones beside any entry already
-there):
-
-```json
-"Notification": [{ "hooks": [{ "type": "command",
-  "command": "$HOME/.claude/hooks/notify.sh" }] }]
-```
-
-```json
-"PreToolUse": [{ "matcher": "Bash", "hooks": [{ "type": "command",
-  "command": "$HOME/.claude/hooks/search-excludes.sh" }] }]
-```
-
-```json
-"StopFailure": [{ "matcher": "rate_limit", "hooks": [{ "type": "command",
-  "command": "$HOME/.claude/hooks/resume-after-limit.sh" }] }]
-```
-
-and this at the top level:
-
-```json
-"statusLine": { "type": "command",
-  "command": "$HOME/.claude/statusline.sh", "padding": 0 }
-```
+**Settings merge, they don't link.** `~/.claude/settings.json` is untracked, so
+the blocks that wire the deployed scripts (the hooks, the status line, and
+`attribution` set to empty so commits carry no co-author trailer) live in
+`.claude/settings.portable.json`. The installer merges that file in: hook
+entries are appended beside whatever is already under each event, never in
+place of it, and a hook already present by command isn't added twice.
 
 `hooks/notify.sh` fires a `terminal-notifier` banner when Claude is waiting on
 you. Only the `Notification` event is hooked — permission prompts and idle
@@ -200,6 +180,17 @@ questions. Hooking `Stop` as well would banner every single turn.
 `hooks/search-excludes.sh` stops Claude running an `rg` or `fd` that skips the
 ignore files without also excluding `node_modules`, `vendor` and the other
 noise folders.
+`hooks/command-guard.sh` blocks the commands the instructions say never to run:
+skipping git hooks, turning off signing, creating a branch, merging `develop` or
+`staging`, a force push without both lease flags, `git config --global`,
+installing Nix tools globally, `abbr`/`iris` rewriting tracked files, `sed -i`
+through a symlink, and running `install.sh`. Each refusal says why and what to
+do instead. It parses the command with `shfmt` rather than matching strings, so
+it also sees through `eval`, `sh -c`, variables, your aliases and functions,
+git aliases, a `git checkout` that would create a branch from a remote, and a
+merge of a fetched `develop`. A script piped into a shell (`curl ... | sh`) is
+blocked, since the guard can't see what it runs. Without `shfmt` installed it
+allows everything.
 `hooks/resume-after-limit.sh` picks a session back up by itself when it stopped
 on the usage limit: once the limit resets, the usage-refresh LaunchAgent resumes
 it in the background and a banner says so.

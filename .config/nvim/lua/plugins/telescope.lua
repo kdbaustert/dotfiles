@@ -1,8 +1,8 @@
 -- Telescope: the fuzzy finder.
 --
 -- Note what it is NOT used for. fzf owns Ctrl-T/Ctrl-R at the shell, atuin
--- owns history, and yazi is the file manager — this is scoped to finding
--- things *inside the project you already have open*, which is the one job
+-- owns history, and yazi is the file manager. This is scoped to finding
+-- things inside the project you already have open, which is the one job
 -- none of those do from within the editor.
 
 return {

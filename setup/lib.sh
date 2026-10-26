@@ -1,16 +1,15 @@
 #!/usr/bin/env bash
 #==============================================================================
-#  setup/lib.sh — the installer's reusable steps
+#  setup/lib.sh: the installer's reusable steps
 #------------------------------------------------------------------------------
-#  Sourced by install.sh. It is NOT executable and does nothing on its own;
+#  Sourced by install.sh. It is not executable and does nothing on its own;
 #  every function here is called from one of install.sh's sections.
 #
-#  This used to be the half shared with a Linux installer, which is gone. It
-#  stays a separate file because install.sh reads as a list of sections, and
+#  It is a separate file because install.sh reads as a list of sections, and
 #  ~800 lines of symlink loops and settings merges inlined into it would bury
-#  that list. The split is the same as before: install.sh owns the section
-#  order, the prompts and anything that talks to Homebrew, launchd or system
-#  defaults; this file owns the steps those sections call.
+#  that list. install.sh owns the section order, the prompts and anything that
+#  talks to Homebrew, launchd or system defaults; this file owns the steps
+#  those sections call.
 #
 #  Callers must set DOTFILES_DIR before sourcing.
 #==============================================================================
@@ -31,12 +30,12 @@ success() { echo -e "${COLOR_GREEN}$1${COLOR_NONE}"; }
 
 # Every warning collected during the run, so a step's failure does not scroll
 # off screen by the time the installer finishes. `error` is deliberately not
-# collected here — every call site is a precondition the rest of the
-# script cannot run without, so it still exits immediately rather than joining
-# a summary nobody gets to read.
+# collected here: every call site is a precondition the rest of the script
+# cannot run without, so it still exits immediately rather than joining a
+# summary nobody gets to read.
 ISSUES=()
 
-# print_summary — call once, at the very end of install.sh.
+# print_summary: call once, at the very end of install.sh.
 print_summary() {
   if [ ${#ISSUES[@]} -eq 0 ]; then
     success "\nNo warnings — every step completed cleanly."
@@ -57,8 +56,9 @@ link() {
     warning "Skipping $(basename "$dst") — source missing: $src"
     return
   fi
-  # Stops when the backup fails. Going on, `ln -sfn` onto a real directory
-  # puts the link inside it, and the line below used to report that as linked.
+  # Stops when the backup fails. Going on would run `ln -sfn` onto a real
+  # directory, which puts the link inside it, and the line below would report
+  # that as linked.
   if [ -e "$dst" ] && [ ! -L "$dst" ]; then
     if ! mv "$dst" "${dst}.backup-$(date +%Y%m%d-%H%M%S)"; then
       warning "Could not back up $dst — left it in place and did not link it."
@@ -73,7 +73,7 @@ link() {
   fi
 }
 
-# is_dangling_repo_link <path> — whether <path> is a symlink into this repo
+# is_dangling_repo_link <path>: whether <path> is a symlink into this repo
 # whose target is gone. Never true for a real file or for a link installed by
 # hand from somewhere else; that guard is what lets the sweeps run unattended.
 # The repo path is matched as typed and resolved (pwd -P), because a link made
@@ -92,7 +92,7 @@ is_dangling_repo_link() {
   return 1
 }
 
-# sweep_dangling <dir> — remove the dangling repo links directly under <dir>.
+# sweep_dangling <dir>: remove the dangling repo links directly under <dir>.
 sweep_dangling() {
   local item
   for item in "$1"/*; do
@@ -102,7 +102,7 @@ sweep_dangling() {
   done
 }
 
-# retire_launch_agents <dir> — unload and remove the LaunchAgent plists under
+# retire_launch_agents <dir>: unload and remove the LaunchAgent plists under
 # <dir> that are dangling repo links. A plain sweep would delete the file and
 # leave the job loaded until logout, still running whatever it was told to.
 # The label is read off the file name, launchd's naming convention, since the
@@ -117,10 +117,11 @@ retire_launch_agents() {
   done
 }
 
-# merge_claude_settings — merge preferences while keeping hooks and local state.
+# merge_claude_settings: merge preferences while keeping hooks and local state.
 # env and skillOverrides merge key by key; replacing either would drop the
-# variables or per-machine skill toggles the portable file doesn't name. A
-# matching config is left alone so repeat installs do not rewrite it.
+# variables or per-machine skill toggles the portable file doesn't name. hooks
+# only ever gains entries, for the same reason. A matching config is left
+# alone so repeat installs do not rewrite it.
 merge_claude_settings() {
   if ! command -v python3 &>/dev/null; then
     warning "Python 3 is needed to merge Claude settings."
@@ -147,6 +148,29 @@ updated = {**before, **settings}
 for key in ("env", "skillOverrides"):
     if key in settings:
         updated[key] = {**before.get(key, {}), **settings[key]}
+
+# Hooks are appended, never replaced: each event already holds hooks Claude
+# Code and other tools wrote (atuin, nodeterm) that this file doesn't name.
+# A portable hook whose command is anywhere under its event is skipped, so a
+# block pasted in by hand isn't doubled. A null
+# where a list or object belongs counts as empty rather than aborting the
+# whole merge, which would skip env and every other portable key with it.
+if "hooks" in settings:
+    hooks = {event: list(groups or []) for event, groups in (before.get("hooks") or {}).items()}
+    for event, groups in settings["hooks"].items():
+        present = {
+            hook.get("command")
+            for group in hooks.get(event, [])
+            if isinstance(group, dict)
+            for hook in group.get("hooks") or []
+            if isinstance(hook, dict)
+        }
+        for group in groups:
+            missing = [hook for hook in group["hooks"] if hook.get("command") not in present]
+            if missing:
+                hooks.setdefault(event, []).append({**group, "hooks": missing})
+    updated["hooks"] = hooks
+
 if updated == before:
     raise SystemExit(0)
 
@@ -171,7 +195,7 @@ PYTHON
   fi
 }
 
-# merge_codex_settings — apply portable preferences without tracking app state.
+# merge_codex_settings: apply portable preferences without tracking app state.
 # Requires Python 3.11+ for TOML validation. A failed merge leaves config alone
 # and warns rather than preventing the rest of the dotfiles from deploying.
 merge_codex_settings() {
@@ -245,9 +269,9 @@ link_dotfiles() {
   local f item
 
   # Root-level dotfiles (only those that exist in the repo are linked).
-  # .vimrc and .default-npm-packages were dropped from this list: neither has
-  # ever existed in the repo, so they warned on every single run — two
-  # guaranteed warnings is exactly how you learn to stop reading them.
+  # .vimrc and .default-npm-packages aren't listed: neither exists in the
+  # repo, so they would warn on every single run, and two guaranteed warnings
+  # is exactly how you learn to stop reading them.
   for f in .zshenv .zshrc .gitconfig .editorconfig .prettierrc; do
     link "$DOTFILES_DIR/$f" "$HOME/$f"
   done
@@ -256,13 +280,13 @@ link_dotfiles() {
   # remotes, plus the allowed-signers file it points
   # gpg.ssh.allowedSignersFile at. Neither is in this repo and neither should
   # be: nothing about the work account belongs in something pushed to GitHub.
-  # They are only ever warned about, never created — the contents are not ours
+  # They are only ever warned about, never created, since the contents are not ours
   # to write.
   #
   # Worth a check because the failure is silent. Git ignores a missing include
   # path rather than erroring (measured: `git config --get user.email` exits 0
   # and returns the base identity), so on a machine without these files a
-  # bitbucket repo does not complain — it just commits as the personal
+  # bitbucket repo does not complain. It just commits as the personal
   # identity, signed with the personal key, which the work account cannot
   # attribute.
   #
@@ -272,11 +296,11 @@ link_dotfiles() {
     [ -e "$HOME/$f" ] || warning "Missing ~/$f — bitbucket repos will commit as the personal identity until it exists."
   done
 
-  # Retired links, removed on re-run. Only ever unlinks a SYMLINK whose target
-  # is inside $DOTFILES_DIR — a real file of the same name is left alone.
-  # .gitconfig-os pointed at .gitconfig-macos or .gitconfig-linux, the platform
-  # half of .gitconfig; with Linux support gone that half moved into .gitconfig
-  # itself and both source files were deleted, so the old link now dangles.
+  # Retired links, removed on re-run. Only ever unlinks a symlink whose target
+  # is inside $DOTFILES_DIR; a real file of the same name is left alone.
+  # .gitconfig-os is a link to .gitconfig-macos or .gitconfig-linux, the
+  # platform half of .gitconfig. That half lives in .gitconfig itself and
+  # neither source file exists, so a leftover link dangles.
   for f in .gitignore .eslintrc .eslintignore .stylelintrc .prettierignore \
            tsconfig.json .gitconfig-os; do
     if [ -L "$HOME/$f" ] && case "$(readlink "$HOME/$f")" in "$DOTFILES_DIR"/*) true ;; *) false ;; esac; then
@@ -295,21 +319,20 @@ link_dotfiles() {
   # Two files, split by cost. CLAUDE.md is loaded into every session in every
   # project, so it carries the rules alone. REFERENCE.md carries the
   # measurements and history behind them and is read only when CLAUDE.md sends
-  # Claude there. They used to be one 29 KB file, about 7k tokens paid at the
+  # Claude there. As one 29 KB file they would cost about 7k tokens at the
   # start of every session and again in most subagents, most of it reasoning a
-  # normal turn never needed. Not an `@REFERENCE.md` import: imports load
+  # normal turn never needs. Not an `@REFERENCE.md` import: imports load
   # eagerly, which would put the cost straight back.
   #
-  # There used to be a second file here, AGENTS.md, linked for the sake of
-  # tools that DO look for it at user scope and pulled into CLAUDE.md by an
-  # `@AGENTS.md` import. Claude Code never discovered it on its own — verified
-  # against 2.1.231: neither ~/.claude/AGENTS.md nor <project>/AGENTS.md was
-  # read, only CLAUDE.md was — so the import was the only thing loading it, and
-  # deleting that one line lost the tooling rules silently rather than failing.
-  # Its contents now live in CLAUDE.md directly. (2.1.310's builtin agents-md
-  # plugin reads a project AGENTS.md where there is no CLAUDE.md, which is a
-  # project-scope change and leaves this one alone. The repo root now uses
-  # AGENTS.md with CLAUDE.md linked to it; setup/REFERENCE.md has why.)
+  # No AGENTS.md is linked here for tools that do look for it at user scope.
+  # Claude Code doesn't discover it on its own (verified against 2.1.231:
+  # neither ~/.claude/AGENTS.md nor <project>/AGENTS.md was read, only
+  # CLAUDE.md was), so an `@AGENTS.md` import would be the only thing loading
+  # it, and deleting that one line would lose the tooling rules silently rather
+  # than failing. Those rules live in CLAUDE.md directly. (2.1.310's builtin
+  # agents-md plugin reads a project AGENTS.md where there is no CLAUDE.md,
+  # which is a project-scope change and leaves this one alone. The repo root
+  # uses AGENTS.md with CLAUDE.md linked to it; setup/REFERENCE.md has why.)
   mkdir -p "$HOME/.claude"
   link "$DOTFILES_DIR/.claude/CLAUDE.md" "$HOME/.claude/CLAUDE.md"
   link "$DOTFILES_DIR/.claude/REFERENCE.md" "$HOME/.claude/REFERENCE.md"
@@ -322,44 +345,48 @@ link_dotfiles() {
   # its ~350 lines in the tracked CLAUDE.md, the same in-place-rewrite hazard
   # as `iris setup`. The cost is that Codex stops seeing nodeterm's canvas
   # instructions while the override exists. A copy kept in a marked block of
-  # its own beside nodeterm's was the other option, passed on because it goes
+  # its own beside nodeterm's is the alternative, rejected because it goes
   # stale between installs. Two config.toml lines go with this and are manual,
   # like settings.json; CLAUDE.md carries them.
   mkdir -p "${CODEX_HOME:-$HOME/.codex}"
   link "$DOTFILES_DIR/.claude/CLAUDE.md" "${CODEX_HOME:-$HOME/.codex}/AGENTS.override.md"
   merge_codex_settings
 
-  # The Notification hook script. ~/.claude/settings.json points at it but is
-  # NOT tracked here — it is mostly state Claude writes itself — so the hook
-  # block has to be pasted in by hand once per machine. notify.sh's own header
-  # carries it.
+  # The Notification hook script. ~/.claude/settings.json is not tracked here
+  # (it is mostly state Claude writes itself), so the block that points at it
+  # lives in settings.portable.json and merge_claude_settings() appends it.
   mkdir -p "$HOME/.claude/hooks"
   link "$DOTFILES_DIR/.claude/hooks/notify.sh" "$HOME/.claude/hooks/notify.sh"
 
   # The PreToolUse hook that rejects a widened rg/fd missing the noise-folder
-  # excludes. Same manual settings.json step; its header carries the block.
+  # excludes. Wired the same way.
   link "$DOTFILES_DIR/.claude/hooks/search-excludes.sh" \
     "$HOME/.claude/hooks/search-excludes.sh"
 
+  # The PreToolUse hook that blocks the commands the rules say never to run.
+  # Wired the same way; its header lists each rule it holds.
+  link "$DOTFILES_DIR/.claude/hooks/command-guard.sh" \
+    "$HOME/.claude/hooks/command-guard.sh"
+
   # The StopFailure hook that resumes a session after the usage limit resets.
-  # Same manual settings.json step; its header carries the block and explains
-  # the --sweep half the usage-refresh LaunchAgent runs.
+  # Wired the same way; its header explains the --sweep half the usage-refresh
+  # LaunchAgent runs.
   link "$DOTFILES_DIR/.claude/hooks/resume-after-limit.sh" \
     "$HOME/.claude/hooks/resume-after-limit.sh"
 
-  # The status line command — the plan's 5-hour and 7-day usage windows on
-  # screen at all times, rather than only when /usage is asked. Same
-  # untracked-settings story as the hook above: the script deploys, the
-  # `statusLine` block does not. It lives beside hooks/ rather than inside it
-  # because Claude Code does not treat it as a hook — it is named by its own
-  # top-level `statusLine` setting rather than by an event, and it re-runs on
-  # every render, not on a lifecycle.
+  # The status line command: the plan's 5-hour and 7-day usage windows on
+  # screen at all times, rather than only when /usage is asked. The
+  # `statusLine` block that names it is in settings.portable.json too. It
+  # lives beside hooks/ rather than inside it because Claude Code does not
+  # treat it as a hook: it is named by its own top-level `statusLine` setting
+  # rather than by an event, and it re-runs on every render, not on a
+  # lifecycle.
   link "$DOTFILES_DIR/.claude/statusline.sh" "$HOME/.claude/statusline.sh"
 
   # Skills: link every skill directory under .claude/skills. A loop rather than
-  # one `link` line per skill, for the same reason .config/* is a loop — a
+  # one `link` line per skill, for the same reason .config/* is a loop: a
   # skill added to the repo but not named here would silently never deploy,
-  # which is exactly the failure mode the old @AGENTS.md import had. Claude
+  # the same silent failure an @AGENTS.md import has. Claude
   # Code discovers a skill by its directory holding a SKILL.md, so the
   # directory is what gets linked, not the file inside it.
   if [ -d "$DOTFILES_DIR/.claude/skills" ]; then
@@ -375,7 +402,7 @@ link_dotfiles() {
   fi
 
   # Subagents: link every subagent file under .claude/agents, same
-  # loop-not-list reasoning as skills above — a file added here but not named
+  # loop-not-list reasoning as skills above: a file added here but not named
   # in the installer would silently never deploy. Claude Code discovers a
   # subagent by a .md file directly under ~/.claude/agents, so the file itself
   # is what gets linked, not a containing directory.
@@ -391,7 +418,7 @@ link_dotfiles() {
   fi
 
   # Slash commands: link every command file under .claude/commands, same
-  # loop-not-list reasoning as skills and agents above — a file added here but
+  # loop-not-list reasoning as skills and agents above: a file added here but
   # not named in the installer would silently never deploy. Claude Code
   # discovers a command the same way it discovers a subagent: by a .md file
   # directly under ~/.claude/commands, so the file itself is what gets linked,
@@ -425,15 +452,15 @@ link_dotfiles() {
     sweep_dangling "$HOME/.claude/rules"
   fi
 
-  # Retired: the ~/.claude/AGENTS.md link from before that merge. Same guard as
-  # the root-level sweep above — only a symlink pointing into this repo is
-  # removed.
+  # Retired: the ~/.claude/AGENTS.md link, which has no repo file behind it.
+  # Same guard as the root-level sweep above: only a symlink pointing into this
+  # repo is removed.
   if [ -L "$HOME/.claude/AGENTS.md" ] && case "$(readlink "$HOME/.claude/AGENTS.md")" in "$DOTFILES_DIR"/*) true ;; *) false ;; esac; then
     rm -f "$HOME/.claude/AGENTS.md" && info "Removed retired symlink ~/.claude/AGENTS.md"
   fi
 
   # ~/.config sub-configs: link every entry in the repo's .config. dotglob so
-  # `*` would also match a hidden entry (there are none today — this is
+  # `*` would also match a hidden entry (there are none today; this is
   # defensive, so adding one later doesn't silently go unlinked); nullglob so
   # an empty dir doesn't leave the literal glob pattern behind.
   mkdir -p "$HOME/.config"
@@ -452,17 +479,17 @@ link_dotfiles() {
 #------------------------------------------------------------------------------
 # install_ls_colors
 #------------------------------------------------------------------------------
-# A second LS_COLORS database, kept ALONGSIDE the vivid/Voltage one rather than
+# A second LS_COLORS database, kept alongside the vivid/Voltage one rather than
 # replacing it: .zshrc chooses between them at runtime via $LS_COLORS_SOURCE,
 # which defaults to vivid. See that block for why Voltage stays the default.
 #
 # Cloned, not fetched as a release: upstream publishes no tarball. Only the
-# LS_COLORS data file is used — its lscolors.sh wrapper is ignored, because it
+# LS_COLORS data file is used; its lscolors.sh wrapper is ignored, because it
 # hardcodes `dircolors`, which does not exist on macOS (coreutils installs GNU
 # tools g-prefixed and gnubin is off PATH by design). .zshrc runs the database
 # through `gdircolors` itself.
 #
-# Deliberately NOT a zinit plugin. Everything zinit loads is turbo-deferred to
+# Deliberately not a zinit plugin. Everything zinit loads is turbo-deferred to
 # after the first prompt, but LS_COLORS has to exist before the
 # `zstyle ':completion:*' list-colors` line in .zshrc reads it.
 install_ls_colors() {
@@ -485,7 +512,7 @@ install_ls_colors() {
     fi
   fi
 
-  # zcache keys off the *binary's* mtime (dircolors), so a changed database is
+  # zcache keys off the binary's mtime (dircolors), so a changed database is
   # invisible to it and a pull above would otherwise keep serving the old
   # colours forever. Dropping the cache file here is what makes the installer a
   # complete update path; `zcache_clear` remains the manual equivalent.
@@ -515,8 +542,8 @@ bootstrap_zinit() {
   # Launch a zsh once so zinit installs the declared plugins.
   #
   # Every plugin is turbo-deferred (`wait lucid`), so they are scheduled rather
-  # than loaded — a plain `zsh -ic exit` would exit before any of them
-  # downloads. This used to be handled with `sleep 3`, which is wrong in both
+  # than loaded, so a plain `zsh -ic exit` would exit before any of them
+  # downloads. A fixed `sleep 3` is wrong in both
   # directions: too short on a cold cache or slow link (plugins clone from
   # GitHub), and three wasted seconds when they are already installed.
   #
@@ -553,9 +580,9 @@ bootstrap_zinit() {
 # 18.24 the daemon refuses a client from a different build ("daemon is build
 # 18.24.2, client sent no build"), and the hooks send `atuin history end`'s
 # stderr to /dev/null, so a mismatch stops history from recording with no
-# message anywhere. That happened on 2026-10-23 and went unnoticed for three
-# days: a Homebrew atuin landed beside zinit's, and autostart wrote the plist
-# with whichever binary started the daemon first. atuin is Homebrew-only now
+# message anywhere. It happens when a Homebrew atuin sits beside another copy:
+# autostart writes the plist with whichever binary started the daemon first,
+# and the mismatch can go unnoticed for days. atuin is Homebrew-only
 # (homebrew/Brewfile), but autostart still writes whatever binary it ran from,
 # and 18.24 has no `atuin daemon install` to regenerate the plist, so this
 # edits its ProgramArguments in place.
@@ -616,7 +643,7 @@ sync_atuin_daemon() {
 # into a cache instead of reading the file, and need a build step. See
 # themes/voltage.md.
 build_themes() {
-  # bat reads ~/.cache/bat/themes.bin, not the .tmTheme — without this,
+  # bat reads ~/.cache/bat/themes.bin, not the .tmTheme. Without this,
   # $BAT_THEME="Voltage" doesn't resolve and bat silently falls back to its
   # default theme. This also fixes delta, which highlights through bat.
   if command -v bat >/dev/null 2>&1; then
@@ -627,8 +654,8 @@ build_themes() {
     fi
   fi
 
-  # fast-syntax-highlighting reads .config/fsh/current_theme.zsh, which IS
-  # committed — so this is a refresh, not a requirement, and it is best-effort:
+  # fast-syntax-highlighting reads .config/fsh/current_theme.zsh, which is
+  # committed, so this is a refresh, not a requirement, and it is best-effort:
   # `fast-theme` is a plugin function, so it only exists once zinit has actually
   # finished installing fast-syntax-highlighting above.
   if command -v zsh >/dev/null 2>&1; then
@@ -644,13 +671,13 @@ build_themes() {
 # install_pay_respects <version> <sha256> <asset>
 #------------------------------------------------------------------------------
 # Command correction (the `fuck` alias in .zshrc). Not installed from Homebrew:
-# there is no core formula, and the tap upstream points at is a third-party repo pinning `version "nightly"` — a
-# moving target for a tool that reads the command line. So: pull the author's
-# own signed release, pinned and checksummed, into ~/.local/bin (already on PATH
-# via .zprofile).
+# there is no core formula, and the tap upstream points at is a third-party
+# repo pinning `version "nightly"`, a moving target for a tool that reads the
+# command line. The installer pulls the author's own signed release, pinned and
+# checksummed, into ~/.local/bin (already on PATH via .zprofile).
 #
-# The release only ships .tar.zst, which is why this isn't a zinit `gh-r` block
-# like starship was — zinit's extractor handles zip/tar.gz/tar.xz/7z, not zstd.
+# The release only ships .tar.zst, which is why this isn't a zinit `gh-r` block:
+# zinit's extractor handles zip/tar.gz/tar.xz/7z, not zstd.
 #
 # Asset name and checksum are the caller's to supply because they change with
 # every version bump and with the architecture; install.sh pins both next to the
@@ -678,7 +705,7 @@ install_pay_respects() {
     mkdir -p "$HOME/.local/bin" "$HOME/.local/share/man/man1" "$HOME/.local/share/man/man5"
     install -m 755 "$tmp/pay-respects" "$HOME/.local/bin/"
     # Rules module only. _pay-respects-fallback-100-request-ai is deliberately
-    # NOT installed — it ships failed commands off the machine to an AI endpoint.
+    # not installed: it ships failed commands off the machine to an AI endpoint.
     install -m 755 "$tmp/_pay-respects-module-100-runtime-rules" "$HOME/.local/bin/"
     install -m 644 "$tmp"/man/*.1 "$HOME/.local/share/man/man1/" 2>/dev/null
     install -m 644 "$tmp"/man/*.5 "$HOME/.local/share/man/man5/" 2>/dev/null
@@ -699,15 +726,15 @@ install_pay_respects() {
 # A plugin from anywhere else is written `<name>@<owner>/<repo>`: the GitHub
 # repo is its marketplace, added first, and the plugin installs as
 # `<name>@<repo>`. That leans on the marketplace's own `name` (in its
-# .claude-plugin/marketplace.json) matching the repo's — true of every
-# marketplace here, the official one included — because `claude plugin
+# .claude-plugin/marketplace.json) matching the repo's. That holds for every
+# marketplace here, the official one included, because `claude plugin
 # marketplace add` reports nothing machine-readable to learn the name from
 # (no --json, checked on 2.1.285). A marketplace that breaks the convention
 # fails loudly as a "Failed to install" warning, not silently.
 #
 # shellcheck disable=SC2034 # read by install.sh after it sources this file
 CLAUDE_PLUGINS=(
-  php-lsp          # intelephense, for cnc-claims' PHP
+  php-lsp          # intelephense, for the Development/ PHP projects
   swift-lsp        # SourceKit-LSP, for the Developer/ Swift projects
   typescript-lsp   # typescript-language-server, for web work
   miro             # board access via MCP; auth happens on first use, not here
@@ -717,7 +744,7 @@ CLAUDE_PLUGINS=(
   asana            # Asana task/project MCP; needs /asana-setup once, after install
   code-review      # multi-agent PR review with confidence-scored findings
 
-  # Third-party; opt-in twice over — /i-have-adhd per session, or every session
+  # Third-party; opt-in twice over: /i-have-adhd per session, or every session
   # once ~/.claude/.i-have-adhd-always exists (its SessionStart hook checks).
   i-have-adhd@ayghri/i-have-adhd  # action-first, ADHD-shaped output style
 )
@@ -725,21 +752,21 @@ CLAUDE_PLUGINS=(
 #------------------------------------------------------------------------------
 # install_claude_plugins <plugin...>
 #------------------------------------------------------------------------------
-# Installs each named plugin at user scope — a bare name from the official
+# Installs each named plugin at user scope: a bare name from the official
 # marketplace (claude-plugins-official), a `<name>@<owner>/<repo>` from that
 # GitHub repo's own marketplace (see CLAUDE_PLUGINS above).
 #
 # Unlike everything else link_dotfiles puts under ~/.claude, a plugin isn't a
-# file this repo owns —
+# file this repo owns.
 # `claude plugin install` writes into ~/.claude/plugins/installed_plugins.json,
-# which is runtime state the CLI manages itself and was never a candidate for a
-# symlink (see the note above link_dotfiles's ~/.claude section). So the only
-# way an install survives a fresh machine is running the command again here.
+# which is runtime state the CLI manages itself and can't be a symlink (see the
+# note above link_dotfiles's ~/.claude section). So the only way an install
+# survives a fresh machine is running the command again here.
 #
 # Both `claude plugin marketplace add` and `claude plugin install` are
-# idempotent on their own — re-adding a marketplace already on disk, or
+# idempotent on their own (re-adding a marketplace already on disk, or
 # reinstalling a plugin already at the requested version, exits 0 with an
-# "already" message rather than erroring — so this is a plain loop with no
+# "already" message rather than erroring), so this is a plain loop with no
 # separate already-installed check. `-y` accepts a marketplace-declared
 # command with no prompt; none of the LSP plugins declare one, but the flag
 # costs nothing and keeps a future catalog change from hanging a
@@ -752,7 +779,7 @@ CLAUDE_PLUGINS=(
 # that hasn't run it yet skips cleanly rather than erroring the rest of the
 # installer. Takes its plugin names as arguments rather than reading
 # CLAUDE_PLUGINS directly, so it stays a plain, testable "install these"
-# primitive — CLAUDE_PLUGINS is the one caller that matters today, not a
+# primitive. CLAUDE_PLUGINS is the one caller that matters today, not a
 # hidden dependency of the function itself.
 install_claude_plugins() {
   local entry plugin repo marketplace
@@ -788,11 +815,10 @@ install_claude_plugins() {
 # run_setup_scripts <default-list>
 #------------------------------------------------------------------------------
 # Opt-in, and off by default: these pull down a lot of global packages.
-# (macos.sh, which rewrites system defaults, used to be one of them and is now
-# install.sh's own `macos` section.) Previously this was five
-# commented-out lines in install.sh, which meant editing the installer to enable
-# one — so it printed a heading and did nothing on every run. Select them by
-# name instead:
+# (macos.sh, which rewrites system defaults, is install.sh's own `macos`
+# section instead.) Commented-out lines in install.sh would mean editing the
+# installer to enable one, and the section would print a heading and do nothing
+# on every run. Select them by name instead:
 #
 #     SETUP_SCRIPTS="pnpm composer" ./install.sh
 #     SETUP_SCRIPTS=all ./install.sh

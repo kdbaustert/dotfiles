@@ -1,18 +1,17 @@
 #!/usr/bin/env bash
 #
-# Global JS packages, installed with pnpm. bash, not sh — see the note in
-# composer.sh: the list below is a bash array and would be a syntax error under
+# Global JS packages, installed with pnpm. bash, not sh (see the note in
+# composer.sh): the list below is a bash array and would be a syntax error under
 # a real POSIX sh.
 #
-# WHY PNPM AND NOT NPM. This was setup/npm.sh running `npm install -g` until
-# the two were compared on a working machine: every package here already
-# existed under pnpm (~/Library/pnpm), npm's own global prefix held only
-# neovim, npm and tree-sitter-cli, and every binary that matters — tsc,
-# prettier, eslint, intelephense — resolved to ~/Library/pnpm/bin. So the
-# script had been installing a second, shadowed copy of each package into a
-# prefix nothing on PATH reads. The pnpm globals are the real ones; .zprofile
-# puts $PNPM_HOME/bin on PATH and .claude/CLAUDE.md already described Prettier
-# as a pnpm global.
+# WHY PNPM AND NOT NPM. Installing with `npm install -g` would put a second,
+# shadowed copy of each package into a prefix nothing on PATH reads. On a
+# working machine every package here already lives under pnpm (~/Library/pnpm),
+# npm's own global prefix holds only neovim, npm and tree-sitter-cli, and every
+# binary that matters (tsc, prettier, eslint, intelephense) resolves to
+# ~/Library/pnpm/bin. The pnpm globals are the real ones; .zprofile puts
+# $PNPM_HOME/bin on PATH and .claude/CLAUDE.md describes Prettier as a pnpm
+# global.
 set -uo pipefail
 
 if ! command -v pnpm >/dev/null 2>&1; then
@@ -23,10 +22,10 @@ fi
 # pnpm refuses to install globally without a global bin directory and will not
 # guess one: no PNPM_HOME means ERR_PNPM_NO_GLOBAL_BIN_DIR and nothing
 # installed. .zprofile exports it, but .zprofile is a LOGIN file and this
-# script is a bash child of install.sh — on the first run of a fresh machine
+# script is a bash child of install.sh. On the first run of a fresh machine
 # the file has only just been symlinked and no shell has read it yet, so the
-# variable is simply absent (measured: `env -i bash -c` sees nothing). Hence
-# the same two values, derived the same way, rather than a dependency on
+# variable is simply absent (measured: `env -i bash -c` sees nothing). So the
+# same two values are derived the same way here, rather than depending on
 # having logged in once already. Exported, not just set, because pnpm reads it
 # from the environment.
 if [ -z "${PNPM_HOME:-}" ]; then
@@ -52,7 +51,7 @@ pkgs=(
   gitignore.cli
   # The PHP language server. Also in both editors' Mason lists
   # (.config/nvim/lua/plugins/lsp.lua, .config/lvim/config.lua), which is where
-  # servers normally come from here — this copy is the one on PATH, for
+  # servers normally come from here. This copy is the one on PATH, for
   # anything that expects to find intelephense itself rather than ask an editor
   # to fetch it. Two installs, so check both when the version matters.
   intelephense
@@ -63,7 +62,7 @@ pkgs=(
   stylelint
   svgo
   # Held at 6 on purpose: pnpm's `latest` is 7.x, the native rewrite. Without
-  # the pin this list silently upgrades across that boundary on the next run,
+  # the pin this list would upgrade across that boundary on the next run,
   # since this script doubles as the update path. Drop the `@6` to follow latest.
   typescript@6
   # The standalone TypeScript language server, for anything that expects it on

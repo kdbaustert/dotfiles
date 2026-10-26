@@ -1,27 +1,27 @@
-# ~/.config/iris/theme.toml — Voltage (themes/voltage.md).
+# ~/.config/iris/theme.toml: Voltage (themes/voltage.md).
 #
 # iris draws an overlay menu over the prompt, so it sits directly next to fzf,
 # fzf-tab and atuin and has to agree with them. The roles below are mapped from
 # the tools that already own the same job:
 #
-#   selection accent  magenta — fzf `hl`, atuin `Important`, lazygit's active
+#   selection accent  magenta, as in fzf `hl`, atuin `Important`, lazygit's active
 #                     border. Reserved here for "current/selected" and used for
 #                     nothing else, which is why the tag pills below avoid it.
-#   borders/muted     #6b6b6b — fzf `border`, lazygit's inactive border, the
-#                     palette's `subtle`.
-#   metadata          cyan — fzf `header`/`spinner`, atuin `Annotation`, the
+#   borders/muted     #6b6b6b, as in fzf `border`, lazygit's inactive border and
+#                     the palette's `subtle`.
+#   metadata          cyan, as in fzf `header`/`spinner`, atuin `Annotation`, the
 #                     `da` slot in EZA_COLORS.
-#   keybinding hints  blue — lazygit `optionsTextColor`.
+#   keybinding hints  blue, as in lazygit `optionsTextColor`.
 #
 # iris falls back to its own default for any key that is missing, so this file
 # sets every one rather than relying on partial overrides.
 
 # Overlay border. Subtle, so the frame recedes instead of competing with the
-# prompt it is drawn over — same value fzf uses for its own border.
+# prompt it is drawn over. Same value fzf uses for its own border.
 border = "#6b6b6b"
 
 # Selected marker and icon. The palette's `accent` (bright magenta), which
-# voltage.md already defines as the cursor color — this is the cursor of the
+# voltage.md already defines as the cursor color. This is the cursor of the
 # menu, and it matches fzf's hl+ on the focused row.
 accent = "#f712ff"
 
@@ -38,7 +38,7 @@ text_sel = "#f8f8f8"
 # same strip along the bottom of its panels.
 key = "#5cc9f5"
 
-# Matched substring — fzf's `hl` exactly, so a match highlights the same way in
+# Matched substring: fzf's `hl` exactly, so a match highlights the same way in
 # the menu as it does in every picker.
 match = "#eb43f4"
 
@@ -48,13 +48,13 @@ match = "#eb43f4"
 desc = "#6b6b6b"
 desc_sel = "#e7e7e7"
 
-# Selected row fill — fzf's bg+ and lazygit's selectedLineBgColor. `sel` rather
+# Selected row fill: fzf's bg+ and lazygit's selectedLineBgColor. `sel` rather
 # than `bg-alt`: bg-alt is too dark to read as a highlight against ghostty's
 # blurred, 75%-opacity background.
 sel_bg = "#2a2427"
 
-# Text printed *on* a selected tag pill, i.e. on one of the vivid backgrounds
-# below. `bg` — the same near-black lazygit puts on its cherry-picked and marked
+# Text printed on a selected tag pill, i.e. on one of the vivid backgrounds
+# below. `bg`, the same near-black lazygit puts on its cherry-picked and marked
 # commits for the identical foreground-on-accent case.
 sel_text = "#0f0d0e"
 
@@ -62,7 +62,7 @@ sel_text = "#0f0d0e"
 scroll_info = "#17d5df"
 
 # Inline ghost text. `ghost-text = false` in config.toml (zsh-autosuggestions
-# keeps that job), so this is currently inert — set to the exact value of
+# keeps that job), so this is currently inert. It's set to the exact value of
 # $ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE in .zshrc so that flipping it on doesn't
 # introduce a second, differently-colored ghost.
 ghost_text = "#6b6b6b"
@@ -71,19 +71,19 @@ ghost_text = "#6b6b6b"
 # Category tag pills
 #------------------------------------------------------------------------------
 # Three tags have to stay tellable apart at a glance, so they take three widely
-# separated hues — and none of them magenta, which is reserved for selection:
+# separated hues, none of them magenta, which is reserved for selection:
 #
-#   sys    green  — what fast-syntax-highlighting already paints a command,
-#                   builtin or function (.config/fsh/voltage.ini)
-#   hist   cyan   — history is atuin's, and cyan is atuin's Annotation
-#   alias  orange — the palette's designated warm extra, which voltage.md keeps
-#                   precisely for cases like this one, where a third color has
-#                   to read as neither of the other two. (fsh paints aliases
-#                   green, same as commands, so it can't disambiguate here.)
+#   sys    green:  what fast-syntax-highlighting already paints a command,
+#                  builtin or function (.config/fsh/voltage.ini)
+#   hist   cyan:   history is atuin's, and cyan is atuin's Annotation
+#   alias  orange: the palette's designated warm extra, which voltage.md keeps
+#                  for cases like this one, where a third color has
+#                  to read as neither of the other two. (fsh paints aliases
+#                  green, same as commands, so it can't disambiguate here.)
 #
 # The unselected backgrounds are the only derived values in this file: each is
 # its family color mixed 20% into `bg` (#0f0d0e), which is the same weight
-# iris's own defaults use. They are dark tints, not palette entries — if the
+# iris's own defaults use. They are dark tints, not palette entries. If the
 # palette changes, recompute them rather than looking them up.
 sys = "#30371c"
 sys_sel = "#b3e053"

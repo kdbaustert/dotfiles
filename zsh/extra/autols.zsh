@@ -1,10 +1,10 @@
 #!/usr/bin/env zsh
 #==============================================================================
-#  autols.zsh — list a directory's contents on entry.
+#  autols.zsh: list a directory's contents on entry.
 #
 #  Hooks chpwd, which covers every kind of directory change: cd, pushd/popd,
 #  and zoxide's z/zi (the same reason osc7.zsh hooks chpwd rather than wrapping
-#  cd). Deliberately does NOT list the directory the shell starts in — that
+#  cd). Deliberately doesn't list the directory the shell starts in, because that
 #  would add an eza run to every shell startup, and the first prompt is what
 #  this repo optimizes hardest. osc7.zsh calls itself once for that case
 #  because a stale cwd report is a correctness bug; a missing listing isn't.
@@ -29,7 +29,7 @@ _auto_ls() {
 
   # (N) is nullglob, so an empty directory yields an empty array instead of a
   # "no matches found" error. Dotfiles are excluded to match what the listing
-  # below actually shows — eza hides them without -a, so counting them would
+  # below actually shows: eza hides them without -a, so counting them would
   # make the cap fire on directories that look nearly empty.
   local -a entries=(*(N))
 

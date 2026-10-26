@@ -1,14 +1,9 @@
 #!/usr/bin/env bash
 #==============================================================================
-#  Claude Code PreToolUse hook — keep widened searches out of noise folders
+#  Claude Code PreToolUse hook: keep widened searches out of noise folders
 #==============================================================================
-# Wired from ~/.claude/settings.json, beside the atuin PreToolUse entry:
-#
-#   { "matcher": "Bash", "hooks": [{ "type": "command",
-#     "command": "$HOME/.claude/hooks/search-excludes.sh" }] }
-#
-# settings.json is not tracked (see notify.sh's header for why), so those lines
-# are the manual step on a new machine; the repo CLAUDE.md repeats them.
+# Wired by .claude/settings.portable.json as a Bash PreToolUse hook, which
+# merge_claude_settings() in setup/lib.sh appends beside the atuin entry.
 #
 # CLAUDE.md tells Claude never to search the eight folders below and to name
 # them on any `rg`/`fd` that is widened past the ignore files. This is the

@@ -1,32 +1,30 @@
 #==============================================================================
-#  zinit — plugin manager bootstrap + plugins
+#  zinit: plugin manager bootstrap + plugins
 #------------------------------------------------------------------------------
-#  Philosophy: zinit manages zsh *plugins* only. CLI binaries come from
+#  Philosophy: zinit manages zsh plugins only. CLI binaries come from
 #  homebrew/Brewfile; starship is the one exception, installed by its own
 #  official script from .zshrc, just above its `zcache starship` line.
 #
-#  This file used to fetch fzf, zoxide, vivid, bat, fd, delta, lsd, ripgrep and
-#  atuin as gh-r release binaries in a section 5. That went for two reasons.
-#  Homebrew copies kept getting installed beside them, and only interactive
-#  shells load zinit, so scripts and agent tool calls ran one build while the
-#  prompt ran another: atuin's daemon rejecting its own shell hooks for three
-#  days, and delta at 0.19.2 vs 0.20.1, both came from that. And fzf, zoxide
-#  and vivid are `zcache`'d synchronously in .zshrc right after this file is
-#  sourced, so they had to load eagerly, putting zinit's plugin-load machinery
-#  on the startup path. With that section gone, everything below is
-#  turbo-deferred again. homebrew/Brewfile has the matching note at fzf.
+#  fzf, zoxide, vivid, bat, fd, delta, lsd, ripgrep and atuin are not fetched
+#  here as gh-r release binaries. Two reasons. Homebrew copies get installed
+#  beside them, and only interactive shells load zinit, so scripts and agent
+#  tool calls would run one build while the prompt runs another (atuin's daemon
+#  rejecting the other build's shell hooks, or delta at 0.19.2 vs 0.20.1). And
+#  fzf, zoxide and vivid are `zcache`'d synchronously in .zshrc right after this
+#  file is sourced, so they would have to load eagerly, putting zinit's
+#  plugin-load machinery on the startup path. Everything below is
+#  turbo-deferred. homebrew/Brewfile has the matching note at fzf.
 #
 #  File order is deliberate and is the one thing to preserve when editing:
-#    1. Bootstrap          — clone/source zinit itself
-#    2. Helper functions   — referenced by ices below, so must exist first
-#    3. Plugin config      — every var a plugin reads AT SOURCE TIME
-#    4. Plugin loading     — zsh *plugins* (completions, highlighting, …)
+#    1. Bootstrap          : clone/source zinit itself
+#    2. Helper functions   : referenced by ices below, so must exist first
+#    3. Plugin config      : every var a plugin reads at source time
+#    4. Plugin loading     : zsh plugins (completions, highlighting, ...)
 #
-#  Sections 3 and 4 used to be interleaved, which made "this must be set before
-#  the plugin loads" a property of where a line happened to sit rather than
-#  something the file enforces. Keeping all configuration above all loading
-#  makes that constraint structural: anything in section 3 is guaranteed to
-#  precede every plugin, so a new export cannot be added in the wrong place.
+#  Keeping all configuration above all loading makes "this must be set before
+#  the plugin loads" something the file enforces rather than a property of where
+#  a line happens to sit: anything in section 3 is guaranteed to precede every
+#  plugin, so a new export cannot be added in the wrong place.
 #==============================================================================
 
 #------------------------------------------------------------------------------
@@ -60,29 +58,28 @@ setopt PROMPT_SUBST
 # zstyle in section 3. Definitions must precede those references.
 
 # --- compinit -----------------------------------------------------------------
-# Replaces the bare `ZINIT[COMPINIT_OPTS]=-C; zicompinit` that used to sit in
-# fzf-tab's atinit. Two things were wrong with that:
+# Used instead of the bare `ZINIT[COMPINIT_OPTS]=-C; zicompinit` in fzf-tab's
+# atinit, which has two problems:
 #
 #   1. `compinit -C` trusts the existing dump and never rebuilds it, so a dump
-#      written once was reused forever. This machine's ~/.zcompdump was months
-#      stale, meaning completions for anything installed since simply never
-#      appeared — `rehash true` finds new *commands*, but not new completion
-#      *functions*.
-#   2. When no dump existed at all, the turbo-run zicompinit did not write one
+#      written once is reused forever and completions for anything installed
+#      since never appear. `rehash true` finds new commands, but not new
+#      completion functions.
+#   2. When no dump exists at all, the turbo-run zicompinit does not write one
 #      (verified: a manual zicompinit in the same shell does). So a fresh machine
 #      would silently pay a full, uncached compinit on every single start.
 #
-# This does a full, checked compinit once every 24h — and whenever the dump is
-# missing — and takes the cheap cached path the rest of the time.
+# This does a full, checked compinit once every 24h, and whenever the dump is
+# missing, and takes the cheap cached path the rest of the time.
 zsh_compinit() {
   # localoptions: (#q…) glob qualifiers need EXTENDED_GLOB. .zshrc happens to
-  # set it, but this function must not silently depend on that — without it the
+  # set it, but this function must not silently depend on that; without it the
   # test below fails open and every start takes the cached path forever.
   setopt localoptions extendedglob
   autoload -Uz compinit compdump
   local dump="${ZINIT[ZCOMPDUMP_PATH]}"
 
-  # (#qN.mh-24) — glob qualifier: exists (N: no error if not), plain file (.),
+  # (#qN.mh-24) is a glob qualifier: exists (N: no error if not), plain file (.),
   # mtime less than 24h ago (mh-24). A match means "fresh". The qualifier must
   # be globbed in an array assignment; inside [[ ]] no filename generation
   # happens at all and the test would always fall through to the cached branch.
@@ -102,7 +99,7 @@ zsh_compinit() {
 
 # --- bracketed paste ----------------------------------------------------------
 # Referenced by the two zstyles in section 3, which OMZP::safe-paste consumes.
-# See the rationale attached to those zstyles — the pair is not optional.
+# See the rationale attached to those zstyles; the pair is not optional.
 _zsh_paste_init() {
   # widgets[self-insert] reads like "user:autosuggest-widget-self-insert";
   # [2,3] strips the "user:" tag and keeps the function name.
@@ -118,7 +115,7 @@ _zsh_paste_finish() { zle -N self-insert $OLD_SELF_INSERT }
 _fzf_git_rebind() {
   local o k m
   # Same object list upstream passes to __fzf_git_init; '?list_bindings' is the
-  # odd one out — its widget really is named fzf-git-?list_bindings-widget and
+  # odd one out; its widget really is named fzf-git-?list_bindings-widget and
   # its key is '?', per the ${o[1]} == "?" branch in the plugin.
   for o in files branches tags remotes hashes stashes lreflogs each_ref \
            worktrees '?list_bindings'; do
@@ -129,31 +126,31 @@ _fzf_git_rebind() {
     bindkey -M emacs "${FZF_GIT_PREFIX}^$k" "fzf-git-$o-widget"
     bindkey -M emacs "${FZF_GIT_PREFIX}$k"  "fzf-git-$o-widget"
   done
-  # Removing the ^g<x> sequences above does NOT restore the plain ^G binding the
-  # plugin overwrote when it made ^G a prefix — that has to be put back by hand.
+  # Removing the ^g<x> sequences above doesn't restore the plain ^G binding the
+  # plugin overwrote when it made ^G a prefix; that has to be put back by hand.
   (( ${+widgets[_navi_widget]} )) && bindkey -M emacs '^g' _navi_widget
 }
 
 #------------------------------------------------------------------------------
 # 3. Plugin configuration
 #------------------------------------------------------------------------------
-# Every variable and zstyle a plugin reads AT SOURCE TIME. All of it must be in
-# place before section 4 runs — which is now guaranteed by file order rather
-# than by each assignment happening to sit above its own plugin.
+# Every variable and zstyle a plugin reads at source time. All of it must be in
+# place before section 4 runs, which file order guarantees rather than each
+# assignment happening to sit above its own plugin.
 #
-# NOT here: FAST_WORK_DIR (fast-syntax-highlighting's state dir). It lives in
+# Not here: FAST_WORK_DIR (fast-syntax-highlighting's state dir). It lives in
 # .zshrc because it is a path into ~/.config that the theme steps in install.sh
 # also reference; see the comment there.
 
 # --- forgit -------------------------------------------------------------------
-# Rename the 5 helpers whose default names collide with our own git shortcuts —
-# which live in zsh/abbreviations, not aliases.zsh: ga, gd, grh, grs, gco. The
+# Rename the 5 helpers whose default names collide with our own git shortcuts
+# (which live in zsh/abbreviations, not aliases.zsh): ga, gd, grh, grs, gco. The
 # f-prefixed names give the interactive versions; the plain names stay as the
 # abbreviations.
 #
 # The collision is real even though one side is an abbreviation and the other an
 # alias, and it is the confusing kind: zsh-abbr binds SPACE only (plus ^SPACE
-# for a literal space) — it does not touch Enter. So `grs<space>` expands to
+# for a literal space) and does not touch Enter. So `grs<space>` expands to
 # `git reset --soft `, while a bare `grs<enter>` never expands and runs forgit's
 # alias instead. One name, two behaviours, picked by whether you hit space.
 # Renaming forgit's side keeps each name meaning exactly one thing.
@@ -166,24 +163,24 @@ forgit_checkout_commit=fgco
 # forgit pagers. forgit resolves its pager as $FORGIT_PAGER → `git config
 # core.pager` → `cat`, and core.pager is deliberately unset in .gitconfig (see
 # the comment above the [delta] section there), so without this every forgit
-# diff and show renders as raw `git diff --color=always` output — no delta, and
-# so nothing matching the fzf-tab git previews in .zshrc, which do pipe through
-# delta. Pointing forgit at delta makes the two agree.
+# diff and show renders as raw `git diff --color=always` output, with no delta
+# and so nothing matching the fzf-tab git previews in .zshrc, which do pipe
+# through delta. Pointing forgit at delta makes the two agree.
 #
-# FORGIT_PREVIEW_PAGER is separate and NOT optional here: inside an fzf preview
+# FORGIT_PREVIEW_PAGER is separate and not optional here: inside an fzf preview
 # there is no TTY, and delta's own paging would otherwise engage and hang the
 # pane. It overrides every other FORGIT_*_PAGER in preview context only.
 #
-# Must be exported, not just set — git-forgit is a separate bash process. The
+# Must be exported, not just set: git-forgit is a separate bash process. The
 # plugin exports stray FORGIT_* vars for us on load, but only with a warning.
 export FORGIT_PAGER='delta'
 export FORGIT_PREVIEW_PAGER='delta --paging=never'
 
 # Directory previews (gcf on a directory, gwt/gwa on a worktree path). forgit
 # defaults to `tree` (declared in the Brewfile, so it would be used) and falls
-# back to `find` only when that is missing. eza instead — not because tree is
-# absent, but because eza is what every other listing here goes through, so it
-# picks up EZA_COLORS/LS_COLORS and the same Nerd Font icons. Swap it back to
+# back to `find` only when that is missing. This uses eza instead. tree is
+# available, but eza is what every other listing here goes through, so it picks
+# up EZA_COLORS/LS_COLORS and the same Nerd Font icons. Swap it to
 # 'tree -C -L 2' if you prefer tree's output; both work.
 #
 # --icons=always, not the bare --icons used in aliases.zsh: forgit invokes this
@@ -201,15 +198,15 @@ export AUTO_NOTIFY_IGNORE=(nvim hx micro vim man less ssh tmux fzf navi \
 
 # --- abbr ---------------------------------------------------------------------
 # fish-style abbreviations that expand inline as you type. Unlike an alias, the
-# *expanded* command is what runs and what lands in history — pairs well with
-# you-should-use. Manage with `abbr add ga='git add'`, `abbr list`, `abbr
+# expanded command is what runs and what lands in history, which pairs well
+# with you-should-use. Manage with `abbr add ga='git add'`, `abbr list`, `abbr
 # erase`. Definitions are seeded in $DOTFILES/zsh/abbreviations (pointed at
 # below); abbr reads/writes that file directly so runtime `abbr add`s stay
 # version-controlled.
 export ABBR_USER_ABBREVIATIONS_FILE="$DOTFILES/zsh/abbreviations"
 
 # --- safe-paste ---------------------------------------------------------------
-# On zsh >= 5.1 (this is 5.9.2) the plugin collapses to three lines — it re-sets
+# On zsh >= 5.1 (this is 5.9.2) the plugin collapses to three lines: it re-sets
 # the zle_bracketed_paste option and swaps zsh's *built-in* bracketed-paste
 # widget for bracketed-paste-magic. Worth being precise about what that buys,
 # because it is not the obvious thing: the built-in widget already stops a
@@ -218,40 +215,40 @@ export ABBR_USER_ABBREVIATIONS_FILE="$DOTFILES/zsh/abbreviations"
 # a paste instead of being bypassed.
 #
 # That processing is per-character, and per-character is exactly the case
-# zsh-autosuggestions documents as "slow pasting" — every pasted char would
+# zsh-autosuggestions documents as "slow pasting": every pasted char would
 # otherwise re-enter the autosuggest self-insert wrapper, and with
 # fast-syntax-highlighting also hooked in, a large paste crawls. The two zstyles
 # below are upstream's own fix: swap self-insert to a bare url-quote-magic for
 # the duration of the paste, then restore whatever widget was there. Without
-# them this plugin is a net LOSS on this config — do not add one without the
-# other, and do not move them below section 4.
+# them this plugin is a net loss on this config, so don't add one without the
+# other, and don't move them below section 4.
 autoload -Uz url-quote-magic
 zstyle :bracketed-paste-magic paste-init   _zsh_paste_init
 zstyle :bracketed-paste-magic paste-finish _zsh_paste_finish
 
 # --- fzf-git.sh ---------------------------------------------------------------
-# REBOUND OFF ^G, deliberately. Upstream's __fzf_git_init hardcodes
+# Rebound off ^G, deliberately. Upstream's __fzf_git_init hardcodes
 #   bindkey -M $m '^g^<x>'   and   bindkey -M $m '^g<x>'
 # for every object, in the emacs, viins and vicmd keymaps, with no prefix option
 # to override. That collides with navi's single-key ^G widget (bound in .zshrc
-# from the cached `navi widget zsh`) — though not by deleting it, which is worth
+# from the cached `navi widget zsh`), though not by deleting it, which is worth
 # stating precisely because the failure is intermittent rather than total:
 #
-#   Binding any '^g<x>' sequence promotes ^G to a PREFIX key. zsh keeps the
+#   Binding any '^g<x>' sequence promotes ^G to a prefix key. zsh keeps the
 #   standalone ^G binding as a fallback, so `bindkey '^g'` still reports
-#   _navi_widget — but it can only resolve it after KEYTIMEOUT (40 = 0.4s here)
+#   _navi_widget, but it can only resolve it after KEYTIMEOUT (40 = 0.4s here)
 #   proves no continuation is coming. So navi still works, with a 0.4s stall,
 #   and typing ^G followed quickly by any of f/b/t/r/h/s/l/e/w/? runs fzf-git
 #   instead of navi. A lag that only sometimes ends in the wrong widget is worse
 #   to live with than a clean break, hence moving fzf-git rather than tolerating it.
 #
-# navi keeps ^G — it was here first and is in the muscle memory — so fzf-git
+# navi keeps ^G, which is in the muscle memory, so fzf-git
 # moves to ^X^G, matching the ^X^E (edit-command-line) and ^X^X (pay-respects)
 # prefix convention already in use. ^X^G is genuinely free: the emacs keymap
 # binds ^Xg and ^XG to list-expand, but those are ^X-then-g, a different
 # sequence from ^X-then-^G.
 #
-#   ^X^G then f b t r h s l e w   (or ^F ^B ^T … — both forms bound, as upstream)
+#   ^X^G then f b t r h s l e w   (or ^F ^B ^T ...; both forms bound, as upstream)
 #   ^X^G ?                        lists the bindings
 #
 # Change the prefix in one place here; _fzf_git_rebind in section 2 reads it.
@@ -261,28 +258,27 @@ FZF_GIT_PREFIX='^X^G'
 # 4. Plugin loading
 #------------------------------------------------------------------------------
 # The only section that calls `zinit`. Every block uses the `zinit <ices> for
-# <plugins>` form — NOT the `zinit ice <ices>` + `zinit light <plugin>` pair
-# this file used to mix in for the four single-plugin cases (nvm, carapace,
-# fzf-git.sh, zsh-bench). Both forms work, but the two-step one is a live
-# footgun: ices are consumed by the *next* zinit command, so inserting any
-# zinit call — or a `zinit light` that is commented out mid-debug — between the
-# `ice` and its `light` silently applies the ices to the wrong plugin, with no
-# error. The `for` form binds ices to plugin names positionally and cannot come
-# apart that way.
+# <plugins>` form, not the `zinit ice <ices>` + `zinit light <plugin>` pair, even
+# for the single-plugin cases (nvm, carapace, fzf-git.sh, zsh-bench). Both forms
+# work, but the two-step one is a live footgun: ices are consumed by the next
+# zinit command, so inserting any zinit call, or a `zinit light` that is
+# commented out mid-debug, between the `ice` and its `light` silently applies
+# the ices to the wrong plugin, with no error. The `for` form binds ices to
+# plugin names positionally and cannot come apart that way.
 #
 # Block order is load-bearing and must not be reshuffled:
-#   1. zsh-nvm            — nothing depends on it; first so it is queued early
-#   2. zsh-completions    — extra completion definitions, before compinit runs
-#   3. fzf-tab            — its atinit runs compinit ONCE (zsh_compinit) so
+#   1. zsh-nvm            : nothing depends on it; first so it is queued early
+#   2. zsh-completions    : extra completion definitions, before compinit runs
+#   3. fzf-tab            : its atinit runs compinit once (zsh_compinit) so
 #      autosuggestions      completions exist before fzf-tab hooks them
-#      fast-syntax-highlighting — MUST be last of the three
-#   4. carapace           — after 3, so compdef exists by the time it runs
-#   5. behaviour plugins  — order-independent among themselves, but the block as
+#      fast-syntax-highlighting must be last of the three
+#   4. carapace           : after 3, so compdef exists by the time it runs
+#   5. behaviour plugins  : order-independent among themselves, but the block as
 #                           a whole must stay after 3: zsh-manydots-magic chains
 #                           onto self-insert and has to find the wrappers from
 #                           autosuggestions and F-Sy-H already in place
 #   6. fzf-git.sh
-#   7. measurement        — zsh-bench and zsh-prompt-benchmark; neither of them
+#   7. measurement        : zsh-bench and zsh-prompt-benchmark; neither of them
 #                           runs anything at startup
 
 # --- Node ---------------------------------------------------------------------
@@ -290,32 +286,27 @@ FZF_GIT_PREFIX='^X^G'
 # nvm.sh is never sourced at startup. The plugin instead defines function shims
 # for node/npm/npx/nvm that source it on first call.
 #
-# nvm is the ONLY node version manager here. asdf used to be declared in the
-# Brewfile alongside it, but it had zero plugins installed and was never
-# initialised in any shell file, so it managed nothing — it has been removed
-# rather than wired up.
+# nvm is the only node version manager here. asdf isn't used: it had no plugins
+# installed and no init in any shell file, so it managed nothing.
 #
-# The previous version of this comment claimed nvm managed no versions and that
-# `node` therefore resolved to Homebrew's. Both halves are now wrong:
-# ~/.nvm/versions/node holds v26.5.0, and ~/.nvm/alias/default is `node` — nvm's
-# symbolic alias for "newest installed", not a literal version. This comment said
-# `lts` until the alias files were actually read: ~/.nvm/alias/lts is an empty
-# file, so had default really pointed there it would resolve to nothing. The
-# v26.5.0 conclusion was right regardless, because `node` and the sole installed
-# version coincide — but it held by luck, not by the mechanism described.
+# nvm does manage versions, and `node` doesn't resolve to Homebrew's in an
+# interactive shell: ~/.nvm/versions/node holds v26.5.0, and
+# ~/.nvm/alias/default is `node`, nvm's symbolic alias for "newest installed",
+# not a literal version. (~/.nvm/alias/lts is an empty file, so a default
+# pointing there would resolve to nothing.)
 #
-# So in an interactive shell `node` is the shim *function* and gives v26.5.0 — a
+# So in an interactive shell `node` is the shim function and gives v26.5.0. A
 # function outranks any $path lookup, so Homebrew's v26.7.0 does not win despite
 # /opt/homebrew/bin being first in the path array. Homebrew's node is what
 # non-interactive shells and scripts get, since they never load this plugin.
-# Verify with `whence -w node` in a real interactive shell — NOT `zsh -i -c`,
+# Verify with `whence -w node` in a real interactive shell, not `zsh -i -c`,
 # which exits before the first prompt and so before turbo fires.
 #
-# Python — pyenv was removed. It managed zero versions (~/.pyenv/versions empty,
-# `pyenv global` was `system`), so its shims and turbo-deferred `pyenv init`
-# resolved python3 to the same Homebrew python they'd have hit anyway. If
-# per-project Python versions are ever needed, add pyenv back here — or reach
-# for mise and let one tool cover Node and Python together.
+# Python: pyenv isn't used. It would manage zero versions (~/.pyenv/versions is
+# empty, `pyenv global` is `system`), so its shims and turbo-deferred
+# `pyenv init` would resolve python3 to the same Homebrew python anyway. If
+# per-project Python versions are needed, add pyenv here, or reach for mise and
+# let one tool cover Node and Python together.
 zinit wait lucid for \
   lukechilds/zsh-nvm
 
@@ -332,19 +323,19 @@ zinit wait lucid for \
   zdharma-continuum/fast-syntax-highlighting
 
 # --- carapace: completions for tools that ship none we can use ----------------
-# Replaces the hand-rolled `_gh` fpath cache and the pnpm precmd-retry hook that
-# used to live here. Registered per-command ON PURPOSE:
+# Used instead of a hand-rolled `_gh` fpath cache and a pnpm precmd-retry hook.
+# Registered per-command on purpose:
 #
-#   source <(carapace _carapace zsh)   # DON'T — one compdef hijacks 653 commands
+#   source <(carapace _carapace zsh)   # DON'T: one compdef hijacks 653 commands
 #   source <(carapace gh zsh)          # scoped: emits `compdef _gh_completion gh`
 #
 # The wholesale form would take over `git`, `ssh`, `man`, `tar`, `find`… clobbering
 # zsh's native _git and, with it, the `:completion:*:git-checkout:*` /
-# `:fzf-tab:complete:git-(add|diff|…)` zstyles in .zshrc — those match on _git's
+# `:fzf-tab:complete:git-(add|diff|...)` zstyles in .zshrc, which match on _git's
 # sub-context, which _carapace_completer never produces. Add a line per tool that
 # genuinely lacks a good native completion; leave the rest to zsh.
 #
-# Attached to the null plugin because there is no repo to clone — this is a pair
+# Attached to the null plugin because there is no repo to clone: this is a pair
 # of subprocesses, not a plugin. Deferred via turbo so they land after the first
 # prompt, and ordered after the block above so compdef exists by the time they run.
 zinit wait lucid id-as'carapace-init' has'carapace' \
@@ -352,32 +343,30 @@ zinit wait lucid id-as'carapace-init' has'carapace' \
   zdharma-continuum/null
 
 # --- Extra behaviour plugins --------------------------------------------------
-#   - OMZP::sudo          — ESC ESC prepends `sudo` to the current line (or the
+#   - OMZP::sudo          : ESC ESC prepends `sudo` to the current line (or the
 #                           last command, on an empty line). Self-contained: it
 #                           pulls no OMZ lib. ^X^X is pay-respects' inline fixer
-#                           and ^X^E is edit-command-line — no collision.
-#   - OMZP::safe-paste    — bracketed-paste-magic; see the zstyles in section 3,
+#                           and ^X^E is edit-command-line, so no collision.
+#   - OMZP::safe-paste    : bracketed-paste-magic; see the zstyles in section 3,
 #                           which are not optional.
-#   - zsh-autopair        — auto-insert/delete matching brackets, quotes, parens
-#   - zsh-manydots-magic  — a third '.' typed after '..' expands to '../..', a
+#   - zsh-autopair        : auto-insert/delete matching brackets, quotes, parens
+#   - zsh-manydots-magic  : a third '.' typed after '..' expands to '../..', a
 #                           fourth to '../../..'. Knows when not to fire, so
 #                           `ruby -e '(1...`, `git log branch...` and
 #                           `git diff ...branch` are all left alone
-#   - zsh-you-should-use  — nags when a full command has an existing alias
-#   - forgit              — fzf-powered git (glo, gss, gcb…); honours delta,
+#   - zsh-you-should-use  : nags when a full command has an existing alias
+#   - forgit              : fzf-powered git (glo, gss, gcb...); honours delta,
 #                           and is put on $PATH so `git forgit <cmd>` works
-#   - zsh-auto-notify     — desktop notification when a long command finishes.
-#                           Uses osascript on macOS. This comment used to say
-#                           terminal-notifier, which the plugin never calls;
-#                           the Homebrew formula of that name is used by
-#                           zsh/extra/notify.zsh instead.
-#   - zsh-abbr            — fish-style abbreviations; store is section 3's
+#   - zsh-auto-notify     : desktop notification when a long command finishes.
+#                           Uses osascript on macOS, not terminal-notifier
+#                           (that one is used by zsh/extra/notify.zsh).
+#   - zsh-abbr            : fish-style abbreviations; store is section 3's
 #                           $ABBR_USER_ABBREVIATIONS_FILE
 #
 # zsh-manydots-magic is the one entry here that is not order-independent, and its
 # constraint points out of this block rather than inside it. It works by chaining
-# onto whatever widget currently answers self-insert — its `.on` reads the live
-# binding, wraps it, and re-binds through it — so every other wrapper has to be
+# onto whatever widget currently answers self-insert (its `.on` reads the live
+# binding, wraps it, and re-binds through it), so every other wrapper has to be
 # installed first: autosuggestions and fast-syntax-highlighting in block 3, and
 # zsh-autopair one line above. Load it any earlier and it captures the bare
 # builtin, the later wrapper replaces it outright, and dots quietly stop
@@ -385,15 +374,15 @@ zinit wait lucid id-as'carapace-init' has'carapace' \
 #
 # The usual reason to refuse a plugin that touches self-insert does not apply
 # here: it chains rather than clobbers, and upstream handles the url-quote-magic
-# case by name — which is exactly what section 3's bracketed-paste zstyles swap
+# case by name, which is exactly what section 3's bracketed-paste zstyles swap
 # in for the duration of a paste. `pick` is not optional either: the repo ships a
 # single file called `manydots-magic` with no extension, so zinit's
 # `*.plugin.zsh` detection would find nothing to source.
 #
 # forgit's atload is what makes the `git forgit …` sub-command work: forgit
 # ships bin/git-forgit, and git finds a `git-<x>` on $PATH as sub-command <x>.
-# Only the shell functions are wired up without it — which left the completion
-# in place for a command that did not exist, since zinit already symlinks
+# Only the shell functions are wired up without it, which leaves the completion
+# in place for a command that doesn't exist, since zinit already symlinks
 # forgit's completions/_git-forgit into its own completions dir (on $fpath).
 # `typeset -U path` in .zprofile keeps a re-source from duplicating the entry.
 #
@@ -413,10 +402,10 @@ zinit wait lucid for \
   olets/zsh-abbr
 
 # --- fzf-git.sh ---------------------------------------------------------------
-# fzf widgets that INSERT a git object into the line you are already typing:
+# fzf widgets that insert a git object into the line you are already typing:
 # files, branches, tags, remotes, hashes, stashes, reflogs, each_ref, worktrees.
-# Complements forgit above rather than overlapping it — forgit gives whole
-# interactive *commands* (fga/fgd/glo), this gives *completions* mid-command,
+# Complements forgit above rather than overlapping it: forgit gives whole
+# interactive commands (fga/fgd/glo), this gives completions mid-command,
 # e.g. `git rebase -i <^X^G h>`. Previews use bat and delta, both already here.
 # The ^G collision and the rebind live in sections 3 and 2 respectively.
 zinit wait lucid for \
@@ -424,25 +413,23 @@ zinit wait lucid for \
     junegunn/fzf-git.sh
 
 # --- Measurement: zsh-bench + zsh-prompt-benchmark ----------------------------
-# Measures *perceived* interactive latency — first-prompt-lag, first-command-lag,
-# input-lag, exit-time — by driving a real interactive zsh under a pty. This is
+# Measures perceived interactive latency (first-prompt-lag, first-command-lag,
+# input-lag, exit-time) by driving a real interactive zsh under a pty. This is
 # the thing the turbo-defer architecture at the top of this file is actually
-# optimising for, and the thing zprof cannot see: zprof times shell *functions*,
+# optimising for, and the thing zprof cannot see: zprof times shell functions,
 # so it attributes nothing to the gap between a keypress and the response.
 #
-# as"program" is load-bearing: it puts the repo directory on $PATH and does NOT
-# source anything, which is correct — this is a benchmark harness, not a plugin.
+# as"program" is load-bearing: it puts the repo directory on $PATH and doesn't
+# source anything, which is correct: this is a benchmark harness, not a plugin.
 # Nothing here runs at shell startup.
 #
 #   zsh-bench                 # summary for the current interactive config
 #   zsh-bench --iters 20      # tighter confidence interval
 #
 # zsh-prompt-benchmark covers the other half of the same question. zsh-bench
-# reports first-prompt-lag once per run — the cost of *starting* a shell; this
+# reports first-prompt-lag once per run (the cost of starting a shell); this
 # reports milliseconds per prompt averaged over a few hundred samples, i.e. the
 # cost of drawing a prompt on every command, which on this config is starship.
-# That is the number the PROMPT2 fix in .zshrc moved, and it was found by reading
-# `zprof` by hand because nothing here measured it directly.
 #
 # Sourced rather than as"program": unlike zsh-bench this genuinely is a plugin
 # file, and its only top-level statement is one function definition. The precmd
@@ -451,7 +438,7 @@ zinit wait lucid for \
 #
 #   zsh-prompt-benchmark      # then press and hold ENTER for ~10s
 #
-# Dormant upstream — last commit 2019-11-21, and taken anyway: ~80 lines doing
+# Dormant upstream (last commit Nov 2019), and used anyway: ~80 lines doing
 # one thing, by the author of zsh-bench above, written for powerlevel10k.
 zinit wait lucid for \
   as"program" pick"zsh-bench" \

@@ -1,17 +1,15 @@
 #==============================================================================
-#  .gitconfig — symlinked to ~/.gitconfig by install.sh
+#  .gitconfig, symlinked to ~/.gitconfig by install.sh
 #==============================================================================
-# This file used to drift from the live ~/.gitconfig: the real one had been
-# edited in place and was no longer the symlink install.sh creates, so the repo
-# copy still said `name = Kenny Baustert`, had signing commented out and was
-# missing the work-identity rules entirely. install.sh backs up rather than
-# clobbers (see link()), but a fresh run would still have activated this file —
-# committing as the wrong name with signing off. Reconciled from the live copy.
+# If the live ~/.gitconfig is edited in place and stops being the symlink
+# install.sh creates, this copy drifts from it. install.sh backs up rather than
+# clobbers (see link()), but a fresh run would then activate a stale file,
+# committing under the wrong name with signing off. Keep this copy current.
 
 [user]
 	name = Kenny B
 	email = kenny@kennyb.dev
-	# Public half of the ssh key 1Password signs with — safe to commit.
+	# Public half of the ssh key 1Password signs with, safe to commit.
 	signingkey = ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOISHjId1mlt/MUYsl1rA/J8ox77BFvqQL7e8dZWWvc5
 
 # Commit signing via 1Password's ssh agent rather than GPG.
@@ -30,18 +28,18 @@
 	allowedSignersFile = ~/.config/git/allowed_signers
 
 [core]
-	# Not an absolute path. This used to be /opt/homebrew/bin/nvim, which made a
-	# portable setting look like a platform-specific one — the bare name
-	# resolves through $PATH on both machines and needs no OS include.
+	# Not an absolute path like /opt/homebrew/bin/nvim, which would make a
+	# portable setting platform-specific. The bare name resolves through $PATH
+	# on both machines and needs no OS include.
 	editor = nvim
 
-# delta is not git's pager here — it is invoked by the git-diff/git-show fzf-tab
+# delta is not git's pager here. It is invoked by the git-diff/git-show fzf-tab
 # previews in .zshrc (`git diff --color=always … | delta`). delta still reads
 # this section when piped to, so this is what themes those previews.
 #
 # Syntax highlighting inside the diff comes from $BAT_THEME (set in .zshrc);
 # delta renders through bat's engine. But the +/- line backgrounds are delta's
-# own and are NOT part of a bat theme — left unset they are delta's built-in
+# own and are not part of a bat theme. Left unset they are delta's built-in
 # red/green, which clash with Voltage. Palette: themes/voltage.md.
 [delta]
 	# Desaturated Voltage red/green, dark enough to read text over on #0F0D0E.
@@ -68,18 +66,17 @@
 # `brew` runs git against its taps as your user; without these git refuses to
 # operate on them.
 #
-# Duplicates creep back in: `brew` appends a fresh pair with `git config --add`
+# Duplicates accumulate: `brew` appends a fresh pair with `git config --add`
 # every time it hits the error, so this block regrows unless it is periodically
-# collapsed. Git only ever needs one entry per path — extra copies are inert,
-# just noise. Re-dedupe by deleting the extra lines here by hand, in the repo
-# copy, and nowhere else.
+# collapsed. Git only needs one entry per path; extra copies are inert, just
+# noise. Dedupe by deleting the extra lines here by hand, in the repo copy, and
+# nowhere else.
 #
-# Not with `git config --global --unset-all safe.directory`, which this comment
-# used to recommend: every `git config --global` write rewrites this tracked
-# file behind your back, and it can replace the symlink with a real file rather
-# than following it — which is how the repo copy and the live ~/.gitconfig came
-# apart the last time (see the header). A hand edit is the whole fix; nothing
-# needs restoring afterwards.
+# Don't use `git config --global --unset-all safe.directory`: every
+# `git config --global` write rewrites this tracked file behind your back, and
+# it can replace the symlink with a real file rather than following it, which
+# makes the repo copy and the live ~/.gitconfig drift apart (see the header).
+# A hand edit is the whole fix; nothing needs restoring afterwards.
 [safe]
 	directory = /opt/homebrew/Library/Taps/homebrew/homebrew-core
 	directory = /opt/homebrew/Library/Taps/homebrew/homebrew-cask
@@ -96,7 +93,7 @@
 	directory = /opt/homebrew/Library/Taps/homebrew/homebrew-core
 	directory = /opt/homebrew/Library/Taps/homebrew/homebrew-cask
 
-# Work identity (Kenny Baustert) applied automatically for any repo whose
+# Work identity, applied automatically for any repo whose
 # remote URL points at Bitbucket. Matches both SSH and HTTPS remotes.
 # Placed last so it overrides the default [user]/[commit] above.
 [includeIf "hasconfig:remote.*.url:git@bitbucket.org:*/**"]

@@ -14,7 +14,7 @@ return {
   cmd = { "TSUpdate", "TSInstall", "TSInstallInfo" },
   main = "nvim-treesitter.configs",
   opts = {
-    -- The stack this machine actually edits — the web tooling implied by
+    -- The stack this machine actually edits: the web tooling implied by
     -- setup/pnpm.sh and the Brewfile's php, plus the languages this repo is
     -- itself written in.
     ensure_installed = {

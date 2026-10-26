@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 #
 # GitHub CLI extensions. `gh extension install` fails on an already-installed
-# extension, so skip those — install.sh is meant to be safely re-runnable.
+# extension, so skip those. install.sh is meant to be safely re-runnable.
 set -uo pipefail
 
 if ! command -v gh >/dev/null 2>&1; then

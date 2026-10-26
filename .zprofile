@@ -1,22 +1,22 @@
 #!/usr/bin/env zsh
 
 #==============================================================================
-#  .zprofile — login shell: environment, PATH, locale (no interactive config)
+#  .zprofile: login shell: environment, PATH, locale (no interactive config)
 #==============================================================================
 
 #------------------------------------------------------------------------------
 # Terminal
 #------------------------------------------------------------------------------
-# Locale (LANG/LC_ALL), EDITOR, DOTFILES, WORDCHARS and the XDG base dirs now
-# live in .zshenv so scripts and non-login shells see them too. TERM is left
-# for the terminal to set — iTerm and Rio each advertise their own; hardcoding
-# xterm-256color here only risked downgrading Rio's capabilities.
+# Locale (LANG/LC_ALL), EDITOR, DOTFILES, WORDCHARS and the XDG base dirs live
+# in .zshenv so scripts and non-login shells see them too. TERM is left for the
+# terminal to set: iTerm and Rio each advertise their own, and hardcoding
+# xterm-256color here could downgrade Rio's capabilities.
 export COLORTERM="truecolor"
 
 #------------------------------------------------------------------------------
-# Core (DOTFILES/EDITOR/WORDCHARS/locale/XDG now live in .zshenv)
+# Core (DOTFILES/EDITOR/WORDCHARS/locale/XDG live in .zshenv)
 #------------------------------------------------------------------------------
-# $TTY is zsh's own record of the terminal device — same string `tty` prints,
+# $TTY is zsh's own record of the terminal device, the same string `tty` prints,
 # without the fork+exec. Fall back to tty(1) for the rare login shell that has
 # no controlling terminal recorded (non-interactive), where $TTY is unset.
 export GPG_TTY="${TTY:-$(tty)}"
@@ -31,46 +31,44 @@ export EZA_COLUMNS=80
 #------------------------------------------------------------------------------
 # Tooling
 #------------------------------------------------------------------------------
-# HOMEBREW_BREWFILE moved to zsh/os/macos-env.zsh with the rest of the Homebrew
-# environment — it names this repo's Brewfile for a bare `brew bundle`.
+# HOMEBREW_BREWFILE lives in zsh/os/macos-env.zsh with the rest of the Homebrew
+# environment. It names this repo's Brewfile for a bare `brew bundle`.
 export NTL_RUNNER=pnpm
 export NVM_COLORS='cmgRY'
 export NVM_LAZY_LOAD=true          # zsh-nvm: defer nvm.sh until first node/npm/nvm use
 [ -d "$HOME/.nvm" ] && export NVM_DIR="$HOME/.nvm"
 
-# pnpm's global bin dir, which pnpm itself creates and writes into. pnpm does
-# not derive it from XDG on macOS, it uses ~/Library/pnpm. Stated explicitly
-# rather than left to pnpm, because the path array below has to name it.
+# pnpm's global bin dir, which pnpm itself creates and writes into. pnpm doesn't
+# derive it from XDG on macOS, it uses ~/Library/pnpm. Set explicitly because
+# the path array below has to name it.
 export PNPM_HOME="$HOME/Library/pnpm"
 
 #------------------------------------------------------------------------------
-# PATH (built once, high → low priority: earlier entries win)
+# PATH (built once, high to low priority: earlier entries win)
 #------------------------------------------------------------------------------
 # Nix's shell hook, sourced from here rather than from the /etc/zshrc edit its
-# installer would make — install.sh passes `--no-modify-profile`, so on a fresh
+# installer would make. install.sh passes `--no-modify-profile`, so on a fresh
 # machine this is the only wiring. Two reasons it lives in the repo: Apple
 # resets /etc/zshrc on major macOS updates, which is the usual way a Nix
 # install quietly drops off PATH; and a tracked file is one this repo can see.
 #
-# Sourced BEFORE the path array on purpose. The hook prepends the Nix profile
+# Sourced before the path array on purpose. The hook prepends the Nix profile
 # bins, and the array then prepends Homebrew ahead of them, so `brew` still
-# wins for any tool installed both ways — the global rule. The /etc hook did
-# the opposite: it ran after this file and left ~/.nix-profile/bin at position
-# 2 with /opt/homebrew/bin at 9 (measured). The hook exports a guard variable,
-# so a machine that still carries the /etc copy sources it once, here, and the
-# /etc copy returns immediately.
+# wins for any tool installed both ways (the global rule). The /etc hook runs
+# after this file and would leave ~/.nix-profile/bin at position 2 with
+# /opt/homebrew/bin at 9 (measured). The hook exports a guard variable, so a
+# machine that still carries the /etc copy sources it once, here, and the /etc
+# copy returns immediately.
 #
-# Cost: tests and exports only, no fork on the common path — 0.16ms per source
-# (measured over 200 sourcings), invisible in `zsh -lic exit` — so it does not
+# Cost: tests and exports only, no fork on the common path. 0.16ms per source
+# (measured over 200 sourcings), invisible in `zsh -lic exit`, so it doesn't
 # need zcache.
 [ -e /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh ] \
   && . /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh
 
 # Homebrew first, so brew's binaries outrank the language-manager and vendor
-# shims below it. (The previous version listed Homebrew *last* under a "Homebrew
-# last so it wins" comment — that was backwards for a zsh path array; what
-# actually hoisted it was the path_helper call inside `brew shellenv`. Now the
-# intended precedence is stated directly by the order of this list.)
+# shims below it. The precedence is the order of this list; listing Homebrew
+# last would not make it win in a zsh path array.
 path=(
   "/opt/homebrew/bin"
   "/opt/homebrew/sbin"
@@ -84,14 +82,14 @@ path=(
 # trailing /opt/homebrew/bin that /etc/paths.d contributes collapses into ours)
 typeset -U path PATH
 
-# Deliberate overrides of a Homebrew formula — prepended after the array above
+# Deliberate overrides of a Homebrew formula, prepended after the array above
 # so they outrank /opt/homebrew/bin. This is the one exception to "Homebrew
 # wins", so it is a dedicated directory rather than ~/.local/bin: only what is
 # explicitly placed here outranks brew, and dropping a binary into ~/.local/bin
-# later can't quietly do so.
+# can't quietly do so.
 #
-# Currently empty; the directory is kept so an override can be dropped in without
-# touching this file.
+# The directory can stay empty; an override can be dropped in without touching
+# this file.
 [ -d "$HOME/.local/overrides" ] && path=("$HOME/.local/overrides" $path) \
   && typeset -U path PATH
 
@@ -100,7 +98,7 @@ typeset -U path PATH
 #------------------------------------------------------------------------------
 # The Homebrew environment, LSCOLORS and FlyEnv's PHP paths.
 #
-# Sourced LAST in this file, which is a real constraint rather than tidiness:
+# Sourced last in this file, which is a real constraint rather than tidiness:
 # zsh/os/macos-env.zsh prepends FlyEnv to $path and that has to stay ahead of
 # everything the array and the overrides block above install. A file that only
 # exported variables could go anywhere; one that touches $path cannot.

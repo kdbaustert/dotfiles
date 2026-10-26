@@ -1,23 +1,19 @@
 #!/usr/bin/env bash
 #==============================================================================
-#  Claude Code Notification hook — a macOS banner when Claude is blocked on me
+#  Claude Code Notification hook: a macOS banner when Claude is blocked on me
 #==============================================================================
-# Wired from ~/.claude/settings.json:
+# Wired by .claude/settings.portable.json, which merge_claude_settings() in
+# setup/lib.sh appends to ~/.claude/settings.json. settings.json itself is not
+# tracked in this repo: it is mostly state Claude writes for itself (model,
+# enabledPlugins, the atuin hooks) and would fight a symlink. The merge only
+# adds hook entries, so whatever else sits under Notification stays.
 #
-#   "Notification": [{ "hooks": [{ "type": "command",
-#     "command": "$HOME/.claude/hooks/notify.sh" }] }]
+# Only the `Notification` event is hooked. That event fires when Claude is
+# actually waiting on me, for a permission prompt or an idle question. Stop and
+# PostToolUse stay unhooked: a banner per turn is noise, and noise is what
+# teaches you to leave Do Not Disturb on.
 #
-# settings.json itself is not tracked in this repo — it is mostly state Claude
-# writes for itself (model, enabledPlugins, the atuin hooks) and would fight a
-# symlink. Only this script is deployed; the four lines above are the manual
-# step on a new machine, and they are repeated in CLAUDE.md and README.MD.
-#
-# ONLY the `Notification` event is hooked. That event fires when Claude is
-# actually waiting on me — a permission prompt, or an idle question. Stop and
-# PostToolUse were considered and rejected: a banner per turn is noise, and
-# noise is what teaches you to leave Do Not Disturb on.
-#
-# The payload arrives as JSON on stdin — `.message` is why Claude is waiting,
+# The payload arrives as JSON on stdin. `.message` is why Claude is waiting and
 # `.cwd` is the project. stdin can only be drained once, so it is read into a
 # variable before jq is pointed at it twice.
 #
@@ -42,9 +38,9 @@ project=$(basename "$cwd")
 # __CFBundleIdentifier on the whole process tree launched from an app bundle,
 # so this names the real host (Ghostty here, iTerm or VS Code elsewhere) with
 # no lookup table. It is absent when Claude Code was not launched from a bundle
-# — over ssh, from cron — and then the flag is simply left off.
+# (over ssh, from cron), and then the flag is simply left off.
 #
-# Deliberately -activate and NOT -sender. -sender would additionally swap the
+# Deliberately -activate, not -sender. -sender would additionally swap the
 # banner's icon to that app, which is the nicer look, but it hangs: measured on
 # macOS 26.6.1 with terminal-notifier 2.0.0, naming a running app made it block
 # indefinitely (2/2 for Ghostty and for Claude), while a non-running app and a
@@ -55,7 +51,7 @@ activate=()
 [ -n "${__CFBundleIdentifier:-}" ] && activate=(-activate "$__CFBundleIdentifier")
 
 # -group replaces the previous banner for the same project instead of stacking
-# a new one on every prompt — Notification can fire several times in a turn.
+# a new one on every prompt, since Notification can fire several times in a turn.
 terminal-notifier \
   -title "Claude Code" \
   -subtitle "$project" \

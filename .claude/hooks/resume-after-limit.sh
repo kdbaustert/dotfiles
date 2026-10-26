@@ -14,14 +14,9 @@
 #              each marker, once the limits have room again, it resumes that
 #              session headless with a "carry on" prompt.
 #
-# Wired from ~/.claude/settings.json, beside whatever StopFailure entry is
-# already there rather than in place of it:
-#
-#   "StopFailure": [{ "matcher": "rate_limit", "hooks": [{ "type": "command",
-#     "command": "$HOME/.claude/hooks/resume-after-limit.sh" }] }]
-#
-# settings.json is not tracked (see notify.sh's header for why), so those lines
-# are the manual step on a new machine, repeated in CLAUDE.md.
+# Wired by .claude/settings.portable.json under StopFailure with the
+# "rate_limit" matcher. merge_claude_settings() in setup/lib.sh appends it
+# beside whatever StopFailure entry is already there rather than in place of it.
 #
 # WHAT "ROOM AGAIN" MEANS. The sweep reads ~/.cache/claude-usage.json, the
 # status line's cache, rather than doing its own date math on resets_at. Two
@@ -54,7 +49,7 @@
 # first is still going. The cache does not refresh during a long resume; a live
 # session's status line refreshes it on its own.
 #
-# The marker is removed *before* the resume starts, so a resume that hits the
+# The marker is removed before the resume starts, so a resume that hits the
 # limit again re-arms itself through this same hook.
 #
 # NOT RESUMED: a session whose transcript was written to more than a minute

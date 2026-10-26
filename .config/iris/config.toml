@@ -4,12 +4,12 @@
 # `exec`s the iris binary, which then runs zsh as a child and draws a suggestion
 # menu over the prompt while reading $LBUFFER through a zle hook.
 #
-# That makes it the only tool here that sits *outside* zle rather than inside
+# That makes it the only tool here that sits outside zle rather than inside
 # it, and upstream's README warns it will fight anything that already owns the
-# line editor — zsh-autosuggestions, atuin, completion UIs. This config settles
+# line editor (zsh-autosuggestions, atuin, completion UIs). This config settles
 # every one of those in favour of the incumbent: iris is additive, and nothing
-# that worked before it was installed changes behaviour. The three places that
-# matters are ghost-text, atuin-history and [keybindings] below.
+# that works without it changes behaviour. The three places that
+# matter are ghost-text, atuin-history and [keybindings] below.
 
 [core]
 # schema version
@@ -36,18 +36,18 @@ mode = "last"
 debug = false
 
 # OFF. This rewrites a typed alias into its expansion on the space bar, in
-# place, so `ll` visibly becomes `l -h` as you type — which reads as "aliases
+# place, so `ll` visibly becomes `l -h` as you type, which reads as "aliases
 # stopped working" even though nothing is wrong with them. The alias table is
 # untouched by iris either way: 124 aliases resolve inside the wrapper, `ll`
 # among them. Off means what you typed is what stays on the line, and zsh
 # expands it at execution as it always has.
 expand-alias = false
 
-# Never run a suggestion on accept — accepting inserts it and leaves the cursor
+# Never run a suggestion on accept. Accepting inserts it and leaves the cursor
 # on the line, which is the same contract fzf-tab and atuin have here.
 auto-execute = false
 
-# 2 = atuin's database *and* $HISTFILE. atuin is what actually records history
+# 2 = atuin's database and $HISTFILE. atuin is what actually records history
 # on this machine (it owns Ctrl-R, see .zshrc), so with the default 0 iris's
 # history mode would be reading the thin shell history rather than the real one.
 # Both, not atuin-only: SHARE_HISTORY keeps $HISTFILE populated too and the
@@ -57,15 +57,15 @@ atuin-history = 2
 # Empty = atuin's own default path, which is where our atuin config leaves it.
 atuin-db-path = ""
 
-# What the arrows do when the menu is CLOSED — "history" browses iris's own
+# What the arrows do when the menu is CLOSED: "history" browses iris's own
 # history, "shell" leaves the key to zle. "shell", so the empty-prompt Up arrow
-# reaches atuin again: `atuin init zsh` binds Up as well as Ctrl-R (.zshrc), and
-# iris reads keys in raw mode before zle sees them, so the default "history" was
+# reaches atuin: `atuin init zsh` binds Up as well as Ctrl-R (.zshrc), and
+# iris reads keys in raw mode before zle sees them, so the default "history" is
 # a silent theft of that key rather than an error.
 #
-# New in 0.7.0, and the reason this file changed. Before it the only way to hand
-# Up back was to move navigate-up/down off the arrows entirely, which cost the
-# menu its scroll keys — see [keybindings] below. This costs nothing: menu open,
+# Needs iris 0.7.0. Without it, the only way to hand Up back is to move
+# navigate-up/down off the arrows entirely, which costs the menu its scroll
+# keys (see [keybindings] below). This costs nothing: menu open,
 # the arrows still scroll it; menu closed, they fall through. iris's own history
 # mode is still there on toggle-mode, and atuin-history = 2 above means it reads
 # the same database atuin does either way.
@@ -90,7 +90,7 @@ nerd-fonts = true
 # the menu but can see in Ctrl-T is worse than either choice on its own.
 hidden-files = true
 
-# OFF — zsh-autosuggestions keeps the inline ghost text. Both draw faded text
+# OFF. zsh-autosuggestions keeps the inline ghost text. Both draw faded text
 # after the cursor from different processes; running the two together gives you
 # two suggestions in the same cell, and the zle one wins the redraw. See
 # $ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE in .zshrc for the colour they'd share.
@@ -132,14 +132,14 @@ auto-update = 0
 [ai]
 # Off, and stated rather than left to the default so it can't drift on with a
 # future `iris config init`. Enabling it ships the line you are typing to Groq
-# (or a local ollama) on a debounce — the same objection that keeps
+# (or a local ollama) on a debounce, the same objection that keeps
 # _pay-respects-fallback-100-request-ai out of install.sh.
 enabled = false
 
 [keybindings]
 # Every default here except toggle-menu collided with something already bound,
-# because iris reads keys in raw mode *before* zle sees them — a collision is a
-# silent theft, not an error.
+# because iris reads keys in raw mode before zle sees them, so a collision is
+# a silent theft, not an error.
 #
 # Ctrl-O is the one free control key left on this keymap. Taken, for reference:
 # Ctrl-R atuin, Ctrl-T + Alt-C fzf, Ctrl-G navi, Alt-A the fzf alias widget,
@@ -151,10 +151,10 @@ toggle-mode = "ctrl+o"
 # four keys below out of the way of the shell the rest of the time.
 toggle-menu = "shift+tab"
 
-# Tab. This MUST NOT be enter, and the reason is worth keeping: binding select
-# to enter overrides iris's built-in Enter, which is the only thing that sends a
-# line to the shell. Enter then accepts a suggestion and nothing else — pressing
-# it twice re-accepts rather than executing, so NOTHING runs. Verified: `git st`
+# Tab. This MUST NOT be enter: binding select to enter overrides iris's
+# built-in Enter, which is the only thing that sends a line to the shell. Enter
+# then accepts a suggestion and nothing else. Pressing it twice re-accepts
+# rather than executing, so NOTHING runs. Tested: `git st`
 # + Enter + Enter left `git status` sitting on the line and produced no git
 # output at all. Aliases look broken first, because `ll` + Enter swaps in a
 # suggestion instead of running the alias.
@@ -163,13 +163,12 @@ toggle-menu = "shift+tab"
 # auto-execute = false it stops there, ready to edit), Enter runs the line.
 select = "tab"
 
-# The arrows, i.e. iris's defaults. These were briefly moved to Ctrl-P/Ctrl-N to
-# keep the empty-prompt up-arrow reaching atuin, which left the menu unscrollable
-# by the one pair of keys anybody reaches for. core.navigate-closed = "shell"
-# above replaces that workaround and is strictly better: it splits the two cases
-# rather than trading one for the other. Menu open, the arrows scroll it; menu
-# closed, they fall through to zle and atuin answers Up as it did before iris was
-# installed. So these stay on the arrows.
+# The arrows, i.e. iris's defaults. Moving them to Ctrl-P/Ctrl-N would keep the
+# empty-prompt up-arrow reaching atuin, but it leaves the menu unscrollable by
+# the one pair of keys anybody reaches for. core.navigate-closed = "shell"
+# above does better: it splits the two cases rather than trading one for the
+# other. Menu open, the arrows scroll it; menu closed, they fall through to zle
+# and atuin answers Up as it does without iris. So these stay on the arrows.
 navigate-up = "up"
 navigate-down = "down"
 

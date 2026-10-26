@@ -5,7 +5,7 @@
 -- cargo (see the LunarVim install prerequisites in README.MD) and because the
 -- alternative is a Lua matcher that gets visibly slow in a large TypeScript
 -- project. `version` pins to a release tag, which is what makes the prebuilt
--- binary available at all — a branch build would need to compile.
+-- binary available at all, since a branch build would need to compile.
 
 return {
   "saghen/blink.cmp",
@@ -27,7 +27,7 @@ return {
     },
 
     appearance = {
-      -- Tells blink which glyph set to measure, not which font to use — the
+      -- Tells blink which glyph set to measure, not which font to use. The
       -- terminal font is a Nerd Font (see the LunarVim install note).
       nerd_font_variant = "mono",
     },
@@ -54,7 +54,7 @@ return {
     },
 
     -- Rust matcher. If the prebuilt binary is ever unavailable this is the one
-    -- line to flip to "lua" — everything else keeps working.
+    -- line to flip to "lua", and everything else keeps working.
     fuzzy = { implementation = "prefer_rust_with_warning" },
   },
 

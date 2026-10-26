@@ -2,10 +2,10 @@
 -- indent guides. One file because none of them need more than a spec.
 
 return {
-  -- oil.nvim — the filesystem as an editable buffer.
+  -- oil.nvim: the filesystem as an editable buffer.
   --
-  -- Not the file *browser*: that is the always-open sidebar in
-  -- lua/plugins/filetree.lua. This is the other half of the job — renaming
+  -- Not the file browser: that is the always-open sidebar in
+  -- lua/plugins/filetree.lua. This is the other half of the job: renaming
   -- twenty files with `:%s` and a write, which neither a tree nor yazi can do.
   -- It keeps netrw (the tree explicitly does not take it) so that `:e some/dir`
   -- lands in an editable buffer rather than a sidebar.
@@ -29,7 +29,7 @@ return {
     },
   },
 
-  -- gitsigns — the gutter, plus hunk staging without leaving the buffer.
+  -- gitsigns: the gutter, plus hunk staging without leaving the buffer.
   {
     "lewis6991/gitsigns.nvim",
     event = { "BufReadPre", "BufNewFile" },
@@ -65,7 +65,7 @@ return {
     },
   },
 
-  -- which-key — shows what a half-typed prefix can still become.
+  -- which-key: shows what a half-typed prefix can still become.
   {
     "folke/which-key.nvim",
     event = "VeryLazy",

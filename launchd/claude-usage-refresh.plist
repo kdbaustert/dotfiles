@@ -2,7 +2,7 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <!--
   Keeps ~/.cache/claude-usage.json warm even when no Claude Code session is
-  open to trigger the opportunistic refresh in .claude/statusline.sh — see the
+  open to trigger the opportunistic refresh in .claude/statusline.sh; see the
   "THE REFRESHER" comment there for the render-path half of this.
 
   The Label below is a placeholder. install.sh copies this file into

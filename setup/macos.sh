@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 #
-# macOS system configuration — the defaults that are ACTUALLY applied on this
-# Mac, rather than an aspirational list. bash, not sh, to match the rest of
+# macOS system configuration: the defaults that are applied on this Mac,
+# rather than an aspirational list. bash, not sh, to match the rest of
 # setup/ and because `&>` below is not POSIX.
 #
 # Changes system settings; review before running. Run it through the
@@ -33,7 +33,7 @@ done 2>/dev/null &
 # rather than written in, so the script can run on any Mac without renaming
 # it after the one it was written on.
 #
-# local_host_name <name> — the Bonjour form of a computer name. LocalHostName
+# local_host_name <name>: the Bonjour form of a computer name. LocalHostName
 # allows letters, digits and hyphens, at most 63 of them. Apostrophes are
 # dropped rather than turned into hyphens, so "Ada’s Mac" becomes Adas-Mac,
 # the same as System Settings does.
@@ -49,10 +49,10 @@ local_host_name() {
   printf '%s\n' "$name"
 }
 
-# set_computer_name — ask for the name and set ComputerName plus the
+# set_computer_name: ask for the name and set ComputerName plus the
 # LocalHostName derived from it. Enter sets nothing: re-deriving from the
 # current name would overwrite a LocalHostName chosen by hand, such as a short
-# "kennys-mbp". Skipped under install.sh -y (ASSUME_YES=true), which promises
+# "my-mbp". Skipped under install.sh -y (ASSUME_YES=true), which promises
 # no questions, and when stdin is not a terminal, where read would get EOF and
 # nobody is around to answer anyway.
 set_computer_name() {
@@ -117,7 +117,7 @@ defaults write NSGlobalDomain AppleInterfaceStyle -string "Dark"
 # Disable press-and-hold for keys in favor of key repeat
 defaults write NSGlobalDomain ApplePressAndHoldEnabled -bool false
 
-# Set a blazingly fast keyboard repeat rate
+# Set a very fast keyboard repeat rate
 defaults write NSGlobalDomain KeyRepeat -int 1
 defaults write NSGlobalDomain InitialKeyRepeat -int 10
 

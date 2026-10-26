@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# Mac App Store apps. bash, not zsh — see the note in composer.sh: the list
+# Mac App Store apps. bash, not zsh (see the note in composer.sh): the list
 # below is a bash array, and keeping one shell across every script in setup/
 # means one set of guards rather than four dialects.
 #
@@ -13,7 +13,7 @@ if ! command -v mas >/dev/null 2>&1; then
   exit 0
 fi
 
-# "<app-id>:<name>" — the id is what mas takes, the name keeps this readable.
+# "<app-id>:<name>". The id is what mas takes, the name keeps this readable.
 apps=(
   "497799835:Xcode"
   "975937182:Fantastical"
@@ -26,7 +26,7 @@ apps=(
   "1212019923:Antivirus Zap"
 )
 
-# `mas install` exits non-zero on an already-installed app, so check first —
+# `mas install` exits non-zero on an already-installed app, so check first.
 # install.sh is meant to be safely re-runnable. `mas list` prints "<id> <name>",
 # hence anchoring the match to the id followed by whitespace.
 installed="$(mas list 2>/dev/null)"

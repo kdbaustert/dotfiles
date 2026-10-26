@@ -84,11 +84,11 @@ style = "italic"
 weight = 400
 
 [navigation]
-mode = "NativeTab"       # macOS native tabs — each tab gets an "×" close button
-# New tabs/splits open in the current dir (renamed from use-current-path).
+mode = "NativeTab"       # macOS native tabs, each tab gets an "×" close button
+# New tabs/splits open in the current dir.
 # Rio prefers the OSC 7 path the shell reports and only falls back to inspecting
 # the foreground process on its pty. zsh/extra/osc7.zsh is what emits that
-# report — without it this setting is left with the unreliable fallback.
+# report, and without it this setting relies on the unreliable fallback.
 current-working-directory = true
 
 [cursor]
@@ -112,7 +112,7 @@ keys = [
 
 [renderer]
 backend = "Metal"                # GPU backend on macOS (vs Vulkan/GL/DX12/WebGPU)
-target-fps = 120                 # cap render rate — match ProMotion (drop to 60 on non-120Hz displays)
+target-fps = 120                 # cap render rate to match ProMotion (drop to 60 on non-120Hz displays)
 disable-unfocused-render = true  # stop rendering windows that aren't focused
 disable-occluded-render = true   # stop rendering windows hidden behind others
 
@@ -120,7 +120,7 @@ disable-occluded-render = true   # stop rendering windows hidden behind others
 audio = false
 
 [panel]
-padding = [10, 20]  # vertical, horizontal (CSS shorthand) — space inside each panel
+padding = [10, 20]  # vertical, horizontal (CSS shorthand), space inside each panel
 row-gap = 10  # 10px vertical gap between panels
 column-gap = 15  # 15px horizontal gap between panels
 border-width = 2.0  # 2px border around panels

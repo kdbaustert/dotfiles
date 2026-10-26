@@ -136,9 +136,9 @@ travel on the command.
 ## How I want you to work
 
 **`CLAUDE-REFERENCE.md`.** Claude Code auto-loads `CLAUDE.md` and nothing else,
-so a repo that splits its mandatory rules from its architecture reference —
-`cnc-claims` does, and the reference is where the framework's real behaviour is
-written down — hands you only half of what it wrote for you, and withholds
+so a repo that splits its mandatory rules from its architecture reference, where
+the framework's real behaviour is written down, hands you only half of what it
+wrote for you, and withholds
 exactly the half that stops you guessing at code you have not read. Treat it as
 loaded context, not as a file to skim if a search happens to surface it. This is
 *investigate first* aimed at documentation the harness will not hand you.
@@ -166,6 +166,26 @@ large, so page text comes first. "Show failing output verbatim" replaces "don't
 paraphrase a test failure": a paraphrase hides the line that tells me what
 broke. The writing bullet keeps a short tell list because Codex reads this file
 as `AGENTS.override.md` but never reads `~/.claude/rules/`.
+
+**Stop what you start.** A dev server or watcher left from a finished task
+keeps its port, so the next session's server fails to bind or a stale copy
+answers in its place, and by then nobody knows which session started it. Naming
+one you leave running on purpose turns it into a choice I can see.
+
+**Keep work code and secrets where they are.** Artifacts, Miro, Jira and the
+browser tools are loaded in every project, and publishing to any of them sends
+the code to a service under my account where it can be shared, cached or
+indexed; deleting it later doesn't undo that. Work code and client data aren't
+mine to send. A Bitbucket remote is the tell because work repos live there and
+personal ones on GitHub, the same signal the signing identity follows (see
+**Git**). Secrets get the wider rule because a token echoed into a reply stays
+in the session transcript under `~/.claude/projects`.
+
+**Overrides in a project file.** A project that overrides a rule here has to
+name it. Silent overrides were the problem this fixes: the dotfiles
+`AGENTS.md` asked for documentation, finished work and status emoji while this
+file said no summary markdown, research first and no emoji, and nothing said
+which one won.
 
 ## Code style
 
@@ -305,8 +325,10 @@ remote is added. A first commit made before the remote lands under my personal
 name, signed with a key the work account cannot attribute.
 
 `attribution.commit` and `attribution.pr` are set to `""` in
-`~/.claude/settings.json` to strip co-author trailers, but that file is untracked,
-so the rule lives in `CLAUDE.md` too.
+`.claude/settings.portable.json`, which the installer merges into
+`~/.claude/settings.json`, to strip co-author trailers. The rule lives in
+`CLAUDE.md` too, because Codex reads that file and never reads Claude's
+settings.
 
 `develop` and `staging` are integration branches carrying everyone's in-flight
 work, so merging one into a feature branch pulls other people's commits into my
@@ -363,7 +385,7 @@ of it without distinguishing. Reviewing a colleague's code back to them under my
 name is worse than a thin audit.
 
 Whoever reads an audit, and especially whoever reads it as a Jira comment, is a
-claims handler, a tester or a manager. A change you skip because it is mechanical
+support lead, a tester or a manager. A change you skip because it is mechanical
 is a change nobody knows to retest.
 
 The Jira byline goes because the audit goes up under my name as my review, and
@@ -382,7 +404,7 @@ These four read in the order you execute them: pick the diff, write it up,
 format it, sign it.
 
 - **Audit only my own changes.** The subject is what *I* wrote on the branch, not everything its diff against the base contains. Take the merge-base, list my commits (`git log --author="$(git config user.email)" $(git merge-base origin/HEAD HEAD)..HEAD`), and diff those. If that leaves nothing, say the branch has no commits of mine rather than widening the net to fill the report.
-- **Audits are written for non-programmers.** Describe every change as observable behaviour: what the system did before, what it does now, and what to look at to confirm it. Cover *all* of them, including the mechanical ones. File paths, class and method names, and framework vocabulary go in a trailing parenthetical at most: "renamed `getClaimant()` to `getPolicyholder()` in `ClaimController`" tells that reader nothing, while "the claimant is now called the policyholder everywhere it appears on screen" tells them what to check. Use the voice of the `plain` skill, not a commit message.
+- **Audits are written for non-programmers.** Describe every change as observable behaviour: what the system did before, what it does now, and what to look at to confirm it. Cover *all* of them, including the mechanical ones. File paths, class and method names, and framework vocabulary go in a trailing parenthetical at most: "renamed `getBuyer()` to `getCustomer()` in `OrderController`" tells that reader nothing, while "the buyer is now called the customer everywhere it appears on screen" tells them what to check. Use the voice of the `plain` skill, not a commit message.
 - **Jira comments carry no AI byline.** The heading is `Audit of the code changes`. Strip the `AI-generated` label, and don't reinstate it as a footer or disclaimer.
 - **Format Jira comments deliberately.** Always pass `contentFormat: "markdown"` to `addCommentToJiraIssue`, because the default varies when omitted. Write ordinary markdown: a `##` heading, `-` bullets, bold used sparingly. No hand-rolled ADF JSON, no diffs or code blocks. Read the comment back afterwards to confirm it rendered, and fix a mistake by passing `commentId` to update it in place, never by posting a second comment.
 
@@ -424,7 +446,7 @@ deciding change by change. What was changed and why:
 
 - **Out of git.** Upstream already says not to commit these files. Here that's
   done in `.config/git/ignore`, by exact name, because a `CLAUDE-*.md` glob
-  would also ignore tracked files with that prefix (cnc-claims'
+  would also ignore tracked files with that prefix (a project's
   `CLAUDE-REFERENCE.md`). The ignore has a side effect upstream doesn't
   mention: `rg`, `fd`, Grep and Glob all skip the files, which is why the rule
   says to open them by path. Two more costs of being untracked: `git clean
@@ -516,10 +538,13 @@ loading every workflow into every session. Deployment history moved from the
 repo's CLAUDE.md to setup/REFERENCE.md for the same reason.
 
 Portable Claude preferences now live in .claude/settings.portable.json and are
-merged by the shared installer. Sonnet replaces Opus as the routine default;
-medium effort and existing output and compaction limits remain unchanged.
-Use Opus explicitly for work that needs it. These defaults reduce model cost;
-only reducing context and generated output directly reduces token counts.
+merged by the shared installer. Sonnet briefly replaced Opus as the main
+session's default to cut model cost. On 2026-10-26 the main session went back
+to Opus, because the merge overwrites the live `model` key and a hand-set Opus
+kept getting flipped back. Subagents still default to Sonnet (see
+setup/REFERENCE.md). Medium effort and existing output and compaction limits
+remain unchanged. Only reducing context and generated output directly reduces
+token counts.
 
 On 2026-10-26 drona23/claude-token-efficient (MIT) was installed globally using
 its README's "Option 1 - Universal": its root `CLAUDE.md`, verbatim as of
@@ -648,8 +673,8 @@ Write every comment and docblock description the way a developer on the team wou
 - No marketing words (robust, seamless, comprehensive, elegant, gracefully), em dashes, emoji or markdown emphasis.
 
 ```
-// Bad:  This function is responsible for robustly retrieving the user's claims.
-// Good: Skips archived claims; the nightly export reads those separately.
+// Bad:  This function is responsible for robustly retrieving the user's orders.
+// Good: Skips archived orders; the nightly export reads those separately.
 
 // Bad:  Updated to use the new cache layer
 // Good: Cached for 5 minutes because the carrier API allows 60 calls a minute.

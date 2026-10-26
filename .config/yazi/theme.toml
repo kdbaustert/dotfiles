@@ -1,10 +1,10 @@
-# Voltage — themes/voltage.md.
+# Voltage: themes/voltage.md.
 #
 # yazi does not read LS_COLORS, so none of the vivid work reaches it; the
 # filetype rules at the bottom are a hand port of the same categories.
 #
-# Section is [mgr], not [manager]: yazi renamed it, and the old spelling is
-# silently ignored rather than rejected, which looks exactly like a theme that
+# The section is [mgr], not [manager]: yazi ignores the old [manager] spelling
+# silently instead of rejecting it, which looks exactly like a theme that
 # did not load.
 [mgr]
 cwd = { fg = "#17d5df" }
@@ -91,13 +91,13 @@ title_info = { fg = "#b3e053" }
 title_warn = { fg = "#f9e906" }
 title_error = { fg = "#ff4d5e" }
 
-# The LS_COLORS port. Ordering matters -- first match wins -- so the directory
+# The LS_COLORS port. Ordering matters (first match wins), so the directory
 # rules lead and the catch-all closes.
 #
 # Glob matches are keyed on `url`. Most yazi themes in the wild still say
 # `name`, and this version rejects it outright (as it does the old `is = "dir"`
-# form) -- a hard TOML parse error that takes the whole theme down, not just
-# the offending rule.
+# form), which is a hard TOML parse error that takes the whole theme down, not
+# just the offending rule.
 [filetype]
 rules = [
   { mime = "inode/directory", fg = "#5cc9f5", bold = true },

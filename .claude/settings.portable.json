@@ -1,7 +1,38 @@
 {
-  "model": "sonnet",
+  "model": "opus",
   "effortLevel": "medium",
   "bashOutputMaxChars": 15000,
+  "attribution": {
+    "commit": "",
+    "pr": ""
+  },
+  "statusLine": {
+    "type": "command",
+    "command": "$HOME/.claude/statusline.sh",
+    "padding": 0
+  },
+  "hooks": {
+    "Notification": [
+      {
+        "hooks": [{ "type": "command", "command": "$HOME/.claude/hooks/notify.sh" }]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          { "type": "command", "command": "$HOME/.claude/hooks/search-excludes.sh" },
+          { "type": "command", "command": "$HOME/.claude/hooks/command-guard.sh" }
+        ]
+      }
+    ],
+    "StopFailure": [
+      {
+        "matcher": "rate_limit",
+        "hooks": [{ "type": "command", "command": "$HOME/.claude/hooks/resume-after-limit.sh" }]
+      }
+    ]
+  },
   "env": {
     "MAX_MCP_OUTPUT_TOKENS": "15000",
     "CLAUDE_CODE_FILE_READ_MAX_OUTPUT_TOKENS": "15000",

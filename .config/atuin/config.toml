@@ -80,10 +80,10 @@
 ## code default is 40 (`.set_default("inline_height", 40)` in atuin-client's
 ## settings.rs), so leaving this commented gives you 40, not full screen.
 ##
-## 40 is a trap while iris is on. atuin only falls back to full screen when
+## 40 breaks Ctrl-R while iris is on. atuin only falls back to full screen when
 ## inline_height >= the terminal's row count, so a window taller than 40 rows
 ## takes ratatui's Inline viewport, which asks crossterm for the cursor position
-## — a DSR `ESC[6n`. iris owns the real terminal in raw mode and runs zsh on a
+## (a DSR `ESC[6n`). iris owns the real terminal in raw mode and runs zsh on a
 ## pty underneath; the query reaches the terminal, but iris eats the reply as a
 ## keystroke instead of forwarding it into the pty, so crossterm times out and
 ## Ctrl-R / Up / Down print "Error: The cursor position could not be read within
@@ -92,9 +92,9 @@
 ## under iris broken, 60 rows with iris off fine, 60 rows under iris with this
 ## set to 0 fine.
 ##
-## So 0 costs nothing — it is what every window of 40 rows or fewer already did.
-## The alternative is iris forwarding the cursor-position reply, which 0.7.0 has
-## no setting for; keep this pinned until it does.
+## So 0 costs nothing: it matches what every window of 40 rows or fewer does
+## anyway. The alternative is iris forwarding the cursor-position reply, which
+## 0.7.0 has no setting for; keep this pinned until it does.
 inline_height = 0
 
 ## the maximum number of lines the interface should take up
@@ -192,9 +192,9 @@ inline_height = 0
 ##
 ## Set to false: enter and tab BOTH place the selected command on the prompt for
 ## editing instead of running it. That matches every other picker in this shell
-## — fzf-tab, the fzf widgets, navi and → (accept_past_line_end below) all
-## insert and wait — and the upstream default of true was the only one that
-## executed on selection, which is a bad asymmetry for a history search where
+## (fzf-tab, the fzf widgets, navi and → via accept_past_line_end below all
+## insert and wait), while the upstream default of true is the only one that
+## executes on selection. That's a bad asymmetry for a history search where
 ## the entry you want is often nearly right rather than exactly right.
 enter_accept = false
 
@@ -271,12 +271,12 @@ enter_accept = false
 #
 # Set explicitly rather than left to the default: this is the behaviour we
 # actually want from → (select the highlighted command onto the prompt WITHOUT
-# running it). With enter_accept = false above, → now agrees with Enter and Tab
+# running it). With enter_accept = false above, → agrees with Enter and Tab
 # rather than being the exception. Pinning it here means an upstream change to
 # the default can't silently turn → into "execute", which is the one direction
 # of drift that would actually hurt.
 #
-# Only fires when the cursor is at the END of the typed query — mid-query, →
+# Only fires when the cursor is at the END of the typed query. Mid-query, →
 # moves the cursor as usual. Tab does the same accept-without-running from any
 # cursor position, so that's the one to reach for while editing a query.
 accept_past_line_end = true
@@ -330,7 +330,7 @@ autostart = true
 # tcp_port = 8889
 
 [theme]
-## Voltage — themes/voltage.md. The theme file is themes/voltage.toml alongside
+## Voltage: themes/voltage.md. The theme file is themes/voltage.toml alongside
 ## this config; install.sh symlinks the whole .config/atuin directory, so it is
 ## picked up with no extra wiring. Values there are Voltage hex rather than the
 ## named colors documented below: atuin parses a hex triplet first and only

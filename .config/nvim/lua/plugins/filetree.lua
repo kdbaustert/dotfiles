@@ -1,4 +1,4 @@
--- nvim-tree — the always-open sidebar.
+-- nvim-tree: the always-open sidebar.
 --
 -- Chosen over neo-tree because the Voltage colorscheme already spells out the
 -- full NvimTree* group set (it was written for LunarVim, which ships this same
@@ -6,7 +6,7 @@
 -- of the palette. See themes/voltage.md.
 --
 -- It does NOT take over netrw: oil.nvim owns that (lua/plugins/editor.lua), and
--- both hijacking it means whichever loads last wins. The two split cleanly —
+-- both hijacking it means whichever loads last wins. The two split cleanly:
 -- this is for seeing where you are, oil is for editing the filesystem as text.
 --
 -- `lazy = false` is forced by the requirement: a sidebar that opens on demand
@@ -85,7 +85,7 @@ return {
     local api = require "nvim-tree.api"
     local group = vim.api.nvim_create_augroup("configs_nvim_tree", { clear = true })
 
-    -- Open on start, and hand focus straight back — the sidebar is context,
+    -- Open on start, and hand focus straight back. The sidebar is context,
     -- not where the work happens.
     vim.api.nvim_create_autocmd("VimEnter", {
       group = group,
@@ -121,7 +121,7 @@ return {
     --
     -- This deliberately hooks WinClosed and defers, rather than the QuitPre
     -- recipe that is usually posted for this. Closing or tearing down the tree
-    -- *inside* QuitPre wedges Neovim: the quit is already in progress, and
+    -- inside QuitPre wedges Neovim: the quit is already in progress, and
     -- both `nvim_win_close` and nvim-tree's own `tree.close()` hang `:q` and
     -- `:qa` outright. WinClosed fires after the window is gone, and the
     -- schedule puts the check outside the autocmd entirely, so by the time it

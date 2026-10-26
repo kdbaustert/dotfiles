@@ -1,4 +1,4 @@
-# Voltage — vivid theme (generates LS_COLORS)
+# Voltage, a vivid theme (generates LS_COLORS)
 #
 # vivid ships no theme matching this palette, and the built-ins it does ship
 # would put file listings on a different set of hues than the prompt, fzf and
@@ -6,7 +6,7 @@
 #
 # Used by `vivid generate voltage` in .zshrc. vivid resolves a bare theme name
 # against ~/.config/vivid/themes/<name>.yml before falling back to its
-# built-ins, and install.sh symlinks .config/vivid there — so this applies on a
+# built-ins, and install.sh symlinks .config/vivid there, so this applies on a
 # fresh machine with no extra step.
 #
 # LS_COLORS is cached (zcache_value). Run `zcache_clear` after editing this

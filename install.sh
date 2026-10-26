@@ -29,7 +29,7 @@ DOTFILES_DIR="$(CDPATH='' cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 # theme caches, LS_COLORS, pay-respects, the setup-script runner. Kept out of
 # this file so it reads as a list of sections. See setup/lib.sh's header.
 # Checked by hand because `error` is one of the things it defines; without the
-# check a failed source ran on into "command not found" for every helper.
+# check a failed source would run on into "command not found" for every helper.
 # shellcheck source=setup/lib.sh
 if ! source "$DOTFILES_DIR/setup/lib.sh"; then
   echo "Error: could not load $DOTFILES_DIR/setup/lib.sh" >&2
@@ -46,7 +46,7 @@ if ! command -v brew &>/dev/null && [ -x /opt/homebrew/bin/brew ]; then
 fi
 
 #------------------------------------------------------------------------------
-# print_banner — the DOTFILES wordmark, shown once at the start of a run.
+# print_banner: the DOTFILES wordmark, shown once at the start of a run.
 #
 # Pasted in rather than generated with figlet: figlet is something this script
 # installs, so it cannot be relied on the first time the script runs, and it
@@ -131,7 +131,7 @@ section_brew() {
 section_nix() {
   title "Nix"
   # The Nix package manager, beside Homebrew rather than instead of it. The split:
-  # Homebrew owns the machine — the Brewfile, casks, fonts, the global CLI set —
+  # Homebrew owns the machine (the Brewfile, casks, fonts, the global CLI set)
   # and Nix owns per-project environments. `nix-shell` and `nix develop` give a
   # repo a pinned toolchain without touching anything global, which Homebrew has
   # no equivalent for. Don't install through Nix what the Brewfile already has:
@@ -141,14 +141,14 @@ section_nix() {
   # Upstream's installer, not Determinate Systems'. Determinate's writes a
   # receipt for a clean uninstall and re-adds its /etc/zshrc hook after a macOS
   # upgrade, but it puts a third party between us and the interpreter, and this
-  # machine was first installed with upstream. The one thing it fixes — the /etc
-  # hook — is moot here: `--no-modify-profile` skips that edit entirely and
+  # machine uses upstream. The one thing it fixes, the /etc hook, is moot here:
+  # `--no-modify-profile` skips that edit entirely and
   # .zprofile sources the hook itself, tracked and upgrade-proof (Apple resets
   # /etc/zshrc on major updates, which is the usual way a Nix install quietly
   # drops off PATH).
   #
-  # `--daemon` is the only mode macOS accepts — the installer refuses
-  # `--no-daemon` on Darwin — and it creates a separate APFS volume for /nix,
+  # `--daemon` is the only mode macOS accepts (the installer refuses
+  # `--no-daemon` on Darwin), and it creates a separate APFS volume for /nix,
   # since the root volume is read-only. The default nixpkgs-unstable channel is
   # kept: `nix-shell -p` resolves <nixpkgs> through it, and without a channel
   # that form fails until flakes are set up.
@@ -185,13 +185,13 @@ section_claude() {
   # the run. The .claude files themselves (CLAUDE.md, hooks, skills, agents) are
   # deployed by the symlinks section, which runs before this one.
 
-  # See CLAUDE_PLUGINS and install_claude_plugins in setup/lib.sh — the plugin
-  # list is declared there, and installing has to be a command run again on every machine rather than a symlink like
-  # the rest of .claude.
+  # See CLAUDE_PLUGINS and install_claude_plugins in setup/lib.sh. The plugin
+  # list is declared there, and installing has to be a command run again on
+  # every machine rather than a symlink like the rest of .claude.
   install_claude_plugins "${CLAUDE_PLUGINS[@]}"
 
   # The usage cache LaunchAgent keeps ~/.cache/claude-usage.json warm between
-  # Claude Code sessions — see the "THE REFRESHER" comment in
+  # Claude Code sessions. See the "THE REFRESHER" comment in
   # .claude/statusline.sh for why a session-less gap otherwise leaves the cache
   # up to an hour stale. It lives here rather than in link_dotfiles()
   # (setup/lib.sh) because it needs the launchctl bootstrap below, not just a
@@ -201,8 +201,8 @@ section_claude() {
   # daemon's is, and set in a copy of the tracked plist rather than a link to
   # it; the plist's header says why. The copy loses nothing a link gave:
   # launchd only rereads a plist at bootstrap, which takes this re-run either
-  # way. The old agent was linked under a label naming a person; renaming its
-  # file left that link dangling, and retire_launch_agents unloads it.
+  # way. An agent linked under a label naming a person leaves a dangling link
+  # when its file is renamed, and retire_launch_agents unloads it.
   LAUNCH_AGENT_LABEL="local.$(id -un).claude-usage-refresh"
   LAUNCH_AGENT_PLIST="$HOME/Library/LaunchAgents/$LAUNCH_AGENT_LABEL.plist"
   mkdir -p "$HOME/Library/LaunchAgents"
@@ -222,10 +222,10 @@ section_claude() {
 
   # The verdict comes from `print`, not from what bootstrap returned. bootout can
   # return before launchd has finished tearing the job down, and the bootstrap
-  # behind it then fails *because the job is still there* — an error that means
-  # the agent is loaded, which is the opposite of what reporting that exit status
-  # would say. Asking what state launchd ended up in answers the only question
-  # this step actually cares about.
+  # behind it then fails because the job is still there. That error means the
+  # agent is loaded, the opposite of what reporting that exit status would say.
+  # Asking launchd what state it ended up in answers the only question this
+  # step cares about.
   if launchctl print "gui/$(id -u)/$LAUNCH_AGENT_LABEL" &>/dev/null; then
     success "Loaded $LAUNCH_AGENT_LABEL — refreshes the usage cache every 5 minutes."
   else
@@ -243,16 +243,16 @@ section_zsh() {
   # step calls `fast-theme`, a plugin function that exists once zinit has
   # installed the plugin, so zinit comes before the themes.
 
-  # pay-respects — command correction (the `fuck` alias and ^X^X in .zshrc). Not
+  # pay-respects: command correction (the `fuck` alias and ^X^X in .zshrc). Not
   # installed via Homebrew: there is no formula in core, and the tap the upstream
   # README points at (timescam/homebrew-tap) is a 2-star third-party repo owned
-  # by someone other than the project author that pins `version "nightly"` — a
-  # moving target for a tool that reads the command line. So: pull the author's
-  # own signed release, pinned and checksummed, into ~/.local/bin (already on
-  # PATH via .zprofile).
+  # by someone other than the project author that pins `version "nightly"`, a
+  # moving target for a tool that reads the command line. The installer pulls
+  # the author's own signed release, pinned and checksummed, into ~/.local/bin
+  # (already on PATH via .zprofile).
   #
-  # The release only ships .tar.zst, which is why this was never a zinit `gh-r`
-  # block — zinit's extractor handles zip/tar.gz/tar.xz/7z but not zstd.
+  # The release only ships .tar.zst, which is why this isn't a zinit `gh-r`
+  # block: zinit's extractor handles zip/tar.gz/tar.xz/7z but not zstd.
   #
   # arm64 only, because this repo targets Apple Silicon alone. The
   # install itself is install_pay_respects in setup/lib.sh; the asset name and
@@ -278,7 +278,7 @@ section_zsh() {
 
   # The Brewfile's link, not the Cellar path behind it, which changes with
   # every `brew upgrade` and would strand the plist. Guarded because with no
-  # brew, `$(brew --prefix)` is empty and the check went looking for /bin/atuin.
+  # brew, `$(brew --prefix)` is empty and the check would look for /bin/atuin.
   if command -v brew &>/dev/null; then
     sync_atuin_daemon "$HOME/Library/LaunchAgents/sh.atuin.daemon.plist" \
       "$(brew --prefix)/bin/atuin"
@@ -293,7 +293,7 @@ section_zsh() {
 section_hosts() {
   title "Hosts blocklist (LaunchDaemon)"
   # Splices the blocklist into /etc/hosts now and installs the root job that
-  # re-splices it every Monday — see the header of setup/hosts.sh for why a root
+  # re-splices it every Monday. See the header of setup/hosts.sh for why a root
   # job is acceptable here. Both files are copied, like the agent's plist, but
   # root owned: the daemon must not run anything I can edit, and launchd
   # refuses a daemon plist not owned by root. That makes this section what
@@ -316,8 +316,9 @@ section_hosts() {
 
   # StartCalendarInterval rather than StartInterval: a calendar job that came
   # due while the Mac slept runs once on wake instead of being skipped. One
-  # missed while the Mac was shut down is not made up; the next Monday catches it.
-  # --scheduled only adds a dated line to the log — launchd's has no timestamps.
+  # missed while the Mac was shut down is not made up; the next Monday catches
+  # it. --scheduled only adds a dated line to the log, since launchd's has no
+  # timestamps.
   cat >"$hosts_plist_tmp" <<EOF
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
@@ -382,17 +383,17 @@ section_touchid() {
   # /etc/pam.d/sudo_local is Apple's supported override file (macOS 14+); it is
   # `include`d by /etc/pam.d/sudo and, unlike that file, survives OS updates.
   #
-  # Both operations below are now guarded. They used to run unconditionally on
-  # every invocation, outside any section heading, which meant a re-run silently
-  # rewrote a root-owned PAM file and ran a destructive sed over Apple's own
-  # /etc/pam.d/sudo — with no output either way. A mistake there costs you sudo.
+  # Both operations below are guarded. Running them unconditionally on every
+  # invocation would silently rewrite a root-owned PAM file and run a
+  # destructive sed over Apple's own /etc/pam.d/sudo, with no output either way.
+  # A mistake there costs you sudo.
   PAM_TID='auth       sufficient     pam_tid.so'
 
   if [ -f /etc/pam.d/sudo_local ] && grep -q '^[^#]*pam_tid\.so' /etc/pam.d/sudo_local; then
     info "Touch ID for sudo already enabled."
   else
-    # Preserve anything already in the file rather than clobbering it — a plain
-    # `tee` here would discard unrelated rules someone had added.
+    # Preserve anything already in the file rather than clobbering it. A plain
+    # `tee` here would discard unrelated rules someone has added.
     if [ -s /etc/pam.d/sudo_local ]; then
       printf '%s\n' "$PAM_TID" | sudo tee -a /etc/pam.d/sudo_local >/dev/null
     else
@@ -405,9 +406,10 @@ section_touchid() {
     fi
   fi
 
-  # Legacy cleanup only: older setups edited /etc/pam.d/sudo directly. With
-  # sudo_local in place that line is redundant, but only touch the file if it is
-  # actually there — a no-op sed on a system PAM file every run is a needless risk.
+  # Legacy cleanup only: a setup that edited /etc/pam.d/sudo directly leaves a
+  # line there. With sudo_local in place that line is redundant, but only touch
+  # the file if it is actually there, since a no-op sed on a system PAM file
+  # every run is a needless risk.
   if grep -q '^[^#]*pam_tid\.so' /etc/pam.d/sudo 2>/dev/null; then
     if sudo cp /etc/pam.d/sudo "/etc/pam.d/sudo.backup-$(date +%Y%m%d-%H%M%S)"; then
       sudo sed -i '' '/pam_tid.so/d' /etc/pam.d/sudo \
@@ -423,10 +425,10 @@ section_touchid() {
 section_iterm() {
   title "iTerm preferences"
   # iTerm2 reads its prefs from a folder rather than a symlinked plist: point it at
-  # iterm/ and it picks up com.googlecode.iterm2.plist from there. This was set by
-  # hand on the current machine and left out of the script, so a fresh box kept the
-  # repo's plist but never loaded it. Written unconditionally — `defaults write` is
-  # idempotent, and iTerm2 only reads these at launch.
+  # iterm/ and it picks up com.googlecode.iterm2.plist from there. Without these
+  # writes a fresh box has the repo's plist but never loads it. Written
+  # unconditionally, since `defaults write` is idempotent and iTerm2 only reads
+  # these at launch.
   if [ -d "$DOTFILES_DIR/iterm" ]; then
     defaults write com.googlecode.iterm2 PrefsCustomFolder -string "$DOTFILES_DIR/iterm"
     defaults write com.googlecode.iterm2 LoadPrefsFromCustomFolder -bool true
@@ -434,19 +436,19 @@ section_iterm() {
   fi
 
   # obsidian/ holds the "Amethyst Night" theme. It is intentionally NOT deployed
-  # here: Obsidian themes live at <vault>/.obsidian/themes/, and the vault path is
-  # per-machine — there is no vault on this one yet (no .obsidian directory exists
-  # under $HOME). Copy obsidian/themes/* into <vault>/.obsidian/themes/ by hand
+  # here: Obsidian themes live at <vault>/.obsidian/themes/, the vault path is
+  # per-machine, and there is no vault on this one yet (no .obsidian directory
+  # exists under $HOME). Copy obsidian/themes/* into <vault>/.obsidian/themes/ by hand
   # once a vault exists; symlinking into a synced vault tends to confuse Obsidian.
 }
 
 #------------------------------------------------------------------------------
 section_setup_scripts() {
   title "Optional setup scripts"
-  # Opt-in and off by default — see run_setup_scripts in setup/lib.sh for how the
-  # selection works. macos.sh used to be here too and is now
-  # the `macos` section below, so it gets a yes/no of its own instead of hiding
-  # behind an environment variable.
+  # Opt-in and off by default. See run_setup_scripts in setup/lib.sh for how the
+  # selection works. macos.sh isn't one of these: it is the `macos` section
+  # below, with a yes/no of its own instead of hiding behind an environment
+  # variable.
   #
   #     SETUP_SCRIPTS="pnpm composer" ./install.sh
   #     SETUP_SCRIPTS=all ./install.sh
@@ -457,12 +459,12 @@ section_setup_scripts() {
 section_macos() {
   title "macOS system defaults"
   # setup/macos.sh rewrites system settings (Finder, Dock, the save panel, the
-  # computer name) — review it before saying yes. It stays a script of its own,
+  # computer name), so review it before saying yes. It stays a script of its own,
   # as setup/hosts.sh does, rather than being pasted in here: it is 180 lines of
   # `defaults write`, and it can still be run by hand.
   #
   # Last on purpose. The script ends by killing Dock, Finder, SystemUIServer and
-  # Terminal so they reread their settings — and when the installer is running
+  # Terminal so they reread their settings, and when the installer is running
   # in Terminal.app, that kills the installer too. As the final section, the only
   # thing that loss can cost is the summary.
   # ASSUME_YES goes along so -y skips the computer-name prompt too; without it
@@ -478,8 +480,8 @@ section_macos() {
 #  Section selection
 #==============================================================================
 # Every section, in the order a full run takes them, as "name|description".
-# The order is load-bearing — the theme step calls the bat the Brewfile
-# installs, zinit reads the .zshrc the symlink step puts in place — so a
+# The order is load-bearing (the theme step calls the bat the Brewfile
+# installs, zinit reads the .zshrc the symlink step puts in place), so a
 # partial run keeps it too: `./install.sh theme brew` still runs brew first.
 # "name|description" strings rather than an associative array because a fresh
 # Mac runs this under /bin/bash 3.2, before Homebrew's bash exists.
@@ -497,15 +499,14 @@ SECTIONS=(
   "macos|macOS system defaults from setup/macos.sh — review it first"
 )
 
-# The sections that call sudo. The prompt used to open every run, which was
-# right when every run was a full one; `./install.sh symlinks` should not ask
-# for a password it never uses. brew is here for the Homebrew installer and
-# for casks that ship a .pkg; macos because setup/macos.sh runs sudo itself.
-# setup-scripts used to be here for that same reason and left with macos.sh —
-# none of the scripts still behind it calls sudo.
+# The sections that call sudo. The password prompt only appears when one of
+# them runs, so `./install.sh symlinks` doesn't ask for a password it never
+# uses. brew is here for the Homebrew installer and for casks that ship a .pkg;
+# macos because setup/macos.sh runs sudo itself. setup-scripts isn't listed:
+# none of the scripts behind it calls sudo.
 SUDO_SECTIONS="brew nix hosts touchid macos"
 
-# usage — print the section list, generated from SECTIONS so it cannot drift.
+# usage: print the section list, generated from SECTIONS so it cannot drift.
 usage() {
   local entry
 
@@ -524,14 +525,14 @@ usage() {
   done
 }
 
-# has_word <list> <word> — whether a space-separated list contains the word.
+# has_word <list> <word>: whether a space-separated list contains the word.
 # A padded substring match rather than an array, which bash 3.2 cannot pass
 # into a function and which `set -u` trips on when it is empty.
 has_word() {
   [[ " $1 " == *" $2 "* ]]
 }
 
-# describe <name> — the description half of a SECTIONS entry.
+# describe <name>: the description half of a SECTIONS entry.
 describe() {
   local entry
 
@@ -543,7 +544,7 @@ describe() {
   done
 }
 
-# The yes/no questions are drawn with gum — Charm's prebuilt CLI over their
+# The yes/no questions are drawn with gum, Charm's prebuilt CLI over their
 # Bubble Tea TUI framework. A prebuilt binary rather than a Bubble Tea
 # program of our own because the questions have to work on a fresh Mac, which
 # has no Go toolchain to build one with (go is not in the Brewfile), and gum
@@ -557,7 +558,7 @@ GUM_VERSION="2.0.2"
 GUM_SHA256="4777a69b1170b8db23c95d5889fb32186cfda1a3ac950d339aa17e3513633890"
 GUM=""
 
-# ensure_gum — point GUM at a gum binary, fetching the pinned release when
+# ensure_gum: point GUM at a gum binary, fetching the pinned release when
 # there is none. Leaves GUM empty when it can't (offline, not arm64), and the
 # plain read-based prompts below take over, so gum never blocks a run.
 ensure_gum() {
@@ -588,7 +589,7 @@ ensure_gum() {
   rm -rf "$tmp"
 }
 
-# confirm <question> — yes/no, defaulting to yes. Ctrl-C aborts the whole run
+# confirm <question>: yes/no, defaulting to yes. Ctrl-C aborts the whole run
 # instead of reading as "no": gum reports it as 130, and a bare `read` sees EOF.
 confirm() {
   local reply status
@@ -655,8 +656,8 @@ done
 # their message without the banner in front of it.
 print_banner
 
-# Interactive only when nothing was named — named sections were already
-# chosen, so asking about them again would be noise — and only when there is
+# Interactive only when nothing was named (named sections were already
+# chosen, so asking about them again would be noise) and only when there is
 # someone to ask: with stdin not a terminal (piped, cron, ssh without -t) a
 # question would hang or read EOF, so that run behaves as -y does.
 INTERACTIVE=false

@@ -1,5 +1,5 @@
 # Machine-specific atuin install manifest (written by cargo-dist on
-# install/update). Not portable across machines — keep it local.
+# install/update). Not portable across machines, so keep it local.
 atuin-receipt.json
 
 # Runtime state atuin may drop here; history DB, key and session live under
