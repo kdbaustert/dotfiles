@@ -109,6 +109,26 @@ This file defines mandatory working rules for code you write or change in any pr
 - Keep comments precise and maintain them when code changes.
 - Avoid TODO comments unless they are actionable, specific, and necessary.
 
+### How comments read
+
+Write every comment and docblock description the way a developer on the team would type it by hand. The tells in `~/.claude/rules/human-writing.md` apply here too, even though that file leaves code itself out.
+
+- Say why the code is there or what a reader would trip over, in plain words, as you'd tell a colleague looking over your shoulder.
+- Lead with the point. Drop openers like "This function", "This method is used to", "Helper that" and "Utility for".
+- Keep it short and specific: name the real table, edge case, limit or ticket. One or two sentences covers most comments.
+- Match the tone, casing and density of the comments already in the file.
+- Don't restate the name or signature. A description that says nothing the name doesn't is noise; when the project requires a docblock, keep the type tags and make the description earn its line.
+- Don't narrate history or the task: no "Updated to", "Added for the new feature", "Fixed bug where", "As requested". That belongs in the commit message.
+- No marketing words (robust, seamless, comprehensive, elegant, gracefully), em dashes, emoji or markdown emphasis.
+
+```
+// Bad:  This function is responsible for robustly retrieving the user's claims.
+// Good: Skips archived claims; the nightly export reads those separately.
+
+// Bad:  Updated to use the new cache layer
+// Good: Cached for 5 minutes because the carrier API allows 60 calls a minute.
+```
+
 ## Formatting and structure
 
 - Use consistent formatting across the repository.

@@ -163,7 +163,7 @@ for Kenny's own code rules. Claude Code loads them like the other rules. Codex
 gets them through a pointer in the *Code style* section of `.claude/CLAUDE.md`
 and reads them on demand, which keeps one copy of the rules instead of pasting
 them into `CLAUDE.md`, where they'd be paid for twice in Claude sessions.
-Together they're about 26k characters (~6.5k tokens est.), so both carry
+Together they're about 29k characters (~7.2k tokens est.), so both carry
 `paths:` frontmatter listing source-file extensions: Claude Code loads them
 only once a session works with a matching file, and a docs or config session
 never pays for them. A new language needs its extension added to both lists.
