@@ -25,7 +25,8 @@ preferences are merged automatically by the installers.
 `~/.zshenv`, `~/.gitconfig`, `~/.editorconfig`, `~/.prettierrc`,
 `~/.claude/CLAUDE.md`, `~/.codex/AGENTS.override.md` (a second link to it),
 `~/.claude/REFERENCE.md`, `~/.claude/hooks/notify.sh`,
-`~/.claude/hooks/search-excludes.sh`, `~/.claude/hooks/resume-after-limit.sh`, `~/.claude/statusline.sh`, every `~/.claude/skills/<skill>` directory and every
+`~/.claude/hooks/search-excludes.sh`, `~/.claude/hooks/resume-after-limit.sh`, `~/.claude/statusline.sh`, every `~/.claude/skills/<skill>` directory, every
+`~/.claude/rules/<rule>.md` file and every
 `~/.config/<tool>` entry are symlinks into this repo. **Edit the file in `~/dotfiles`.** Never write to the
 `$HOME` path. One exception: `~/.hushlogin`, which `install.sh` `touch`es
 rather than links because only its existence is ever read.

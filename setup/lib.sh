@@ -433,6 +433,24 @@ link_dotfiles() {
     sweep_dangling "$HOME/.claude/commands"
   fi
 
+  # User-level rules: link every rule file under .claude/rules, same
+  # loop-not-list reasoning as the three loops above. Claude Code loads every
+  # .md file under ~/.claude/rules in every project, before the project's own
+  # rules, and one with no `paths:` frontmatter loads unconditionally like
+  # CLAUDE.md does. This is where a vendored ruleset goes instead of being
+  # pasted into CLAUDE.md: it stays upstream's file, so a refresh is a diff
+  # rather than a merge. Codex has no equivalent, so these reach Claude only.
+  if [ -d "$DOTFILES_DIR/.claude/rules" ]; then
+    mkdir -p "$HOME/.claude/rules"
+    shopt -s dotglob nullglob
+    for item in "$DOTFILES_DIR/.claude/rules"/*.md; do
+      [ -f "$item" ] || continue
+      link "$item" "$HOME/.claude/rules/$(basename "$item")"
+    done
+    shopt -u dotglob nullglob
+    sweep_dangling "$HOME/.claude/rules"
+  fi
+
   # Retired: the ~/.claude/AGENTS.md link from before that merge. Same guard as
   # the root-level sweep above — only a symlink pointing into this repo is
   # removed.

@@ -438,3 +438,28 @@ merged by the shared installer. Sonnet replaces Opus as the routine default;
 medium effort and existing output and compaction limits remain unchanged.
 Use Opus explicitly for work that needs it. These defaults reduce model cost;
 only reducing context and generated output directly reduces token counts.
+
+On 2026-10-26 drona23/claude-token-efficient (MIT) was installed globally using
+its README's "Option 1 - Universal": its root `CLAUDE.md`, verbatim as of
+upstream commit c5f0c96, saved as `.claude/rules/token-efficient.md` and linked
+to `~/.claude/rules/`. Claude Code loads every file there in every project, so
+it applies everywhere without overwriting this file. Curling it to
+`~/.claude/CLAUDE.md`, as the README's command would if pointed at the home
+directory, follows the symlink and replaces this whole file with seven lines.
+Merging its lines into this file was tried first and backed out so the vendored
+copy stays upstream's file and a refresh is a plain diff.
+
+It overlaps this file on purpose and in one place it is stricter. "No
+em-dashes" is a flat ban, where *Write like a person* only rules out em dashes
+used as all-purpose punctuation; the stricter rule is the one to follow. Codex
+does not read `~/.claude/rules/`, so these seven lines reach Claude only.
+
+Two upstream pieces were left out. Its `.claude/settings.json` PreCompact hook
+runs `git add -A` and commits with `--no-verify` before every compaction, which
+breaks the *Git* rules (never commit unless asked, never skip hooks). Its
+`profiles/` are per-project-type variants rather than global rules. To refresh:
+
+```sh
+curl -fsSL https://raw.githubusercontent.com/drona23/claude-token-efficient/main/CLAUDE.md \
+  | diff ~/dotfiles/.claude/rules/token-efficient.md -
+```
