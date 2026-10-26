@@ -60,29 +60,21 @@ This block is mandatory and verbose on purpose. Kenny reads it to see what mode 
 
 ## The one rule that breaks everything else
 
-Every path the global `.claude/CLAUDE.md` lists under **Environment** as a
-symlink into `~/dotfiles` is one (`~/.profile` is a second link to
-`.zprofile`). The list lives there alone because both agents load that file in
-every project, so a copy here only cost tokens and drifted. **Edit the file in
-`~/dotfiles`.** Never write to the `$HOME` path. One exception:
-`~/.hushlogin`, which `install.sh` `touch`es rather than links because only its
-existence is ever read.
+The global `.claude/CLAUDE.md` lists the symlinks into `~/dotfiles` under
+**Environment** (`~/.profile` links to `.zprofile`). **Edit the file in
+`~/dotfiles`**, never the `$HOME` path. The one exception is `~/.hushlogin`,
+which `install.sh` `touch`es because only its existence is read.
 
-The corollary is the real hazard: **never run a tool that rewrites one of these
-files in place**, because it lands in the tracked file with no indication it did.
-Known offenders:
+**Never run a tool that rewrites one of these files in place**; the change
+lands in the tracked file without a sign. Known offenders:
 
-- `iris setup` / `iris uninstall` — rewrite the shell RC. Don't run either.
-- `abbr add` / `abbr erase` — rewrite `zsh/abbreviations`, which is tracked, and
-  drop every comment in it (its own header says so). Editing that file by hand is
-  the way to keep the section breaks; `abbr` is for throwaway experiments.
-- `brew` — appends a `[safe] directory` pair to `~/.gitconfig` with
-  `git config --global --add` every time it hits dubious-ownership on a tap, so
-  the block regrows a copy at a time and shows up as an unexplained diff. Nothing
-  breaks — extra entries are inert — but collapse it back to one pair per path
-  when you see it; the comment above the block carries the recipe. This is also
-  why `git config --global` is the wrong way to change anything here: it rewrites
-  the tracked file, and it can replace the symlink rather than follow it.
+- `iris setup` / `iris uninstall` rewrite the shell RC.
+- `abbr add` / `abbr erase` rewrite `zsh/abbreviations` and drop its comments.
+  Edit that file by hand.
+- `git config --global` rewrites `.gitconfig` and can replace the symlink.
+  `brew` does it too, adding a `[safe] directory` pair on each
+  dubious-ownership hit. The extras are inert; collapse them to one pair per
+  path with the recipe in the comment above the block.
 
 ## Layout
 
@@ -127,30 +119,16 @@ Every symlink lives in `link_dotfiles()` in `setup/lib.sh`, not in
 
 ### Never hard-code a name
 
-Nothing you add or change here may name a specific user, home directory,
-machine or account. No `kenny`, no `/Users/kenny`, no
-`Kenny's MacBook Pro`. Resolve it when the file runs instead. A new machine
-might use a different account name or hostname. A literal works on the machine it was written on
-and breaks without warning everywhere else. That is the same silent failure the
-installer loops exist to prevent.
+Nothing you add or change may name a specific user, home directory, machine
+or account (`kenny`, `/Users/kenny`, a hostname). Resolve it when the file runs
+(`$HOME`, `$USER`, `$(hostname -s)`) or, for a format with no variables, at
+install time. **Never hard-code a name** in `setup/REFERENCE.md` has the recipe
+for each format; read it before adding a plist, TOML, YAML or launchd label.
 
-Use whatever dynamic form the file format supports:
-
-- Shell: `$HOME`, `$USER` / `$(id -un)`, `$(hostname -s)`, and `~` wherever
-  the shell expands it.
-- A plist, TOML or YAML with no variables of its own: generate it or substitute
-  into it from the installer at deploy time, which is how the hosts-refresh
-  LaunchDaemon is built. If the tool reads a path relative to `$HOME` or
-  `$XDG_CONFIG_HOME` by itself, drop the path and let it.
-- Identifiers such as launchd labels come from a variable derived at install
-  time. Don't embed a personal domain or handle.
-
-The only exceptions are files whose whole job is to say who someone is: the
-`[user]` block in `.gitconfig`, `.config/git/allowed_signers`, and the
-copyright line in `LICENSE.MD`. Git and SSH read those as literals and cannot
-work them out. Don't add another exception without writing down why next to
-it. If you come across a leftover literal while working on something else,
-point it out; don't fix it silently as part of an unrelated change.
+The only exceptions are files whose job is identity: the `[user]` block in
+`.gitconfig`, `.config/git/allowed_signers` and the copyright line in
+`LICENSE.MD`. Don't add another without writing why next to it. Point out a
+leftover literal you find; don't fix it inside an unrelated change.
 
 ## Do not run `install.sh` to test a change
 
@@ -180,27 +158,14 @@ not match this codebase.
 
 ## Generated vs. tracked
 
-Do not commit: `*.zwc` (byte-compiled zsh, machine-specific),
-`.config/fsh/secondary_theme.zsh`, `.zsh_history`.
-
-`.claude/settings.local.json` is also uncommittable here, but not via `.gitignore`
-— the exclude lives in `.config/git/ignore` as `**/.claude/settings.local.json`,
-which this repo deploys and is therefore subject to. So `git status` is clean with
-that file sitting untracked in the tree; `git check-ignore -v <path>` is what tells
-you which rule caught something.
-
-Do commit, even though a tool generates them: `.config/fsh/current_theme.zsh`
-(built from our `voltage.ini`; it's what themes a fresh machine) and both
-`lazy-lock.json` files (they pin the plugin sets for `:Lazy restore`).
+Before staging anything, read **Generated vs. tracked** in `setup/REFERENCE.md`.
+Some generated files here must never be committed and some must be.
 
 ## Colors
 
-Every palette change starts at `themes/voltage.md` — it holds the canonical hex
-values and lists every file that transcribes them (ghostty, starship, fzf, vivid,
-bat, btop, lsd, atuin, fsh, yazi, glow, `voltage.nvim`). Update the doc and all
-consumers together; drift between two copies of the palette is the exact failure
-that file exists to prevent. `bat` and fast-syntax-highlighting compile their
-themes into caches and need the corresponding `install.sh` steps re-run.
+Every palette change starts at `themes/voltage.md`, which holds the canonical
+hex values and lists every file that copies them. Update all of them together,
+then re-run the `install.sh` cache steps for `bat` and fast-syntax-highlighting.
 
 # Coding Rules
 
@@ -218,9 +183,9 @@ When you are using compact, please focus on test output and code changes
 
 ### Tests and evals — every time, no exceptions
 
-- Scope what you RUN by the triage size (see "Task sizing"): small and medium changes run only the tests covering the touched code; the full suite is for large and contract changes. State in the report which lane ran and why. Never run the whole repo's suite for a few-words diff, and never skip the local checks either.
-- What you WRITE: every behavior change ships its test in the same diff, and every bug fix ships a regression test that fails with the bug present. "I'll add tests later" is banned. "No new test needed" applies only to non-behavioral small changes (typo, copy, styling value).
-- Evals apply only to code that calls an LLM. They are paid, slow and non-deterministic, so writing one for a shell, config or doc change buys nothing and costs a session's worth of tokens. Where a change does touch LLM-calling code, it ships an eval with a pass threshold, run before ship rather than on every commit.
+- What you RUN follows the triage size. Never skip the local checks.
+- Every behavior change ships its test in the same diff, and every bug fix a regression test that fails with the bug present. No "tests later". Only non-behavioral small changes (typo, copy, styling value) skip a new test.
+- Evals are only for code that calls an LLM: it ships one with a pass threshold, run before ship, not on every commit.
 
   ### Tech choice — vanilla by default
 
@@ -233,16 +198,7 @@ When you are using compact, please focus on test output and code changes
 
 When a task matches a specialized domain (SEO, schema, security audit, design review, etc.), use the installed Claude Code skill. Don't reinvent what an installed skill already does well. Invoke via the Skill tool, not by re-implementing.
 
-**The critic per work type** (the pattern is constant, the weapon changes). This is the large-task critic loop; small tasks get none and medium tasks get the single pass from "Task sizing":
-
-- **Copy/parity:** real reference, blind side-by-side, visual and behavioral.
-- **New feature:** rubric plus best-in-class analog; critic uses it cold like a first-time user.
-- **Bug fix:** the reference is the repro. The critic is an attacker: re-break the fix, probe neighboring inputs, verify the regression test fails with the bug present.
-- **Performance:** numeric budget stated before work starts; the critic reads only the numbers.
-- **Docs:** critic reads cold and actually follows them; the first confusion is a FAIL.
-- **Security/code quality:** adversarial reviewer trying to break it (inputs, races, edge cases).
-
-**Solo (no fan-out) is the rule for:** small tasks, most medium tasks, conversational answers, and reading/investigation that fits in one context. Medium bug fixes still get the one cold critic pass from "Task sizing" (an attacker on the repro). When in doubt between medium and large, triage says pick medium; when a large task is in doubt about how to split, fan out.
+Before any critic pass (the medium task's one pass, or the large task's loop), read **Critic per work type** in `setup/REFERENCE.md` for how the critic attacks that kind of work.
 
 ## Completion status protocol
 
@@ -261,11 +217,12 @@ Before starting any long-running background job (batch, migration, backfill, scr
 
 ## Safety
 
-- Never commit secrets. If `.env` is touched, verify `.gitignore` before any commit.
-- Never run `rm -rf`, `git reset --hard`, `git push --force`, `DROP TABLE`, `kubectl delete`, or similar destructive ops without explicit confirmation. When a force push is confirmed, use `git push --force-with-lease --force-if-includes`. Both flags are required: `--force-with-lease` on its own is defeated by the `git fetch` that precedes a rebase, and will destroy a teammate's commit without a word. Never on a shared branch, never on `main`.
-- Never skip pre-commit hooks with `--no-verify`. If a hook fails, fix the underlying issue.
-- Never commit binaries, compiled outputs, or model weights to the repo. Use Git LFS or cloud storage with a pointer.
-- Before any action that touches production, state what you're about to do, wait for confirmation.
+Destructive commands need confirmation first, under *Ask before destructive or hard-to-reverse actions* in the global `.claude/CLAUDE.md`. On top of that:
+
+- Never commit secrets, binaries, compiled output or model weights. If `.env` is touched, check `.gitignore` before any commit.
+- A confirmed force push uses `git push --force-with-lease --force-if-includes`. `--force-with-lease` alone is defeated by the `git fetch` before a rebase and drops a teammate's commit silently. Never on a shared branch or `main`.
+- When a pre-commit hook fails, fix the cause; never `--no-verify`.
+- Before anything that touches production, say what you're about to do and wait.
 
 How to talk to Kenny lives in the global `.claude/CLAUDE.md` (*Be direct*,
 *Write like a person*) and `.claude/rules/human-writing.md`, which load in every

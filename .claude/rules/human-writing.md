@@ -42,7 +42,11 @@ Cut these whenever you spot them:
   "In today's world", "When it comes to".
 - Inflated words: delve, crucial, robust, seamless, leverage, elevate, crafted,
   comprehensive, pivotal, landscape, tapestry, foster, showcase, vibrant,
-  testament, journey, realm, unlock, empower, game-changer.
+  testament, journey, realm, unlock, empower, game-changer, nuanced,
+  multifaceted, furthermore, moreover, underscore, intricate, fundamental,
+  significant, interplay.
+- Stock phrases: "here's the kicker", "here's the thing", "plot twist", "let
+  me break this down", "the bottom line", "make no mistake".
 - Hedges piled on hedges: "may potentially", "it could be argued that".
 - Filler emphasis: "truly", "incredibly", "it's worth noting that".
 - Bold scattered through prose, headings on a short note, and bullets where

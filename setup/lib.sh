@@ -141,8 +141,9 @@ sweep_dangling() {
 }
 
 # merge_claude_settings — merge preferences while keeping hooks and local state.
-# Nested env preferences need a merge too; replacing env would drop unrelated
-# variables. A matching config is left alone so repeat installs do not rewrite it.
+# env and skillOverrides merge key by key; replacing either would drop the
+# variables or per-machine skill toggles the portable file doesn't name. A
+# matching config is left alone so repeat installs do not rewrite it.
 merge_claude_settings() {
   if ! command -v python3 &>/dev/null; then
     warning "Python 3 is needed to merge Claude settings."
@@ -166,7 +167,9 @@ before = json.loads(target.read_text()) if target.exists() else {}
 if not isinstance(before, dict) or not isinstance(settings, dict):
     raise SystemExit("Claude settings must be JSON objects; left untouched.")
 updated = {**before, **settings}
-updated["env"] = {**before.get("env", {}), **settings["env"]}
+for key in ("env", "skillOverrides"):
+    if key in settings:
+        updated[key] = {**before.get(key, {}), **settings[key]}
 if updated == before:
     raise SystemExit(0)
 

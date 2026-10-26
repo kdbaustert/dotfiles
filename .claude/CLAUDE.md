@@ -12,20 +12,12 @@ node versions, git signing identities, or Swift formatting and language modes.
 
 ## Environment
 
-- macOS, Apple Silicon. Homebrew at `/opt/homebrew`; prefer its binaries over `/usr/bin`.
-- Nix sits beside Homebrew and is for per-project environments only (`nix-shell`, `nix develop`). Homebrew owns every global tool, so never `nix profile install` or `nix-env -i` anything the Brewfile has. A tool call may not have `nix` at all: check with `command -v nix-shell`, and if it's missing, source `/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh` rather than splicing `/nix/...` into PATH by hand. direnv never fires in a tool call, so run `nix develop -c <cmd>` from the project.
-- Shell is zsh. `~/.zshrc`, `~/.zprofile`, `~/.profile`, `~/.zshenv`, `~/.gitconfig`, `~/.editorconfig`, `~/.prettierrc`, `~/.claude/CLAUDE.md`, `~/.codex/AGENTS.override.md` (a second link to it), `~/.claude/REFERENCE.md`, `~/.claude/hooks/notify.sh`, `~/.claude/hooks/search-excludes.sh`, `~/.claude/hooks/resume-after-limit.sh`, `~/.claude/statusline.sh`, every `~/.claude/skills/<skill>` directory, every `~/.claude/rules/<rule>.md` file and every `~/.config/<tool>` entry are symlinks into `~/dotfiles`. Edit the file in `~/dotfiles`, never the path in `$HOME`.
-- Editor is `nvim`. No Python version manager; `python3` is Homebrew's.
-- `node` differs by shell type. Tool calls get Homebrew's `/opt/homebrew/bin/node`; my interactive shell gets nvm's lazy-loaded version. So a version you see in a tool call may not be mine. `whence -w node` in a real interactive shell is the only honest check, since `zsh -i -c` exits before nvm loads.
-- Shell history is `atuin`.
-
-GNU `coreutils`, `grep` and `gnu-sed` are installed g-prefixed (`ggrep`, `gsed`,
-`gls`, `gsort`) and the defaults are BSD. Call the g-prefixed binary when you need
-GNU flags (`sed -i` without an argument, `grep -P`). There is no `gfind`; use `fd`.
-
-Interactive aliases reach tool calls through the shell snapshot: `ls` is
-`eza`/`lsd` with icons and `tree` is an alias. **When parsing output, call the
-real binary**, `/bin/ls` or better `fd`.
+- macOS, Apple Silicon, zsh, `nvim`, `atuin`. Homebrew at `/opt/homebrew` owns every global tool; prefer its binaries over `/usr/bin`. `python3` is Homebrew's.
+- Nix is for per-project environments only: never `nix profile install` or `nix-env -i`. If a tool call lacks `nix-shell`, source `/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh`. direnv never fires in a tool call, so run `nix develop -c <cmd>`.
+- Symlinks into `~/dotfiles`: `~/.zshrc`, `~/.zprofile`, `~/.profile`, `~/.zshenv`, `~/.gitconfig`, `~/.editorconfig`, `~/.prettierrc`, `~/.codex/AGENTS.override.md`, every `~/.config/<tool>` entry, and in `~/.claude/` the `CLAUDE.md`, `REFERENCE.md`, `statusline.sh`, `hooks/*.sh`, `skills/<skill>` and `rules/<rule>.md`. Edit the file in `~/dotfiles`, never the `$HOME` path.
+- The `node` a tool call sees is Homebrew's, not my interactive nvm one; read **Environment** in `~/.claude/REFERENCE.md` before stating my version.
+- GNU tools are g-prefixed (`ggrep`, `gsed`, `gls`, `gsort`); the defaults are BSD. No `gfind`; use `fd`.
+- `ls` and `tree` are aliases in tool calls. To parse output, call `/bin/ls` or `fd`.
 
 ## Reach for these first
 
@@ -50,39 +42,23 @@ Also installed: `fzf`, `zoxide`, `delta`, `lazygit`, `gitui`, `glow`, `yazi`,
 
 ## The gotcha that actually bites
 
-**`rg` and `fd` both respect `.gitignore` and both skip hidden files.** A search
-that comes back empty may be a search that never looked. When the target could be
-ignored (`dist`, build output, lockfiles, anything under a dot-directory), pass
-the flags:
+**`rg` and `fd` respect `.gitignore` and skip hidden files**, so an empty
+result may be a search that never looked. Widen it when the target could be
+ignored or under a dot-directory. Every `rg` carries `--max-columns=200
+--max-columns-preview`; for a match past column 200, use `-o '.{0,40}needle.{0,40}'`.
 
 ```sh
-rg -n --max-columns=200 --max-columns-preview 'pattern'  # tracked, non-hidden
 rg -n --max-columns=200 --max-columns-preview --hidden -g '!.git' 'pattern'
 rg -nuu --max-columns=200 --max-columns-preview \
   -g '!{node_modules,vendor,build,out,public,storage,logs,tmp}' 'pattern'
-fd -e ts 'name'                      # smart-case, .gitignore-aware
 fd -H -I -E '{node_modules,vendor,build,out,public,storage,logs,tmp}' 'name'
 ```
 
-The second `rg` adds dotfiles but still skips `.git`. The last `rg` ignores
-`.gitignore` and includes hidden files; the last `fd` does the same and also
-bypasses the global ignore.
-
-Every `rg` carries `--max-columns=200 --max-columns-preview` so one minified
-line can't flood the context. If the match sits past column 200, rerun with
-`-o '.{0,40}needle.{0,40}'`.
-
-**Never search `node_modules`, `vendor`, `build`, `out`, `public`, `storage`,
-`logs` or `tmp`.** Exclude all eight by name whenever you widen a search, as
-above, and in any search you hand the Grep or Glob tool or a subagent. A
-PreToolUse hook rejects a widened `rg` or `fd` that leaves one out. The
-exception is a task about something inside one of them: search only that
-folder. A project's own `.ignore` lists its other noise, and `rg`, `fd` and the
-Grep tool read it with no flags.
-
-Use `rg -l` or `rg -c` when you only need to know where something lives. `fd` also
-reads a global ignore at `~/.config/fd/ignore` that excludes only `.git/` and
-`.DS_Store`; `-I` bypasses it.
+**Never search those eight folders.** Name all of them whenever you widen a
+search, including one you hand Grep, Glob or a subagent; a hook rejects a
+widened `rg` or `fd` that leaves one out. The exception is a task about one of
+them: search only that folder. A project's `.ignore` lists its other noise and
+is read with no flags.
 
 ## Where things live
 
@@ -92,31 +68,31 @@ reads a global ignore at `~/.config/fd/ignore` that excludes only `.git/` and
 
 ## How I want you to work
 
-- **Investigate first.** Never speculate about code you have not read. Read files and `rg` for usages before making claims, and read any file I reference before answering. If uncertain, say so and propose how to verify — don't fabricate APIs, paths, or behavior.
-- **Read `CLAUDE-REFERENCE.md` before planning or editing, when the repo has one.** Claude Code auto-loads only `CLAUDE.md`, so a repo that splits its rules from its architecture reference (`cnc-claims` does) hands you half of what it wrote. Look for it at the repo root at the start of a task and read it in full before you plan or touch anything.
-- **Scope to the request.** Do what is asked; nothing more. Don't refactor adjacent code or create abstractions for a single use. Default to research and recommendations — only edit when explicitly asked. If the ambiguity would change the work materially, ask once up front rather than guessing and rewriting later.
-- **Find the smallest change that works.** Before editing, work out the minimal set of files and lines that has to change, and change only those. Then say what that scope was and what you left alone. Renames the task didn't need, reformatting lines you only read, moving code to where it 'should' live, config for a single call site and "while I'm here" fixes are all out. If the minimal change only papers over a real defect, say so and let me decide rather than widening scope yourself.
-- **Clean up your own orphans, and only your own.** A change that leaves an import, variable or function unused is not finished — remove what *your* edit stranded, in the same pass. Pre-existing dead code is a different thing: leave it, and mention it, so removing it stays my call.
-- **File discipline.** Edit existing files in place; don't create new ones unless required. No README or summary markdown unless I ask. Clean up scratch files.
-- **Verify before done.** Re-check each requirement, run typecheck, tests and lint, and state what changed, what was verified, and what could not be. When something fails, show me the actual command output — don't paraphrase a test failure. When I say "skip verification", skip the test, lint and `./build.sh --install` steps for that task and say in one line what went unchecked.
+- **Investigate first.** Read the code, and any file I reference, before making claims about it. If unsure, say so and say how you'd verify; never invent APIs, paths or behavior.
+- **Read `CLAUDE-REFERENCE.md` in full before planning or editing, when the repo root has one** (`cnc-claims` does). Only `CLAUDE.md` loads by itself.
+- **Scope to the request.** Do what is asked, nothing more, and no abstractions for a single use. Default to research and recommendations; edit only when asked. If an ambiguity would change the work materially, ask once up front.
+- **Find the smallest change that works.** Change only the files and lines that must change, then say what you left alone. No unrequested renames, reformatting, moves, single-use config or "while I'm here" fixes. If the minimal change papers over a real defect, say so and let me decide.
+- **Clean up your own orphans, and only your own.** Remove what your edit left unused in the same pass. Mention pre-existing dead code; don't remove it.
+- **File discipline.** Edit files in place and create new ones only when required. No README or summary markdown unless I ask. Clean up scratch files.
+- **Verify before done.** Re-check each requirement, run typecheck, tests and lint, and say what changed, what was verified and what wasn't. Show failing output verbatim. When I say "skip verification", skip tests, lint and `./build.sh --install`, and say in one line what went unchecked.
 - **Ask before destructive or hard-to-reverse actions:** deleting files or branches, force pushes, hard resets, `--no-verify`, dropping DB tables, `brew uninstall`.
-- **Stop and re-plan when it goes sideways.** Don't keep pushing an approach that isn't working — say what broke, say what you'd try instead, and let me redirect before you spend another five tool calls on it.
-- **Be direct.** Skip preamble and don't restate my request back to me.
-- **Write like a person, not a model.** This covers anything I read or publish: replies, commit messages, audits, Jira comments, and copy that goes on a page. Avoid the tells. That means em dashes used as all-purpose punctuation, lists of three for rhythm, "not X, it's Y", a tidy last line that restates the paragraph, colon reveals, and words like *robust*, *seamless*, *leverage*, *elevate* and *crafted*. Use plain words and sentences of different lengths, and claim nothing that isn't true. A reader who spots one tell stops trusting the rest, and on my site or under my name that costs more than the sentence was worth.
-- **Be efficient.** Parallelize independent tool calls; serialize dependent ones. Everything a tool returns stays in the conversation and is paid for again on every turn after it, so:
-  - Find where something lives with `rg -l` or `rg -c` first, then read only the lines you need.
-  - Don't re-read a file that is already in the conversation or that you just edited.
-  - Run the narrowest test or lint that covers the change, and pipe long output through `tail`.
-  - Ask for the compact form first: `git diff --stat` before the full diff, `git log --oneline`, `phpunit --no-progress`, `vitest --reporter=dot`, `jest --silent`. Expand only the part that needs it.
+- **Stop and re-plan when it goes sideways.** Say what broke and what you'd try instead, and let me redirect.
+- **Be direct.** No preamble, no restating my request. Name the file, function and line (`src/auth.ts:42`). Say plainly when something is broken. End with the next action, not a recap.
+- **Write like a person, not a model,** in anything I read or publish. No em dashes as all-purpose punctuation, lists of three for rhythm, "not X, it's Y", a last line restating the paragraph, colon reveals, or words like *robust*, *seamless* and *leverage*. Claim nothing that isn't true. `~/.claude/rules/human-writing.md` has the full list.
+- **Be efficient.** Parallelize independent tool calls. Tool output is resent on every later turn, so:
+  - Locate with `rg -l` or `rg -c`, then read only the lines you need. Don't re-read a file already in the conversation.
+  - Run the narrowest test or lint, pipe long output through `tail`, and ask for the compact form first (`git diff --stat`, `git log --oneline`, `phpunit --no-progress`, `vitest --reporter=dot`, `jest --silent`).
   - Keep replies short: the answer, then what changed and what was checked.
-  - When a long session turns to unrelated work, say so and suggest a fresh session or `/compact`. Every turn resends the whole history, so old context costs more than any single search.
+  - When a long session turns to unrelated work, suggest a fresh session or `/compact`.
+  - Before a model switch past ~100k context, warn me: the new model starts with a cold cache. Suggest `/compact` or a fresh session with a handoff.
+  - Suggest its own session for browser and computer-use work, and read page text (`get_page_text`, `read_page`) before taking a screenshot.
 
 ## Code style
 
 Before writing or changing code, read **Code style** in `~/.claude/REFERENCE.md`
-and follow `~/.claude/rules/clean-code.md` and `~/.claude/rules/code-complete.md`.
-Claude Code loads both once it works with a source file. Codex never reads
-`~/.claude/rules/`, so open them before writing code.
+and follow `~/.claude/rules/code-style.md`. Claude Code loads it once it works
+with a source file. Codex never reads `~/.claude/rules/`, so open it before
+writing code.
 
 ## Tests
 
@@ -142,40 +118,28 @@ Do not post a comment unless asked.
 
 ## Memory
 
-Write a memory when the next session would otherwise have to redo the work: a
-measured number, a traced call path, a root cause, an approach ruled out *and
-why*, a goal in flight with what is left of it, or a pointer with no home in the
-repo. Write it the moment it is established, not at the end.
+Write a memory the moment you establish something the next session would
+otherwise redo: a measured number, a traced call path, a root cause, an
+approach ruled out *and why*, or a goal in flight and what's left of it.
 
-In a project, those findings go in its memory bank: `CLAUDE-*.md` files at the
-repo root. Claude and Codex both read them, so whichever agent runs next starts
-where the last one stopped. Create a file the first time it has something to
-hold.
+In a project it goes in the memory bank at the repo root, which Claude and
+Codex both read. Read `CLAUDE-activeContext.md` (goal, done, left) at the start
+of a task, `CLAUDE-patterns.md` before writing code, `CLAUDE-decisions.md`
+(choices, and approaches ruled out) before a design choice,
+`CLAUDE-troubleshooting.md` when debugging, `CLAUDE-config-variables.md` when
+touching config, and `CLAUDE-temp.md` only when I point at it. Skip missing
+ones; create one the first time it has something to hold. They're globally
+git-ignored, so search tools never see them: open them by exact path, and
+never stage one. Date entries and fix or delete wrong ones. Auto memory keeps
+only what isn't about the repo. `/update-memory-bank` records a session; the
+`memory-bank-synchronizer` agent checks the files against the code.
 
-| File | Holds | Read it |
-| ---- | ----- | ------- |
-| `CLAUDE-activeContext.md` | The goal in flight, what's done, what's left | At the start of a task |
-| `CLAUDE-patterns.md` | Conventions the code follows that one file won't show | Before writing code |
-| `CLAUDE-decisions.md` | Choices made, and approaches ruled out *and why* | Before a design choice |
-| `CLAUDE-troubleshooting.md` | Root causes and the fixes that worked | When debugging |
-| `CLAUDE-config-variables.md` | Config and env variables, and what reads each | When touching config |
-| `CLAUDE-temp.md` | Scratch | Only when I point at it |
-
-Read only what the task needs and skip files that don't exist. The global git
-ignore lists all six, so `rg`, `fd` and the Grep and Glob tools never see them:
-open them by exact path. Never stage or commit one. Date each entry, and fix or
-delete it when it turns out wrong. Claude's auto memory keeps what isn't about
-the repo and never copies the memory bank. `/update-memory-bank` records a
-session; the `memory-bank-synchronizer` agent checks the files against the code.
-
-- **A durable rule belongs in this file, not in memory.** If a memory would begin
-  "Kenny prefers…" or "always run…", propose it as a CLAUDE.md edit instead.
+- **A durable rule belongs in this file, not in memory.** Propose a "Kenny
+  prefers…" or "always run…" memory as a CLAUDE.md edit instead.
 - **Recalled memories are dated, not authoritative.** Re-read any file, flag,
-  version or command one names before acting on it, and delete the memory when it
-  turns out wrong.
-
-Never write anything sensitive — credentials, tokens, client data, or the work
-identity in `~/.gitconfig-work`.
+  version or command one names before acting on it.
+- Never write anything sensitive: credentials, tokens, client data, or the work
+  identity in `~/.gitconfig-work`.
 
 ## Philosophy
 
