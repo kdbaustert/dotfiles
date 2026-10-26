@@ -66,7 +66,6 @@ lands in the tracked file without a sign. Known offenders:
 
 ## Layout
 
-- Shared agent instructions and scripts: `.claude/`.
 - Portable preferences: `.claude/settings.portable.json`, `.codex/settings.toml`.
   The shared installer merges these into live configs; do not symlink app state.
 
@@ -130,8 +129,7 @@ Shell startup is budgeted: keep new work off the critical path, use the existing
 
 ## Style
 
-`.editorconfig` governs: 2-space indent, LF, UTF-8, final newline, no trailing
-whitespace (CSS/SCSS use tabs at 4). Shell scripts in `setup/` and `install.sh`
+`.editorconfig` governs formatting. Shell scripts in `setup/` and `install.sh`
 declare a **bash** shebang and use bash arrays — they are run directly, never via
 `sh`.
 
@@ -152,8 +150,6 @@ hex values and lists every file that copies them. Update all of them together,
 then re-run the `install.sh` cache steps for `bat` and fast-syntax-highlighting.
 
 # Coding Rules
-
-Please follow all of the following coding rules.
 
 - Use comments only to explain reasons that code cannot express.
 - Use vertical whitespace (blank lines) between logical steps, declaration groups, and completed control-flow blocks.
