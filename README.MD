@@ -49,7 +49,8 @@ step is pinned to arm64 and skips itself elsewhere).
 - Installs Nix (multi-user, daemon mode) beside Homebrew — for per-project
   shells, not for tools the Brewfile already has; the shell hook is sourced
   from `.zprofile`, not `/etc/zshrc`
-- Symlinks the root dotfiles and every `.config/*` entry into `$HOME`
+- Symlinks the root dotfiles and every `.config/*` entry into `$HOME`, except
+  `.config/tweakcc`, where only `config.json` is linked
 - Installs `pay-respects` (pinned + checksummed) into `~/.local/bin`
 - Clones the trapd00r `LS_COLORS` database as an alternative to the default
   vivid/Voltage one — see `themes/voltage.md`

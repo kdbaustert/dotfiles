@@ -289,7 +289,31 @@ untracked `settings.json`, so a new machine went back to adding trailers.
 never reads Claude's settings.
 
 The output and compaction defaults now live in `.claude/settings.portable.json`
-and merge during installation. Permission rules below remain a manual step. The deny list stops the Read tool
+and merge during installation.
+
+`DISABLE_AUTOUPDATER=1` in the same `env` block keeps Claude Code from replacing
+a binary that tweakcc patched. A native install re-checks the retained binary
+against Anthropic's signed checksum and swaps in the stock build when it
+differs, and `autoUpdates: false` in `~/.claude.json` is ignored on a native
+install, so the environment variable is the only switch that works (tweakcc's
+README, "Keep customizations across Claude Code updates"). Update by hand with
+`claude update`, then re-run `tweakcc --apply --yes`. On 2026-10-26 tweakcc 4.4.0
+was killed at about 12 GB on Claude Code 2.1.310, and the fix (tweakcc #1053)
+was on `main` but unreleased, so it was built from `~/Developer/tweakcc`.
+
+`.config/tweakcc/config.json` is the one file of tweakcc's state that is
+tracked, and `link_dotfiles()` links it file by file instead of through the
+`.config/*` loop. The rest of `~/.config/tweakcc` (the ~270 MB
+`native-binary.backup`, `system-prompts/`, `prompt-data-cache/`, the hash files
+and `applied.json`) is generated per machine and must not reach the repo.
+Linking the directory would have moved all of it into the repo, or on an
+existing machine into a `.backup-*` copy that tweakcc then downloads again.
+tweakcc rewrites `config.json` in place on every apply, which follows the link,
+so `ccVersion`, `changesApplied` and `lastModified` change in the tracked file
+each time. Those three fields are the only per-machine churn; the file holds no
+paths or names.
+
+Permission rules below remain a manual step. The deny list stops the Read tool
 opening files that are only ever noise. `composer.lock` is left readable on
 purpose, because working out an installed package version sometimes needs it.
 `vendor/` is denied, so in a PHP repo where Claude has to read a library's

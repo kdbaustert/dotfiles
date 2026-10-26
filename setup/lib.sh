@@ -468,11 +468,24 @@ link_dotfiles() {
     shopt -s dotglob nullglob
     for item in "$DOTFILES_DIR/.config"/*; do
       [ -e "$item" ] || continue
-      case "$(basename "$item")" in .DS_Store) continue ;; esac
+      # tweakcc is linked file by file below, not as a directory.
+      case "$(basename "$item")" in .DS_Store | tweakcc) continue ;; esac
       link "$item" "$HOME/.config/$(basename "$item")"
     done
     shopt -u dotglob nullglob
     sweep_dangling "$HOME/.config"
+  fi
+
+  # tweakcc keeps its config.json beside a ~270 MB copy of the original Claude
+  # Code binary, a prompt cache and per-apply hash files. Linking the whole
+  # directory would move all of that into the repo (or, on a machine that
+  # already has it, into a .backup-* copy that tweakcc then downloads again), so
+  # only config.json is tracked. tweakcc writes it in place, which follows the
+  # link. Rejected: pointing TWEAKCC_CONFIG_DIR at the repo, which would put the
+  # backup and caches there too.
+  if [ -f "$DOTFILES_DIR/.config/tweakcc/config.json" ]; then
+    mkdir -p "$HOME/.config/tweakcc"
+    link "$DOTFILES_DIR/.config/tweakcc/config.json" "$HOME/.config/tweakcc/config.json"
   fi
 }
 
