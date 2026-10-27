@@ -213,6 +213,9 @@ cask "ngrok"
 cask "rio"
 # cask "iconchanger"
 cask "ghostty"
+cask "superduper"
+cask "thaw@beta"
+cask "macshot"
 
 # Declared so `brew bundle` on a fresh box produces the same machine.
 # karabiner-elements matters most: .config/karabiner is symlinked and actively
