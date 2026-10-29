@@ -760,7 +760,7 @@ install_superfile() {
   info "Installing superfile..."
   case ":$PATH:" in
     *":$HOME/.local/bin:"*) ;;
-    *) warning "~/.local/bin is not on PATH here; the script will append to your shell RC (a tracked symlink). Check 'git status' afterwards." ;;
+    *) warning "$HOME/.local/bin is not on PATH here; the script will append to your shell RC (a tracked symlink). Check 'git status' afterwards." ;;
   esac
 
   stub="$(mktemp -d)"
