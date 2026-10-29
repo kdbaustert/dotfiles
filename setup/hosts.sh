@@ -64,9 +64,21 @@ scheduled=false
 # Unattended, a list that one week started blocking raw.githubusercontent.com
 # would also stop every later download, and nothing would say so.
 keep_reachable() {
-  # TODO: drop the lines for hosts you can't afford to lose.
-  cat
+  awk '
+    BEGIN { protected["raw.githubusercontent.com"] = 1 }
+    {
+      for (i = 2; i <= NF; i++) {
+        host = tolower($i)
+        if (host != "" && !(host in protected)) print "0.0.0.0 " $i
+      }
+    }
+  '
 }
+
+if [ "${1:-}" = "--filter" ]; then
+  keep_reachable
+  exit 0
+fi
 
 $scheduled && echo "$(date '+%Y-%m-%d %H:%M') scheduled refresh"
 

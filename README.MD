@@ -60,7 +60,8 @@ step is pinned to arm64 and skips itself elsewhere).
 - Bootstraps zinit and pre-installs/compiles the zsh plugins
 - Builds the Voltage theme caches for `bat` and fast-syntax-highlighting
 - Splices an ad, tracker and porn blocklist into `/etc/hosts` (`setup/hosts.sh`)
-  and installs a root LaunchDaemon that refreshes it every Monday
+  while keeping `raw.githubusercontent.com` reachable, and installs a root
+  LaunchDaemon that refreshes it every Monday
 - Enables Touch ID for `sudo` via `/etc/pam.d/sudo_local`
 - Points iTerm2 at `iterm/` for its preferences
 
