@@ -50,7 +50,8 @@ step is pinned to arm64 and skips itself elsewhere).
   shells, not for tools the Brewfile already has; the shell hook is sourced
   from `.zprofile`, not `/etc/zshrc`
 - Symlinks the root dotfiles and every `.config/*` entry into `$HOME`, except
-  `.config/tweakcc`, where only `config.json` is linked
+  `.config/tweakcc`, where only `config.json` is linked, and
+  `.config/superfile`, where only `config.toml` and the Voltage theme are
 - Installs `pay-respects` (pinned + checksummed) into `~/.local/bin`
 - Builds `tweakcc` from a pinned commit into `~/.local/share/tweakcc` and links
   it to `~/.local/bin/tweakcc`

@@ -468,8 +468,8 @@ link_dotfiles() {
     shopt -s dotglob nullglob
     for item in "$DOTFILES_DIR/.config"/*; do
       [ -e "$item" ] || continue
-      # tweakcc is linked file by file below, not as a directory.
-      case "$(basename "$item")" in .DS_Store | tweakcc) continue ;; esac
+      # tweakcc and superfile are linked file by file below, not as directories.
+      case "$(basename "$item")" in .DS_Store | tweakcc | superfile) continue ;; esac
       link "$item" "$HOME/.config/$(basename "$item")"
     done
     shopt -u dotglob nullglob
@@ -486,6 +486,16 @@ link_dotfiles() {
   if [ -f "$DOTFILES_DIR/.config/tweakcc/config.json" ]; then
     mkdir -p "$HOME/.config/tweakcc"
     link "$DOTFILES_DIR/.config/tweakcc/config.json" "$HOME/.config/tweakcc/config.json"
+  fi
+
+  # superfile writes all 21 of its stock themes into ~/.config/superfile/theme
+  # whenever its version changes, so a linked directory would put them in the
+  # repo on the first upgrade. Only config.toml and the Voltage theme are
+  # tracked. hotkeys.toml stays superfile's own default and isn't linked.
+  if [ -d "$DOTFILES_DIR/.config/superfile" ]; then
+    mkdir -p "$HOME/.config/superfile/theme"
+    link "$DOTFILES_DIR/.config/superfile/config.toml" "$HOME/.config/superfile/config.toml"
+    link "$DOTFILES_DIR/.config/superfile/theme/voltage.toml" "$HOME/.config/superfile/theme/voltage.toml"
   fi
 }
 

@@ -318,6 +318,16 @@ so `ccVersion`, `changesApplied` and `lastModified` change in the tracked file
 each time. Those three fields are the only per-machine churn; the file holds no
 paths or names.
 
+`.config/superfile` is linked the same way, for a different reason. superfile
+v1.6.0 compares `~/.local/share/superfile/themeFileVersion` with its own
+version and, when they differ, writes every stock theme into
+`~/.config/superfile/theme` (`LoadAllDefaultConfig` in
+`src/internal/common/load_config.go`). With the directory linked, the first
+upgrade would put 21 untracked theme files in the repo. Only `config.toml` and
+`theme/voltage.toml` are tracked. superfile overwrites only the stock theme
+names, so `voltage.toml` survives an upgrade. `hotkeys.toml` is left as
+superfile's default and isn't linked.
+
 Permission rules below remain a manual step. The deny list stops the Read tool
 opening files that are only ever noise. `composer.lock` is left readable on
 purpose, because working out an installed package version sometimes needs it.

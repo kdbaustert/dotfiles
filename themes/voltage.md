@@ -70,6 +70,7 @@ All of these have to agree or the shell looks patched together:
 | atuin (owns Ctrl-R)      | `.config/atuin/themes/voltage.toml` |
 | lazygit                  | `.config/lazygit/config.yml`      |
 | yazi                     | `.config/yazi/theme.toml`         |
+| superfile (`spf`)        | `.config/superfile/theme/voltage.toml` |
 | btop                     | `.config/btop/themes/voltage.theme` |
 | glow                     | `.config/glow/voltage.json`       |
 | Neovim + LunarVim        | `.config/voltage.nvim/`           |
