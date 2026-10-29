@@ -286,8 +286,8 @@ FZF_GIT_PREFIX='^X^G'
 # nvm.sh is never sourced at startup. The plugin instead defines function shims
 # for node/npm/npx/nvm that source it on first call.
 #
-# nvm is the only node version manager here. asdf isn't used: it had no plugins
-# installed and no init in any shell file, so it managed nothing.
+# nvm is the only node version manager here. asdf isn't used: with no plugins
+# installed and no init in any shell file, it would manage nothing.
 #
 # nvm does manage versions, and `node` doesn't resolve to Homebrew's in an
 # interactive shell: ~/.nvm/versions/node holds v26.5.0, and
@@ -323,7 +323,7 @@ zinit wait lucid for \
   zdharma-continuum/fast-syntax-highlighting
 
 # --- carapace: completions for tools that ship none we can use ----------------
-# Used instead of a hand-rolled `_gh` fpath cache and a pnpm precmd-retry hook.
+# Simpler than a hand-rolled `_gh` fpath cache or a pnpm precmd-retry hook.
 # Registered per-command on purpose:
 #
 #   source <(carapace _carapace zsh)   # DON'T: one compdef hijacks 653 commands
@@ -340,6 +340,21 @@ zinit wait lucid for \
 # prompt, and ordered after the block above so compdef exists by the time they run.
 zinit wait lucid id-as'carapace-init' has'carapace' \
   atload'source <(carapace gh zsh); source <(carapace pnpm zsh)' for \
+  zdharma-continuum/null
+
+# --- GitButler: `but` completions ---------------------------------------------
+# Deferred like carapace above. The generated script ends in `compdef _but but`,
+# and compdef only exists once the fzf-tab block has run zsh_compinit. The
+# `eval "$(but completions zsh)"` line the GitButler installer appends to .zshrc
+# runs before that and fails with "command not found: compdef", so it doesn't
+# belong there. The installer's PATH export isn't needed either: .zprofile puts
+# ~/.local/bin on $PATH.
+#
+# zcache rather than source <(…), because `but` is the ~100MB GitButler app
+# binary. ~/.local/bin/but links into GitButler.app and zcache's -nt follows the
+# link, so an app update regenerates the cache.
+zinit wait lucid id-as'but-completions' has'but' \
+  atload'zcache but but completions zsh' for \
   zdharma-continuum/null
 
 # --- Extra behaviour plugins --------------------------------------------------
