@@ -137,7 +137,7 @@ auto-update = 0
 enabled = false
 
 [keybindings]
-# Every default here except toggle-menu collided with something already bound,
+# Every default here except toggle-menu collides with something already bound,
 # because iris reads keys in raw mode before zle sees them, so a collision is
 # a silent theft, not an error.
 #

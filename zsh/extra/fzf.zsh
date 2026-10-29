@@ -2,7 +2,7 @@
 
 #######################################
 # FZF deserves its own config         #
-# Don't move it to zsh_config.zsh     #
+# Keep it out of .zshrc               #
 #######################################
 
 # Common fd command. --color=always makes fd tint each entry by file type from

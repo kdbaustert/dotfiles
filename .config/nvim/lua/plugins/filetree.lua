@@ -1,9 +1,9 @@
 -- nvim-tree: the always-open sidebar.
 --
 -- Chosen over neo-tree because the Voltage colorscheme already spells out the
--- full NvimTree* group set (it was written for LunarVim, which ships this same
--- tree), so both editors get an identical sidebar with no second transcription
--- of the palette. See themes/voltage.md.
+-- full NvimTree* group set (LunarVim ships this same tree, and the scheme
+-- covers it), so both editors get an identical sidebar with no second
+-- transcription of the palette. See themes/voltage.md.
 --
 -- It does NOT take over netrw: oil.nvim owns that (lua/plugins/editor.lua), and
 -- both hijacking it means whichever loads last wins. The two split cleanly:

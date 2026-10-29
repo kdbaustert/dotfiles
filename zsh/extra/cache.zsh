@@ -38,8 +38,8 @@ typeset -g ZSH_CACHE_INIT_DIR="${ZSH_CACHE_DIR:-$HOME/.cache/zsh}/init"
 zcache() {
   local name=$1; shift
   # $commands is zsh's builtin name→path hash; a subscript miss is the "not
-  # installed" case, so an empty result returns 0, matching the
-  # `command -v X && eval ...` guards this replaces.
+  # installed" case, so an empty result returns 0, the same as a
+  # `command -v X && eval ...` guard would.
   #
   # Not `bin=$(command -v "$1")`: a command substitution forks a subshell, and
   # with seven zcache/zcache_value calls on the startup path that costs ~3.5ms of

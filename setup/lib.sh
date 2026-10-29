@@ -331,7 +331,7 @@ link_dotfiles() {
   # it, and deleting that one line would lose the tooling rules silently rather
   # than failing. Those rules live in CLAUDE.md directly. (2.1.310's builtin
   # agents-md plugin reads a project AGENTS.md where there is no CLAUDE.md,
-  # which is a project-scope change and leaves this one alone. The repo root
+  # which is project scope and doesn't reach this user-scope link. The repo root
   # uses AGENTS.md with CLAUDE.md linked to it; setup/REFERENCE.md has why.)
   mkdir -p "$HOME/.claude"
   link "$DOTFILES_DIR/.claude/CLAUDE.md" "$HOME/.claude/CLAUDE.md"
