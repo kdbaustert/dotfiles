@@ -125,6 +125,10 @@ section_brew() {
   else
     warning "brew is not on PATH — skipped the Brewfile, analytics opt-out, and cleanup."
   fi
+
+  # superfile (`spf`) comes from its own install script, not Homebrew. See
+  # install_superfile in setup/lib.sh.
+  install_superfile
 }
 
 #------------------------------------------------------------------------------

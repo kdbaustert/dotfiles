@@ -729,6 +729,55 @@ install_pay_respects() {
   rm -rf "$tmp"
 }
 
+# superfile (`spf`), a terminal file manager. Not in the Brewfile: the project's
+# documented install is its own script, so this runs that script as given.
+#
+# The script moves the binary into /usr/local/bin with sudo and, if that fails,
+# into ~/.local/bin. It also appends a PATH line to the shell RC when
+# ~/.local/bin isn't on PATH, which here would write into a symlinked, tracked
+# file. .zprofile already puts ~/.local/bin on PATH, so that branch never runs
+# in a login shell; the warning below covers a tool call that lacks it.
+#
+# The script tries `sudo mv` into /usr/local/bin first, which would stop the
+# installer on a password prompt. A stub `sudo` that fails sits first on PATH for
+# that one command, so the script takes its own fallback and installs into
+# ~/.local/bin without asking. The script's "Unable to move binary" line is that
+# fallback, not an error.
+#
+# Skipped when `spf` already resolves, so a re-run never downloads again. To
+# upgrade, run with SPF_FORCE=1: the script then replaces the ~/.local/bin copy.
+# A leftover /usr/local/bin/spf from an earlier sudo install is warned about,
+# because it would shadow the new one if it comes first on PATH.
+install_superfile() {
+  local stub
+
+  if [ -z "${SPF_FORCE:-}" ] \
+    && { command -v spf >/dev/null 2>&1 || [ -x "$HOME/.local/bin/spf" ]; }; then
+    info "superfile already installed (SPF_FORCE=1 to reinstall)."
+    return 0
+  fi
+
+  info "Installing superfile..."
+  case ":$PATH:" in
+    *":$HOME/.local/bin:"*) ;;
+    *) warning "~/.local/bin is not on PATH here; the script will append to your shell RC (a tracked symlink). Check 'git status' afterwards." ;;
+  esac
+
+  stub="$(mktemp -d)"
+  printf '#!/bin/sh\nexit 1\n' >"$stub/sudo"
+  chmod +x "$stub/sudo"
+
+  if PATH="$stub:$PATH" bash -c "$(curl -sLo- https://superfile.dev/install.sh)"; then
+    success "superfile installed."
+    if [ -x /usr/local/bin/spf ]; then
+      warning "/usr/local/bin/spf from an earlier install may shadow ~/.local/bin/spf; remove it with sudo rm."
+    fi
+  else
+    warning "superfile install failed (see above) — skipping."
+  fi
+  rm -rf "$stub"
+}
+
 #------------------------------------------------------------------------------
 # CLAUDE_PLUGINS
 #------------------------------------------------------------------------------
