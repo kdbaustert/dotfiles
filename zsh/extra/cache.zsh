@@ -23,6 +23,16 @@
 
 typeset -g ZSH_CACHE_INIT_DIR="${ZSH_CACHE_DIR:-$HOME/.cache/zsh}/init"
 
+# fzf's generated integrations snapshot every option, then restore them through
+# the `options` parameter. zle cannot be assigned through that parameter, so
+# omit it from both restore expressions; fzf does not change the option itself.
+zcache_post_fzf() {
+  print '# zcache-filter:fzf:v1'
+  sed \
+    -e 's|eval $__fzf_key_bindings_options|eval "${${__fzf_key_bindings_options// zle on/}// zle off/}"|' \
+    -e 's|eval $__fzf_completion_options|eval "${${__fzf_completion_options// zle on/}// zle off/}"|'
+}
+
 # zcache <name> <command> [args...]
 #
 # Sources the cached stdout of `<command> [args...]`, regenerating it when the
@@ -31,10 +41,11 @@ typeset -g ZSH_CACHE_INIT_DIR="${ZSH_CACHE_DIR:-$HOME/.cache/zsh}/init"
 # don't need their own `command -v` guard.
 #
 # If a function named `zcache_post_<name>` exists, the generated output is piped
-# through it before being written. Use it to patch a generator's output when the
-# upstream tool does something at source time that should happen lazily; see
-# zcache_post_starship in .zshrc. The filter runs once per regeneration, not per
-# shell start, so it can be as expensive as it likes.
+# through it before being written. Its first line is a filter-version marker;
+# bump the callback's marker and the matching check below when its behavior
+# changes, so an old cache is regenerated even when the tool binary is unchanged.
+# See zcache_post_starship in .zshrc. The filter runs once per regeneration,
+# not per shell start, so it can be as expensive as it likes.
 zcache() {
   local name=$1; shift
   # $commands is zsh's builtin name→path hash; a subscript miss is the "not
@@ -49,12 +60,19 @@ zcache() {
   local bin=${commands[$1]}
   [[ -n $bin ]] || return 0
 
-  local cache="$ZSH_CACHE_INIT_DIR/$name.zsh"
+  local cache="$ZSH_CACHE_INIT_DIR/$name.zsh" regenerate=false filter_marker
+
+  if [[ ! -s $cache || $bin -nt $cache ]]; then
+    regenerate=true
+  elif (( ${+functions[zcache_post_$name]} )); then
+    IFS= read -r filter_marker < "$cache"
+    [[ $filter_marker == "# zcache-filter:$name:v1" ]] || regenerate=true
+  fi
 
   # -s: non-empty. A zero-byte cache means a previous generation failed (tool
   # errored, disk full); treat it as absent rather than sourcing nothing and
   # silently losing the integration forever.
-  if [[ ! -s $cache || $bin -nt $cache ]]; then
+  if [[ $regenerate == true ]]; then
     [[ -d $ZSH_CACHE_INIT_DIR ]] || command mkdir -p "$ZSH_CACHE_INIT_DIR"
     # Generate to a temp file and move into place, so a crash mid-write can't
     # leave a truncated cache that sources as a syntax error on next start.
@@ -75,9 +93,14 @@ zcache() {
       zcompile -R -- "$cache" 2>/dev/null
     else
       command rm -f "$tmp"
-      # Generation failed: fall back to eval'ing directly so the shell is still
-      # correct this session, and retry the cache next start.
-      eval "$("$@" 2>/dev/null)"
+      # Generation failed: apply the same filter before eval so integrations
+      # remain correct this session, then retry the cache next start.
+      local generated
+      generated="$("$@" 2>/dev/null)"
+      if (( ${+functions[zcache_post_$name]} )); then
+        generated="$(print -r -- "$generated" | "zcache_post_$name")"
+      fi
+      eval "$generated"
       return 0
     fi
   fi

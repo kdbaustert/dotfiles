@@ -193,7 +193,10 @@ fi
 # the cache is itself what pays the cost, so reassigning PROMPT2 afterwards would
 # be too late. Runs once per regeneration; see zcache in zsh/extra/cache.zsh.
 setopt PROMPT_SUBST   # required for the lazy form below; zinit.zsh also sets it
-zcache_post_starship() { sed "s|^PROMPT2=\"\\\$(\(.*\))\"\$|PROMPT2='\$(\1)'|" }
+zcache_post_starship() {
+  print '# zcache-filter:starship:v1'
+  sed "s|^PROMPT2=\"\\\$(\(.*\))\"\$|PROMPT2='\$(\1)'|"
+}
 
 # starship comes from its own official installer
 # (https://starship.rs/install.sh), not Homebrew and not zinit, installed to

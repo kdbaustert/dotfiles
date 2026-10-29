@@ -429,6 +429,16 @@ sources `macos-interactive.zsh` after `aliases.zsh` and at the end of the
 tool-integration block, so its `command_not_found_handler` is the last one
 defined.
 
+## Hosts blocklist
+
+`setup/hosts.sh` filters the StevenBlack list to `0.0.0.0` entries and keeps
+`raw.githubusercontent.com` out of the block, so the scheduled updater can
+fetch its next copy. `setup/check-hosts-filter.sh` covers both that exception
+and filtering multiple hostnames on one input line. The fzf cache filter in
+`zsh/extra/cache.zsh` omits the unassignable `zle` option from upstream's
+restore expressions; `setup/check-zsh-cache-filters.sh` covers the rewrite and
+stale-cache regeneration and cache-write fallback.
+
 ## Do not run `install.sh` to test a change
 
 It asks for sudo, edits `/etc/pam.d/sudo_local`, runs `brew bundle`, and loads
@@ -446,6 +456,8 @@ time zsh -i -c exit                           # startup cost — it is budgeted
 stylua --check .config/nvim .config/lvim .config/voltage.nvim
 plutil -lint launchd/*.plist                  # plist syntax, no launchctl load
 setup/check-claude-settings.sh                # settings merge + command guard
+setup/check-hosts-filter.sh                   # blocklist allowlist and multi-host filtering
+setup/check-zsh-cache-filters.sh              # fzf option restore + write fallback
 ```
 
 Both file lists are load-bearing, and both used to be shorter than they needed
