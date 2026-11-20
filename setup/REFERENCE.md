@@ -62,6 +62,15 @@ one of them appears not to work: `allowed_signers` is named explicitly by
 pointing at it at all — git reads `$XDG_CONFIG_HOME/git/ignore` on its own, so
 the symlink is the whole wiring.
 
+GitButler doesn't read `commit.gpgsign`. It signs according to
+`gitbutler.signCommits` and then uses the same `gpg.format`, `gpg.ssh.program`
+and `user.signingkey` as git. `.gitconfig` sets it to `true` globally, but a
+repo-local value wins over the global one, and that's where the `false` came
+from in dotfiles and wp-starter-theme-vue (cause unknown) when their 2026-10-29
+commits went out unsigned. If a repo's commits show up unverified on GitHub, run
+`git config --show-origin --get gitbutler.signCommits` there before blaming
+1Password or the key.
+
 ### Agent deployment and vendored skills
 
 `.claude/` is tracked in full but only partly deployed: `install.sh` links

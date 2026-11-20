@@ -27,6 +27,15 @@
 	# .config/git/allowed_signers in this repo.
 	allowedSignersFile = ~/.config/git/allowed_signers
 
+# GitButler ignores commit.gpgsign and decides from its own key, so without
+# this a repo's `but commit`s can go out unsigned while plain `git commit`
+# still signs. It did: dotfiles and wp-starter-theme-vue had a local
+# `signCommits = false` and pushed unsigned commits from 2026-10-29. Unset also
+# signs in practice, but setting it here keeps a new repo from depending on
+# GitButler's default. A repo-local value still wins over this one.
+[gitbutler]
+	signCommits = true
+
 [core]
 	# Not an absolute path like /opt/homebrew/bin/nvim, which would make a
 	# portable setting platform-specific. The bare name resolves through $PATH
