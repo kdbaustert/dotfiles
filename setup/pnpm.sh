@@ -7,7 +7,7 @@
 # WHY PNPM AND NOT NPM. Installing with `npm install -g` would put a second,
 # shadowed copy of each package into a prefix nothing on PATH reads. On a
 # working machine every package here already lives under pnpm (~/Library/pnpm),
-# npm's own global prefix holds only neovim, npm and tree-sitter-cli, and every
+# npm's own global prefix holds only neovim and npm, and every
 # binary that matters (tsc, prettier, eslint, intelephense) resolves to
 # ~/Library/pnpm/bin. The pnpm globals are the real ones; .zprofile puts
 # $PNPM_HOME/bin on PATH and .claude/CLAUDE.md describes Prettier as a pnpm

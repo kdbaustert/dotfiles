@@ -467,6 +467,7 @@ plutil -lint launchd/*.plist                  # plist syntax, no launchctl load
 setup/check-claude-settings.sh                # settings merge + command guard
 setup/check-hosts-filter.sh                   # blocklist allowlist and multi-host filtering
 setup/check-zsh-cache-filters.sh              # fzf option restore + write fallback
+setup/check-update-function.sh                # `update` step order, skips and failure report
 ```
 
 Both file lists are load-bearing, and both used to be shorter than they needed
