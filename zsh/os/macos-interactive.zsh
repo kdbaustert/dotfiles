@@ -82,5 +82,8 @@ alias chromekill="ps ux | grep '[C]hrome Helper --type=renderer' | grep -v exten
 alias brewf='$(brew --prefix)'
 alias ibrew='arch -x86_64 /usr/local/bin/brew'
 
-# Everything the machine can update in one go.
-alias update='brew update; brew upgrade; brew cleanup; npm install npm -g; npm update -g; composer global update; zinit update'
+# Everything the machine can update in one go. `zinit update` only pulls the
+# plugins, so `zinit self-update` runs first to update zinit itself. No
+# `composer global update`: there's no ~/.composer/composer.json, so it only
+# ever printed an error.
+alias update='brew update; brew upgrade; brew cleanup; npm install npm -g; npm update -g; zinit self-update; zinit update'
