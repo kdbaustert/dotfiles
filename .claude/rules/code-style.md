@@ -118,6 +118,52 @@ fixing them. Don't copy bad structure just because it sits nearby.
 // Good: Skips archived orders; the nightly export reads those separately.
 ```
 
+Docblocks follow the same rule: write each one the way the developer who owns
+the file would type it by hand, and if a teammate would spot it as generated,
+rewrite it. Generated docblocks look like this:
+
+- Every tag gets a full sentence, and they all match in length and rhythm,
+  even when the type already says it all.
+- The summary opens with "This method", "Helper that", "Handles" or
+  "Retrieves and returns", or just reads the name back as a sentence.
+- The body walks through the parameters in prose, then the `@param` lines
+  repeat it.
+- Hedges or praise ("safely", "efficiently", "gracefully") that the code
+  doesn't back up.
+
+Shape:
+
+- Copy the file's format first: tag set and order, alignment, summary mood and
+  punctuation. A project standard (WordPress, PSR-5, Google style) wins.
+- The summary says what the caller gets or what changes, as briefly as stays
+  true. Add a body only for a side effect, an ordering requirement, a cost or
+  a reason.
+- Tags carry what the signature can't: precise types (`list<Order>`, `?User`,
+  `array<string, int>`), units, accepted values, what null or empty means.
+  Drop a description that repeats the name ("The user ID."), and a tag the
+  native type already covers unless the project requires it. TypeScript JSDoc
+  has no `{type}`.
+- `@throws` only for what actually escapes, with when. No `@author`, `@since`,
+  dates or history unless the project uses them.
+- Update it in the same edit as the signature. Don't claim thread-safe,
+  idempotent or O(1) unless you checked.
+
+```php
+/**
+ * This method is responsible for retrieving the orders for the given user.
+ *
+ * @param int $userId The user ID.
+ * @return array Returns an array of orders.
+ */
+
+/**
+ * Returns the customer's open orders, newest first.
+ *
+ * @param int $userId
+ * @return list<Order> empty when the customer has none
+ */
+```
+
 ## Tests
 
 - Tests are production code: readable, deterministic, isolated, fast,
