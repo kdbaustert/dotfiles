@@ -277,8 +277,10 @@ FZF_GIT_PREFIX='^X^G'
 #                           a whole must stay after 3: zsh-manydots-magic chains
 #                           onto self-insert and has to find the wrappers from
 #                           autosuggestions and F-Sy-H already in place
-#   6. fzf-git.sh
-#   7. measurement        : zsh-bench and zsh-prompt-benchmark; neither of them
+#   6. zsh-atuin-history  : after 3 and 5, because it takes over Enter, Up and
+#                           Down and falls back to whatever they bound
+#   7. fzf-git.sh
+#   8. measurement        : zsh-bench and zsh-prompt-benchmark; neither of them
 #                           runs anything at startup
 
 # --- Node ---------------------------------------------------------------------
@@ -415,6 +417,15 @@ zinit wait lucid for \
     wfxr/forgit \
   MichaelAquilina/zsh-auto-notify \
   olets/zsh-abbr
+
+# --- zsh-atuin-history: atuin history in a popup under the prompt -------------
+# A local plugin (~/Development/zsh-atuin-history), not a clone. It remembers
+# what Enter, Up and Down were bound to when it loads and calls back into them,
+# so it has to come after zsh-abbr's Enter and atuin's Up (.zshrc, before turbo).
+# Skipped under iris, which redraws the line from outside zle and fights it
+# (see KNOWN CONFLICTS in .zshrc).
+zinit wait lucid if'[[ -z $IRIS_PID ]]' for \
+  %HOME/Development/zsh-atuin-history
 
 # --- fzf-git.sh ---------------------------------------------------------------
 # fzf widgets that insert a git object into the line you are already typing:
