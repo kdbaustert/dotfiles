@@ -537,7 +537,7 @@ curl -fsSL https://raw.githubusercontent.com/drona23/claude-token-efficient/main
 The complete rule sets behind `rules/code-style.md`. As path-scoped rules they
 would be about 29k characters (~7.2k tokens) loaded in nearly every dotfiles
 session, because `*.sh` and `*.zsh` match their paths; the condensed rule is
-about a sixth of that. Read this
+under a third of that. Read this
 section for a refactor, a code review, concurrency work, or when the short
 rule is unclear. Headings are demoted two levels from the originals.
 

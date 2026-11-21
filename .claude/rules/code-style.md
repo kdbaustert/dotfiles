@@ -46,6 +46,33 @@ tricks or fashionable idioms at the cost of clarity. Leave the code the task
 changes cleaner than you found it, and mention problems outside it rather than
 fixing them. Don't copy bad structure just because it sits nearby.
 
+## Written by hand
+
+Code should read like the developer who owns the file typed it. Don't write
+AI-style code, the kind a reviewer picks out at a glance. If a teammate
+reviewing the diff would guess it was generated, rewrite it. Copy the file's
+own habits first: its idiom, naming, error handling, ordering and the helpers
+it already uses.
+
+AI-style code looks like this:
+
+- Guards for what can't happen: a null check on a value the type guarantees,
+  a `try`/`catch` that only logs and rethrows, a fallback default that hides a
+  failure.
+- A helper, wrapper, option or config value with one caller, or flexibility
+  nobody asked for.
+- The long way round where the language or the codebase has a short one, or a
+  second copy of a helper the project already has.
+- Names that say everything or nothing: `userDataResponseObject`, `result`,
+  `data`, `helper`.
+- Every function built to one template, with the same checks and logging
+  whether the logic is hard or trivial. A developer spends lines where the
+  logic is hard and none where it's obvious.
+- Leftovers: unused imports and variables, commented-out code, debug output,
+  a shim for code that's gone, a placeholder TODO.
+- Banner and step comments ("// Step 1", "// --- Helpers ---"), and log
+  messages with emoji or "Successfully".
+
 ## Names
 
 - Reveal intent: purpose or behavior without needing a comment. Pronounceable
@@ -184,5 +211,6 @@ optimization or a new dependency only with evidence it pays for itself.
 
 Read the diff: names reveal intent, functions are small, control flow is plain,
 boundaries are defended, nothing is newly duplicated, comments earn their
-place, style matches the codebase, and complexity went down or held level.
+place, style matches the codebase, nothing reads as generated, and complexity
+went down or held level.
 Then say what changed, what checks ran, and any risk left open.

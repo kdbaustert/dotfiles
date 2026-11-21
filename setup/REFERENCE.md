@@ -159,11 +159,19 @@ where it would be paid for twice in Claude sessions. It carries `paths:`
 frontmatter listing source-file extensions, so it loads only once a session
 works with a matching file. A new language needs its extension added there.
 
+Its *Written by hand* section comes from neither book. It lists what gives
+generated code away (guards for impossible states, single-caller helpers,
+template-shaped functions, leftovers) so a diff reads like the file's owner
+typed it. It sits in this rule and not in a file of its own because a second
+file would have to repeat the `paths:` list and get its own Codex pointer in
+`.claude/CLAUDE.md`. The comment and docblock tells stay under *Comments*.
+
 The two full rule sets are about 29k characters (~7.2k tokens est.) and repeat
 each other on comments, errors, class design, tests and the review checklist.
 Path scoping doesn't save much, because the lists include `*.sh` and
 `*.zsh` and nearly every dotfiles session touches one. The condensed rule is
-about 7.5k characters (~1.9k tokens est.) with its docblock guidance. The full
+about 8.8k characters (~2.2k tokens est.) with its docblock and hand-written
+guidance. The full
 text of both sits, verbatim apart from heading levels, in **Code rules in full** at the end of
 `.claude/REFERENCE.md`, read only for refactors, reviews, concurrency work or
 when the short rule is unclear. Putting it in the *Code style* section instead
