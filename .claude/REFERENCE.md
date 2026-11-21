@@ -361,10 +361,16 @@ checks that the remote tip is in your reflog, which a fetch alone can't fake.
   bold, emoji, "Summary" or "Changes" sections, and bullet lists of touched
   files. Don't open with "This commit" or end on a line that repeats the
   subject.
-- **Never create a branch.** Commit on whatever branch I'm already on, including
-  the default branch; this overrides the harness default of branching first on
-  `main`/`master`. If a commit really shouldn't land on the current branch, say
-  so and let me decide.
+- **Never create a branch unless I tell you to.** Commit on whatever branch is
+  checked out, and when that's `master` or `main`, commit straight to it. This
+  overrides two defaults that say otherwise: the harness's "branch first" on
+  `main`/`master`, and the line in `~/.claude/rules/gitbutler.md` that gives
+  each agent session its own GitButler branch. That file isn't tracked in this
+  repo (GitButler's setup wrote it, and the same text sits in
+  `~/.codex/AGENTS.md`), so the override is stated in `CLAUDE.md` instead of
+  edited into it. With `but`, commit to the existing branch by name, not a new
+  one. If a commit really shouldn't land on the current branch, say so and let
+  me decide.
 - **Never merge `develop` or `staging` into another branch.** They carry
   everyone's in-flight work, so a merge pulls other people's commits into my
   history. That holds for every target, including a merge that would only

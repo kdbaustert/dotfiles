@@ -108,9 +108,13 @@ Before selecting or running a formatter, linter or build/install command, read
 
 ## Git
 
-Before a Git task, read **Git** in `~/.claude/REFERENCE.md`. Never commit, push
-or create a PR unless asked. Never create a branch, disable signing, add
-attribution trailers, or merge `develop` or `staging` into another branch.
+Before a Git task, read **Git** in `~/.claude/REFERENCE.md`. Never commit, push,
+create a PR or create a branch unless asked. Work on the branch that's checked
+out, and when that's `master` or `main`, commit there. This overrides the
+"dedicated GitButler branch for each agent session" line in
+`~/.claude/rules/gitbutler.md` and any harness default of branching first.
+Never disable signing, add attribution trailers, or merge `develop` or
+`staging` into another branch.
 
 ## Memory
 
