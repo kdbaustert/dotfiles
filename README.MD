@@ -78,7 +78,7 @@ SETUP_SCRIPTS=all ./install.sh          # pnpm composer mas gh-extensions
 | Script             | Installs                                          |
 | ------------------ | ------------------------------------------------- |
 | `pnpm.sh`          | Global JS packages (pnpm, not npm — see the file) |
-| `composer.sh`      | Global Composer packages                          |
+| `composer.sh`      | Global Composer packages, listed in `Composerfile` |
 | `mas.sh`           | Mac App Store apps (sign in to the App Store first) |
 | `gh-extensions.sh` | GitHub CLI extensions                             |
 
@@ -97,6 +97,7 @@ the `macos` section of `install.sh` (`./install.sh macos`), last in the run.
 | `themes/`    | Voltage — the shared palette; see `themes/voltage.md`  |
 | `iterm/`     | iTerm2 preferences folder                              |
 | `obsidian/`  | "Amethyst Night" theme                                 |
+| `.dotsnitch.json` | Config for `dotsnitch status`, which checks this Mac against the Brewfile and `setup/Composerfile` |
 
 ## Notes
 
