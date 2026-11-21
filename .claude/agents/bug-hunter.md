@@ -1,6 +1,6 @@
 ---
 name: bug-hunter
-description: Hunts a codebase for existing bugs and for spots where error handling is missing, silent, or inadequate. Use when asked for a health check of a project, to find bugs, or to audit error handling rather than review a specific diff.
+description: Finds existing bugs and missing or silent error handling across a codebase. Use for a project health check, not to review a diff.
 tools: Read, Grep, Glob, Bash
 model: sonnet
 memory: project

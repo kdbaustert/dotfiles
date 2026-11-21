@@ -59,5 +59,10 @@
     "artifact-capabilities": "name-only",
     "code-review": "name-only",
     "update-config": "name-only"
+  },
+  "enabledPlugins": {
+    "miro@claude-plugins-official": false,
+    "code-simplifier@claude-plugins-official": false,
+    "code-review@claude-plugins-official": false
   }
 }

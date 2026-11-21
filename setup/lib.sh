@@ -118,9 +118,9 @@ retire_launch_agents() {
 }
 
 # merge_claude_settings: merge preferences while keeping hooks and local state.
-# env and skillOverrides merge key by key; replacing either would drop the
-# variables or per-machine skill toggles the portable file doesn't name. hooks
-# only ever gains entries, for the same reason. A matching config is left
+# env, skillOverrides and enabledPlugins merge key by key; replacing any of them
+# would drop the variables, per-machine skill toggles or installed plugins the
+# portable file doesn't name. hooks only ever gains entries, for the same reason. A matching config is left
 # alone so repeat installs do not rewrite it.
 merge_claude_settings() {
   if ! command -v python3 &>/dev/null; then
@@ -145,7 +145,7 @@ before = json.loads(target.read_text()) if target.exists() else {}
 if not isinstance(before, dict) or not isinstance(settings, dict):
     raise SystemExit("Claude settings must be JSON objects; left untouched.")
 updated = {**before, **settings}
-for key in ("env", "skillOverrides"):
+for key in ("env", "skillOverrides", "enabledPlugins"):
     if key in settings:
         updated[key] = {**before.get(key, {}), **settings[key]}
 
@@ -809,13 +809,14 @@ CLAUDE_PLUGINS=(
   php-lsp          # intelephense, for the Development/ PHP projects
   swift-lsp        # SourceKit-LSP, for the Developer/ Swift projects
   typescript-lsp   # typescript-language-server, for web work
-  miro             # board access via MCP; auth happens on first use, not here
   frontend-design  # design-quality guidance for new/reshaped UI work
-  code-simplifier  # reuse/simplification pass over recently changed code
-  code-review      # multi-agent PR review with confidence-scored findings
 
-  # Third-party; opt-in twice over: /i-have-adhd per session, or every session
-  # once ~/.claude/.i-have-adhd-always exists (its SessionStart hook checks).
+  # miro, code-simplifier and code-review left this list to save prompt tokens;
+  # settings.portable.json's enabledPlugins turns them off where installed.
+
+  # Third-party; on every session because install.sh creates
+  # ~/.claude/.i-have-adhd-always, the flag its SessionStart hook checks.
+  # Without the flag it waits for /i-have-adhd.
   i-have-adhd@ayghri/i-have-adhd  # action-first, ADHD-shaped output style
 )
 

@@ -57,8 +57,8 @@ Branch: <current branch> in <repo path>
 ```
 
 - **small**: typo, copy, styling value, config tweak, rename, or a one-or-two-file mechanical edit with no behavior change. Solo, no critic. Run the checks covering what was touched; no new test.
-- **medium**: a behavior change or bug fix inside one module. Solo unless the work splits into independent units. Run that module's tests, ship the regression test, one cold critic pass.
-- **large**: new feature, cross-service or contract change, architecture, anything judgment-heavy. Fan out, harsh critic loop, full test and eval suites for every service touched.
+- **medium**: a behavior change or bug fix inside one module. Solo unless the work splits into independent units. Run that module's tests, ship the regression test, one cold critic pass. A diff under ~40 lines gets that pass from you, rereading the diff cold against *Critic per work type* in `setup/REFERENCE.md`; a bigger one goes to the sonnet `code-reviewer` agent.
+- **large**: new feature, cross-service or contract change, architecture, anything judgment-heavy. Fan out, harsh critic loop, full test and eval suites for every service touched. Critics are the sonnet agents in `.claude/agents/`, never a fork of the main model.
 
 When torn, pick the smaller size and say so. Escalate the moment the work proves bigger, with a new triage block saying why. Test what you touch: if the diff can't reach outside the module, its tests are the complete verification. The final report restates which tests and agents actually ran.
 

@@ -1,6 +1,6 @@
 ---
 name: memory-bank-synchronizer
-description: Checks a project's memory bank (the CLAUDE-*.md files at the repo root) against the code and corrects what has gone stale. Use when asked to sync, audit or refresh the memory bank, or after a change that moved, renamed or replaced things those files describe.
+description: Checks a repo's CLAUDE-*.md memory bank against the code and fixes what's stale. Use when asked to sync it, or after moving or renaming what it describes.
 tools: Read, Grep, Glob, Bash, Edit, Write
 model: sonnet
 ---

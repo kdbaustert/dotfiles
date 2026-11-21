@@ -405,6 +405,24 @@ happening. `disableBundledSkills` was rejected because it also strips
 this key entry by entry, as it does `env`, so neither list overwrites the
 other.
 
+miro, code-simplifier and code-review are disabled for the same reason: miro's
+skills and MCP tools cost ~290 tokens and work code can't go to Miro anyway,
+and the other two duplicate the built-in `/simplify` and `/code-review`.
+Removing them from `CLAUDE_PLUGINS` stops new installs; `enabledPlugins` in the
+portable file turns them off where they're already installed, and merges entry
+by entry so other plugins stay on. Re-enable one with `/plugin`. Don't judge
+this with headless `/context`: with miro off, `claude -p` has no MCP server
+and loads ~300 tokens of tool text it otherwise defers.
+
+Claude in Chrome is off by default (`claudeInChromeDefaultEnabled` in
+`~/.claude.json`, set by `install.sh`) because its guidance adds ~1.3k tokens
+to every session. Use `claude --chrome` when a session needs it. The
+computer-use guidance (~700 tokens) has no setting to turn it off.
+
+i-have-adhd is always on: its SessionStart hook injects the ruleset (~1.8k
+tokens) whenever `~/.claude/.i-have-adhd-always` exists, which `install.sh`
+creates. Delete the file to go back to `/i-have-adhd` per session.
+
 ### Editors
 
 Two Neovim configs, deliberately independent: `.config/nvim` (hand-rolled,
@@ -415,8 +433,8 @@ other or copy the palette into either.
 ### Portable app settings
 
 `merge_claude_settings()` merges `.claude/settings.portable.json` into
-`${CLAUDE_CONFIG_DIR:-$HOME/.claude}/settings.json`, preserving other env and
-`skillOverrides` keys, hooks, permissions and plugin state. `merge_codex_settings()` merges
+`${CLAUDE_CONFIG_DIR:-$HOME/.claude}/settings.json`, preserving other env,
+`skillOverrides` and `enabledPlugins` keys, hooks, permissions and plugin state. `merge_codex_settings()` merges
 `.codex/settings.toml` into `${CODEX_HOME:-$HOME/.codex}/config.toml`.
 Both are called by `link_dotfiles()`. Neither live config is
 symlinked or tracked. Re-running a merge with matching values does not rewrite
