@@ -298,11 +298,8 @@ link_dotfiles() {
 
   # Retired links, removed on re-run. Only ever unlinks a symlink whose target
   # is inside $DOTFILES_DIR; a real file of the same name is left alone.
-  # .gitconfig-os is a link to .gitconfig-macos or .gitconfig-linux, the
-  # platform half of .gitconfig. That half lives in .gitconfig itself and
-  # neither source file exists, so a leftover link dangles.
   for f in .gitignore .eslintrc .eslintignore .stylelintrc .prettierignore \
-           tsconfig.json .gitconfig-os; do
+           tsconfig.json; do
     if [ -L "$HOME/$f" ] && case "$(readlink "$HOME/$f")" in "$DOTFILES_DIR"/*) true ;; *) false ;; esac; then
       rm -f "$HOME/$f" && info "Removed retired symlink ~/$f"
     fi

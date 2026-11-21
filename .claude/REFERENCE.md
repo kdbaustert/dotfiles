@@ -38,9 +38,9 @@ machine: casks, fonts, and every global CLI tool. Never `nix profile install` or
 zoxide, starship, atuin, git, delta, lazygit, neovim, node and python all exist in
 both, and a second copy only drifts. The shell hook is sourced from `.zprofile`
 *before* the path array, so `/opt/homebrew/bin` outranks `~/.nix-profile/bin`
-(measured: positions 6 and 11 in a login shell), and `/etc/zshrc` is deliberately
+(positions 6 and 11 in a login shell), and `/etc/zshrc` is deliberately
 left unedited. `.zprofile` is login-only, so a Bash tool call may not see `nix` at
-all — the session that wrote this did not. `command -v nix-shell` is the check,
+all. `command -v nix-shell` is the check,
 and sourcing `/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh` first is
 the fix; don't splice `/nix/...` into a tool call's PATH by hand. Flakes are on via
 `.config/nix/nix.conf`, and `direnv` (Homebrew, with nix-direnv fetched by
@@ -48,8 +48,7 @@ the fix; don't splice `/nix/...` into a tool call's PATH by hand. Flakes are on 
 kennybdev each carry an `.envrc`. That is a prompt hook, so a tool call never gets
 the shell; run `nix develop -c <cmd>` from the project instead.
 
-There is no Python version manager because `pyenv` was removed: it managed zero
-versions.
+There is no Python version manager: `pyenv` managed zero versions here.
 
 **`node` is version-skewed by shell type.** `nvm` is lazy-loaded
 (`NVM_LAZY_LOAD` in `.zprofile`, turbo-deferred in `zsh/zinit.zsh`) and is a shim
@@ -74,9 +73,8 @@ the first `rg` adds dotfiles but still skips `.git`; the second ignores
 `.gitignore` and includes hidden files; the `fd` does the same and also
 bypasses the global ignore below. A plain `rg -n --max-columns=200
 --max-columns-preview 'pattern'` or `fd -e ts 'name'` covers tracked,
-non-hidden files and needs no exclusions. The two plain examples and these
-explanations were cut from `CLAUDE.md` on 2026-10-26 to shrink a file that
-loads in every project.
+non-hidden files and needs no exclusions. These live here, not in `CLAUDE.md`,
+because that file loads in every project.
 
 `fd`'s global ignore lives at `.config/fd/ignore`, deployed to
 `~/.config/fd/ignore` and read automatically with no env var wiring it up. It
@@ -121,10 +119,10 @@ repos and blocking every search would cost more turns than it saves.
 
 `--max-columns=200 --max-columns-preview`: one match in a minified bundle or a
 SQL dump can be a single line tens of kilobytes long, and all of it lands in
-the context. Checked on ripgrep 15.2.0: a 10,000-character matching line came
+the context. On ripgrep 15.2.0 a 10,000-character matching line comes
 back as about 230 characters ending in `[... omitted end of long line]`. The
 preview keeps the start of the line, so a match deep in it is cut off; `-o`
-with a bounded pattern printed just the match and its 40 characters either
+with a bounded pattern prints just the match and its 40 characters either
 side (89 bytes for the same line).
 
 A project's `.ignore` is the per-repo half. `rg` and `fd` read it by default,
@@ -154,12 +152,11 @@ escape hatch matters: if the minimal change only papers over a real defect, say
 so and let me decide — widening scope on your own is the thing to avoid, not
 telling me the narrow fix is wrong.
 
-**Be efficient, and the 2026-10-26 trim.** The whole section was shortened that
-day because `CLAUDE.md` loads in every project. Every bullet kept its rule;
-what moved here is the why. Tool output is paid for again on every later turn,
+**Be efficient.** The bullets in `CLAUDE.md` are short because it loads in
+every project; the why is here. Tool output is paid for again on every later turn,
 so a search that dumps 5k tokens early costs 5k on each call after it. The
 model-switch warning comes from a measurement: switching Opus sessions to
-Fable at 200-260k context drove 77% of a week's Fable tokens (2026-10-25), and
+Fable at 200-260k context drove 77% of a week's Fable tokens, and
 the cold cache means each later call pays full price on the whole context.
 Browser and computer-use work grows context fastest because screenshots are
 large, so page text comes first. "Show failing output verbatim" replaces "don't
@@ -378,16 +375,10 @@ checks that the remote tip is in your reflog, which a fetch alone can't fake.
 
 ## Philosophy
 
-The *curate context* paragraph used to send nearly everything to a subagent:
-researching, exploring, tracing, testing, reviewing, searching and reading
-documentation, with "if you find yourself asking yourself questions, that is the
-signal to ask a subagent instead". Five of the custom agents also said "use
-proactively" in their descriptions, `code-reviewer` after every code change and
-`quick-lookup` for any single search. Together they turned one question into
-several fresh agent runs, each paying for its system prompt and instructions
-again. Both were narrowed on
-2026-10-24: delegation is for broad or parallel work, and the agents run when
-asked.
+Delegation is for broad or parallel work, and the custom agents run when
+asked, never "proactively". A rule that sends every search, trace or review to
+a subagent turns one question into several fresh agent runs, each paying for
+its system prompt and instructions again.
 
 ## Memory
 
@@ -405,7 +396,7 @@ sounding established and costs a session to unpick. Keeping secrets out of memor
 is the context curation rule applied across sessions rather than within one.
 
 **The memory bank** comes from centminmod/my-claude-code-setup (MIT, George
-Liu), as of commit `7d5c3743942606a9c5756de47ecdb41e2317c8b6`, 2026-10-26: the
+Liu), as of commit `7d5c3743942606a9c5756de47ecdb41e2317c8b6`: the
 six `CLAUDE-*.md` files and their "read when" column from
 `CLAUDE-template-2.md`, the `memory-bank-synchronizer` agent and the
 `update-memory-bank` command. It was adapted rather than vendored, so there's no
@@ -437,16 +428,15 @@ deciding change by change. What was changed and why:
 - **Not proactive.** Upstream's agent description says "use proactively", which
   invites unrequested spawns at a full agent's startup cost. This one runs when
   asked. Upstream's `CLAUDE-todo-list.md` and its roadmap and business-plan
-  preservation rules were dropped; none of those files exist here.
+  preservation rules are left out; none of those files exist here.
 - **Skipped:** the template's core rules (this file already has them, close to
   word for word), its progressive-disclosure table, and its backup
   section. Backups would only matter if these notes outgrew one machine.
 
-`CLAUDE.md` used to show the six files as a table with a "holds" and a "read
-it" column. On 2026-10-26 it became one sentence per file with the read-when
-inline, which kept every name in backticks (the check below looks for them)
-and cut the section from 2.1k to about 1.4k characters. The "holds" column
-survives only where the name doesn't say it: activeContext and decisions.
+`CLAUDE.md` gives each file one sentence with its read-when inline, which is
+smaller than a table and keeps every name in backticks (the check below looks
+for them). What a file holds is spelled out only where the name doesn't say
+it: activeContext and decisions.
 
 `setup/check-memory-bank.sh` checks that the six names agree across
 `.claude/CLAUDE.md`, the git ignore and the agent, and that the ignore leaves
@@ -499,37 +489,34 @@ Stupid.
 
 ## Context and settings maintenance
 
-On 2026-10-25, specialized code, test, formatting, Git and audit rules moved here
-verbatim from the global instructions, with read triggers left at their original
-headings. This keeps the rules available before the relevant task without
-loading every workflow into every session. Deployment history moved from the
-repo's CLAUDE.md to setup/REFERENCE.md for the same reason.
+The specialized code, test, formatting, Git and audit rules live here, with
+read triggers at their headings in `CLAUDE.md`, so they're on hand before the
+relevant task without loading into every session. Deployment details live in
+setup/REFERENCE.md for the same reason.
 
-Portable Claude preferences now live in .claude/settings.portable.json and are
-merged by the shared installer. Sonnet briefly replaced Opus as the main
-session's default to cut model cost. On 2026-10-26 the main session went back
-to Opus, because the merge overwrites the live `model` key and a hand-set Opus
-kept getting flipped back. Subagents still default to Sonnet (see
-setup/REFERENCE.md). Medium effort and existing output and compaction limits
-remain unchanged. Only reducing context and generated output directly reduces
-token counts.
+Portable Claude preferences live in .claude/settings.portable.json and are
+merged by the shared installer. Set the main session's model there: the merge
+overwrites the live `model` key, so a model picked by hand gets flipped back.
+The main session is Opus; subagents default to Sonnet (see
+setup/REFERENCE.md). Only reducing context and generated output directly
+reduces token counts.
 
-On 2026-10-26 drona23/claude-token-efficient (MIT) was installed globally using
+drona23/claude-token-efficient (MIT) is installed globally using
 its README's "Option 1 - Universal": its root `CLAUDE.md`, verbatim as of
 upstream commit c5f0c96, saved as `.claude/rules/token-efficient.md` and linked
 to `~/.claude/rules/`. Claude Code loads every file there in every project, so
 it applies everywhere without overwriting this file. Curling it to
 `~/.claude/CLAUDE.md`, as the README's command would if pointed at the home
 directory, follows the symlink and replaces this whole file with seven lines.
-Merging its lines into this file was tried first and backed out so the vendored
-copy stays upstream's file and a refresh is a plain diff.
+Merging its lines into this file was rejected so the vendored copy stays
+upstream's file and a refresh is a plain diff.
 
 It overlaps this file on purpose and in one place it is stricter. "No
 em-dashes" is a flat ban, where *Write like a person* only rules out em dashes
 used as all-purpose punctuation; the stricter rule is the one to follow. Codex
 does not read `~/.claude/rules/`, so these seven lines reach Claude only.
 
-Two upstream pieces were left out. Its `.claude/settings.json` PreCompact hook
+Two upstream pieces are left out. Its `.claude/settings.json` PreCompact hook
 runs `git add -A` and commits with `--no-verify` before every compaction, which
 breaks the *Git* rules (never commit unless asked, never skip hooks). Its
 `profiles/` are per-project-type variants rather than global rules. To refresh:
@@ -541,10 +528,10 @@ curl -fsSL https://raw.githubusercontent.com/drona23/claude-token-efficient/main
 
 ## Code rules in full
 
-The complete rule sets behind `rules/code-style.md`, moved here on 2026-10-26.
-As two path-scoped rules they were about 29k characters (~7.2k tokens est.)
-and loaded in nearly every dotfiles session, because `*.sh` and `*.zsh` are
-on their path lists; the condensed rule is about a sixth of that. Read this
+The complete rule sets behind `rules/code-style.md`. As path-scoped rules they
+would be about 29k characters (~7.2k tokens) loaded in nearly every dotfiles
+session, because `*.sh` and `*.zsh` match their paths; the condensed rule is
+about a sixth of that. Read this
 section for a refactor, a code review, concurrency work, or when the short
 rule is unclear. Headings are demoted two levels from the originals.
 

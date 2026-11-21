@@ -93,9 +93,8 @@ The Neovim and LunarVim configs stay independent and share only voltage.nvim.
 
 ## macOS only
 
-This repo targets macOS on Apple Silicon. Linux support (`install-linux.sh`,
-the Arch package lists, the systemd units, `$DOTFILES_OS`) was removed on
-2026-10-26; don't add platform branches back without being asked. Code that
+This repo targets macOS on Apple Silicon only; don't add Linux or other
+platform branches without being asked. Code that
 calls Apple tools, Homebrew or `~/Library` paths goes in
 `zsh/os/macos-{env,interactive}.zsh`, and .zprofile and .zshrc source those
 files by fixed path at points that matter. Read **zsh/os** in
