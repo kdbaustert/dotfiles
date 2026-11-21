@@ -360,10 +360,6 @@ zinit wait lucid id-as'but-completions' has'but' \
   zdharma-continuum/null
 
 # --- Extra behaviour plugins --------------------------------------------------
-#   - OMZP::sudo          : ESC ESC prepends `sudo` to the current line (or the
-#                           last command, on an empty line). Self-contained: it
-#                           pulls no OMZ lib. ^X^X is pay-respects' inline fixer
-#                           and ^X^E is edit-command-line, so no collision.
 #   - OMZP::safe-paste    : bracketed-paste-magic; see the zstyles in section 3,
 #                           which are not optional.
 #   - zsh-autopair        : auto-insert/delete matching brackets, quotes, parens
@@ -379,6 +375,11 @@ zinit wait lucid id-as'but-completions' has'but' \
 #                           (that one is used by zsh/extra/notify.zsh).
 #   - zsh-abbr            : fish-style abbreviations; store is section 3's
 #                           $ABBR_USER_ABBREVIATIONS_FILE
+#
+# OMZP::sudo is left out on purpose. It binds ESC ESC, and
+# with KEYTIMEOUT at 0.4s any two Escs in a row (tapping Esc to back out of a
+# line, or Esc before a Meta key) put `sudo` in front of the line, or of the
+# last command when the line was empty. Type `sudo !!` when you need it.
 #
 # zsh-manydots-magic is the one entry here that is not order-independent, and its
 # constraint points out of this block rather than inside it. It works by chaining
@@ -407,7 +408,6 @@ zinit wait lucid id-as'but-completions' has'but' \
 #   git config --global alias.cf 'forgit checkout_file'
 # and from non-interactive/bash contexts that never load this plugin file.
 zinit wait lucid for \
-  OMZP::sudo \
   OMZP::safe-paste \
   hlissner/zsh-autopair \
   pick'manydots-magic' \
