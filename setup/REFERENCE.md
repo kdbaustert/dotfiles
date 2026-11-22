@@ -447,6 +447,29 @@ and filtering multiple hostnames on one input line. The fzf cache filter in
 restore expressions; `setup/check-zsh-cache-filters.sh` covers the rewrite and
 stale-cache regeneration and cache-write fallback.
 
+## `gh run watch` and scroll input
+
+`zsh/functions.zsh` wraps `gh`. For `gh run watch` on a terminal it writes
+`ESC[?1007l` before gh starts and `ESC[?1007h` after it exits, and it passes
+every other gh command straight through.
+
+Three things line up to cause it. `gh run watch` switches to the alternate
+screen and sleeps between refreshes without putting the tty in raw mode or
+reading stdin (`pkg/cmd/run/watch/watch.go` at gh v2.105.0), so the kernel
+echoes any input. Ghostty has DEC mode 1007 on by default
+(`src/terminal/modes.zig` at v1.4.0) and, on the alternate screen with no mouse
+reporting, sends one arrow key per unit of scroll (`src/Surface.zig`). And
+`mouse-scroll-multiplier = 5` in `.config/ghostty/config` has no `precision:`
+prefix, so it multiplies trackpad scrolling too. One swipe during a watch came
+out as a long run of `^[[A^[[B`, and the same arrows then reached zle as
+history navigation once gh exited.
+
+`ghostty +show-config --default --docs` lists no option for mode 1007, which
+is why this is a shell wrapper and not a line in the Ghostty config. Lowering
+the multiplier only shortens the run. `setup/check-gh-watch-scroll.sh` runs
+the wrapper on a pty against a stub gh and covers the two writes, the exit
+status, the restore after Ctrl+C and the untouched cases.
+
 ## Do not run `install.sh` to test a change
 
 It asks for sudo, edits `/etc/pam.d/sudo_local`, runs `brew bundle`, and loads
@@ -467,6 +490,7 @@ setup/check-claude-settings.sh                # settings merge + command guard
 setup/check-hosts-filter.sh                   # blocklist allowlist and multi-host filtering
 setup/check-zsh-cache-filters.sh              # fzf option restore + write fallback
 setup/check-update-function.sh                # `update` step order, skips and failure report
+setup/check-gh-watch-scroll.sh                # `gh run watch` scroll-mode writes + restore on Ctrl+C
 ```
 
 Both file lists are load-bearing. `shellcheck` never sees `setup/*.sh` on its own — those are invoked by

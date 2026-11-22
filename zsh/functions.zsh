@@ -85,3 +85,40 @@ fcd() {
     cd "$dir"
 }
 
+# Runs gh, and for `gh run watch` on a terminal turns off alternate scroll
+# (DEC mode 1007) until gh exits.
+#
+# `gh run watch` draws on the alternate screen but leaves the tty in cooked
+# mode and never reads stdin. Ghostty has mode 1007 on by default, which sends
+# a wheel or trackpad scroll on the alternate screen as Up/Down arrow keys, so
+# every scroll during a watch is echoed as `^[[A^[[B` across the output and
+# then replayed into the prompt as history navigation when gh exits. With the
+# mode off the scroll sends nothing.
+#
+# Ghostty has no config option for mode 1007, so it's switched per command.
+# `stty -echo` was the other candidate: it hides the characters but they still
+# queue up for the prompt.
+#
+# The restore sits in an `always` block because Ctrl+C is the usual way out of
+# a watch, and zsh abandons the rest of a function whose foreground command
+# died of SIGINT. A restore on the next line would be skipped, and scrolling
+# in less and man would stay dead for the rest of the tab. It writes `h`
+# without checking what the mode was before, which is right for Ghostty's
+# default; a terminal that doesn't know mode 1007 ignores both writes.
+#
+# @param $@ gh arguments, passed through untouched
+# @return gh's exit status
+gh() {
+  if [[ $1 != run || $2 != watch || ! -t 1 ]]; then
+    command gh "$@"
+    return
+  fi
+
+  {
+    printf '\e[?1007l'
+    command gh "$@"
+  } always {
+    printf '\e[?1007h'
+  }
+}
+
