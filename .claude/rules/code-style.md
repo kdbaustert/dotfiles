@@ -87,8 +87,9 @@ AI-style code looks like this:
 
 - Small, one job, one level of abstraction, one reason to change. Order them
   top-down so the story comes before the details.
-- Few parameters. No boolean flag parameters: split the function. Avoid output
-  parameters.
+- At most three parameters, and as few as the job allows; group related ones
+  into one object. No boolean flag parameters: split the function. Avoid
+  output parameters.
 - No hidden side effects. A function that answers a question doesn't change
   state.
 - Guard clauses over deep nesting. Keep error handling apart from the main

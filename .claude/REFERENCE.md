@@ -592,7 +592,7 @@ This file defines mandatory working rules for code you write or change in any pr
 - Keep each function at one level of abstraction.
 - Organize code top-down so readers see the high-level story before details.
 - Prefer descriptive names over short names.
-- Minimize the number of parameters.
+- Minimize the number of parameters: three at most, fewer when the job allows. Group related ones into one object.
 - Avoid boolean flag parameters. Split behavior into separate functions instead.
 - Avoid output parameters unless language conventions make them necessary.
 - Eliminate hidden side effects.
