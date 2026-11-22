@@ -75,6 +75,76 @@ All of these have to agree or the shell looks patched together:
 | glow                     | `.config/glow/voltage.json`       |
 | Neovim + LunarVim        | `.config/voltage.nvim/`           |
 | iris (completion overlay)| `.config/iris/theme.toml`         |
+| Claude Code (via tweakcc) | `.config/tweakcc/config.json`, the `voltage-dark` and `voltage-dark-ansi` themes |
+
+### Claude Code picks its syntax colors from the theme's id
+
+There are two Voltage themes because Claude Code has no setting for code
+colors. Its highlighter (code blocks and diffs) reads the theme's id and
+branches on two substrings, and that is the only control there is:
+
+| Id contains     | Syntax colors                                   |
+| --------------- | ----------------------------------------------- |
+| `ansi`          | ANSI slots 8 and 10-14, plus slot 7 for plain code |
+| `dark`, no `ansi` | Monokai Extended, hard-coded in the binary    |
+| neither         | GitHub's light theme: dark gray text, unreadable on `bg` |
+
+So the ids are load-bearing and a rename changes the colors:
+
+- **`voltage-dark-ansi`** ("Voltage (ANSI syntax)") is the one whose code
+  matches. The slots resolve through the Ghostty palette, so keywords come out
+  bright magenta, strings bright green, types bright cyan, numbers bright blue,
+  function names bright yellow and comments `subtle`, and they follow the
+  terminal the way `git` and `rg` do. It needs `dark` as well as `ansi`:
+  without it, plain code is drawn in slot 0, which is `black`.
+- **`voltage-dark`** ("Voltage") is the same interface with Monokai code
+  colors. It exists for the diff fills, below.
+
+The cost of the `ansi` id is that the highlighter stops emitting 24-bit color
+and rounds every `rgb()` it is given to the 256-color cube. The mixed diff
+fills round to neutral grays (`rgb(64,76,35)` becomes gray 237), so
+`voltage-dark-ansi` uses the four cube colors that survive the rounding
+unchanged: `rgb(0,95,0)` and `rgb(0,135,0)` for added lines and words,
+`rgb(95,0,0)` and `rgb(135,0,0)` for removed. Those are the same slots stock
+Claude Code falls back to on a 256-color terminal, and they are the only
+values in either theme that owe nothing to the palette.
+
+Rejected: patching the Monokai table in the binary to Voltage hex, which would
+give matching code and the mixed fills in one theme. tweakcc has no patch for
+it, so it would be a hand-kept byte patch that every Claude Code update could
+break without a sign.
+
+This was read out of Claude Code 2.1.314 (`ge()`, `Y()` and `Q()` in the
+highlighter chunk). Check it again if code colors change after an update.
+
+### Claude Code's themes hold values that aren't in the tables
+
+tweakcc themes take only `rgb()` or `ansi:` values, so the hex above is written
+as decimal triplets there and a search for a hex code will not find them. The
+themes also need 13 colors the palette doesn't have, each mixed from two values
+that are in it. Recompute them when either source moves:
+
+- **Diff fills** (`diffAdded*`, `diffRemoved*`), in `voltage-dark` only, are
+  `green` and `red` mixed into `bg` at 30% (line), 50% (word), 18% (dimmed
+  line) and 35% (dimmed word).
+  Claude Code draws diff text on top of these, and the accents at full strength
+  would leave that text unreadable.
+- **`inactive` and `promptBorderShimmer`** are `#A9A9A9`, halfway between
+  `subtle` and `fg`. Claude Code sets most of its hint text in `inactive`, and
+  `subtle` is too dim for that much reading.
+- **`autoAccept`, the purple subagent and `rainbow_indigo`** are `#A388F6`,
+  `violet` mixed 40% toward white, because `violet` is too dark on `bg` for
+  text. `rainbow_indigo_shimmer` is the same mix at 60%.
+- **`claudeShimmer` and `rainbow_violet_shimmer`** are `magenta` mixed 40%
+  toward white, and `rainbow_orange_shimmer` is `orange` mixed 35% toward
+  white. A shimmer has to be lighter than its base, and neither color has a
+  lighter partner in the palette (bright magenta is more saturated, not lighter).
+
+The theme's `background` key is `cyan`, not `bg`. Stock Claude Code sets it to
+a cyan too, so it is an accent despite the name; the terminal still draws the
+real background.
+
+A change reaches Claude Code only after `tweakcc --apply --yes` and a restart.
 
 ### What deliberately has no entry
 
