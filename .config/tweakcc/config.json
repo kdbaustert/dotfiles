@@ -1,7 +1,7 @@
 {
   "ccVersion": "2.1.314",
   "ccInstallationPath": null,
-  "lastModified": "2026-11-21T07:38:09.860Z",
+  "lastModified": "2026-11-22T11:49:00.257Z",
   "changesApplied": true,
   "settings": {
     "themes": [
@@ -246,7 +246,7 @@
       "fitBoxToContent": false
     },
     "inputBox": {
-      "removeBorder": true,
+      "removeBorder": false,
       "chevronIdleThemeColor": "success",
       "cursorColor": null
     },
