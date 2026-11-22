@@ -94,7 +94,8 @@ is read with no flags.
 Before writing or changing code, read **Code style** in `~/.claude/REFERENCE.md`
 and follow `~/.claude/rules/code-style.md`. Claude Code loads it once it works
 with a source file. Codex never reads `~/.claude/rules/`, so open it before
-writing code.
+writing code. For PHP work, open `~/.claude/rules/php.md` too, plus
+`wordpress.md` or `laravel.md` beside it for those projects.
 
 ## Tests
 
