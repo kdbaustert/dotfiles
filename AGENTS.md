@@ -163,11 +163,11 @@ Before staging anything, read **Generated vs. tracked** in `setup/REFERENCE.md`.
 Some generated files here must never be committed and some must be.
 
 When asked to commit, this is the whole recipe, with no skill or reference
-section to load first. It commits everything uncommitted to `master`, and
-`--allow-merged` is required because GitButler treats `master` as landed:
+section to load first. It commits everything uncommitted to `main`, and
+`--allow-merged` is required because GitButler treats `main` as landed:
 
 ```sh
-but commit --allow-merged -b master -F - <<'EOF'
+but commit --allow-merged -b main -F - <<'EOF'
 Subject line
 
 Why it changed.
