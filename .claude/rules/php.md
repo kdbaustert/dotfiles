@@ -52,7 +52,7 @@ when the project fits:
 - Uploads: check the type server-side, rename the file and store it outside
   the web root.
 - Secrets come from env or config, never from code. Every state-changing
-  request checks a CSRF token.
+  request authenticated by a cookie checks a CSRF token.
 
 ## Tooling
 
@@ -64,7 +64,8 @@ and ask before adding one.
 
 Before calling PHP work done, run:
 
-1. `php -l` on every changed file.
+1. `php -l` on every changed file. It parses with the installed PHP, which
+   can be newer than the target, so it won't catch syntax the target lacks.
 2. The project's formatter or linter, in check mode, on the changed files.
 3. Its static analysis, if it has any configured.
 4. The tests that cover the change.

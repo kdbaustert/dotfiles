@@ -107,6 +107,13 @@ alias ibrew='arch -x86_64 /usr/local/bin/brew'
 #
 # composer only runs when its global composer.json exists. setup/composer.sh is
 # opt-in, and before it has run `composer global update` just prints an error.
+# The phpcs step after it puts Neutron back in installed_paths: phpcs keeps
+# that setting in CodeSniffer.conf inside its own vendor folder, so an update
+# that brings a new phpcs wipes it and `phpcs --standard=NeutronStandard` stops
+# resolving. It's the same command setup/composer.sh runs after its install,
+# and it runs on every update because nothing cheap says whether phpcs changed.
+# The set replaces the whole installed_paths value, so a second standard has to
+# be added here and in setup/composer.sh together.
 #
 # Mason's LSP servers aren't here: mason has no headless "update everything"
 # command without mason-tool-installer, which .config/nvim doesn't use. Press
@@ -119,7 +126,7 @@ unalias update 2>/dev/null
 function update {
   local -a failed
   local brew_prefix="${HOMEBREW_PREFIX:-/opt/homebrew}"
-  local composer_home
+  local composer_home neutron
 
   if (( $+commands[brew] )); then
     _update_step 'brew update' brew update
@@ -141,8 +148,14 @@ function update {
 
   if (( $+commands[composer] )); then
     composer_home="$(composer global config home 2>/dev/null)"
-    [[ -n $composer_home && -f $composer_home/composer.json ]] \
-      && _update_step 'composer globals' composer global update
+    neutron=$composer_home/vendor/automattic/phpcs-neutron-standard
+
+    if [[ -n $composer_home && -f $composer_home/composer.json ]]; then
+      _update_step 'composer globals' composer global update
+
+      [[ -d $neutron ]] && _update_step 'phpcs Neutron standard' \
+        "$composer_home/vendor/bin/phpcs" --config-set installed_paths "$neutron"
+    fi
   fi
 
   (( $+commands[gh] )) && _update_step 'gh extensions' gh extension upgrade --all

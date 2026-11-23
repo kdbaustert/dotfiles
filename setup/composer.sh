@@ -28,4 +28,18 @@ fi
 
 # Idempotent: `composer global require` on an already-present package resolves
 # to the same constraint and no-ops, so this doubles as the update path.
-composer global require "${composer[@]}"
+composer global require "${composer[@]}" || exit
+
+# phpcs only finds a standard whose folder is in its installed_paths, and
+# nothing has listed Neutron there since
+# dealerdirect/phpcodesniffer-composer-installer left the Composerfile. phpcs
+# keeps the setting in CodeSniffer.conf inside its own vendor folder, so a
+# phpcs upgrade wipes it and this script has to run again. Each set replaces
+# the whole comma-separated value: a second standard in the Composerfile goes
+# into this same call. setup/check-composer-neutron.sh covers it.
+composer_home="$(composer global config home 2>/dev/null)"
+neutron="$composer_home/vendor/automattic/phpcs-neutron-standard"
+
+if [ -d "$neutron" ]; then
+  "$composer_home/vendor/bin/phpcs" --config-set installed_paths "$neutron"
+fi

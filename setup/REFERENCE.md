@@ -517,6 +517,7 @@ setup/check-hosts-filter.sh                   # blocklist allowlist and multi-ho
 setup/check-zsh-cache-filters.sh              # fzf option restore + write fallback
 setup/check-update-function.sh                # `update` step order, skips and failure report
 setup/check-gh-watch-scroll.sh                # `gh run watch` scroll-mode writes + restore on Ctrl+C
+setup/check-composer-neutron.sh               # phpcs Neutron registration after the Composer install
 ```
 
 Both file lists are load-bearing. `shellcheck` never sees `setup/*.sh` on its own — those are invoked by
