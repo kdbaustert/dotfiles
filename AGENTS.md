@@ -20,7 +20,7 @@ default `project_doc_max_bytes`; past that it gets cut off. Run
 ## Where this file overrides the global rules
 
 The global `.claude/CLAUDE.md` loads first and asks a project that overrides
-one of its rules to name it. Here, follow this file on these three:
+one of its rules to name it. Here, follow this file on these four:
 
 - **Overrides *File discipline*'s "no README or summary markdown".** "Do it
   with documentation" means a change ships with its comments, its
@@ -32,6 +32,10 @@ one of its rules to name it. Here, follow this file on these three:
 - **Overrides the no-emoji rules** in `human-writing.md` and
   `token-efficient.md`, for the four circles under *Completion status protocol*
   only.
+- **Overrides the ADHD mode hook's "first line is the action" and "no recap".**
+  The triage block comes first and the action line right after it. The reply
+  ends with what ran and the status line, then the one next action. Every other
+  ADHD rule applies to what sits between them.
 
 ## How to work (high-level mindset)
 
@@ -157,6 +161,20 @@ doesn't match this codebase.
 
 Before staging anything, read **Generated vs. tracked** in `setup/REFERENCE.md`.
 Some generated files here must never be committed and some must be.
+
+When asked to commit, this is the whole recipe, with no skill or reference
+section to load first. It commits everything uncommitted to `master`, and
+`--allow-merged` is required because GitButler treats `master` as landed:
+
+```sh
+but commit --allow-merged -b master -F - <<'EOF'
+Subject line
+
+Why it changed.
+EOF
+```
+
+To commit only some files, run `but diff` and add their IDs after the flags.
 
 ## Colors
 
