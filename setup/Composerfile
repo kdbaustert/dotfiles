@@ -1,5 +1,4 @@
-# Global Composer packages, one per line. setup/composer.sh installs them and
-# `dotsnitch status` checks them.
+# Global Composer packages, one per line. setup/composer.sh installs them.
 laravel/installer
 laravel/valet
 automattic/phpcs-neutron-standard

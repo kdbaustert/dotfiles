@@ -7,7 +7,7 @@
 #------------------------------------------------------------------------------
 # Terminal
 #------------------------------------------------------------------------------
-# Locale (LANG/LC_ALL), EDITOR, DOTFILES, WORDCHARS and the XDG base dirs live
+# Locale (LANG), EDITOR, DOTFILES, WORDCHARS and the XDG base dirs live
 # in .zshenv so scripts and non-login shells see them too. TERM is left for the
 # terminal to set: iTerm and Rio each advertise their own, and hardcoding
 # xterm-256color here could downgrade Rio's capabilities.

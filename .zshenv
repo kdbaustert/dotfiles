@@ -25,8 +25,12 @@ export ZSH_CACHE_DIR="$XDG_CACHE_HOME/zsh"
 [[ -d $ZSH_CACHE_DIR ]] || command mkdir -p "$ZSH_CACHE_DIR"
 
 # Locale: needed by scripts and tools, not just interactive shells.
+#
+# LANG only, no LC_ALL. LANG is the fallback every LC_* category reads, so it
+# gives the same locale here. LC_ALL overrides all of them, so a tool or a
+# single command couldn't set LC_COLLATE or LC_TIME for itself, and ssh's
+# SendEnv LC_* pushed it to servers that may not have en_US.UTF-8.
 export LANG=en_US.UTF-8
-export LC_ALL=en_US.UTF-8
 
 # Preferred programs.
 export EDITOR='nvim'

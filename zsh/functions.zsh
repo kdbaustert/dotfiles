@@ -23,14 +23,25 @@ extract() {
 }
 
 # GIT ADD, COMMIT & PUSH
+# Stops at the first step that fails, so a rejected commit (a hook, nothing
+# staged) never pushes what was already there.
+#
+# @param $1 commit message
 function acp() {
-  git add .
-  git commit -m "$1"
-  git push
+  git add . && git commit -m "$1" && git push
 }
 
+# Packs a file or directory into <name>.tar.gz beside it. The trailing slash
+# tab completion puts on a directory is dropped first: kept, `compress dir/`
+# named the archive dir/.tar.gz, inside the directory being packed, and tar
+# refused to add the archive to itself.
+#
+# @param $1 file or directory
 function compress() {
-  tar cvzf $1.tar.gz $1
+  # extended_glob for /##, so `d//` loses both slashes too.
+  setopt local_options extended_glob
+  local src=${1%%/##}
+  tar cvzf "$src.tar.gz" "$src"
 }
 
 # MAKE FOLDER AND CD INTO IT
@@ -39,8 +50,10 @@ mcd() {
 }
 
 # CHECK SHELL
+# Asks ps for this PID alone. Grepping the full ps list for $$ also matched
+# any other process whose PID contains those digits (123 matches 1234).
 shell() {
-  ps | grep $(echo $$) | awk '{ print $4 }'
+  ps -p $$ -o comm=
 }
 
 # Create a data URL from a file
@@ -120,5 +133,33 @@ gh() {
   } always {
     printf '\e[?1007h'
   }
+}
+
+# Runs ngrok, and with no arguments opens the HTTP tunnel to port 80 on the
+# reserved domain.
+#
+# A function, not the old alias: the alias put `http --url=... 80` in front of
+# every ngrok command, so `ngrok version` and `ngroka TOKEN` both ran as
+# `ngrok http --url=... 80 <args>` and ngrok refused the extra arguments.
+#
+# The domain is written here on purpose, as an exception to AGENTS.md's
+# "Never hard-code a name": it's the static domain ngrok reserves for this
+# account, and a new Mac should get it from the repo with nothing else to set
+# up. $NGROK_DOMAIN overrides it for another account. The authtoken is the
+# part that can't be tracked; `ngroka <token>` saves it to ngrok's own config.
+#
+# The unalias is for a shell that still has the old alias and re-sources
+# .zshrc: the alias would keep winning over this function.
+#
+# @param $@ ngrok arguments, passed through untouched; none opens the tunnel
+# @return ngrok's exit status
+unalias ngrok 2>/dev/null
+function ngrok {
+  if (( $# )); then
+    command ngrok "$@"
+    return
+  fi
+
+  command ngrok http --url="${NGROK_DOMAIN:-engaged-obviously-ferret.ngrok-free.app}" 80
 }
 

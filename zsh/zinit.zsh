@@ -40,6 +40,11 @@ if [[ ! -f $ZINIT_HOME/zinit.zsh ]]; then
     || print -P "%F{160}▓▒░ Clone failed.%f"
 fi
 
+# A failed clone (offline first run) leaves nothing to source. Without this,
+# the source errored and so did every zinit line below it. Returning skips the
+# plugins for this shell only; the next one retries the clone.
+[[ -f $ZINIT_HOME/zinit.zsh ]] || return 1
+
 source "$ZINIT_HOME/zinit.zsh"
 autoload -Uz _zinit
 (( ${+_comps} )) && _comps[zinit]=_zinit

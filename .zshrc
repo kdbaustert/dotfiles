@@ -153,10 +153,8 @@ source "$DOTFILES/zsh/extra/cache.zsh"
 # Branch 2: the autostart, and the branch a fresh terminal takes. It tests
 # != 0 rather than -n so that turning iris off is a value you set for one shell
 # rather than a variable you have to remember to unset. The rest of that guard
-# stops `exec iris` firing in a shell that is interactive but not a session:
-# `zsh -ic '…'` sets $ZSH_EXECUTION_STRING and is how install.sh drains zinit's
-# turbo queue, so without it the installer drops into an interactive iris and
-# hangs. -t 1 catches the same shape when stdout is a pipe.
+# is the not-a-session test explained above ("The guard is not `command -v
+# iris`").
 #
 # Not exported: the child shell reaches Branch 1 on $IRIS_PID regardless, and
 # leaving it shell-local keeps it out of the environment of everything iris runs.
@@ -231,13 +229,44 @@ zcache_post_starship() {
 # `/opt/homebrew/bin/starship` baked into `$PROMPT` survives a switch to
 # this installer). Touching the binary after every install restores the
 # "newer install invalidates the cache" invariant zcache relies on.
+#
+# The script is fetched into a variable before it runs, with -f so an HTTP
+# error is a failure. `curl | sh` lost curl's exit status: offline, sh ran an
+# empty script, exited 0, and the touch then left an empty, non-executable
+# ~/.local/bin/starship behind while this printed "Installation successful."
+# The -x test is the last word, since the installer can exit 0 without having
+# put a binary there.
 if ! command -v starship >/dev/null 2>&1; then
-  print -P "%F{33}▓▒░ %F{160}Installing starship (https://starship.rs)…%f"
-  command mkdir -p "$HOME/.local/bin"
-  curl -sS https://starship.rs/install.sh | sh -s -- -y -b "$HOME/.local/bin" \
-    && command touch "$HOME/.local/bin/starship" \
-    && print -P "%F{34}▓▒░ Installation successful.%f" \
-    || print -P "%F{160}▓▒░ Install failed.%f"
+  () {
+    # A failure leaves a stamp, and shells opened in the next retry_minutes skip
+    # the download. Offline, every new tab otherwise sat through the 5s connect
+    # timeout below before its prompt. Delete the stamp to retry sooner.
+    local retry_minutes=10
+    local stamp="${ZSH_CACHE_DIR:-$HOME/.cache/zsh}/starship-install-failed"
+    local -a recent_failure
+    local script
+
+    recent_failure=($stamp(Nmm-$retry_minutes))
+    if (( $#recent_failure )); then
+      print -P "%F{160}▓▒░ starship install failed under $retry_minutes minutes ago; skipping until then.%f"
+      return
+    fi
+
+    print -P "%F{33}▓▒░ %F{160}Installing starship (https://starship.rs)…%f"
+    command mkdir -p "$HOME/.local/bin"
+    # --connect-timeout: this runs during startup, and a network that accepts
+    # nothing would otherwise hold the prompt until curl's own minutes-long limit.
+    if script="$(curl -fsSL --connect-timeout 5 https://starship.rs/install.sh)" && [[ -n $script ]] \
+      && print -r -- "$script" | sh -s -- -y -b "$HOME/.local/bin" \
+      && [[ -x $HOME/.local/bin/starship ]]; then
+      command touch "$HOME/.local/bin/starship"
+      command rm -f "$stamp"
+      print -P "%F{34}▓▒░ Installation successful.%f"
+    else
+      command mkdir -p "${stamp:h}" && command touch "$stamp"
+      print -P "%F{160}▓▒░ Install failed.%f"
+    fi
+  }
 fi
 
 zcache starship starship init zsh
@@ -384,14 +413,29 @@ zstyle ':fzf-tab:*' fzf-flags $_ftb_height
 zstyle ':fzf-tab:complete:cd:*'                fzf-preview 'eza -1 --color=always --icons=always --group-directories-first $realpath'
 zstyle ':fzf-tab:complete:__zoxide_z:*'        fzf-preview 'eza -1 --color=always --icons=always --group-directories-first $realpath'
 
-# Command position (incl. aliases/functions): show what the candidate resolves
-# to: `command -V` prints "x is an alias for ..." / "... is a shell function" / path.
-zstyle ':fzf-tab:complete:-command-:*'         fzf-preview 'command -V $word 2>/dev/null | head -20 || echo $word'
+# Command position: show what the candidate resolves to (a path, a builtin, a
+# reserved word). fzf-tab runs the preview in a fresh `zsh -c` (it sets
+# SHELL=$ZSH_NAME for fzf), which reads only .zshenv, so the aliases and
+# functions defined in this file don't exist there and `command -V` can only
+# say "ll not found". Those fall back to the completion group fzf-tab exports,
+# which prints "ll [alias]". whence decides, not command -V's status, because
+# command -V writes "not found" to stdout and the fallback would print under it.
+zstyle ':fzf-tab:complete:-command-:*'         fzf-preview 'whence -- $word >/dev/null && command -V -- $word || print -r -- "$word $group"'
 zstyle ':fzf-tab:complete:-command-:*'         fzf-flags $_ftb_height '--preview-window=down:3:wrap'
 zstyle ':fzf-tab:complete:(cat|bat|less|nvim|vim|vi|nano):*' \
                                                fzf-preview 'bat --color=always --style=numbers --line-range=:200 $realpath 2>/dev/null || eza -1 --color=always $realpath'
-zstyle ':fzf-tab:complete:(-command-|export|unset):*' \
-                                               fzf-preview 'echo ${(P)word}'        # env-var values
+# Env-var values. $PA<Tab> and ${PA<Tab> complete in the -parameter- and
+# -brace-parameter- contexts (the #compdef lines of zsh's _parameter and
+# _brace_parameter). -command- isn't listed: the literal -command- style above
+# is more specific, so it always won there.
+#
+# The preview runs in the same `zsh -c` as the -command- one above, which only
+# sees exported variables and what .zshenv sets. A variable .zshrc sets without
+# exporting (HISTSIZE, FUNCNEST) isn't there, and the bare `echo ${(P)word}`
+# this replaced showed a blank pane for it, the same as an empty value. The
+# message says why instead.
+zstyle ':fzf-tab:complete:(-parameter-|-brace-parameter-|export|unset):*' \
+                                               fzf-preview '(( ${(P)+word} )) && print -r -- ${(P)word} || print -r -- "$word: not set in the preview shell, which sees exported variables and .zshenv, not .zshrc"'
 zstyle ':fzf-tab:complete:(kill|ps):argument-rest:*' \
                                                fzf-preview 'ps -p $word -o comm= -o args 2>/dev/null'
 zstyle ':fzf-tab:complete:(kill|ps):argument-rest:*' fzf-flags $_ftb_height '--preview-window=down:3:wrap'
@@ -426,7 +470,9 @@ zcache fzf fzf --zsh
 
 export FZF_COMPLETION_TRIGGER=','
 export _ZO_FZF_OPTS="$FZF_DEFAULT_OPTS --height=45%"   # zoxide's `zi` picker
-export FUNCNEST=5000
+# Raised from Homebrew zsh's default of 500. Not exported: bash reads FUNCNEST
+# too, and in a bash child it would cap recursion that bash leaves unlimited.
+FUNCNEST=5000
 
 #------------------------------------------------------------------------------
 # Functions & aliases

@@ -33,7 +33,10 @@ if (( ! ${+RIO_NOTIFY_IGNORE} )); then
   )
 fi
 
-zmodload -F zsh/datetime b:strftime 2>/dev/null  # provides $EPOCHSECONDS
+# -F turns on only the features it names, so $EPOCHSECONDS has to be one of
+# them. Naming b:strftime alone left it unset in a clean shell, and the hooks
+# below only worked because another plugin had already loaded the whole module.
+zmodload -F zsh/datetime p:EPOCHSECONDS 2>/dev/null
 autoload -Uz add-zsh-hook
 
 # Bundle ID of whatever app is frontmost, via LaunchServices (no AppleScript

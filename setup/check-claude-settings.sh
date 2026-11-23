@@ -435,6 +435,188 @@ else
   fail "an unreadable payload is let through"
 fi
 
+# --- i-have-adhd always on ---------------------------------------------------
+
+# A stub claude whose `plugin list --json` reports the plugin enabled when
+# $STUB_ENABLED is 1, and whose `plugin enable` logs its argv, the way the real
+# one does, fails when the plugin is already on.
+adhd="$scratch/adhd"
+mkdir -p "$adhd/bin"
+cat >"$adhd/bin/claude" <<'EOF'
+#!/bin/bash
+case "$2" in
+  list) printf '[{"id":"i-have-adhd@i-have-adhd","enabled":%s}]\n' \
+    "$([ "$STUB_ENABLED" = 1 ] && echo true || echo false)" ;;
+  enable) printf '%s\n' "$*" >>"$STUB_LOG"; [ "$STUB_ENABLED" != 1 ] ;;
+esac
+EOF
+chmod +x "$adhd/bin/claude"
+
+# Runs enable_adhd_always_on against $adhd/config with only the stub and the
+# system tools on PATH. Prints the function's status, then what enable got.
+#
+# @param $1 1 when the stub should report the plugin already enabled
+# @param $2 PATH for the run; defaults to the stub dir first
+run_adhd() {
+  : >"$adhd/log"
+  env -i HOME="$adhd/home" CLAUDE_CONFIG_DIR="$adhd/config" STUB_LOG="$adhd/log" \
+    STUB_ENABLED="$1" PATH="${2:-$adhd/bin:/opt/homebrew/bin:/usr/bin:/bin}" \
+    bash -c 'DOTFILES_DIR=$1; source "$1/setup/lib.sh"; enable_adhd_always_on' _ "$root" \
+    >/dev/null 2>&1
+  printf '<%s>' "$?"
+  cat "$adhd/log"
+}
+
+# @param $1 description
+# @param $2 expected text
+# @param $3 actual text
+expect_text() {
+  if [[ $2 == "$3" ]]; then
+    pass "$1"
+  else
+    fail "$1"$'\n'"expected: $2"$'\n'"actual:   $3"
+  fi
+}
+
+expect_text "a disabled plugin gets enabled" \
+  '<0>plugin enable i-have-adhd@i-have-adhd' "$(run_adhd 0)"
+if [[ -e $adhd/config/.i-have-adhd-always && ! -e $adhd/home/.claude ]]; then
+  pass "the flag goes in CLAUDE_CONFIG_DIR, where the hook looks"
+else
+  fail "the flag goes in CLAUDE_CONFIG_DIR, where the hook looks"
+fi
+expect_text "an enabled plugin isn't enabled again" '<0>' "$(run_adhd 1)"
+
+rm -r "$adhd/config"
+jq_dir="$(dirname "$(command -v jq)")"
+expect_text "no claude CLI still sets the flag" '<0>' "$(run_adhd 0 "$jq_dir:/usr/bin:/bin")"
+if [[ -e $adhd/config/.i-have-adhd-always ]]; then
+  pass "no claude CLI still sets the flag (file)"
+else
+  fail "no claude CLI still sets the flag (file)"
+fi
+
+# --- Claude in Chrome off by default -----------------------------------------
+
+chrome="$scratch/chrome"
+chrome_config="$chrome/.claude.json"
+mkdir -p "$chrome/bin"
+
+# A jq that, on the edit, plays a Claude session saving ~/.claude.json right
+# after the real jq read it: it bumps .saves, up to $STUB_SAVES times a run.
+cat >"$chrome/bin/jq" <<'EOF'
+#!/bin/bash
+out="$("$REAL_JQ" "$@")"
+rc=$?
+count="$(<"$STUB_COUNT")"
+if [ "$1" = '.claudeInChromeDefaultEnabled = false' ] && [ "$count" -lt "$STUB_SAVES" ]; then
+  echo $((count + 1)) >"$STUB_COUNT"
+  "$REAL_JQ" ".saves = $((count + 1))" "$STUB_CONFIG" >"$STUB_CONFIG-saved" \
+    && mv "$STUB_CONFIG-saved" "$STUB_CONFIG"
+fi
+printf '%s\n' "$out"
+exit "$rc"
+EOF
+chmod +x "$chrome/bin/jq"
+
+# Runs disable_claude_in_chrome with HOME at $chrome and prints what it said.
+#
+# @param $1 saves the stub jq makes during the edit; defaults to none
+run_chrome() {
+  echo 0 >"$chrome/count"
+  env -i HOME="$chrome" PATH="$chrome/bin:$jq_dir:/usr/bin:/bin" REAL_JQ="$jq_dir/jq" \
+    STUB_COUNT="$chrome/count" STUB_SAVES="${1:-0}" STUB_CONFIG="$(realpath "$chrome_config" 2>/dev/null)" \
+    bash -c 'DOTFILES_DIR=$1; source "$1/setup/lib.sh"; disable_claude_in_chrome' _ "$root" 2>&1
+}
+
+# @param $1 description
+# @param $2 text the output must contain
+# @param $3 actual output
+expect_contains() {
+  if [[ $3 == *"$2"* ]]; then
+    pass "$1"
+  else
+    fail "$1"$'\n'"expected to contain: $2"$'\n'"actual: $3"
+  fi
+}
+
+# mktemp's copies are named <config>.XXXXXX; none may outlive a run.
+#
+# @param $1 description
+# @param $2 the config file the copies sit beside; defaults to $chrome_config
+expect_no_leftovers() {
+  local leftovers=("${2:-$chrome_config}".*)
+  if [[ ! -e ${leftovers[0]} ]]; then
+    pass "$1"
+  else
+    fail "$1"$'\n'"left behind: ${leftovers[*]}"
+  fi
+}
+
+out="$(run_chrome)"
+expect_contains "no ~/.claude.json says to re-run later" "No ~/.claude.json yet" "$out"
+if [[ ! -e $chrome_config ]]; then
+  pass "no ~/.claude.json isn't created"
+else
+  fail "no ~/.claude.json isn't created"
+fi
+
+printf '{"theme":"dark-ansi","claudeInChromeDefaultEnabled":true}\n' >"$chrome_config"
+chmod 644 "$chrome_config"
+inode_before="$(stat -f %i "$chrome_config")"
+out="$(run_chrome)"
+expect_contains "an enabled default is turned off" "Claude in Chrome off by default" "$out"
+expect_text "the key is false and other keys survive" 'false dark-ansi' \
+  "$(jq -r '"\(.claudeInChromeDefaultEnabled) \(.theme)"' "$chrome_config")"
+expect_text "the file keeps its mode" '644' "$(stat -f %Lp "$chrome_config")"
+# `cat >` over the file keeps the inode and truncates it under a running
+# session; a rename gives the path a new inode.
+if [[ $(stat -f %i "$chrome_config") != "$inode_before" ]]; then
+  pass "the edit replaces the file by rename, not by truncating it"
+else
+  fail "the edit replaces the file by rename, not by truncating it"
+fi
+expect_no_leftovers "a successful edit leaves no temp copy"
+
+inode_before="$(stat -f %i "$chrome_config")"
+out="$(run_chrome)"
+expect_contains "an already-off default is reported" "already off by default" "$out"
+expect_text "an already-off default isn't rewritten" "$inode_before" "$(stat -f %i "$chrome_config")"
+
+printf '{not json\n' >"$chrome_config"
+out="$(run_chrome)"
+expect_contains "invalid JSON warns" "Could not update ~/.claude.json" "$out"
+expect_text "invalid JSON is left as it was" '{not json' "$(<"$chrome_config")"
+expect_no_leftovers "a failed edit leaves no temp copy"
+
+printf '{"claudeInChromeDefaultEnabled":true}\n' >"$chrome_config"
+out="$(run_chrome 1)"
+expect_contains "a save during the edit is retried" "Claude in Chrome off by default" "$out"
+expect_text "a save during the edit isn't lost" 'false 1' \
+  "$(jq -r '"\(.claudeInChromeDefaultEnabled) \(.saves)"' "$chrome_config")"
+expect_no_leftovers "a retried edit leaves no temp copy"
+
+printf '{"claudeInChromeDefaultEnabled":true}\n' >"$chrome_config"
+out="$(run_chrome 99)"
+expect_contains "a file that keeps changing warns" "Could not update ~/.claude.json" "$out"
+expect_text "a file that keeps changing keeps every save" 'true 3' \
+  "$(jq -r '"\(.claudeInChromeDefaultEnabled) \(.saves)"' "$chrome_config")"
+expect_no_leftovers "giving up leaves no temp copy"
+
+mkdir -p "$chrome/target"
+printf '{"claudeInChromeDefaultEnabled":true}\n' >"$chrome/target/claude.json"
+rm "$chrome_config"
+ln -s "$chrome/target/claude.json" "$chrome_config"
+out="$(run_chrome)"
+if [[ -L $chrome_config ]]; then
+  pass "a symlinked ~/.claude.json stays a link"
+else
+  fail "a symlinked ~/.claude.json stays a link"
+fi
+expect_text "the link's target gets the edit" 'false' \
+  "$(jq '.claudeInChromeDefaultEnabled' "$chrome/target/claude.json")"
+expect_no_leftovers "an edit through a link leaves no temp copy" "$chrome/target/claude.json"
+
 echo
 if ((failures)); then
   echo "$failures check(s) failed" >&2

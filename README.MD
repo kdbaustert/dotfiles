@@ -86,6 +86,79 @@ The macOS system defaults in `setup/macos.sh` are not one of these — they are
 the `macos` section of `install.sh` (`./install.sh macos`), last in the run.
 **Review that script before saying yes to it.**
 
+## The zsh setup
+
+`.zshenv`, `.zprofile` and `.zshrc` load the files in `zsh/`. An interactive
+shell starts in about 40ms (`time zsh -i -c exit`), and
+`setup/check-zsh-config.sh` tests the aliases, functions, fzf completers,
+install bootstraps and previews listed here.
+
+### Startup and prompt
+
+- [starship](https://starship.rs) prompt. When it's missing, `.zshrc` installs
+  it into `~/.local/bin`. A failed install (offline, say) waits 10 minutes
+  before the next shell tries again, so new tabs don't each sit through the
+  download timeout.
+- `zcache` (`zsh/extra/cache.zsh`) saves the `init zsh` output of starship,
+  fzf, zoxide, atuin, navi, direnv, iris and pay-respects, and only re-runs a
+  tool when its binary changes.
+- zinit loads the plugins in turbo mode, after the first prompt.
+- The startup files and the `.zsh` files in `zsh/` are recompiled to `.zwc`
+  on the next shell after you edit them.
+- nvm loads lazily, through zsh-nvm.
+
+### Plugins
+
+- fzf-tab: completion menus in fzf, with previews for files, directories,
+  commands and variable values.
+- zsh-autosuggestions, and fast-syntax-highlighting with the Voltage theme.
+- zsh-abbr for abbreviations (`zsh/abbreviations`), which expand inline as
+  you type. Edit that file by hand; `abbr add` rewrites it and drops the
+  comments.
+- zsh-you-should-use, which reminds you when an alias or abbreviation exists
+  for what you typed, and zsh-auto-notify, which sends a banner when a command
+  over 20 seconds finishes.
+- forgit and fzf-git.sh for fuzzy git, plus zsh-autopair, zsh-manydots-magic,
+  safe-paste and zsh-completions.
+
+### Tools wired into the shell
+
+- atuin owns history search (Up and Ctrl-R); `ms` and `msm` search it too.
+- fzf uses `fd` for Ctrl-T, Alt-C and `**<Tab>`, hidden files included. Alt-A
+  fuzzy-picks an alias.
+- zoxide (`z`, `zi`), navi cheatsheets (Ctrl-G) and direnv.
+- pay-respects corrects the last failed command (`fuck`). Homebrew's
+  command-not-found handler suggests the formula for a missing command.
+- iris wraps the shell. See its note below.
+
+### Behaviour
+
+- Emacs key bindings. Ctrl-X Ctrl-E opens the command line in `$EDITOR`.
+- Shared, de-duplicated history with timestamps. A command starting with a
+  space isn't recorded.
+- `cd` by typing a directory name, a directory stack (`cd -<Tab>`), and a
+  listing of each directory you enter (`zsh/extra/autols.zsh`, capped at 60
+  entries).
+- The shell reports its directory to the terminal (OSC 7), so new tabs open
+  where you are. In Rio, a long command that finishes while you're in another
+  app posts a notification (`zsh/extra/notify.zsh`).
+
+### Aliases and functions
+
+- `zsh/aliases.zsh` and `zsh/functions.zsh` are portable;
+  `zsh/os/macos-interactive.zsh` holds the ones that call Apple tools or
+  Homebrew (`update`, `lock`, `reloaddns`, `brewf`).
+- `update` upgrades Homebrew, Mac App Store apps, the global npm, pnpm and
+  Composer packages, gh extensions, zinit and the Neovim plugins. One failing
+  step doesn't stop the rest.
+- eza listings (`l`, `ll`, `la`, `lt`), git shortcuts that abbreviations can't
+  hold (`gc!`, `gwip`), `extract` and `compress` for archives, `mcd`, `fcd`
+  and `acp`.
+- `ngrok` with no arguments opens an HTTP tunnel from port 80 on the reserved
+  domain in `zsh/functions.zsh` (`NGROK_DOMAIN` overrides it); with arguments
+  it's plain ngrok. On a new Mac, run `ngroka <authtoken>` once. The token
+  lives in ngrok's own config and isn't tracked here.
+
 ## Layout
 
 | Path         | Contents                                              |
@@ -97,7 +170,6 @@ the `macos` section of `install.sh` (`./install.sh macos`), last in the run.
 | `themes/`    | Voltage — the shared palette; see `themes/voltage.md`  |
 | `iterm/`     | iTerm2 preferences folder                              |
 | `obsidian/`  | "Amethyst Night" theme                                 |
-| `.dotsnitch.json` | Config for `dotsnitch status`, which checks this Mac against the Brewfile and `setup/Composerfile` |
 
 ## Notes
 
@@ -162,7 +234,6 @@ behind them, which Claude reads only when `CLAUDE.md` points it there),
 `skills/` are symlinked into `~/.claude/`. The rest of `~/.claude` is state Claude writes itself
 (`settings.json`, `settings.local.json`, `projects/`, `todos/`), so the
 directory is created and linked *into* rather than linked over.
-`.claude/themes/` is kept here for reference only; nothing links it.
 
 **Every project gets a memory bank.** The **Memory** section of
 `.claude/CLAUDE.md` tells Claude and Codex to keep project notes in six

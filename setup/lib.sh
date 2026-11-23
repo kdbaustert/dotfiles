@@ -719,19 +719,25 @@ install_pay_respects() {
 
   info "Installing pay-respects ${version}..."
   tmp="$(mktemp -d)"
-  if curl -sSfL -o "$tmp/$asset" "$url" \
+  # The binaries' copy is checked, so a failed one isn't reported as installed.
+  # The module goes first because pay-respects itself is what the version check
+  # above looks for: copied before a failed module, it would make every later
+  # run report "already installed" with no module. Rules module only. _pay-respects-fallback-100-request-ai is deliberately not
+  # installed: it ships failed commands off the machine to an AI endpoint. The
+  # man pages stay best effort, since the tool works without them.
+  if ! { curl -sSfL -o "$tmp/$asset" "$url" \
     && echo "${sha256}  ${tmp}/${asset}" | shasum -a 256 -c - >/dev/null 2>&1 \
-    && tar --use-compress-program=unzstd -xf "$tmp/$asset" -C "$tmp"; then
-    mkdir -p "$HOME/.local/bin" "$HOME/.local/share/man/man1" "$HOME/.local/share/man/man5"
-    install -m 755 "$tmp/pay-respects" "$HOME/.local/bin/"
-    # Rules module only. _pay-respects-fallback-100-request-ai is deliberately
-    # not installed: it ships failed commands off the machine to an AI endpoint.
-    install -m 755 "$tmp/_pay-respects-module-100-runtime-rules" "$HOME/.local/bin/"
+    && tar --use-compress-program=unzstd -xf "$tmp/$asset" -C "$tmp"; }; then
+    warning "pay-respects install failed (download, checksum, or extract) — skipping."
+  elif mkdir -p "$HOME/.local/bin" \
+    && install -m 755 "$tmp/_pay-respects-module-100-runtime-rules" "$HOME/.local/bin/" \
+    && install -m 755 "$tmp/pay-respects" "$HOME/.local/bin/"; then
+    mkdir -p "$HOME/.local/share/man/man1" "$HOME/.local/share/man/man5"
     install -m 644 "$tmp"/man/*.1 "$HOME/.local/share/man/man1/" 2>/dev/null
     install -m 644 "$tmp"/man/*.5 "$HOME/.local/share/man/man5/" 2>/dev/null
     success "pay-respects ${version} installed."
   else
-    warning "pay-respects install failed (download, checksum, or extract) — skipping."
+    warning "pay-respects downloaded but couldn't be copied into ~/.local/bin — skipping."
   fi
   rm -rf "$tmp"
 }
@@ -756,7 +762,7 @@ install_pay_respects() {
 # A leftover /usr/local/bin/spf from an earlier sudo install is warned about,
 # because it would shadow the new one if it comes first on PATH.
 install_superfile() {
-  local stub
+  local stub script
 
   if [ -z "${SPF_FORCE:-}" ] \
     && { command -v spf >/dev/null 2>&1 || [ -x "$HOME/.local/bin/spf" ]; }; then
@@ -770,11 +776,20 @@ install_superfile() {
     *) warning "$HOME/.local/bin is not on PATH here; the script will append to your shell RC (a tracked symlink). Check 'git status' afterwards." ;;
   esac
 
+  # Fetched into a variable first, with -f. Inline as `bash -c "$(curl ...)"`,
+  # curl's exit status is lost: offline, bash gets an empty string, exits 0, and
+  # this reported a successful install. Without -f an HTTP error page would be
+  # run as the script.
+  if ! script="$(curl -fsSL https://superfile.dev/install.sh)" || [ -z "$script" ]; then
+    warning "Could not download the superfile install script — skipping."
+    return 0
+  fi
+
   stub="$(mktemp -d)"
   printf '#!/bin/sh\nexit 1\n' >"$stub/sudo"
   chmod +x "$stub/sudo"
 
-  if PATH="$stub:$PATH" bash -c "$(curl -sLo- https://superfile.dev/install.sh)"; then
+  if PATH="$stub:$PATH" bash -c "$script"; then
     success "superfile installed."
     if [ -x /usr/local/bin/spf ]; then
       warning "/usr/local/bin/spf from an earlier install may shadow ~/.local/bin/spf; remove it with sudo rm."
@@ -811,9 +826,9 @@ CLAUDE_PLUGINS=(
   # miro, code-simplifier and code-review left this list to save prompt tokens;
   # settings.portable.json's enabledPlugins turns them off where installed.
 
-  # Third-party; on every session because install.sh creates
-  # ~/.claude/.i-have-adhd-always, the flag its SessionStart hook checks.
-  # Without the flag it waits for /i-have-adhd.
+  # Third-party; on every session because enable_adhd_always_on (below)
+  # enables it and creates the flag its SessionStart hook checks. Without the
+  # flag it waits for /i-have-adhd.
   i-have-adhd@ayghri/i-have-adhd  # action-first, ADHD-shaped output style
 )
 
@@ -877,6 +892,108 @@ install_claude_plugins() {
       warning "Failed to install Claude Code plugin ${plugin}@${marketplace}."
     fi
   done
+}
+
+#------------------------------------------------------------------------------
+# enable_adhd_always_on
+#------------------------------------------------------------------------------
+# Makes i-have-adhd's ruleset load in every new session. That takes two things,
+# and either one missing leaves sessions without it and with no error:
+#   - The flag file. The plugin's SessionStart hook (hooks/always-on.mjs)
+#     injects the ruleset only when $CLAUDE_CONFIG_DIR/.i-have-adhd-always
+#     exists, falling back to ~/.claude, so the flag is written to that same
+#     directory rather than to a fixed ~/.claude.
+#   - The plugin enabled. A disabled plugin's hooks never run, and `claude
+#     plugin install` on a plugin that's already installed leaves it disabled.
+#     settings.portable.json enables it too, but that merge belongs to the
+#     symlinks section, and `./install.sh claude` alone skips it.
+#
+# The enabled check reads `claude plugin list --json` first because `claude
+# plugin enable` exits 1 with "already enabled" (2.1.314), which would read as
+# a failure on every repeat install. The flag doesn't depend on the CLI, so it
+# is written even when claude isn't installed yet.
+enable_adhd_always_on() {
+  local plugin=i-have-adhd@i-have-adhd
+  local flag="${CLAUDE_CONFIG_DIR:-$HOME/.claude}/.i-have-adhd-always"
+
+  if [ -e "$flag" ]; then
+    info "i-have-adhd always-on flag already set."
+  elif mkdir -p "$(dirname "$flag")" && touch "$flag"; then
+    success "i-have-adhd set to always on."
+  else
+    warning "Could not create $flag; i-have-adhd stays per-session."
+  fi
+
+  if ! command -v claude &>/dev/null; then
+    warning "claude CLI not found, so $plugin wasn't enabled."
+    return 0
+  fi
+
+  if claude plugin list --json 2>/dev/null \
+    | jq -e --arg id "$plugin" 'any(.[]; .id == $id and .enabled)' &>/dev/null; then
+    info "$plugin already enabled."
+  elif claude plugin enable "$plugin" &>/dev/null; then
+    success "$plugin enabled."
+  else
+    warning "Could not enable $plugin; its always-on hook won't run."
+  fi
+}
+
+#------------------------------------------------------------------------------
+# disable_claude_in_chrome
+#------------------------------------------------------------------------------
+# Turns Claude in Chrome off by default; its guidance costs ~1.3k tokens a
+# session. The key lives in ~/.claude.json, which the portable merge doesn't
+# touch, and left unset Claude turns it on once it sees the extension.
+#
+# The edited copy replaces the file by rename instead of `cat >` over it.
+# Claude Code rewrites ~/.claude.json all through a session, and `cat >`
+# truncates first, so a session reading it mid-write saw an empty or half
+# written file. The copy is made in the same directory so the rename is atomic,
+# and takes the original's mode, since mktemp creates it 600.
+#
+# jq edits a snapshot, and the rename only goes ahead if the file still matches
+# it. A session that saved while jq ran would otherwise lose that save; instead
+# the edit starts over from the session's version, three times before giving
+# up. The window that's left is the instant between cmp and mv. Claude Code
+# exposes no lock that would close it.
+#
+# A symlinked ~/.claude.json is resolved first, so the rename lands on its
+# target and the link survives.
+disable_claude_in_chrome() {
+  local config="$HOME/.claude.json" snapshot edited
+
+  if [ ! -f "$config" ]; then
+    info "No ~/.claude.json yet; re-run after Claude Code's first launch to turn off Chrome by default."
+    return 0
+  fi
+  if ! command -v jq &>/dev/null; then
+    warning "jq not found — Claude in Chrome left at its current default."
+    return 0
+  fi
+  if [ "$(jq '.claudeInChromeDefaultEnabled' "$config" 2>/dev/null)" = "false" ]; then
+    info "Claude in Chrome already off by default."
+    return 0
+  fi
+
+  config="$(realpath "$config")"
+  snapshot="$(mktemp "$config.XXXXXX")"
+  edited="$(mktemp "$config.XXXXXX")"
+  for _ in 1 2 3; do
+    if ! { cp "$config" "$snapshot" \
+      && jq '.claudeInChromeDefaultEnabled = false' "$snapshot" >"$edited"; }; then
+      break
+    fi
+    cmp -s "$snapshot" "$config" || continue
+    if chmod "$(stat -f %Lp "$config")" "$edited" && mv -f "$edited" "$config"; then
+      rm -f "$snapshot"
+      success "Claude in Chrome off by default (enable per session with claude --chrome)."
+      return 0
+    fi
+    break
+  done
+  rm -f "$snapshot" "$edited"
+  warning "Could not update ~/.claude.json; Claude in Chrome left as it was."
 }
 
 #------------------------------------------------------------------------------

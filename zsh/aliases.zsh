@@ -19,8 +19,8 @@ alias genpass='LC_ALL=C tr -dc "[:alnum:]" < /dev/urandom | head -c 20 | pbcopy'
 # runs as root, so an over-match is unrecoverable.
 alias cleandotfiles="sudo find . -type f -name '.DS_Store' -ls -delete"
 alias claude-clean='for d in backups cache file-history projects session-env; do rm -rf "$HOME/.claude/$d"/*(N) "$HOME/.claude/$d"/.[!.]*(N) 2>/dev/null; done; echo "Cleared ~/.claude/{backups,cache,file-history,projects,session-env}"'
+# `ngrok` itself is a function in zsh/functions.zsh; it passes this through.
 alias ngroka='ngrok config add-authtoken'
-alias ngrok='ngrok http --url=engaged-obviously-ferret.ngrok-free.app 80'
 
 
 # Directories
@@ -108,11 +108,15 @@ alias pubkey="pbcopy < ~/.ssh/github_1p.pub && echo '=> Public key copied to pas
 # cache flush, the LaunchServices rebuild, the volume mute) call Apple tools and
 # live in zsh/os/macos-interactive.zsh.
 
-# Removes all node_modules folders older than 4 months:
-alias cnodeold='find . -name "node_modules" -type d -mtime +120 | xargs rm -rf'
-
-# Removes all node_modules folders:
-alias cnodeall='find . -name "node_modules" -type d | xargs rm -rf'
+# Removes node_modules folders. -prune stops find walking into a folder it is
+# about to delete, which used to print an error for every nested node_modules
+# already gone, and -exec passes each path whole, where xargs split any path
+# with a space in it and deleted the wrong thing or nothing.
+#
+# cnodeold only takes folders older than 4 months. It doesn't look inside a
+# fresh one for old nested folders; npm owns those.
+alias cnodeold='find . -type d -name node_modules -prune -mtime +120 -exec rm -rf {} +'
+alias cnodeall='find . -type d -name node_modules -prune -exec rm -rf {} +'
 
 # PHP Artisan: `phpa` lives in abbreviations (zsh/abbreviations)
 
@@ -120,14 +124,19 @@ alias cnodeall='find . -name "node_modules" -type d | xargs rm -rf'
 alias sshconfig='cd ~/.ssh; code config'
 alias sshkeygen='ssh-keygen -t ed25519'
 alias copyssh='ssh-copy-id -i ~/.ssh/github_1p.pub'
-alias chmodssh='sudo chmod 700 ~/.ssh && chmod 600 ~/.ssh/*'
+# (-.) limits the 600 to plain files and symlinks to them. ~/.ssh holds
+# directories too (agent/), and 600 would take away the search bit that lets
+# anything reach inside. The - keeps a symlinked key covered, as the old bare *
+# did.
+alias chmodssh='sudo chmod 700 ~/.ssh && chmod 600 ~/.ssh/*(-.)'
 
 alias permission='chmod +x'
 
 # `update` starts with Homebrew and lives in zsh/os/macos-interactive.zsh.
 
-# Recursively remove .DS_Store files.
-alias dsnuke="find . -name '*.DS_Store' -type f -ls -delete"
+# Recursively remove .DS_Store files. Exact -name for the same reason as
+# cleandotfiles above; this is the no-sudo version.
+alias dsnuke="find . -name '.DS_Store' -type f -ls -delete"
 
 # `chromekill` matches on the macOS helper-process name and lives in
 # zsh/os/macos-interactive.zsh.
@@ -146,7 +155,7 @@ alias hist="history | fzf"
 alias f="fzf"
 
 # Node.js: npm prefixes live in abbreviations (zsh/abbreviations)
-alias npmc='npm install & composer install'
+alias npmc='npm install && composer install'
 
 #PNPM: prefixes live in abbreviations (zsh/abbreviations)
 alias pug="pnpm list -g --json | jq '.[] | .dependencies | keys | .[]' -r  | xargs pnpm add -g"

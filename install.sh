@@ -194,34 +194,12 @@ section_claude() {
   # every machine rather than a symlink like the rest of .claude.
   install_claude_plugins "${CLAUDE_PLUGINS[@]}"
 
-  # i-have-adhd's SessionStart hook loads its ruleset whenever this flag exists.
-  if [ -e "$HOME/.claude/.i-have-adhd-always" ]; then
-    info "i-have-adhd already always on."
-  elif mkdir -p "$HOME/.claude" && touch "$HOME/.claude/.i-have-adhd-always"; then
-    success "i-have-adhd set to always on."
-  else
-    warning "Could not create ~/.claude/.i-have-adhd-always; i-have-adhd stays per-session."
-  fi
+  # After the install, so a fresh machine has the plugin to enable. See
+  # enable_adhd_always_on in setup/lib.sh.
+  enable_adhd_always_on
 
-  # Claude in Chrome off by default; its guidance costs ~1.3k tokens a session.
-  # The key lives in ~/.claude.json, which the portable merge doesn't touch, and
-  # left unset Claude turns it on once it sees the extension.
-  if [ ! -f "$HOME/.claude.json" ]; then
-    info "No ~/.claude.json yet; re-run after Claude Code's first launch to turn off Chrome by default."
-  elif ! command -v jq &>/dev/null; then
-    warning "jq not found — Claude in Chrome left at its current default."
-  elif [ "$(jq '.claudeInChromeDefaultEnabled' "$HOME/.claude.json")" = "false" ]; then
-    info "Claude in Chrome already off by default."
-  else
-    chrome_off=$(mktemp "$HOME/.claude.json.XXXXXX")
-    if jq '.claudeInChromeDefaultEnabled = false' "$HOME/.claude.json" > "$chrome_off" \
-      && cat "$chrome_off" > "$HOME/.claude.json"; then
-      success "Claude in Chrome off by default (enable per session with claude --chrome)."
-    else
-      warning "Could not update ~/.claude.json; Claude in Chrome left as it was."
-    fi
-    rm -f "$chrome_off"
-  fi
+  # See disable_claude_in_chrome in setup/lib.sh.
+  disable_claude_in_chrome
 
   # tweakcc, which patches the Claude Code binary. The tool only; applying it
   # is a manual step. See install_tweakcc in setup/lib.sh.

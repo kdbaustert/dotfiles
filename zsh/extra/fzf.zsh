@@ -94,14 +94,47 @@ export FZF_CTRL_R_OPTS="--no-ansi"
 # expanding it here yields `eval " -- ./"` and the completion dies with
 # "command not found: --". $FD survives because it's a plain shell variable of
 # the interactive shell, which the subshell inherits (same as _fzf_compgen_dir).
+#
+# @param $1 directory to list from
 _fzf_compgen_path() {
-  eval "$FD --type f --type l -- $1"
+  _fzf_compgen_fd "$1" --type f --type l
 }
 
 # Used for generating completions for `directory`
 # Ex: cd **<tab> runs _fzf_compgen_dir()
+#
+# @param $1 directory to list from
 _fzf_compgen_dir() {
-  eval "$FD --type d -- $1"
+  _fzf_compgen_fd "$1" --type d
+}
+
+# Lists what fd finds under the base directory fzf completes from, which is
+# "." for a bare `**` and the typed directory for `~/src/**`.
+#
+# The directory goes after a "." pattern. It used to be the only positional, so
+# fd read it as the search pattern: "." matched everything in the current
+# directory, which hid the bug, and any other base was searched for as a name
+# under the current directory instead of being listed.
+#
+# --strip-cwd-prefix comes off when there's a path, because fd 10 refuses the
+# two together. With "." there's no path to pass, and the flag keeps the "./"
+# off each entry, the same thing fzf's own find-based completer strips with sed.
+#
+# ${=FD} word-splits the string instead of eval'ing it, so a directory name is
+# one argument whatever it holds; under eval a space split it in two and a
+# $(...) in it ran.
+#
+# @param $1 base directory
+# @param $@ fd filters, such as --type d
+_fzf_compgen_fd() {
+  local dir=$1
+  shift
+
+  if [[ $dir == . ]]; then
+    ${=FD} "$@"
+  else
+    ${${=FD}:#--strip-cwd-prefix} "$@" -- . "$dir"
+  fi
 }
 
 # Alias picker (Alt-A): fuzzy-search every alias, insert the chosen name onto

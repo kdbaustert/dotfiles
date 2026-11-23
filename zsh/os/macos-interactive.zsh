@@ -55,8 +55,8 @@ alias stfu="osascript -e 'set volume output muted true'"
 #------------------------------------------------------------------------------
 # OS maintenance
 #------------------------------------------------------------------------------
-alias reloaddns="dscacheutil -flushcache && sudo killall -HUP mDNSResponder"
-alias clearDNSCache='sudo dscacheutil -flushcache && sudo killall -HUP mDNSResponder'
+alias reloaddns='sudo dscacheutil -flushcache && sudo killall -HUP mDNSResponder'
+alias clearDNSCache=reloaddns
 alias purgemem='sudo purge'
 alias testspeed="networkQuality"
 
@@ -79,7 +79,9 @@ alias chromekill="ps ux | grep '[C]hrome Helper --type=renderer' | grep -v exten
 #------------------------------------------------------------------------------
 # Homebrew
 #------------------------------------------------------------------------------
-alias brewf='$(brew --prefix)'
+# $HOMEBREW_PREFIX comes from macos-env.zsh, so this doesn't start brew just
+# to ask where it lives.
+alias brewf='cd "$HOMEBREW_PREFIX"'
 alias ibrew='arch -x86_64 /usr/local/bin/brew'
 
 #------------------------------------------------------------------------------

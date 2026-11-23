@@ -10,8 +10,8 @@ if ! command -v composer >/dev/null 2>&1; then
   exit 0
 fi
 
-# The list lives in Composerfile so dotsnitch can read it too. A while-read
-# loop instead of mapfile, which macOS's bash 3.2 doesn't have.
+# The list lives in Composerfile, beside the Brewfile's role for Homebrew. A
+# while-read loop instead of mapfile, which macOS's bash 3.2 doesn't have.
 composer=()
 while IFS= read -r line || [ -n "$line" ]; do
   line="${line%%#*}"

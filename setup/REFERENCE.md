@@ -54,8 +54,7 @@ unknown) has sent commits out unsigned before. If a repo's commits show up unver
 `.claude/` is tracked in full but only partly deployed: `install.sh` links
 `CLAUDE.md`, `REFERENCE.md`, `hooks/notify.sh`, `hooks/search-excludes.sh`, `hooks/resume-after-limit.sh`, `statusline.sh`, every file under `agents/`,
 every file under `commands/`, every file under `rules/` and every directory
-under `skills/`, so
-`themes/my-theme.json` rides along for reference and is applied by hand. The
+under `skills/`. The
 installer also sweeps the retired `~/.claude/AGENTS.md` link on re-run.
 
 `skills/` is a loop over `skills/*`, not one `link` line per skill, for the same
@@ -422,13 +421,25 @@ this with headless `/context`: with miro off, `claude -p` has no MCP server
 and loads ~300 tokens of tool text it otherwise defers.
 
 Claude in Chrome is off by default (`claudeInChromeDefaultEnabled` in
-`~/.claude.json`, set by `install.sh`) because its guidance adds ~1.3k tokens
-to every session. Use `claude --chrome` when a session needs it. The
+`~/.claude.json`, set by `disable_claude_in_chrome` in `setup/lib.sh`) because
+its guidance adds ~1.3k tokens to every session. Use `claude --chrome` when a
+session needs it. The function swaps in an edited copy by rename, and redoes
+the edit if a running session saved the file meanwhile, so neither side sees a
+truncated file or loses a save. `setup/check-claude-settings.sh` covers both,
+plus a symlinked `~/.claude.json`. The
 computer-use guidance (~700 tokens) has no setting to turn it off.
 
 i-have-adhd is always on: its SessionStart hook injects the ruleset (~1.8k
-tokens) whenever `~/.claude/.i-have-adhd-always` exists, which `install.sh`
-creates. Delete the file to go back to `/i-have-adhd` per session.
+tokens) whenever `${CLAUDE_CONFIG_DIR:-~/.claude}/.i-have-adhd-always`
+exists. Delete the file to go back to `/i-have-adhd` per session. The flag
+does nothing while the plugin is disabled, because a disabled plugin's hooks
+don't run. `enable_adhd_always_on` in `setup/lib.sh`, called from the claude
+section, sets both: it writes the flag into the same directory the hook reads
+and enables the plugin when `claude plugin list --json` shows it off. It
+does the enabling itself because the portable file's `enabledPlugins` entry
+only merges in the symlinks section, so `./install.sh claude` alone would
+skip it. `setup/check-claude-settings.sh` tests the function against a stub
+`claude`.
 
 ### Editors
 
@@ -518,6 +529,8 @@ setup/check-zsh-cache-filters.sh              # fzf option restore + write fallb
 setup/check-update-function.sh                # `update` step order, skips and failure report
 setup/check-gh-watch-scroll.sh                # `gh run watch` scroll-mode writes + restore on Ctrl+C
 setup/check-composer-neutron.sh               # phpcs Neutron registration after the Composer install
+setup/check-install-downloads.sh              # superfile and pay-respects: failed download or copy warns
+setup/check-zsh-config.sh                     # aliases, functions, fzf completers, starship/zinit bootstrap, fzf-tab previews
 ```
 
 Both file lists are load-bearing. `shellcheck` never sees `setup/*.sh` on its own — those are invoked by
