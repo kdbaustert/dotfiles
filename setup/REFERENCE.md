@@ -641,7 +641,14 @@ exist to prevent. Use whatever dynamic form the file format supports:
 - A plist, TOML or YAML with no variables of its own: generate it or
   substitute into it from the installer at deploy time, which is how the
   hosts-refresh LaunchDaemon is built. If the tool reads a path relative to
-  `$HOME` or `$XDG_CONFIG_HOME` by itself, drop the path and let it.
+  `$HOME` or `$XDG_CONFIG_HOME` by itself, drop the path and let it. When the
+  tool takes the same setting as a flag, an alias that passes it is less
+  machinery than a generated file: glow's style path lives in the `glow` alias
+  in `zsh/aliases.zsh`, not in `glow.yml`, for that reason.
+- A file an app writes itself (`iterm/com.googlecode.iterm2.plist`) can pick
+  the home directory back up when the app saves. Its profile's `Working
+  Directory` is blank because `Custom Directory` is `Advanced` and never reads
+  it; check the diff for a literal path before committing that file.
 - Identifiers such as launchd labels come from a variable derived at install
   time. Don't embed a personal domain or handle.
 

@@ -55,6 +55,13 @@ alias mkcd=mcd
 alias v="nvim"
 alias nvmini="NVIM_APPNAME=mini nvim"
 alias lg="lazygit"
+# The Voltage style is passed here because glow.yml can't name it without a
+# literal home directory: glow 3.0.0 takes `style` as written, with no `~` or
+# $HOME expansion, resolves a relative path against the current directory, and
+# ignores GLAMOUR_STYLE. Single quotes, so $HOME expands when the alias runs.
+# A later -s on the command line still wins. glow run by another program skips
+# the alias and gets the stock style; nothing in this repo does that.
+alias glow='glow -s "$HOME/.config/glow/voltage.json"'
 
 if which eza &>/dev/null; then
   alias ls='eza --icons --classify'
