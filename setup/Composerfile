@@ -5,3 +5,7 @@ automattic/phpcs-neutron-standard
 friendsofphp/php-cs-fixer
 phpunit/phpunit
 squizlabs/php_codesniffer
+php-stubs/woocommerce-stubs
+phpmd/phpmd
+szepeviktor/phpstan-wordpress
+wp-coding-standards/wpcs

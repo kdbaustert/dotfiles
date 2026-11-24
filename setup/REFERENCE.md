@@ -478,8 +478,13 @@ defined.
 
 `setup/hosts.sh` filters the StevenBlack list to `0.0.0.0` entries and keeps
 `raw.githubusercontent.com` out of the block, so the scheduled updater can
-fetch its next copy. `setup/check-hosts-filter.sh` covers both that exception
-and filtering multiple hostnames on one input line. The fzf cache filter in
+fetch its next copy. It also lets Google Analytics through: every subdomain of
+`google-analytics.com` and `googleanalytics.com`, plus exact entries for
+`analytics.google.com`, `marketingplatform.google.com`, `googletagmanager.com`,
+`www.googletagmanager.com` and the two `*-google-analytics.l.google.com`
+CNAME targets. The ad hosts under `g.doubleclick.net` stay blocked.
+`setup/check-hosts-filter.sh` covers those exceptions, a lookalike domain that
+must stay blocked, and filtering multiple hostnames on one input line. The fzf cache filter in
 `zsh/extra/cache.zsh` omits the unassignable `zle` option from upstream's
 restore expressions; `setup/check-zsh-cache-filters.sh` covers the rewrite and
 stale-cache regeneration and cache-write fallback.

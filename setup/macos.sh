@@ -256,7 +256,7 @@ defaults write com.apple.dock autohide-delay -float 1000
 defaults write com.apple.dock loc -string en_US:US
 defaults write com.apple.dock no-bouncing -bool true
 defaults write com.apple.dock region -string US
-defaults write com.apple.dock trash-full -bool true
+defaults write com.apple.dock trash-full -bool false
 defaults write com.apple.dock version -int 1
 defaults write com.apple.dock wvous-br-corner -int 14
 

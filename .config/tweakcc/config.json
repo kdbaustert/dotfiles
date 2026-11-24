@@ -1,7 +1,7 @@
 {
   "ccVersion": "2.1.314",
   "ccInstallationPath": null,
-  "lastModified": "2026-11-22T13:32:24.258Z",
+  "lastModified": "2026-11-23T12:48:07.689Z",
   "changesApplied": true,
   "settings": {
     "themes": [
@@ -355,18 +355,16 @@
       ]
     },
     "thinkingStyle": {
-      "updateInterval": 80,
+      "updateInterval": 120,
       "phases": [
-        "⣾",
-        "⣽",
-        "⣻",
-        "⢿",
-        "⡿",
-        "⣟",
-        "⣯",
-        "⣷"
+        "·",
+        "✢",
+        "✳",
+        "✶",
+        "✻",
+        "✽"
       ],
-      "reverseMirror": false
+      "reverseMirror": true
     },
     "userMessageDisplay": {
       "format": " > {} ",

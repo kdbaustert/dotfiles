@@ -1,5 +1,6 @@
 cask_args appdir: '/Applications'
 
+tap "fif7y/tap"
 brew "bash"
 brew "coreutils"
 brew "svn"
@@ -95,6 +96,10 @@ brew "mariadb"
 brew "redis"
 brew "composer"
 brew "wp-cli"
+brew "automake"
+brew "bison"
+brew "cmake"
+brew "re2c"
 # brew "shopify-cli"
 # brew "theme-check"
 
@@ -178,5 +183,13 @@ cask "font-fira-code-nerd-font"
 cask "font-fira-mono-nerd-font"
 cask "font-roboto-mono-nerd-font"
 cask "font-sauce-code-pro-nerd-font"
+cask "fif7y/tap/dimble"
+cask "font-maple-mono"
+cask "macpacker"
+cask "puremac"
+cask "ransomwhere"
+cask "rectangle-pro"
+cask "stats"
+cask "zed"
 
 

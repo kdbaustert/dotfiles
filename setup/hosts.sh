@@ -63,13 +63,41 @@ scheduled=false
 #
 # Unattended, a list that one week started blocking raw.githubusercontent.com
 # would also stop every later download, and nothing would say so.
+#
+# Google Analytics is let through too, so its web UI at analytics.google.com
+# loads, along with gtag.js, which GA serves from googletagmanager.com.
+# Deleting the lines from /etc/hosts by hand would only last until Monday's
+# refresh put them back.
+# google-analytics.com and googleanalytics.com match every subdomain, since
+# upstream keeps adding new ones (region1.google-analytics.com is already in);
+# the hosts under google.com are exact, so the rest of google.com stays blocked.
+# The ad hosts under g.doubleclick.net stay blocked: they serve ads, not GA.
 keep_reachable() {
   awk '
-    BEGIN { protected["raw.githubusercontent.com"] = 1 }
+    BEGIN {
+      protected["raw.githubusercontent.com"] = 1
+      protected["analytics.google.com"] = 1
+      protected["marketingplatform.google.com"] = 1
+      protected["googletagmanager.com"] = 1
+      protected["www.googletagmanager.com"] = 1
+      protected["ssl-google-analytics.l.google.com"] = 1
+      protected["www-google-analytics.l.google.com"] = 1
+      domain_count = split("google-analytics.com googleanalytics.com", protected_domains, " ")
+    }
+
+    function is_protected(host,   i, domain) {
+      if (host in protected) return 1
+      for (i = 1; i <= domain_count; i++) {
+        domain = protected_domains[i]
+        if (host == domain || substr(host, length(host) - length(domain)) == "." domain) return 1
+      }
+      return 0
+    }
+
     {
       for (i = 2; i <= NF; i++) {
         host = tolower($i)
-        if (host != "" && !(host in protected)) print "0.0.0.0 " $i
+        if (host != "" && !is_protected(host)) print "0.0.0.0 " $i
       }
     }
   '
