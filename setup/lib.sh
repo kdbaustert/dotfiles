@@ -276,6 +276,12 @@ link_dotfiles() {
     link "$DOTFILES_DIR/$f" "$HOME/$f"
   done
 
+  # The fallback ESLint config. ESLint 10 has no user-level config setting; it
+  # only walks up from each linted file, so a config in $HOME is the one place
+  # every project without its own can reach. The real file sits in
+  # .config/eslint, next to the node_modules its imports resolve from.
+  link "$DOTFILES_DIR/.config/eslint/eslint.config.mjs" "$HOME/eslint.config.mjs"
+
   # The work identity that .gitconfig's includeIf pulls in for bitbucket
   # remotes, plus the allowed-signers file it points
   # gpg.ssh.allowedSignersFile at. Neither is in this repo and neither should

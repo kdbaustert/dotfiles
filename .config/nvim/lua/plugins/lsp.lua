@@ -149,6 +149,31 @@ return {
 
       vim.lsp.config("ts_ls", ts_ls_opts)
 
+      -- Keeps the ESLint server off a file outside any project when Neovim
+      -- starts in $HOME. nvim-lspconfig falls back to the current directory as
+      -- the root there, finds ~/eslint.config.mjs (the fallback config in
+      -- .config/eslint) and starts the server on $HOME, which has no
+      -- node_modules/eslint, so all it does is print "Unable to find ESLint
+      -- library". nvim-lint's eslint run in format.lua covers those files.
+      -- Wrapped rather than replaced so the upstream root logic still decides
+      -- everything else. The type check is for an nvim-lspconfig release that
+      -- swaps the function for plain root_markers.
+      local eslint_root_dir = vim.lsp.config.eslint.root_dir
+
+      if type(eslint_root_dir) == "function" then
+        local home = vim.fs.normalize(vim.env.HOME)
+
+        vim.lsp.config("eslint", {
+          root_dir = function(bufnr, on_dir)
+            eslint_root_dir(bufnr, function(root)
+              if vim.fs.normalize(root) ~= home then
+                on_dir(root)
+              end
+            end)
+          end,
+        })
+      end
+
       -- mason-lspconfig enables everything mason has installed, which is what
       -- actually starts the servers above.
       require("mason-lspconfig").setup {

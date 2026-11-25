@@ -43,10 +43,9 @@ esac
 export PATH
 
 pkgs=(
+  # The binary only, like prettier below. The packages ~/eslint.config.mjs
+  # imports live in .config/eslint, for the same reason.
   eslint
-  eslint-config-prettier
-  eslint-plugin-prettier
-  eslint-plugin-vue
   firebase-tools
   gitignore.cli
   # The PHP language server. Also in both editors' Mason lists
@@ -79,14 +78,17 @@ status=0
 # upgrade-or-no-op, so this doubles as the update path.
 pnpm add -g "${pkgs[@]}" || status=1
 
-# The plugin directory that ~/.prettierrc loads PHP support from (see
-# .config/prettier/plugin-php.mjs). Installed in the repo path rather than
-# through the ~/.config link, so it works before the link exists. `update`
-# rather than `install` for the same update-path reason as above: the
-# lockfile is git-ignored, so it moves to the newest release in the
-# package.json ranges. A new minor of the 0.x plugin needs its range bumped
-# by hand.
+# The directories ~/.prettierrc and ~/eslint.config.mjs import their plugins
+# from (see .config/prettier/plugin-php.mjs and .config/eslint/eslint.config.mjs).
+# Installed in the repo path rather than through the ~/.config links, so it
+# works before the links exist. `update` rather than `install` for the same
+# update-path reason as above: the lockfiles are git-ignored, so each moves to
+# the newest release in its package.json ranges. A new minor of the 0.x PHP
+# plugin needs its range bumped by hand, and so does a TypeScript release past
+# what typescript-eslint supports (its peer range stops below 6.1).
 repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-pnpm update --dir "$repo_root/.config/prettier" || status=1
+for dir in prettier eslint; do
+  pnpm update --dir "$repo_root/.config/$dir" || status=1
+done
 
 exit "$status"

@@ -130,7 +130,7 @@ unalias update 2>/dev/null
 function update {
   local -a failed
   local brew_prefix="${HOMEBREW_PREFIX:-/opt/homebrew}"
-  local composer_home standard installed_paths
+  local composer_home standard installed_paths dir
   local -a phpcs_standards=(
     automattic/phpcs-neutron-standard
     phpcsstandards/phpcsextra
@@ -154,7 +154,16 @@ function update {
   [[ -s ${NVM_DIR:-$HOME/.nvm}/nvm.sh ]] \
     && _update_step 'npm globals (nvm default node)' _update_nvm_globals
 
-  (( $+commands[pnpm] )) && _update_step 'pnpm globals' pnpm update -g
+  # The plugins ~/.prettierrc and ~/eslint.config.mjs import aren't globals
+  # (see setup/pnpm.sh), so `pnpm update -g` never reaches them.
+  if (( $+commands[pnpm] )); then
+    _update_step 'pnpm globals' pnpm update -g
+
+    for dir in prettier eslint; do
+      [[ -f $DOTFILES/.config/$dir/package.json ]] \
+        && _update_step "pnpm .config/$dir" pnpm update --dir "$DOTFILES/.config/$dir"
+    done
+  fi
 
   if (( $+commands[composer] )); then
     composer_home="$(composer global config home 2>/dev/null)"

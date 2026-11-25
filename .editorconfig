@@ -1,4 +1,11 @@
 # top-most EditorConfig file
+#
+# Also the global fallback: link_dotfiles() links it to ~/.editorconfig, and an
+# editor walks up from each file until it finds root = true. So it covers every
+# file under $HOME whose project has no .editorconfig of its own, and the lf
+# rule below has to suit all of them. That's why there's no [*.txt] crlf
+# section: it was left over from when [*] was crlf, and it made Neovim save any
+# requirements.txt or robots.txt with Windows line endings.
 root = true
 
 [*]
@@ -26,6 +33,3 @@ indent_size = 4
 [*.scss]
 indent_style = tab
 indent_size = 4
-
-[*.txt]
-end_of_line = crlf

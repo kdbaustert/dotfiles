@@ -500,6 +500,58 @@ the `prettier` it imports follow the `package.json` ranges. The plugin is
 git-ignored. `setup/check-prettier.sh` fails if a plugin entry goes back to a
 bare name.
 
+### ESLint fallback config
+
+`.config/eslint/eslint.config.mjs` is linked to `~/eslint.config.mjs`. ESLint
+10 has no user-level config option; it walks up from each linted file to the
+nearest `eslint.config.*`, so a config in `$HOME` covers every project under it
+that has none, and a project config always wins. Files outside `$HOME` get no
+config at all. It sets the JS, typescript-eslint and Vue recommended rules,
+both browser and Node globals, ignores `dist/`, `build/`, `vendor/` and
+`*.min.js`, and puts `eslint-config-prettier` last so Prettier owns layout.
+Type-aware rules are off: they need a `tsconfig.json`, which a stray file
+doesn't have.
+
+The imports resolve from the file's real path, so the plugins live in
+`.config/eslint/node_modules`, installed by the same `pnpm update --dir` loop in
+`setup/pnpm.sh` as `.config/prettier`. The old pnpm globals
+`eslint-config-prettier`, `eslint-plugin-prettier` and `eslint-plugin-vue` were
+dropped from that script and uninstalled: no config can import them (measured 2026-11-25:
+`Cannot find package 'eslint-config-prettier' imported from .../eslint.config.js`).
+`eslint-plugin-prettier` has no replacement on purpose, since Prettier already
+formats on save and the plugin would only repeat its output as lint errors.
+`typescript` is held at `~6.0` because typescript-eslint 8.74's peer range
+stops below 6.1. The `update` shell function refreshes both directories.
+
+Where it breaks:
+
+- A project still on `.eslintrc` lints with this file. ESLint 8 switches to
+  flat config when it finds one walking up from the current directory
+  (`shouldUseFlatConfig` in 8.57.1), and ESLint 9 used to stop with "couldn't
+  find eslint.config" and now runs these rules. Set
+  `ESLINT_USE_FLAT_CONFIG=false` in that project, or give it a flat config. On
+  2026-11-25 no project under `~/Development` or `~/Developer` had an
+  `.eslintrc`, an `eslintConfig` key or ESLint 8.
+- The ignores match a folder with that name at any depth, so a hand-written
+  `build/` or `vendor/` folder in a project with no config isn't linted.
+- Neovim's ESLint language server (Mason's `eslint`) loads ESLint from the
+  project's `node_modules`, not the pnpm global: with root `$HOME` it printed
+  `Unable to find ESLint library` while the global was on PATH (measured
+  2026-11-25). So a project without its own ESLint gets no server
+  diagnostics, as before this file existed, and nvim-lint's CLI run supplies
+  them. It did start in one case: Neovim started in `$HOME` on a file outside
+  any project, where nvim-lspconfig falls back to the current directory as the
+  root and finds this file. The `root_dir` wrapper in
+  `.config/nvim/lua/plugins/lsp.lua` turns down a `$HOME` root, and
+  `setup/check-eslint.sh` covers it. VS Code's ESLint extension runs the same
+  server, but neither it nor Zed was tried in the app.
+
+`eslint` itself isn't in `package.json`: pnpm installs it into the store as
+the plugins' peer, and the global binary is the one that runs.
+`setup/check-eslint.sh` lints JS, TS and Vue samples, checks the ignores and
+the Prettier ordering, checks that a project config wins, and checks the
+Neovim guard (about 10 seconds of the run, skipped without Mason's server).
+
 ### Portable app settings
 
 `merge_claude_settings()` merges `.claude/settings.portable.json` into
@@ -589,6 +641,7 @@ setup/check-composer-neutron.sh               # phpcs Neutron and WPCS registrat
 setup/check-setup-scripts.sh                  # setup scripts: all by default, SETUP_SCRIPTS narrows, a failure doesn't stop the rest
 setup/check-install-downloads.sh              # superfile and pay-respects: failed download or copy warns
 setup/check-prettier.sh                       # .prettierrc plugins load by path; JS and PHP format from outside the repo
+setup/check-eslint.sh                         # ~/eslint.config.mjs lints JS, TS and Vue from outside the repo; a project config wins
 setup/check-zsh-config.sh                     # aliases, functions, fzf completers, starship/zinit bootstrap, fzf-tab previews
 ```
 

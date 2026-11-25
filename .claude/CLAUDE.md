@@ -14,7 +14,7 @@ node versions, git signing identities, or Swift formatting and language modes.
 
 - macOS, Apple Silicon, zsh, `nvim`, `atuin`. Homebrew at `/opt/homebrew` owns every global tool; prefer its binaries over `/usr/bin`. `python3` is Homebrew's.
 - Nix is for per-project environments only: never `nix profile install` or `nix-env -i`. If a tool call lacks `nix-shell`, source `/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh`. direnv never fires in a tool call, so run `nix develop -c <cmd>`.
-- Symlinks into `~/dotfiles`: `~/.zshrc`, `~/.zprofile`, `~/.profile`, `~/.zshenv`, `~/.gitconfig`, `~/.editorconfig`, `~/.prettierrc`, `~/.codex/AGENTS.override.md`, every `~/.config/<tool>` entry, and in `~/.claude/` the `CLAUDE.md`, `REFERENCE.md`, `statusline.sh`, `hooks/*.sh`, `skills/<skill>` and `rules/<rule>.md`. Edit the file in `~/dotfiles`, never the `$HOME` path.
+- Symlinks into `~/dotfiles`: `~/.zshrc`, `~/.zprofile`, `~/.profile`, `~/.zshenv`, `~/.gitconfig`, `~/.editorconfig`, `~/.prettierrc`, `~/eslint.config.mjs`, `~/.codex/AGENTS.override.md`, every `~/.config/<tool>` entry, and in `~/.claude/` the `CLAUDE.md`, `REFERENCE.md`, `statusline.sh`, `hooks/*.sh`, `skills/<skill>` and `rules/<rule>.md`. Edit the file in `~/dotfiles`, never the `$HOME` path.
 - The `node` a tool call sees is Homebrew's, not my interactive nvm one; read **Environment** in `~/.claude/REFERENCE.md` before stating my version.
 - GNU tools are g-prefixed (`ggrep`, `gsed`, `gls`, `gsort`); the defaults are BSD. No `gfind`; use `fd`.
 - `ls` and `tree` are aliases in tool calls. To parse output, call `/bin/ls` or `fd`.
