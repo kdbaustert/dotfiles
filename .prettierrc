@@ -8,10 +8,20 @@
   "bracketSpacing": true,
   "bracketSameLine": false,
   "endOfLine": "lf",
-  "plugins": ["@prettier/plugin-php"],
+  "plugins": [
+    "@prettier/plugin-php"
+  ],
   "overrides": [
     {
-      "files": ["*.js", "*.jsx", "*.mjs", "*.cjs", "*.ts", "*.tsx", "*.php"],
+      "files": [
+        "*.js",
+        "*.jsx",
+        "*.mjs",
+        "*.cjs",
+        "*.ts",
+        "*.tsx",
+        "*.php"
+      ],
       "options": {
         "tabWidth": 2,
         "useTabs": false,
@@ -20,14 +30,18 @@
     },
     {
       "files": "*.html.tpl",
-      "options": { "parser": "html" }
+      "options": {
+        "parser": "html"
+      }
     },
     {
-      "files": ["*.php"],
+      "files": [
+        "*.php"
+      ],
       "options": {
         "parser": "php",
         "printWidth": 120,
-        "tabWidth": 2,
+        "tabWidth": 4,
         "useTabs": false,
         "singleQuote": false,
         "phpVersion": "8.1",

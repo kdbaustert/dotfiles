@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 #
 # Runs setup/composer.sh against a stub composer and a stub phpcs and checks
-# the Neutron registration that follows the install: phpcs gets the standard's
-# folder as installed_paths when the package is there, and isn't called when
-# the package is missing or the install failed. Run it after changing
-# composer.sh:
+# the phpcs registration that follows the install: phpcs gets every installed
+# standard's folder in one installed_paths value, so registering Neutron can't
+# drop WPCS, and isn't called when no standard is there or the install failed.
+# Run it after changing composer.sh:
 #
 #   setup/check-composer-neutron.sh
 #
@@ -67,6 +67,13 @@ expect 'no Neutron package, phpcs is left alone' '<0>' "$(run_composer_script)"
 mkdir -p "$neutron"
 expect 'Neutron is registered after the install' \
   "<0>--config-set installed_paths $neutron" "$(run_composer_script)"
+
+vendor="$composer_home/vendor"
+mkdir -p "$vendor/phpcsstandards/phpcsextra" "$vendor/phpcsstandards/phpcsutils" \
+  "$vendor/wp-coding-standards/wpcs"
+expect 'WPCS and its dependencies are registered beside Neutron' \
+  "<0>--config-set installed_paths $neutron,$vendor/phpcsstandards/phpcsextra,$vendor/phpcsstandards/phpcsutils,$vendor/wp-coding-standards/wpcs" \
+  "$(run_composer_script)"
 
 expect 'a failed install keeps its status and skips phpcs' '<2>' \
   "$(STUB_REQUIRE_EXIT=2 run_composer_script)"

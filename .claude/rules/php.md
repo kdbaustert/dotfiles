@@ -58,9 +58,11 @@ when the project fits:
 
 Use what the project pins first: `vendor/bin/*` and the `scripts` in
 `composer.json`. Installed globally here: `php-cs-fixer`, `phpcs` and `phpcbf`
-(with Automattic's Neutron standard) and `phpunit`. PHPStan, Larastan, Pest,
-Pint and WPCS aren't global, so use them only when the project requires them,
-and ask before adding one.
+(with Automattic's Neutron standard and WPCS), `phpstan`, `phpmd` and
+`phpunit`. Larastan, Pest and Pint aren't global, so use them only when the
+project requires them, and ask before adding one. Run the global `phpstan` and
+`phpmd` only against a project's own `phpstan.neon` or PHPMD ruleset; without
+one there's no agreed level to hold the code to.
 
 Before calling PHP work done, run:
 

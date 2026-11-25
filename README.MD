@@ -78,7 +78,7 @@ SETUP_SCRIPTS=all ./install.sh          # pnpm composer mas gh-extensions
 | Script             | Installs                                          |
 | ------------------ | ------------------------------------------------- |
 | `pnpm.sh`          | Global JS packages (pnpm, not npm — see the file) |
-| `composer.sh`      | Global Composer packages, listed in `Composerfile`, then registers the Neutron standard with `phpcs` |
+| `composer.sh`      | Global Composer packages, listed in `Composerfile`, then registers the Neutron and WordPress standards with `phpcs` |
 | `mas.sh`           | Mac App Store apps (sign in to the App Store first) |
 | `gh-extensions.sh` | GitHub CLI extensions                             |
 

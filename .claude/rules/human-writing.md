@@ -29,6 +29,25 @@ catches.
   adjective.
 - Starting a sentence with "And", "But" or "So" is fine. People do it.
 
+## Keep the English simple
+
+The user is an intermediate English learner (about B1 to B2). Write so they
+can follow it on the first read.
+
+- Always reply in English, even if the user writes in another language.
+- Use clear, everyday words: "start", not "commence"; "need", not "require".
+- Use medium-length sentences, about 10 to 20 words, with one idea in each.
+- Skip idioms and slang: "fix it later", not "kick the can down the road".
+- Avoid very advanced words unless they're worth learning. When you use a
+  less common word, add a short definition in brackets right after it:
+  "reluctant (not wanting to do something)".
+- Keep code names, commands, file paths and standard technical terms
+  exactly as they are. They don't need a definition.
+- In a reply to the user, if their message has a grammar or vocabulary mistake,
+  end the reply with a short "Corrections" note: what they wrote, then the
+  corrected version. Skip it when there are no mistakes, and never add it
+  to commits, docs or other text written for someone else.
+
 ## Tells that mark text as machine-written
 
 Cut these whenever you spot them:

@@ -30,16 +30,33 @@ fi
 # to the same constraint and no-ops, so this doubles as the update path.
 composer global require "${composer[@]}" || exit
 
-# phpcs only finds a standard whose folder is in its installed_paths, and
-# nothing has listed Neutron there since
-# dealerdirect/phpcodesniffer-composer-installer left the Composerfile. phpcs
+# phpcs only finds a standard whose folder is in its installed_paths. phpcs
 # keeps the setting in CodeSniffer.conf inside its own vendor folder, so a
 # phpcs upgrade wipes it and this script has to run again. Each set replaces
-# the whole comma-separated value: a second standard in the Composerfile goes
-# into this same call. setup/check-composer-neutron.sh covers it.
+# the whole comma-separated value, so every standard goes into this one call:
+# Neutron, plus WPCS and the PHPCSUtils and PHPCSExtra standards WPCS 3 needs
+# to load. Setting Neutron alone dropped WPCS on every run.
+#
+# wpcs brings dealerdirect/phpcodesniffer-composer-installer back in, and its
+# plugin registers the same folders during the require above. The set stays
+# anyway: the plugin only runs while allow-plugins trusts it, and taking wpcs
+# out of the Composerfile would take the plugin, and Neutron's registration,
+# with it. setup/check-composer-neutron.sh covers it.
 composer_home="$(composer global config home 2>/dev/null)"
-neutron="$composer_home/vendor/automattic/phpcs-neutron-standard"
+standards=(
+  automattic/phpcs-neutron-standard
+  phpcsstandards/phpcsextra
+  phpcsstandards/phpcsutils
+  wp-coding-standards/wpcs
+)
+installed_paths=""
 
-if [ -d "$neutron" ]; then
-  "$composer_home/vendor/bin/phpcs" --config-set installed_paths "$neutron"
+for standard in "${standards[@]}"; do
+  if [ -d "$composer_home/vendor/$standard" ]; then
+    installed_paths="${installed_paths:+$installed_paths,}$composer_home/vendor/$standard"
+  fi
+done
+
+if [ -n "$installed_paths" ]; then
+  "$composer_home/vendor/bin/phpcs" --config-set installed_paths "$installed_paths"
 fi

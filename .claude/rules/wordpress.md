@@ -129,8 +129,14 @@ Admin screens and front-end output aim for WCAG 2.2 AA:
 
 ## Tooling
 
-WPCS isn't installed globally, so the global `phpcs` can't check against it.
-Use the project's `vendor/bin/phpcs` with its `phpcs.xml` or `phpcs.xml.dist`.
-If the project has neither, say so rather than linting with another standard.
+Use the project's `vendor/bin/phpcs` with its `phpcs.xml` or `phpcs.xml.dist`
+first, since its ruleset sets the prefixes, text domain and minimum WordPress
+version. Without a project copy, the global `phpcs` has WPCS registered and
+reads the same ruleset. With no ruleset at all, lint the changed files with
+`phpcs --standard=WordPress` and say that's what ran, because the project
+never chose it. The global `phpstan` has `szepeviktor/phpstan-wordpress` and
+the WordPress and WooCommerce stubs, but they only apply when the project's
+`phpstan.neon` includes the extension; there's no extension installer to
+load it on its own.
 Test with `WP_DEBUG` and `WP_DEBUG_LOG` on; new notices and warnings count as
 failures.

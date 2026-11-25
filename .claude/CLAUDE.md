@@ -81,6 +81,7 @@ is read with no flags.
 - **Stop and re-plan when it goes sideways.** Say what broke and what you'd try instead, and let me redirect.
 - **Be direct.** No preamble, no restating my request. Name the file, function and line (`src/auth.ts:42`). Say plainly when something is broken. End with the next action, not a recap.
 - **Write like a person, not a model,** in anything I read or publish. No em dashes as all-purpose punctuation, lists of three for rhythm, "not X, it's Y", a last line restating the paragraph, colon reveals, or words like *robust*, *seamless* and *leverage*. Claim nothing that isn't true. `~/.claude/rules/human-writing.md` has the full list.
+- **Keep the English simple.** I'm a B1 to B2 English learner. Always reply in English, with everyday words and medium-length sentences, no idioms or slang. Put a short definition in brackets after a less common word: "reluctant (not wanting to do something)". If my message has a grammar or vocabulary mistake, end the reply with a short corrected version.
 - **Be efficient.** Parallelize independent tool calls. Tool output is resent on every later turn, so:
   - Locate with `rg -l` or `rg -c`, then read only the lines you need. Don't re-read a file already in the conversation.
   - Run the narrowest test or lint, pipe long output through `tail`, and ask for the compact form first (`git diff --stat`, `git log --oneline`, `phpunit --no-progress`, `vitest --reporter=dot`, `jest --silent`).
@@ -95,7 +96,8 @@ Before writing or changing code, read **Code style** in `~/.claude/REFERENCE.md`
 and follow `~/.claude/rules/code-style.md`. Claude Code loads it once it works
 with a source file. Codex never reads `~/.claude/rules/`, so in Codex open it
 before writing code. For PHP work, Codex opens `~/.claude/rules/php.md` too,
-plus `wordpress.md` or `laravel.md` beside it for those projects.
+plus `wordpress.md` or `laravel.md` beside it for those projects. For an app
+that ships Sparkle updates, Codex opens `~/.claude/rules/sparkle.md`.
 
 ## Tests
 
