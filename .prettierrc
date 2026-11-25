@@ -9,7 +9,7 @@
   "bracketSameLine": false,
   "endOfLine": "lf",
   "plugins": [
-    "@prettier/plugin-php"
+    "./.config/prettier/plugin-php.mjs"
   ],
   "overrides": [
     {

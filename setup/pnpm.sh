@@ -56,8 +56,10 @@ pkgs=(
   # to fetch it. Two installs, so check both when the version matters.
   intelephense
   ntl
+  # The binary only. Its PHP plugin is not a global: Prettier can't import
+  # from another global's isolated directory, so the plugin lives in
+  # .config/prettier and is installed at the end of this script.
   prettier
-  @prettier/plugin-php
   prettier-init
   stylelint
   svgo
@@ -71,6 +73,20 @@ pkgs=(
   typescript-language-server
 )
 
+status=0
+
 # Idempotent as-is: `pnpm add -g` on an installed package is an
 # upgrade-or-no-op, so this doubles as the update path.
-pnpm add -g "${pkgs[@]}"
+pnpm add -g "${pkgs[@]}" || status=1
+
+# The plugin directory that ~/.prettierrc loads PHP support from (see
+# .config/prettier/plugin-php.mjs). Installed in the repo path rather than
+# through the ~/.config link, so it works before the link exists. `update`
+# rather than `install` for the same update-path reason as above: the
+# lockfile is git-ignored, so it moves to the newest release in the
+# package.json ranges. A new minor of the 0.x plugin needs its range bumped
+# by hand.
+repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+pnpm update --dir "$repo_root/.config/prettier" || status=1
+
+exit "$status"

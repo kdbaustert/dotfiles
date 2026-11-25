@@ -476,6 +476,30 @@ lazy.nvim) and `.config/lvim` (LunarVim). They share only `.config/voltage.nvim`
 the colorscheme, which both put on their runtimepath. Never fold one into the
 other or copy the palette into either.
 
+### Prettier and its PHP plugin
+
+The `prettier` binary is a pnpm global, but its PHP plugin lives in
+`.config/prettier`, which `link_dotfiles()` links to `~/.config/prettier`.
+`.prettierrc` loads it as `./.config/prettier/plugin-php.mjs`, a one-line
+re-export of `@prettier/plugin-php`. Prettier 3 resolves a plugin path that
+starts with `.` next to the config file: `$HOME` for the `~/.prettierrc` link,
+the repo root for the real file, and both reach the same folder. That only
+holds when this is the config Prettier picks; a project config brings its own
+plugins.
+
+A bare `"@prettier/plugin-php"` was the old entry and broke every file, JS
+included (measured 2026-11-25 on Prettier 3.10.1: `Cannot find package
+'@prettier/plugin-php' imported from <cwd>/noop.js`). Prettier looks a bare
+name up from the current directory only, and pnpm 11+ puts each global in its
+own isolated folder that no other package can import from. `NODE_PATH`
+doesn't help either, since Prettier uses ESM resolution.
+
+`setup/pnpm.sh` runs `pnpm update --dir .config/prettier`, so the plugin and
+the `prettier` it imports follow the `package.json` ranges. The plugin is
+0.x, so a new minor needs its range bumped by hand. The lockfile is
+git-ignored. `setup/check-prettier.sh` fails if a plugin entry goes back to a
+bare name.
+
 ### Portable app settings
 
 `merge_claude_settings()` merges `.claude/settings.portable.json` into
@@ -564,6 +588,7 @@ setup/check-gh-watch-scroll.sh                # `gh run watch` scroll-mode write
 setup/check-composer-neutron.sh               # phpcs Neutron and WPCS registration after the Composer install
 setup/check-setup-scripts.sh                  # setup scripts: all by default, SETUP_SCRIPTS narrows, a failure doesn't stop the rest
 setup/check-install-downloads.sh              # superfile and pay-respects: failed download or copy warns
+setup/check-prettier.sh                       # .prettierrc plugins load by path; JS and PHP format from outside the repo
 setup/check-zsh-config.sh                     # aliases, functions, fzf completers, starship/zinit bootstrap, fzf-tab previews
 ```
 

@@ -36,6 +36,11 @@ venv
 node_modules
 .sass-cache
 
+# setup/pnpm.sh runs `pnpm update` here, which rewrites the lockfile on every
+# release inside the package.json ranges. Tracking it would dirty the tree on
+# each run without pinning anything, since the update ignores it anyway.
+.config/prettier/pnpm-lock.yaml
+
 # macOS custom-folder icons. The file on disk is literally "Icon" followed by a
 # carriage return, so a bare `Icon` pattern matches nothing. The `?` is what
 # makes this work.

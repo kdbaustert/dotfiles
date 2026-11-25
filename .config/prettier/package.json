@@ -1,0 +1,8 @@
+{
+  "name": "global-prettier",
+  "private": true,
+  "dependencies": {
+    "@prettier/plugin-php": "^0.26.0",
+    "prettier": "^3.10.1"
+  }
+}
