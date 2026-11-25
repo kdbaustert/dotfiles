@@ -459,14 +459,12 @@ section_iterm() {
 
 #------------------------------------------------------------------------------
 section_setup_scripts() {
-  title "Optional setup scripts"
-  # Opt-in and off by default. See run_setup_scripts in setup/lib.sh for how the
-  # selection works. macos.sh isn't one of these: it is the `macos` section
-  # below, with a yes/no of its own instead of hiding behind an environment
-  # variable.
+  title "Setup scripts"
+  # All four by default. See run_setup_scripts in setup/lib.sh for why, and for
+  # how SETUP_SCRIPTS narrows the list. macos.sh isn't one of these: it is the
+  # `macos` section below, with a yes/no of its own.
   #
   #     SETUP_SCRIPTS="pnpm composer" ./install.sh
-  #     SETUP_SCRIPTS=all ./install.sh
   run_setup_scripts "pnpm composer mas gh-extensions"
 }
 
@@ -510,7 +508,7 @@ SECTIONS=(
   "hosts|Hosts blocklist and its weekly LaunchDaemon"
   "touchid|Touch ID for sudo"
   "iterm|(iTerm2) Preferences"
-  "setup-scripts|Optional setup/ scripts, selected by \$SETUP_SCRIPTS"
+  "setup-scripts|pnpm and Composer globals, Mac App Store apps, gh extensions (narrow with \$SETUP_SCRIPTS)"
   "macos|macOS system defaults from setup/macos.sh — review it first"
 )
 

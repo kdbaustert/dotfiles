@@ -15,7 +15,7 @@ These details are preserved from the former startup instructions.
 | `.config/git/`        | `ignore` (global excludes) and `allowed_signers` (SSH signing)     |
 | `homebrew/Brewfile`   | The package set                                                   |
 | `setup/lib.sh`        | The longer installer sections, sourced by `install.sh`            |
-| `setup/`              | Opt-in scripts (`SETUP_SCRIPTS="pnpm composer" ./install.sh`)      |
+| `setup/`              | Setup scripts, all run by default (`SETUP_SCRIPTS="pnpm composer" ./install.sh` narrows them) |
 | `themes/voltage.md`   | Canonical palette + the list of files that carry it               |
 | `iterm/`, `obsidian/` | App-specific config                                            |
 | `.claude/CLAUDE.md`   | Global Claude Code instructions                                   |
@@ -562,6 +562,7 @@ setup/check-zsh-cache-filters.sh              # fzf option restore + write fallb
 setup/check-update-function.sh                # `update` step order, skips and failure report
 setup/check-gh-watch-scroll.sh                # `gh run watch` scroll-mode writes + restore on Ctrl+C
 setup/check-composer-neutron.sh               # phpcs Neutron and WPCS registration after the Composer install
+setup/check-setup-scripts.sh                  # setup scripts: all by default, SETUP_SCRIPTS narrows, a failure doesn't stop the rest
 setup/check-install-downloads.sh              # superfile and pay-respects: failed download or copy warns
 setup/check-zsh-config.sh                     # aliases, functions, fzf completers, starship/zinit bootstrap, fzf-tab previews
 ```

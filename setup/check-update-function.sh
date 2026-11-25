@@ -141,7 +141,7 @@ touch "$dir/composer/composer.json"
 run_update "$dir" >/dev/null
 expect 'composer runs once its global composer.json exists' 'composer global update' \
   "$(grep -x 'composer global update' "$dir/log")"
-expect 'phpcs is left alone without the Neutron package' '' "$(grep '^phpcs' "$dir/log")"
+expect 'phpcs is left alone without any standard' '' "$(grep '^phpcs' "$dir/log")"
 
 neutron="$dir/composer/vendor/automattic/phpcs-neutron-standard"
 mkdir -p "$neutron"
@@ -151,8 +151,16 @@ expect 'Neutron is registered again after the composer update' \
   "$(printf '%s\n' 'composer global update' "phpcs --config-set installed_paths $neutron")" \
   "$(grep -A1 -x 'composer global update' "$dir/log")"
 
+vendor="$dir/composer/vendor"
+mkdir -p "$vendor/phpcsstandards/phpcsextra" "$vendor/phpcsstandards/phpcsutils" \
+  "$vendor/wp-coding-standards/wpcs"
+run_update "$dir" >/dev/null
+expect 'WPCS and its dependencies stay registered beside Neutron' \
+  "phpcs --config-set installed_paths $neutron,$vendor/phpcsstandards/phpcsextra,$vendor/phpcsstandards/phpcsutils,$vendor/wp-coding-standards/wpcs" \
+  "$(grep '^phpcs' "$dir/log")"
+
 output="$(run_update "$dir" STUB_FAIL_phpcs=1)"
-expect 'a failed registration is named at the end' '==> Failed: phpcs Neutron standard' \
+expect 'a failed registration is named at the end' '==> Failed: phpcs standards' \
   "$(last_line "$output")"
 
 rm "$dir/composer/composer.json"

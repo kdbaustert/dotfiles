@@ -1057,14 +1057,17 @@ install_tweakcc() {
 #------------------------------------------------------------------------------
 # run_setup_scripts <default-list>
 #------------------------------------------------------------------------------
-# Opt-in, and off by default: these pull down a lot of global packages.
-# (macos.sh, which rewrites system defaults, is install.sh's own `macos`
-# section instead.) Commented-out lines in install.sh would mean editing the
-# installer to enable one, and the section would print a heading and do nothing
-# on every run. Select them by name instead:
+# Runs every script in <default-list> unless SETUP_SCRIPTS names fewer. They
+# used to be opt-in because they pull down a lot of global packages, but the
+# rules in .claude/ describe phpstan, WPCS, prettier and the rest as installed
+# globally, and a plain run left all of them missing. A full run now matches
+# what those rules promise. Leave the whole set out with
+# `--skip setup-scripts`, or by saying no to its question; narrow it by name:
 #
 #     SETUP_SCRIPTS="pnpm composer" ./install.sh
-#     SETUP_SCRIPTS=all ./install.sh
+#
+# (macos.sh, which rewrites system defaults, is install.sh's own `macos`
+# section instead.)
 #
 # <default-list> is what `all` expands to. It is the caller's rather than a
 # glob of setup/*.sh because setup/ also holds scripts that are not optional
@@ -1076,13 +1079,8 @@ install_tweakcc() {
 # macOS, where /bin/sh is bash in POSIX mode.
 run_setup_scripts() {
   local all_list="$1" s setup_script
-  local requested="${SETUP_SCRIPTS:-}"
+  local requested="${SETUP_SCRIPTS:-all}"
   [ "$requested" = "all" ] && requested="$all_list"
-
-  if [ -z "$requested" ]; then
-    info "None requested — re-run with SETUP_SCRIPTS=\"pnpm composer\" (or =all) to include them."
-    return 0
-  fi
 
   # Unquoted on purpose: the variable is a space-separated list of names.
   # shellcheck disable=SC2086

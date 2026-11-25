@@ -107,15 +107,17 @@ alias ibrew='arch -x86_64 /usr/local/bin/brew'
 #   - nvm: nvm.sh is sourced in a subshell, so `nvm use` can't change the
 #     calling shell's node, and `command npm` skips the zsh-nvm shim function.
 #
-# composer only runs when its global composer.json exists. setup/composer.sh is
-# opt-in, and before it has run `composer global update` just prints an error.
-# The phpcs step after it puts Neutron back in installed_paths: phpcs keeps
-# that setting in CodeSniffer.conf inside its own vendor folder, so an update
-# that brings a new phpcs wipes it and `phpcs --standard=NeutronStandard` stops
-# resolving. It's the same command setup/composer.sh runs after its install,
-# and it runs on every update because nothing cheap says whether phpcs changed.
-# The set replaces the whole installed_paths value, so a second standard has to
-# be added here and in setup/composer.sh together.
+# composer only runs when its global composer.json exists. install.sh runs
+# setup/composer.sh by default, but it can be skipped, and before it has run
+# `composer global update` just prints an error. The phpcs step after it puts
+# the standards back in installed_paths: phpcs keeps that setting in
+# CodeSniffer.conf inside its own vendor folder, so an update that brings a new
+# phpcs wipes it and `phpcs --standard=NeutronStandard` stops resolving. It's
+# the same command setup/composer.sh runs after its install, and it runs on
+# every update because nothing cheap says whether phpcs changed. The set
+# replaces the whole installed_paths value, so the standards list here and the
+# one in setup/composer.sh have to match. When this set Neutron alone, every
+# update dropped WPCS.
 #
 # Mason's LSP servers aren't here: mason has no headless "update everything"
 # command without mason-tool-installer, which .config/nvim doesn't use. Press
@@ -128,7 +130,13 @@ unalias update 2>/dev/null
 function update {
   local -a failed
   local brew_prefix="${HOMEBREW_PREFIX:-/opt/homebrew}"
-  local composer_home neutron
+  local composer_home standard installed_paths
+  local -a phpcs_standards=(
+    automattic/phpcs-neutron-standard
+    phpcsstandards/phpcsextra
+    phpcsstandards/phpcsutils
+    wp-coding-standards/wpcs
+  )
 
   if (( $+commands[brew] )); then
     _update_step 'brew update' brew update
@@ -150,13 +158,17 @@ function update {
 
   if (( $+commands[composer] )); then
     composer_home="$(composer global config home 2>/dev/null)"
-    neutron=$composer_home/vendor/automattic/phpcs-neutron-standard
 
     if [[ -n $composer_home && -f $composer_home/composer.json ]]; then
       _update_step 'composer globals' composer global update
 
-      [[ -d $neutron ]] && _update_step 'phpcs Neutron standard' \
-        "$composer_home/vendor/bin/phpcs" --config-set installed_paths "$neutron"
+      for standard in $phpcs_standards; do
+        [[ -d $composer_home/vendor/$standard ]] \
+          && installed_paths+=${installed_paths:+,}$composer_home/vendor/$standard
+      done
+
+      [[ -n $installed_paths ]] && _update_step 'phpcs standards' \
+        "$composer_home/vendor/bin/phpcs" --config-set installed_paths "$installed_paths"
     fi
   fi
 

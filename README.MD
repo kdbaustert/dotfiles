@@ -65,14 +65,15 @@ step is pinned to arm64 and skips itself elsewhere).
 - Enables Touch ID for `sudo` via `/etc/pam.d/sudo_local`
 - Points iTerm2 at `iterm/` for its preferences
 
-### Optional setup scripts
+### Setup scripts
 
-The scripts in `setup/` are opt-in, because they install a lot of global
-packages. Select them by name:
+The `setup-scripts` section runs all four scripts below. They install a lot of
+global packages, and the Mac App Store list includes Xcode. To run only some of
+them, name them. To leave them all out, skip the section:
 
 ```sh
 SETUP_SCRIPTS="pnpm composer" ./install.sh
-SETUP_SCRIPTS=all ./install.sh          # pnpm composer mas gh-extensions
+./install.sh --skip setup-scripts
 ```
 
 | Script             | Installs                                          |

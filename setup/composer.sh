@@ -41,7 +41,8 @@ composer global require "${composer[@]}" || exit
 # plugin registers the same folders during the require above. The set stays
 # anyway: the plugin only runs while allow-plugins trusts it, and taking wpcs
 # out of the Composerfile would take the plugin, and Neutron's registration,
-# with it. setup/check-composer-neutron.sh covers it.
+# with it. setup/check-composer-neutron.sh covers it. The `update` function in
+# zsh/os/macos-interactive.zsh repeats this list, so change both together.
 composer_home="$(composer global config home 2>/dev/null)"
 standards=(
   automattic/phpcs-neutron-standard
