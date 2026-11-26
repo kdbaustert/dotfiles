@@ -4,6 +4,8 @@
 # the phpcs registration that follows the install: phpcs gets every installed
 # standard's folder in one installed_paths value, so registering Neutron can't
 # drop WPCS, and isn't called when no standard is there or the install failed.
+# An empty `composer global config home` fails the script instead of skipping
+# the registration without a word.
 # Run it after changing composer.sh:
 #
 #   setup/check-composer-neutron.sh
@@ -40,10 +42,11 @@ chmod +x "$tmp_dir/bin/composer" "$composer_home/vendor/bin/phpcs"
 
 # Runs composer.sh with only the stubs on PATH and prints its exit status,
 # then what phpcs was called with. STUB_REQUIRE_EXIT in the caller's
-# environment reaches the composer stub.
+# environment reaches the composer stub, and so does STUB_HOME when set, even
+# to empty.
 run_composer_script() {
   : >"$phpcs_log"
-  env -i PATH="$tmp_dir/bin:/usr/bin:/bin" STUB_HOME="$composer_home" \
+  env -i PATH="$tmp_dir/bin:/usr/bin:/bin" STUB_HOME="${STUB_HOME-$composer_home}" \
     STUB_PHPCS_LOG="$phpcs_log" STUB_REQUIRE_EXIT="${STUB_REQUIRE_EXIT:-0}" \
     "$root/setup/composer.sh" >/dev/null 2>&1
   printf '<%s>' "$?"
@@ -77,5 +80,8 @@ expect 'WPCS and its dependencies are registered beside Neutron' \
 
 expect 'a failed install keeps its status and skips phpcs' '<2>' \
   "$(STUB_REQUIRE_EXIT=2 run_composer_script)"
+
+expect 'an empty composer home fails and skips phpcs' '<1>' \
+  "$(STUB_HOME='' run_composer_script)"
 
 exit "$((failures > 0))"

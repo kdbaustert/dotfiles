@@ -294,6 +294,12 @@ Installed as real binaries: `shellcheck`, `shfmt`, `stylua` and `php-cs-fixer`
 from Homebrew, plus Prettier as a pnpm global reading `~/.prettierrc`. Prefer a
 repo's own pinned tooling when it ships one.
 
+`typos` (Homebrew) spell-checks code and docs, reading `~/.typos.toml` when the
+project has no config of its own. Run it on the files you changed,
+`typos <files>`, and fix real typos. A false alarm that only one project has
+goes in that project's own `_typos.toml`, not the global file, and a project
+config replaces the global one, so copy over what it still needs.
+
 Swift: `swift format` ships with Xcode but defaults to 2 spaces, so run it only
 with a config pinning `indentation.spaces: 4`, and prefer not to run it at all.
 `swiftlint` is not installed; a repo that asks for it needs

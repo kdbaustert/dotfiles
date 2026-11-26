@@ -328,6 +328,9 @@ section_hosts() {
   HOSTS_DAEMON_SCRIPT="/usr/local/libexec/$HOSTS_DAEMON_LABEL"
   HOSTS_DAEMON_LOG="/var/log/$HOSTS_DAEMON_LABEL.log"
   hosts_plist_tmp="$(mktemp)"
+  # Removes the draft if the run stops before the rm below, as on_interrupt's
+  # exit does. Cleared again after the rm; nothing else here sets an EXIT trap.
+  trap 'rm -f "$hosts_plist_tmp"' EXIT
 
   # StartCalendarInterval rather than StartInterval: a calendar job that came
   # due while the Mac slept runs once on wake instead of being skipped. One
@@ -384,6 +387,7 @@ EOF
     warning "Could not copy the hosts refresh job into place — the blocklist will only update when setup/hosts.sh is run by hand."
   fi
   rm -f "$hosts_plist_tmp"
+  trap - EXIT
 
   if "$DOTFILES_DIR/setup/hosts.sh"; then
     success "Hosts blocklist current."
@@ -443,11 +447,15 @@ section_iterm() {
   # iterm/ and it picks up com.googlecode.iterm2.plist from there. Without these
   # writes a fresh box has the repo's plist but never loads it. Written
   # unconditionally, since `defaults write` is idempotent and iTerm2 only reads
-  # these at launch.
+  # these at launch. Checked, because a failed write leaves iTerm2 on its own
+  # prefs with nothing on screen to say so.
   if [ -d "$DOTFILES_DIR/iterm" ]; then
-    defaults write com.googlecode.iterm2 PrefsCustomFolder -string "$DOTFILES_DIR/iterm"
-    defaults write com.googlecode.iterm2 LoadPrefsFromCustomFolder -bool true
-    success "iTerm2 prefs folder → $DOTFILES_DIR/iterm"
+    if defaults write com.googlecode.iterm2 PrefsCustomFolder -string "$DOTFILES_DIR/iterm" \
+      && defaults write com.googlecode.iterm2 LoadPrefsFromCustomFolder -bool true; then
+      success "iTerm2 prefs folder → $DOTFILES_DIR/iterm"
+    else
+      warning "Could not point iTerm2 at $DOTFILES_DIR/iterm — it keeps its own prefs."
+    fi
   fi
 
   # obsidian/ holds the "Amethyst Night" theme. It is intentionally NOT deployed
@@ -712,15 +720,32 @@ for name in $SUDO_SECTIONS; do
   fi
 done
 
+# CURRENT_SECTION names the section in each summary line and in the
+# interrupted warning. See on_interrupt in setup/lib.sh for why the trap
+# covers this loop only.
+trap on_interrupt INT
 for name in $ALL_SECTIONS; do
   if has_word "$SELECTED" "$name"; then
+    CURRENT_SECTION="$name"
     "section_${name//-/_}"
   fi
 done
+CURRENT_SECTION=""
+trap - INT
 
 #------------------------------------------------------------------------------
 title "Summary"
 #------------------------------------------------------------------------------
-print_summary
+# Exits 1 when any step warned. Every step still runs past a warning, so the
+# summary is the only place a failure is counted, and a 0 after one would
+# tell `./install.sh && exec zsh` or a script that everything worked.
+#
+# The status comes from the test on the last line rather than an `exit`:
+# ShellCheck 0.11 reads a final `exit` as making every section function
+# unreachable, since it can't see the "section_${name//-/_}" call, and flags
+# all eleven as SC2329.
+summary_status=0
+print_summary || summary_status=1
 
 success "\nDone. Open a new terminal (or run: exec zsh) to load the new shell."
+[ "$summary_status" -eq 0 ]

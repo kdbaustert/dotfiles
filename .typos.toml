@@ -1,0 +1,50 @@
+# Fallback config for typos (the typos-cli formula), linked to ~/.typos.toml.
+# typos has no user-level config path; it walks up from the checked path to
+# the nearest _typos.toml, typos.toml or .typos.toml, so this file covers every
+# project under $HOME that has none. The nearest file wins outright: a
+# project's own config replaces this one, nothing is merged, so a project that
+# adds one has to copy any entry below it still needs.
+#
+# Every entry is a false alarm seen in more than one project under
+# ~/Development or ~/Developer on 2026-11-25. A word that only one project
+# uses belongs in that project's config, not here.
+
+[files]
+# Minified bundles aren't anyone's spelling, and .xcstrings catalogs are
+# mostly translations (French "sur", "pointeur" and so on).
+extend-exclude = ["*.min.js", "*.min.css", "*.xcstrings"]
+
+[default]
+extend-ignore-re = [
+  # Opt-out comments for a misspelling that's meant, like a test sample, in
+  # the form the typos docs suggest. These cover any project, so a file can
+  # opt out without a project config replacing this one.
+  '(?Rm)^.*(#|//)\s*spellchecker:disable-line$',
+  '(?s)(#|//)\s*spellchecker:off.*?\n\s*(#|//)\s*spellchecker:on',
+  # Wrapped base64, like a plist <data> block. typos skips one long base64
+  # token but not 68-character lines, where it finds words like "Ot".
+  '(?m)^\s*[A-Za-z0-9+/]{60,}={0,2}\s*$',
+  # "café" escaped in Unicode tests: "caf\u{E9}", "Caf\U00e9", "caf&#233;",
+  # "caf&eacute;".
+  '(?i)\bcaf(\\u|&)',
+  # The macOS release name. Allowing "sur" as a word would also let a typo
+  # for "sure" through.
+  'Big[- ]Sur',
+]
+
+[default.extend-identifiers]
+# typos splits "PNGs" into "PN" and "Gs".
+PNGs = "PNGs"
+# Key names Apple and iTerm misspelled themselves, so the misspelling is the
+# only one that works in a defaults write or a plist.
+SidebarTagsSctionDisclosedState = "SidebarTagsSctionDisclosedState"
+AIFeatureHostedCodeInterpeter = "AIFeatureHostedCodeInterpeter"
+MinimalDeslectedColoredTabAlpha = "MinimalDeslectedColoredTabAlpha"
+
+[default.extend-words]
+# The company behind WordPress.com, WooCommerce and the Neutron standard.
+automattic = "automattic"
+# WooCommerce's shop_order_placehold post type.
+placehold = "placehold"
+# "look-alikes".
+alikes = "alikes"

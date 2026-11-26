@@ -35,6 +35,11 @@ one you kept needs it.
 
 Without a terminal (piped, over ssh without `-t`) it behaves as `-y`.
 
+A step that fails prints a warning and the run goes on. The summary at the end
+lists every warning with the section it came from, and the installer then
+exits 1, so `./install.sh && exec zsh` stops there. Ctrl-C during a section
+prints the summary too, with the section it stopped in.
+
 The longer sections (the symlinks, zinit, the theme caches, LS_COLORS, the
 setup-script runner) live in `setup/lib.sh`, which `install.sh` sources, so the
 installer itself reads as a list of sections.

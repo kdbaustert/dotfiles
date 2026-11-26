@@ -10,6 +10,15 @@
 #   ./install.sh macos
 #
 # Inspired by https://mths.be/macos
+#
+# Exits non-zero when one of the sudo steps fails (the computer name, restart
+# on freeze, the boot chime), so install.sh's macos section reports it. The
+# `defaults write` lines are left unchecked on purpose: a few domains, such as
+# com.apple.universalaccess, refuse writes without Full Disk Access on some
+# macOS releases, and a warning on every run would bury a real failure.
+set -uo pipefail
+
+status=0
 
 # Close any open System Preferences panes, to prevent them from overriding
 # settings we’re about to change
@@ -71,15 +80,15 @@ set_computer_name() {
   fi
 
   bonjour="$(local_host_name "$name")"
-  sudo scutil --set ComputerName "$name"
+  sudo scutil --set ComputerName "$name" || return 1
   if [ -n "$bonjour" ]; then
-    sudo scutil --set LocalHostName "$bonjour"
+    sudo scutil --set LocalHostName "$bonjour" || return 1
   else
     echo "\"$name\" has no letters or digits for a LocalHostName; left that unchanged."
   fi
 }
 
-set_computer_name
+set_computer_name || status=1
 
 # Set sidebar icon size to medium
 defaults write NSGlobalDomain NSTableViewDefaultSizeMode -int 2
@@ -98,10 +107,10 @@ defaults write com.apple.print.PrintingPrefs "Quit When Finished" -bool true
 defaults write com.apple.LaunchServices LSQuarantine -bool false
 
 # Restart automatically if the computer freezes
-sudo systemsetup -setrestartfreeze on
+sudo systemsetup -setrestartfreeze on || status=1
 
 #Disable the sound effects on boot
-sudo nvram StartupMute=%01
+sudo nvram StartupMute=%01 || status=1
 
 ###############################################################################
 # Appearance                                                                  #
@@ -124,7 +133,11 @@ defaults write NSGlobalDomain AppleAntiAliasingThreshold -int 4
 defaults write NSGlobalDomain AppleLanguagesSchemaVersion -int 5400
 defaults write NSGlobalDomain AppleLocale -string en_US
 defaults write NSGlobalDomain AppleMiniaturizeOnDoubleClick -bool false
+# The curly quotes are the value, the setting's sample text, not a quoting
+# mistake. A directive covers one command, hence two.
+# shellcheck disable=SC1112
 defaults write NSGlobalDomain KB_DoubleQuoteOption -string '“abc”'
+# shellcheck disable=SC1112
 defaults write NSGlobalDomain KB_SingleQuoteOption -string '‘abc’'
 defaults write NSGlobalDomain NSAutomaticCapitalizationEnabled -bool true
 defaults write NSGlobalDomain NSAutomaticPeriodSubstitutionEnabled -bool true
@@ -207,6 +220,8 @@ defaults write com.apple.finder FXToolbarUpgradedToTenEight -int 1
 defaults write com.apple.finder FXToolbarUpgradedToTenNine -int 2
 defaults write com.apple.finder FXToolbarUpgradedToTenSeven -int 1
 defaults write com.apple.finder FinderSpawnTab -bool false
+# Finder expands the ~ itself when Go to Folder opens, so it stays literal.
+# shellcheck disable=SC2088
 defaults write com.apple.finder GoToField -string '~/.ssh/'
 defaults write com.apple.finder NSNavPanelExpandedSizeForOpenMode -string '{880, 448}'
 defaults write com.apple.finder PreviewPaneGalleryWidth -float 240
@@ -449,3 +464,4 @@ for app in "cfprefsd" \
 done
 
 echo "Done. Note that some of these changes require a logout/restart to take effect."
+exit "$status"

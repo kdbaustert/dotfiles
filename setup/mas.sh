@@ -31,12 +31,22 @@ apps=(
 # hence anchoring the match to the id followed by whitespace.
 installed="$(mas list 2>/dev/null)"
 
+# One failed install doesn't stop the rest, but it does set the exit status,
+# which is the only thing install.sh's run_setup_scripts reads. A failure the
+# loop only printed scrolled away with nothing in the summary.
+status=0
+
 for app in "${apps[@]}"; do
   id="${app%%:*}"
   name="${app#*:}"
   if printf '%s\n' "$installed" | grep -qE "^${id}[[:space:]]"; then
     echo "Mac App Store app already installed: $name"
   else
-    mas install "$id" || echo "Failed to install $name ($id)." >&2
+    if ! mas install "$id"; then
+      echo "Failed to install $name ($id)." >&2
+      status=1
+    fi
   fi
 done
+
+exit "$status"

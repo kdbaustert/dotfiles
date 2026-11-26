@@ -43,7 +43,16 @@ composer global require "${composer[@]}" || exit
 # out of the Composerfile would take the plugin, and Neutron's registration,
 # with it. setup/check-composer-neutron.sh covers it. The `update` function in
 # zsh/os/macos-interactive.zsh repeats this list, so change both together.
+#
+# An empty home would make every vendor path below relative, find nothing and
+# skip the set without a word, leaving phpcs with no WPCS. So it stops here,
+# non-zero, and install.sh lists it in the summary.
 composer_home="$(composer global config home 2>/dev/null)"
+if [ -z "$composer_home" ]; then
+  echo "composer global config home printed nothing — phpcs standards not registered." >&2
+  exit 1
+fi
+
 standards=(
   automattic/phpcs-neutron-standard
   phpcsstandards/phpcsextra

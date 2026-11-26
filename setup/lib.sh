@@ -23,8 +23,8 @@ COLOR_YELLOW="\033[1;33m"
 COLOR_NONE="\033[0m"
 
 title()   { echo -e "\n${COLOR_PURPLE}$1${COLOR_NONE}"; echo -e "${COLOR_GRAY}==============================${COLOR_NONE}\n"; }
-error()   { echo -e "${COLOR_RED}Error: ${COLOR_NONE}$1"; exit 1; }
-warning() { echo -e "${COLOR_YELLOW}Warning: ${COLOR_NONE}$1"; ISSUES+=("$1"); }
+error()   { echo -e "${COLOR_RED}Error: ${COLOR_NONE}$1" >&2; exit 1; }
+warning() { echo -e "${COLOR_YELLOW}Warning: ${COLOR_NONE}$1" >&2; ISSUES+=("${CURRENT_SECTION:+$CURRENT_SECTION: }$1"); }
 info()    { echo -e "${COLOR_BLUE}Info: ${COLOR_NONE}$1"; }
 success() { echo -e "${COLOR_GREEN}$1${COLOR_NONE}"; }
 
@@ -33,9 +33,23 @@ success() { echo -e "${COLOR_GREEN}$1${COLOR_NONE}"; }
 # collected here: every call site is a precondition the rest of the script
 # cannot run without, so it still exits immediately rather than joining a
 # summary nobody gets to read.
+#
+# Both go to stderr, so a run piped or redirected to a log still shows its
+# failures on the terminal, and a caller that captures stdout doesn't swallow
+# them.
 ISSUES=()
 
-# print_summary: call once, at the very end of install.sh.
+# The section install.sh is running, which `warning` puts in front of each
+# summary line. The live line doesn't need it, since it prints under the
+# section's title, but the summary comes after every title has scrolled away
+# and "Could not fetch gum" says nothing about where. Empty outside a section.
+CURRENT_SECTION=""
+
+# Prints the warnings collected during the run. Call once, at the very end of
+# install.sh.
+#
+# @return 0 when there were none, 1 otherwise, which install.sh passes on as
+#   its exit status so a script running it can tell
 print_summary() {
   if [ ${#ISSUES[@]} -eq 0 ]; then
     success "\nNo warnings — every step completed cleanly."
@@ -46,6 +60,24 @@ print_summary() {
   for i in "${ISSUES[@]}"; do
     echo -e "  ${COLOR_YELLOW}-${COLOR_NONE} $i"
   done
+  return 1
+}
+
+# INT trap for install.sh's section loop. Without it Ctrl-C ends the run with
+# no summary, so every warning from the sections that did finish is lost, and
+# nothing says which section was cut off. Records the interruption as one more
+# warning, under the section's name, prints the summary and exits 130, the
+# status a shell gives a script killed by SIGINT.
+#
+# Only set around the section loop. During the questions before it nothing
+# has run yet, and confirm() already exits 130 on its own.
+on_interrupt() {
+  trap - INT
+  echo >&2
+  warning "Interrupted — the sections after this one did not run."
+  title "Summary"
+  print_summary
+  exit 130
 }
 
 # Symlink helper: $1 = source in repo, $2 = destination in $HOME.
@@ -272,7 +304,7 @@ link_dotfiles() {
   # .vimrc and .default-npm-packages aren't listed: neither exists in the
   # repo, so they would warn on every single run, and two guaranteed warnings
   # is exactly how you learn to stop reading them.
-  for f in .zshenv .zshrc .gitconfig .editorconfig .prettierrc; do
+  for f in .zshenv .zshrc .gitconfig .editorconfig .prettierrc .typos.toml; do
     link "$DOTFILES_DIR/$f" "$HOME/$f"
   done
 

@@ -3,7 +3,10 @@
 # Runs run_setup_scripts from setup/lib.sh against stub scripts in a scratch
 # DOTFILES_DIR and checks which ones it runs: every script in the default list
 # when SETUP_SCRIPTS is unset, empty or `all`, only the named ones otherwise,
-# and the rest still after one fails. Run it after changing run_setup_scripts:
+# and the rest still after one fails. Also checks the print helpers install.sh
+# reports through: warnings go to stderr and carry the section name into the
+# summary, print_summary's status, and the Ctrl-C summary from on_interrupt.
+# Run it after changing run_setup_scripts or those helpers:
 #
 #   setup/check-setup-scripts.sh
 #
@@ -41,6 +44,17 @@ run_scripts() {
     _ "$root" "$tmp_dir" 2>&1
 }
 
+# Sources lib.sh in a clean environment and runs a snippet after it. Prints
+# the snippet's stdout, then its exit status in angle brackets; stderr goes to
+# $tmp_dir/stderr.
+#
+# @param $1 bash code to run once lib.sh is loaded
+run_lib() {
+  env -i PATH="/usr/bin:/bin" HOME="$tmp_dir" \
+    /bin/bash -c 'set -u; source "$1/setup/lib.sh"; eval "$2"' _ "$root" "$1" 2>"$tmp_dir/stderr"
+  printf '<%s>' "$?"
+}
+
 # @param $1 description
 # @param $2 expected text
 # @param $3 actual text
@@ -75,5 +89,26 @@ expect 'the failure names the script' 1 "$(grep -c 'setup/two.sh exited non-zero
 output="$(run_scripts SETUP_SCRIPTS=missing)"
 expect 'an unknown name warns instead of failing' 1 \
   "$(grep -c 'No such setup script: missing' <<<"$output")"
+
+output="$(run_lib 'warning "first"')"
+expect 'a warning goes to stderr, not stdout' '<0>' "$output"
+expect 'the warning is on stderr' 1 "$(grep -c 'Warning: .*first' "$tmp_dir/stderr")"
+
+output="$(run_lib 'print_summary')"
+expect 'print_summary returns 0 with no warnings' 1 "$(grep -c '<0>$' <<<"$output")"
+
+output="$(run_lib 'warning "outside"; CURRENT_SECTION=brew; warning "inside"; print_summary')"
+expect 'print_summary returns 1 after a warning' 1 "$(grep -c '<1>$' <<<"$output")"
+# Summary lines read "  <color>-<reset> <text>", so each pattern starts at the
+# reset code's closing m.
+expect 'a warning outside a section has no prefix' 1 "$(grep -c 'm outside$' <<<"$output")"
+expect 'a warning inside a section is prefixed with its name' 1 \
+  "$(grep -c 'm brew: inside$' <<<"$output")"
+
+output="$(run_lib 'CURRENT_SECTION=zsh; trap on_interrupt INT; kill -INT $$; echo not-reached')"
+expect 'Ctrl-C in a section exits 130' 1 "$(grep -c '<130>$' <<<"$output")"
+expect 'Ctrl-C prints the summary with the section it stopped in' 1 \
+  "$(grep -c 'm zsh: Interrupted' <<<"$output")"
+expect 'Ctrl-C stops the run there' 0 "$(grep -c 'not-reached' <<<"$output")"
 
 exit "$((failures > 0))"

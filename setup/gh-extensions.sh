@@ -14,10 +14,18 @@ extensions=(
 )
 
 installed="$(gh extension list 2>/dev/null)"
+
+# Kept for the end, as in mas.sh. Without it the script's status was the last
+# install's, so a failure before a later success read as a clean run.
+status=0
+
 for ext in "${extensions[@]}"; do
   if printf '%s\n' "$installed" | grep -qF "$ext"; then
     echo "gh extension already installed: $ext"
-  else
-    gh extension install "$ext"
+  elif ! gh extension install "$ext"; then
+    echo "Failed to install gh extension $ext." >&2
+    status=1
   fi
 done
+
+exit "$status"

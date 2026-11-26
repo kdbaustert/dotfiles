@@ -14,7 +14,7 @@ node versions, git signing identities, or Swift formatting and language modes.
 
 - macOS, Apple Silicon, zsh, `nvim`, `atuin`. Homebrew at `/opt/homebrew` owns every global tool; prefer its binaries over `/usr/bin`. `python3` is Homebrew's.
 - Nix is for per-project environments only: never `nix profile install` or `nix-env -i`. If a tool call lacks `nix-shell`, source `/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh`. direnv never fires in a tool call, so run `nix develop -c <cmd>`.
-- Symlinks into `~/dotfiles`: `~/.zshrc`, `~/.zprofile`, `~/.profile`, `~/.zshenv`, `~/.gitconfig`, `~/.editorconfig`, `~/.prettierrc`, `~/eslint.config.mjs`, `~/.codex/AGENTS.override.md`, every `~/.config/<tool>` entry, and in `~/.claude/` the `CLAUDE.md`, `REFERENCE.md`, `statusline.sh`, `hooks/*.sh`, `skills/<skill>` and `rules/<rule>.md`. Edit the file in `~/dotfiles`, never the `$HOME` path.
+- Symlinks into `~/dotfiles`: `~/.zshrc`, `~/.zprofile`, `~/.profile`, `~/.zshenv`, `~/.gitconfig`, `~/.editorconfig`, `~/.prettierrc`, `~/.typos.toml`, `~/eslint.config.mjs`, `~/.codex/AGENTS.override.md`, every `~/.config/<tool>` entry, and in `~/.claude/` the `CLAUDE.md`, `REFERENCE.md`, `statusline.sh`, `hooks/*.sh`, `skills/<skill>` and `rules/<rule>.md`. Edit the file in `~/dotfiles`, never the `$HOME` path.
 - The `node` a tool call sees is Homebrew's, not my interactive nvm one; read **Environment** in `~/.claude/REFERENCE.md` before stating my version.
 - GNU tools are g-prefixed (`ggrep`, `gsed`, `gls`, `gsort`); the defaults are BSD. No `gfind`; use `fd`.
 - `ls` and `tree` are aliases in tool calls. To parse output, call `/bin/ls` or `fd`.
@@ -36,7 +36,7 @@ node versions, git signing identities, or Swift formatting and language modes.
 | Processes | `procs` | `ps aux \| grep` |
 
 Also installed: `fzf`, `zoxide`, `delta`, `lazygit`, `gitui`, `glow`, `yazi`,
-`btop`, `httpie` (the binary is `http`), `zstd`, and `sevenzip` (the binary is
+`btop`, `httpie` (the binary is `http`), `zstd`, `typos` (spell checker; read **Linters and formatters** in `~/.claude/REFERENCE.md` first), and `sevenzip` (the binary is
 `7zz`; there is no `7z`). A bare `sqlite3` is macOS's older copy; call
 `/opt/homebrew/opt/sqlite/bin/sqlite3` when the version matters.
 
@@ -81,6 +81,8 @@ is read with no flags.
 - **Stop and re-plan when it goes sideways.** Say what broke and what you'd try instead, and let me redirect.
 - **Be direct.** No preamble, no restating my request. Name the file, function and line (`src/auth.ts:42`). Say plainly when something is broken. End with the next action, not a recap.
 - **Write like a person, not a model,** in anything I read or publish. No em dashes as all-purpose punctuation, lists of three for rhythm, "not X, it's Y", a last line restating the paragraph, colon reveals, or words like *robust*, *seamless* and *leverage*. Claim nothing that isn't true. `~/.claude/rules/human-writing.md` has the full list.
+- **Write up like a junior to mid-level developer** in reports, reviews, summaries, PR descriptions, READMEs and other docs: say what you did, what you found and how you checked it, in plain work words, with commands and paths to copy. No architect or textbook voice, no lecturing, and say when you're not sure. `~/.claude/rules/developer-voice.md` has the full rule.
+- **Document a bug and its fix simply,** in the same junior to mid-level voice: the problem with the real error, steps to reproduce, the cause with `file:line`, the fix, and how you checked it. Skip a part you have nothing for, and say "not tested yet" when it isn't. `~/.claude/rules/bug-writeup.md` has the full rule.
 - **Keep the English simple.** I'm a B1 to B2 English learner. Always reply in English, with everyday words and medium-length sentences, no idioms or slang. Put a short definition in brackets after a less common word: "reluctant (not wanting to do something)". If my message has a grammar or vocabulary mistake, end the reply with a short corrected version.
 - **Be efficient.** Parallelize independent tool calls. Tool output is resent on every later turn, so:
   - Locate with `rg -l` or `rg -c`, then read only the lines you need. Don't re-read a file already in the conversation.
